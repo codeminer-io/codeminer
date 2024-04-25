@@ -93,7 +93,7 @@ CLINICAL_CODE_MAPPINGS_MAP <- tibble::tribble(
   "read3", "icd10", "read_ctv3_icd10", "read_code", "icd10_code", NA, NA, list(list(mapping_status = c("*E*", "*G*", "*D*", "R", "A", "U"), refine_flag = c("*C*", "*P*", "M"), element_num = c("*0*", as.character(1:3)), block_num = c("*0*", as.character(1:14)))),
   "read3", "opcs4", "read_ctv3_opcs4", "read_code", "opcs4_code", NA, NA, NA,
   "read3", "read2", "read_ctv3_read_v2", "READV3_CODE", "READV2_CODE", "TERMV2_TYPE", "P", list(list(IS_ASSURED = "*1*")),
-  "bnf", "dmd", "bnf_dmd", "bnf_code", "snomed_code", NA, NA, NA,
+  "bnf", "sct", "bnf_dmd", "bnf_code", "snomed_code", NA, NA, NA,
   "icd10", "phecode", "icd10_phecode", "ALT_CODE", "PHECODE", NA, NA, NA,
   "icd9", "phecode", "icd9_phecode", "icd9", "phecode", NA, NA, NA,
   "sct", "icd10", "sct_icd10", "referencedComponentId", "mapTarget", NA, NA, NA,
