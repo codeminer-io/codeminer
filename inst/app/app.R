@@ -1,4 +1,5 @@
 library(codemapper)
+library(gitcreds)
 options(shiny.maxRequestSize = 20 * 1024^2)
 
 build_all_lkps_maps() |>
