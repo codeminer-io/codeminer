@@ -601,6 +601,7 @@ options({QUERY_OPTIONS})
 ::: {{.column-screen-inset}}
 ```{{r}}
 #| code-fold: false
+#| output: false
 {QUERY_CODE}
 ```
 :::
@@ -609,10 +610,13 @@ options({QUERY_OPTIONS})
 
 ::: {{.column-screen-inset}}
 ```{{r}}
+#| output: false
 # append indicator columns
 {APPEND_INDICATORS_CODE}
 {APPEND_INACTIVE_SCT_CODE}
+```
 
+```{{r}}
 # display interactive table with button to download as a csv file
 htmltools::browsable(
   tagList(
