@@ -20,7 +20,7 @@ ALL_LKPS_MAPS_DB <- Sys.getenv("ALL_LKPS_MAPS_DB")
 # Build db ----------------------------------------------------------------
 
 all_lkps_maps <- build_all_lkps_maps(
-  all_lkps_maps = read_all_lkps_maps(path = "~/Downloads/all_lkps_maps_v4.xlsx"),
+  all_lkps_maps = read_all_lkps_maps(path = "~/Documents/Data/UKB/ukb_backup_files/all_lkps_maps_v4.xlsx"),
   ukb_codings = ukbwranglr::get_ukb_codings(),
   bnf_dmd = get_nhsbsa_snomed_bnf(),
   self_report_med_to_atc_map = get_ukb_self_report_med_to_atc_map(),
