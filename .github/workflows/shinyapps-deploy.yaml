@@ -4,7 +4,7 @@ on:
 
   # run on any push
   push:
-    branches: [dev_sct_trud]
+    branches: [none]
   release:
     types: [published]
   # run on request (via button in actions menu)
