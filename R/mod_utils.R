@@ -50,6 +50,8 @@ find_node_dependencies <- function(graph,
 #' @param query_options Reactive
 #' @param query character
 #' @param code_type character
+#' @param ignore_existing_query logical. Set to `TRUE` if calling
+#'   `update_saved_queries()` in a loop to update all saved queries in order.
 #'
 #' @return Called for side effects within an observer.
 #' @noRd
@@ -57,13 +59,18 @@ update_saved_queries <- function(query,
                                  query_result,
                                  code_type,
                                  saved_queries,
-                                 query_options) {
+                                 query_options,
+                                 ignore_existing_query = FALSE) {
   stopifnot(is.reactive(query_result))
   stopifnot(is.reactive(saved_queries))
   stopifnot(is.reactive(query_options))
 
-  # Determine whether query is new or already exists in saved_queries
-  existing_query <- query %in% saved_queries()$objects[[code_type]]
+  if (!ignore_existing_query) {
+    # Determine whether query is new or already exists in saved_queries
+    existing_query <- query %in% saved_queries()$objects[[code_type]]
+  } else {
+    existing_query <- FALSE
+  }
 
   # Save current query (results and metadata)
 
@@ -94,7 +101,7 @@ update_saved_queries <- function(query,
   nodes <- dplyr::bind_rows(saved_queries()$dag$nodes,
                             nodes)
 
-  if (existing_query) {
+  if (existing_query | ignore_existing_query) {
     nodes <- nodes %>%
       dplyr::distinct(.data[["id"]],
                       .keep_all = TRUE)
@@ -111,7 +118,7 @@ update_saved_queries <- function(query,
     edges <- saved_queries()$dag$edges
   }
 
-  if (existing_query) {
+  if (existing_query | ignore_existing_query) {
     edges <- edges %>%
       dplyr::distinct()
   }
@@ -488,9 +495,13 @@ recompute_all_queries <- function(saved_queries,
         qb <-
           get(x = params$id, envir = saved_queries()$results_meta)$qb
 
+        query_options_for_code_type <- eval(query_options())
+        query_options_for_code_type$codemapper.code_type <- params$group
+        query_options_for_code_type$codemapper.map_to <- params$group
+
         execute_query <-
           purrr::safely(\(x) withr::with_options(
-            eval(query_options()),
+            query_options_for_code_type,
             eval(query, envir = saved_queries()$results)
           ))
 
@@ -498,7 +509,7 @@ recompute_all_queries <- function(saved_queries,
           query = query,
           result = execute_query()$result,
           qb = qb,
-          code_type = params$code_type
+          code_type = params$group
         )
 
         if (is.null(query_result$result)) {
@@ -510,7 +521,8 @@ recompute_all_queries <- function(saved_queries,
           query_result = reactive(query_result),
           saved_queries = saved_queries,
           code_type = params$group,
-          query_options = query_options
+          query_options = query_options,
+          ignore_existing_query = TRUE
         )
 
         incProgress(1 / length(step))
