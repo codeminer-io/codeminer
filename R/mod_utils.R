@@ -472,6 +472,61 @@ get_code_type_labels <- function(available_code_types,
     as.list()
 }
 
+recompute_all_queries <- function(saved_queries,
+                                  query_options) {
+  if (nrow(saved_queries()$dag$nodes) > 0) {
+    # progress bar
+    withProgress(message = "Updating saved queries...", {
+      step <- 1
+      for (x in saved_queries()$dag$nodes$id) {
+        params <- saved_queries()$dag$nodes %>%
+          dplyr::filter(.data[["id"]] == !!x)
+
+        query <-
+          get(x = params$id, envir = saved_queries()$results_meta)$query
+
+        qb <-
+          get(x = params$id, envir = saved_queries()$results_meta)$qb
+
+        execute_query <-
+          purrr::safely(\(x) withr::with_options(
+            eval(query_options()),
+            eval(query, envir = saved_queries()$results)
+          ))
+
+        query_result <- list(
+          query = query,
+          result = execute_query()$result,
+          qb = qb,
+          code_type = params$code_type
+        )
+
+        if (is.null(query_result$result)) {
+          stop('Update `col_filters()` feature is not yet fully implemented to handle cases where errors arise when updating saved queries (e.g. no codes returned, or new filters cause `codemapper.unrecognised_codes_lookup = "error")` to raise an error')
+        }
+
+        update_saved_queries(
+          query = x,
+          query_result = reactive(query_result),
+          saved_queries = saved_queries,
+          code_type = params$group,
+          query_options = query_options
+        )
+
+        incProgress(1 / length(step))
+        step <- step + 1
+      }
+    })
+
+    updateTabsetPanel(inputId = "query_result_tabs", selected = "empty_query")
+
+    updateTabsetPanel(inputId = "tabs_save_or_update_query", selected = "tab_save_query_input_show")
+
+    updateTabsetPanel(inputId = "tabs_select_code_type",
+                      selected = "tab_select_code_type_show")
+  }
+}
+
 ## jqbr filters and operators --------------------------------------------------------------------
 
 ### Filters ---------------------------------------------------------

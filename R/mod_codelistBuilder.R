@@ -229,52 +229,9 @@ codelistBuilderServer <-
       # Update all saved queries if col_filters() updates
 
       # TODO - optimise
-      observeEvent(col_filters(), {
-        if (nrow(saved_queries()$dag$nodes) > 0) {
-          # progress bar
-          withProgress(message = "Updating saved queries...", {
-            step <- 1
-            for (x in saved_queries()$dag$nodes$id) {
-              params <- saved_queries()$dag$nodes %>%
-                dplyr::filter(.data[["id"]] == !!x)
-
-              query <-
-                get(x = params$id, envir = saved_queries()$results_meta)$query
-
-              qb <-
-                get(x = params$id, envir = saved_queries()$results_meta)$qb
-
-              query_result <- list(
-                query = query,
-                result = withr::with_options(
-                  eval(query_options()),
-                  eval(query, envir = saved_queries()$results)
-                ),
-                qb = qb,
-                code_type = params$code_type
-              )
-
-              update_saved_queries(
-                query = x,
-                query_result = reactive(query_result),
-                saved_queries = saved_queries,
-                code_type = params$group,
-                query_options = query_options
-              )
-
-              incProgress(1 / length(step))
-              step <- step + 1
-            }
-          })
-
-          updateTabsetPanel(inputId = "query_result_tabs", selected = "empty_query")
-
-          updateTabsetPanel(inputId = "tabs_save_or_update_query", selected = "tab_save_query_input_show")
-
-          updateTabsetPanel(inputId = "tabs_select_code_type",
-                            selected = "tab_select_code_type_show")
-        }
-      })
+      observeEvent(col_filters(),
+                   recompute_all_queries(saved_queries = saved_queries,
+                                         query_options = query_options))
 
       ## Query -------------------------------------------------------------------
 
