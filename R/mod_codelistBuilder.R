@@ -240,7 +240,7 @@ codelistBuilderServer <-
           cat("<Enter query>")
         } else {
           custom_qbr_translation(input$qb) %>%
-            rlang::expr_deparse() %>%
+            rlang::expr_text() %>%
             cat()
         }
       })
