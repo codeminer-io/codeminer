@@ -53,7 +53,7 @@ transform_query_base <- function(query) {
         condition = gsub("%", "", toupper(query$fun)), # Remove % and convert to uppercase
         rules = rules_list
       ))
-    } else if (query$fun %in% c("DESCRIPTION", "MAP", "CHILDREN")) {
+    } else if (query$fun %in% c("DESCRIPTION", "MAP", "CHILDREN", "CODES")) {
       # Leaf node
       return(list(
         id = tolower(query$fun),
