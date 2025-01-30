@@ -471,12 +471,19 @@ server <- function(input, output, session) {
 
       # browser()
 
+      new_rules <- current_query()
+
+      if (purrr::pluck_depth(new_rules) == 2L) {
+        # needed if single query statement e.g. `DESCRIPTION("diab")` (but not
+        # `DESCRIPTION("diab") %OR% DESCRIPTION("retin")`)
+        new_rules <- list(new_rules)
+      }
 # diab_ret_neph_neuro <- readRDS("~/Documents/phd/r_packages/codemapper/diab_ret_neph_neuro.rds")
 
       jqbr::updateQueryBuilder(
         inputId = "qb",
         # setFilters = new_filters,
-        setRules = current_query()
+        setRules = new_rules
         # setRules = get("DIAB_RETINOP_OR_NEPHROP_OR_NEUROP", diab_ret_neph_neuro$saved_queries()$results_meta)$qb
         # setRules = list(
         #   list(
@@ -537,11 +544,14 @@ server <- function(input, output, session) {
 
   # show query
   current_query <- reactive({
-    input$editor |>
+    result <- input$editor |>
       rlang::parse_expr() |>
       expr_to_list() |>
       flatten_brackets() |>
       transform_query()
+
+    result$valid <- NULL
+    result
   })
 
   output$current_query_tree <- renderPrint({
