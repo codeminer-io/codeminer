@@ -87,7 +87,7 @@ get_qbr_input_from_saved_queries <- function(x) {
       switch(
         x$id,
         "description" = NULL,
-        "child_codes" = NULL,
+        "children" = NULL,
         "codes" = NULL,
         "saved_query" = x$value,
         "map_children" = NULL,
@@ -182,7 +182,7 @@ empty_saved_query_filter <- list(
 )
 
 child_codes_filter <- list(
-  id = "child_codes",
+  id = "children",
   label = "Children",
   type = "string",
   operators = list("read2"),

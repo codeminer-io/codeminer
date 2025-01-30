@@ -246,7 +246,7 @@ get_qbr_saved_queries <- function(x) {
       switch(
         x$id,
         "description" = NULL,
-        "child_codes" = NULL,
+        "children" = NULL,
         "codes" = NULL,
         "saved_query" = x$value,
         "map_children" = NULL,
@@ -279,7 +279,7 @@ convert_rules_to_expr <- function(x) {
       "description" = rlang::call2(.fn = "DESCRIPTION",
                                    x$value),
       "saved_query" = as.symbol(x$value),
-      "child_codes" = rlang::call2(.fn = "CHILDREN",
+      "children" = rlang::call2(.fn = "CHILDREN",
                                    x$value),
       "codes" = rlang::call2(.fn = "CODES",
                              x$value),
@@ -553,7 +553,7 @@ empty_saved_query_filter <- list(
 )
 
 child_codes_filter <- list(
-  id = "child_codes",
+  id = "children",
   label = "Children",
   type = "string",
   operators = list("read2"),
