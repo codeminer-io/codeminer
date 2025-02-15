@@ -10,15 +10,19 @@ dr_children <- CHILDREN(dr, "sct")
 
 # dr_children_raw <- CHILDREN(dr, "sct", standardise_output = FALSE)
 
-dr_children_plus_immediate_parent <- get_parents_sct(dr_children, include_self = FALSE, include_ancestors = FALSE) |>
-  dplyr::bind_rows(dr_children) |>
-  dplyr::distinct()
+# Returns too many codes
+
+# dr_plus_immediate_parent <- get_parents_sct(dr, include_self = FALSE, include_ancestors = FALSE) |>
+#   dplyr::bind_rows(dr) |>
+#   dplyr::distinct()
+#
+# dr_children_plus_immediate_parent <- CHILDREN(dr_plus_immediate_parent, "sct")
 
 # Create parent-child trees -----------------------------------------------
 
 rels <- db$sct_relationship |>
-  dplyr::filter(sourceId %in% !!dr_children_plus_immediate_parent$code) |>
-  dplyr::filter(destinationId %in% !!dr_children_plus_immediate_parent$code) |>
+  dplyr::filter(sourceId %in% !!dr_children$code) |>
+  dplyr::filter(destinationId %in% !!dr_children$code) |>
   dplyr::filter(typeId == "116680003") |>
   dplyr::filter(active == "1") |>
   dplyr::collect()
