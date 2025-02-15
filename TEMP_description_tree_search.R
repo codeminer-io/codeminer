@@ -35,23 +35,23 @@ rels <- db$sct_relationship |>
 
 # Group by '(disorder)$' etc ----------------------------------------------
 
-# get top level ancestors
-rels_top <- rels |>
-  dplyr::pull(destinationId) |>
-  unique() |>
-  CODES("sct")
+# # get top level ancestors
+# rels_top <- rels |>
+#   dplyr::pull(destinationId) |>
+#   unique() |>
+#   CODES("sct")
 
-result_relations <- dplyr::bind_rows(tibble::tibble(sourceId = rels_top$code,
-                                      destinationId = "ROOT"),
-                       rels[, c("sourceId", "destinationId")])
+# result_relations <- dplyr::bind_rows(tibble::tibble(sourceId = rels_top$code,
+#                                       destinationId = "ROOT"),
+#                        rels[, c("sourceId", "destinationId")])
+
+result_relations <- rels[, c("sourceId", "destinationId")]
 
 result_descriptions <- CODES(unique(c(result_relations$sourceId, result_relations$destinationId)),
                              "sct",
                              unrecognised_codes = "warning") |>
   suppressWarnings() |>
-  dplyr::select(-code_type) |>
-  dplyr::bind_rows(data.frame(code = "ROOT",
-                              description = ""))
+  dplyr::select(-code_type)
 
 # network_list <- result_descriptions %>%
 #   dplyr::mutate(
@@ -198,9 +198,6 @@ lobstr::tree(tree_list)
 
 ## Actual query ------------------------------------------------------------
 
-# Identify root nodes (those not appearing in 'to' column, note direction for sct relationship table)
-dr_root_nodes <- setdiff(result_descriptions$code, result_relations$sourceId)
-
 result_relations_with_descriptions <- result_relations |>
   dplyr::left_join(result_descriptions,
                    by = c("sourceId" = "code")) |>
@@ -216,6 +213,14 @@ result_relations_with_descriptions <- result_relations |>
                na.rm = TRUE, sep = ": ") |>
   dplyr::mutate(destinationId = dplyr::case_when(destinationId == "ROOT: " ~ "ROOT",
                                                  TRUE ~ destinationId))
+
+# Identify root nodes (those not appearing in 'to' column, note direction for sct relationship table)
+dr_root_nodes <- setdiff(result_descriptions |>
+                           tidyr::unite(col = "code",
+                                        dplyr::everything(),
+                                        remove = TRUE,
+                                        na.rm = TRUE, sep = ": ") |>
+                           dplyr::pull(code), result_relations_with_descriptions$sourceId)
 
 # TODO - subcategorise by disorder, finding, situation etc
 

@@ -6,11 +6,11 @@ library(shinyTree)
 # names(example_list)[1] <- "sct"
 # example_list <- example_list[-1][1:2]
 
-example_list <- c(list(name = "ROOT"), readRDS("dr_tree_list.rds"))
+example_list <- readRDS("dr_tree_list.rds")
 
-names(example_list)[1] <- "sct"
+# names(example_list)[1] <- "sct"
 
-example_list <- example_list[-1][1]
+# example_list <- example_list[-1][1]
 
 ui <- fluidPage(
   shinyTree(
