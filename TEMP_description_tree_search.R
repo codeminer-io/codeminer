@@ -27,23 +27,7 @@ rels <- db$sct_relationship |>
   dplyr::filter(active == "1") |>
   dplyr::collect()
 
-# now convert to tree for use with shinyTree or shinyWidgets tree. Use shinyTree
-# - has search feature, try runApp(system.file("examples/06-search", package =
-# "shinyTree"))
-
-# data.tree::FromDataFrameNetwork(rels[1:50, c("sourceId", "destinationId")]) # error, needs a root
-
 # Group by '(disorder)$' etc ----------------------------------------------
-
-# # get top level ancestors
-# rels_top <- rels |>
-#   dplyr::pull(destinationId) |>
-#   unique() |>
-#   CODES("sct")
-
-# result_relations <- dplyr::bind_rows(tibble::tibble(sourceId = rels_top$code,
-#                                       destinationId = "ROOT"),
-#                        rels[, c("sourceId", "destinationId")])
 
 result_relations <- rels[, c("sourceId", "destinationId")]
 
@@ -53,115 +37,15 @@ result_descriptions <- CODES(unique(c(result_relations$sourceId, result_relation
   suppressWarnings() |>
   dplyr::select(-code_type)
 
-# network_list <- result_descriptions %>%
-#   dplyr::mutate(
-#     relations = purrr::map(name, \(.x) result_relations %>%
-#                              dplyr::filter(sourceId == .x) %>%
-#                              dplyr::select(destinationId, same.dept, friendship, advice) %>%
-#                              dplyr::group_split(dplyr::row_number())) # Convert each row to a list
-#   ) %>%
-#   dplyr::select(-name) %>%
-#   purrr::transpose()
-
-# hm_result <- data.tree::FromDataFrameNetwork(hm[, c("sourceId", "destinationId")])
-
-# regex to extract "(disorder)$" / "(physical object)$" etc
-
-
-
-## TODO try adapting this - data.tree package not required?
-
-# dag <-
-#   igraph::graph_from_data_frame(
-#     d = result_df,
-#     directed = TRUE,
-#     vertices = result_descriptions
-#   )
-#
-# data.tree::FromDataFrameNetwork(result_df[, c("sourceId", "destinationId")]) |>
-#   data.tree::ToListSimple() |>
-#   View()
-
 
 # From here ---------------------------------------------------------------
 
 
-## Dummy data --------------------------------------------------------------
-
-nodes_df <- tibble::tibble(
-  id = c(
-    "root1",
-    "root2", "root2/SubListA", "root2/SubListA/leaf1", "root2/SubListA/leaf2", "root2/SubListA/leaf3",
-    "root2/SubListB", "root2/SubListB/leafA", "root2/SubListB/leafB",
-    "root3", "root3/SubListA", "root3/SubListA/leaf1", "root3/SubListA/leaf2", "root3/SubListA/leaf3",
-    "root3/SubListB", "root3/SubListB/leafA", "root3/SubListB/leafB"
-  ),
-  label = c(
-    "root1",
-    "root2", "SubListA", "leaf1", "leaf2", "leaf3",
-    "SubListB", "leafA", "leafB",
-    "root3", "SubListA", "leaf1", "leaf2", "leaf3",
-    "SubListB", "leafA", "leafB"
-  )
-)
-
-edges_df <- tibble::tibble(
-  from = c(
-    "root2", "root2/SubListA", "root2/SubListA", "root2/SubListA",
-    "root2", "root2/SubListB", "root2/SubListB",
-    "root3", "root3/SubListA", "root3/SubListA", "root3/SubListA",
-    "root3", "root3/SubListB", "root3/SubListB"
-  ),
-  to = c(
-    "root2/SubListA", "root2/SubListA/leaf1", "root2/SubListA/leaf2", "root2/SubListA/leaf3",
-    "root2/SubListB", "root2/SubListB/leafA", "root2/SubListB/leafB",
-    "root3/SubListA", "root3/SubListA/leaf1", "root3/SubListA/leaf2", "root3/SubListA/leaf3",
-    "root3/SubListB", "root3/SubListB/leafA", "root3/SubListB/leafB"
-  )
-)
-
-build_tree <- function(
-                       edges,
-                       from_col = "from",
-                       to_col = "to",
-                       parent = NULL) {
-  children <- edges %>%
-    dplyr::filter(.data[[from_col]] == !!parent) %>%
-    dplyr::pull(dplyr::all_of(to_col))
-
-  if (length(children) == 0) {
-    return("")
-  }
-
-  purrr::set_names(purrr::map(
-    children,
-    \(.x) build_tree(
-      # nodes = nodes,
-      edges = edges,
-      from_col = from_col,
-      to_col = to_col,
-      parent = .x
-    )
-  ),
-  stringr::str_remove(children, paste0("^", parent, "/")))
-}
-
-# Identify root nodes (those not appearing in 'to' column)
-root_nodes <- setdiff(nodes_df$id, edges_df$to)
-
-# Build the tree structure
-tree_list <- purrr::set_names(purrr::map(root_nodes, \(.x) build_tree(edges_df, parent = .x)), root_nodes)
-
-# Print tree list
-lobstr::tree(tree_list)
 
 
 ## Try again ---------------------------------------------------------------
 
-build_tree <- function(edges, from_col = "from", to_col = "to", parent = NULL, parent_path = NULL) {
-  # Determine the current full path
-  current_path <- if (is.null(parent_path)) parent else paste0(parent_path, "/", parent)
-
+build_tree <- function(edges, from_col = "from", to_col = "to", parent = NULL) {
   # Find children (without assuming full paths in 'to' column)
   children <- edges %>%
     dplyr::filter(.data[[from_col]] == parent) %>%
@@ -173,7 +57,7 @@ build_tree <- function(edges, from_col = "from", to_col = "to", parent = NULL, p
 
   # Recursively build the tree, passing down the full path
   purrr::set_names(
-    purrr::map(children, ~ build_tree(edges, from_col, to_col, .x, parent_path = current_path)),
+    purrr::map(children, ~ build_tree(edges, from_col, to_col, .x)),
     children
   )
 }
@@ -214,35 +98,39 @@ result_relations_with_descriptions <- result_relations |>
   dplyr::mutate(destinationId = dplyr::case_when(destinationId == "ROOT: " ~ "ROOT",
                                                  TRUE ~ destinationId))
 
+# get top level ancestors
+rels_top <- rels |>
+  dplyr::filter(!destinationId %in% sourceId) |>
+  dplyr::pull(destinationId) |>
+  unique() |>
+  CODES("sct") |>
+  dplyr::select(-code_type) |>
+  tidyr::unite(col = "code",
+               dplyr::everything(),
+               remove = TRUE,
+               na.rm = TRUE, sep = ": ") |>
+  dplyr::mutate(category = stringr::str_extract(code, "\\(([^)]+)\\)") |>
+                  stringr::str_remove_all("[()]") |>
+                  stringr::str_to_sentence()) |>
+  dplyr::rename(sourceId = code,
+                destinationId = category)
+
+# TODO - check for nodes not in relation table, and check length(unique) codes in relation table == nrow(result_description)
+result_descriptions |>
+  tidyr::unite(col = "code",
+               dplyr::everything(),
+               remove = TRUE,
+               na.rm = TRUE, sep = ": ") |>
+  dplyr::mutate(category = stringr::str_extract(code, "\\(([^)]+)\\)") |>
+                  stringr::str_remove_all("[()]") |>
+                  stringr::str_to_sentence()) |>
+  View()
+
+
+result_relations_with_descriptions <- dplyr::bind_rows(rels_top, result_relations_with_descriptions)
+
 # Identify root nodes (those not appearing in 'to' column, note direction for sct relationship table)
-dr_root_nodes <- setdiff(result_descriptions |>
-                           tidyr::unite(col = "code",
-                                        dplyr::everything(),
-                                        remove = TRUE,
-                                        na.rm = TRUE, sep = ": ") |>
-                           dplyr::pull(code), result_relations_with_descriptions$sourceId)
-
-# TODO - subcategorise by disorder, finding, situation etc
-
-# result_relations_with_descriptions <- result_relations_with_descriptions |>
-#   dplyr::mutate(category = stringr::str_extract(sourceId, "\\(([^)]+)\\)") |>
-#                   stringr::str_remove_all("[()]") |>
-#                   stringr::str_to_sentence()) |>
-#   dplyr::mutate(destinationId = dplyr::case_when(destinationId == "ROOT" ~ category,
-#                                                  TRUE ~ destinationId)) |>
-#   dplyr::select(-category)
-
-dr_tree_list <- purrr::set_names(purrr::map(
-  dr_root_nodes,
-  \(.x) build_tree(
-    result_relations_with_descriptions,
-    from_col = "destinationId",
-    to_col = "sourceId",
-    parent = .x
-  ),
-  .progress = TRUE
-),
-dr_root_nodes)
+dr_root_nodes <- setdiff(result_relations_with_descriptions$destinationId, result_relations_with_descriptions$sourceId)
 
 # Build the tree structure
 dr_tree_list <- purrr::set_names(purrr::map(
