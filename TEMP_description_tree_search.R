@@ -17,44 +17,35 @@ query_result <- DESCRIPTION("diabetic retinopathy", "sct")
 # get all child codes for query results
 query_result_children <- CHILDREN(query_result, "sct")
 
-# determine which are inactive codes (these will have lost parent-child
-# relations)
-
-# query_result_inactive_codes <- get_sct_inactive_codes(query_result$code) |>
-#   unite_code_with_description(new_col = "code",
-#                               description_col = "description",
-#                               code_col = "code") |>
-#   dplyr::select(-code_type)
-
 query_result_children_inactive_codes <- get_sct_inactive_codes(query_result_children$code) |>
   unite_code_with_description(new_col = "code",
                               description_col = "description",
                               code_col = "code") |>
   dplyr::select(-code_type)
 
-# Returns too many codes
-
-# dr_plus_immediate_parent <- get_parents_sct(dr, include_self = FALSE, include_ancestors = FALSE) |>
-#   dplyr::bind_rows(dr) |>
-#   dplyr::distinct()
-#
-# dr_children_plus_immediate_parent <- CHILDREN(dr_plus_immediate_parent, "sct")
-
-# rels <- db$sct_relationship |>
-#   dplyr::filter(sourceId %in% !!query_result_children$code) |>
-#   dplyr::filter(destinationId %in% !!query_result_children$code) |>
-#   dplyr::filter(typeId == "116680003") |>
-#   dplyr::select(dplyr::all_of(c("sourceId", "destinationId"))) |>
-#   dplyr::collect()
-
 # subset relationships table for query results and their children
 result_relations <- db$sct_relationship |>
   dplyr::filter(sourceId %in% !!query_result_children$code |
                   destinationId %in% !!query_result_children$code) |>
   dplyr::filter(typeId == "116680003") |>
+  dplyr::filter(active == "1") |>
   dplyr::select(dplyr::all_of(c("sourceId", "destinationId"))) |>
   dplyr::distinct() |>
   dplyr::collect()
+
+# ensure top level nodes are all included in query results (otherwise may add to
+# duplicated codes in final tree e.g. a search for 'diabetic retinopathy'
+# returns "4855003 << Retinopathy due to diabetes mellitus (disorder) >>", which
+# has 2 parents, both of which at this stage would be included in the subsetted
+# relationships table, meaning "4855003" and all its children will appear twice
+# in the tree, once under each of the 2 parents)
+result_relations_top_nodes_to_remove <- result_relations |>
+  dplyr::filter(!destinationId %in% sourceId) |>
+  dplyr::filter(!destinationId %in% !!query_result_children$code)
+
+result_relations <- result_relations |>
+  dplyr::anti_join(result_relations_top_nodes_to_remove,
+                   by = dplyr::join_by("sourceId", "destinationId"))
 
 # append descriptions to all codes
 result_descriptions <- CODES(unique(c(result_relations$sourceId, result_relations$destinationId)),
@@ -88,20 +79,6 @@ stopifnot(all(
   )
   %in% result_descriptions$description
 ))
-
-# stopifnot(all(
-#   result_descriptions$description %in% unique(
-#     result_relations_with_descriptions$sourceId,
-#     result_relations_with_descriptions$destinationId
-#   )
-# ))
-
-# subset(
-#   result_descriptions$description, !result_descriptions$description %in% unique(
-#     result_relations_with_descriptions$sourceId,
-#     result_relations_with_descriptions$destinationId
-#   )
-# )
 
 # get top level ancestors and categorise
 rels_top <- result_relations_with_descriptions |>
@@ -156,7 +133,7 @@ tree_list <- purrr::set_names(purrr::map(
 ),
 root_nodes)
 
-lobstr::tree(tree_list)
+# lobstr::tree(tree_list)
 
 # saveRDS(tree_list, file = "tree_list.rds")
 
