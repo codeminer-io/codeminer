@@ -6,7 +6,10 @@ library(shinyTree)
 # names(example_list)[1] <- "sct"
 # example_list <- example_list[-1][1:2]
 
-example_list <- readRDS("dr_tree_list.rds")
+example_list <- readRDS("tree_list.rds")
+
+# attr(example_list[[1]]$`87031000000109: Diabetic retinopathy screening not indicated (INACTIVE)`, "stselected") <- TRUE # <---
+# attr(example_list[[1]],"stopened") <- TRUE
 
 # names(example_list)[1] <- "sct"
 
@@ -18,7 +21,9 @@ ui <- fluidPage(
     search = TRUE,
     searchtime = 1000,
     checkbox = TRUE,
-    three_state = FALSE
+    three_state = FALSE,
+    unique = TRUE,
+    sort = FALSE
   ),
   "Currently Selected:",
   # verbatimTextOutput("sel_names"),
