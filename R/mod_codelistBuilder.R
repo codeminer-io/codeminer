@@ -154,7 +154,14 @@ codelistBuilderInput <-
                     )
                   ),
                   textOutput(ns("result_summary")),
-                  codelistReactableInput(ns("result"))
+                  tabsetPanel(id = "tabs_codelist_reactable_tree",
+                              type = "pills",
+                              tabPanel(title = "Table",
+                                       icon = icon("table"),
+                                       codelistReactableInput(ns("result"))),
+                              tabPanel(title = "Tree",
+                                       icon = icon("folder-tree"),
+                                       codelistTreeInput(ns("result-tree"))))
                 )
               )
             )
