@@ -23,7 +23,8 @@ ui <- fluidPage(
     checkbox = TRUE,
     three_state = FALSE,
     unique = TRUE,
-    sort = FALSE
+    sort = FALSE,
+    theme = "proton"
   ),
   "Currently Selected:",
   # verbatimTextOutput("sel_names"),

@@ -4,10 +4,6 @@
 
 # Inactive concepts are categorised as 'Inactive'
 
-con <-
-  check_all_lkps_maps_path(Sys.getenv("ALL_LKPS_MAPS_DB"))
-db <- ukbwranglr::db_tables_to_list(con)
-
 # Query -------------------------------------------------------------------
 
 # dr <- (DESCRIPTION("diab", "sct") %AND% DESCRIPTION("retin|macul", "sct")) %NOT% DESCRIPTION("absent|without", "sct")
@@ -24,14 +20,15 @@ query_result_children_inactive_codes <- get_sct_inactive_codes(query_result_chil
   dplyr::select(-code_type)
 
 # subset relationships table for query results and their children
-result_relations <- db$sct_relationship |>
-  dplyr::filter(sourceId %in% !!query_result_children$code |
-                  destinationId %in% !!query_result_children$code) |>
-  dplyr::filter(typeId == "116680003") |>
-  dplyr::filter(active == "1") |>
+result_relations <- filter_sct_relationship(codes = NULL,
+                        sourceId_filter = query_result_children$code,
+                        destinationId_filter = query_result_children$code,
+                        typeId_filter = "116680003",
+                        active_only = TRUE,
+                        recursive = FALSE,
+                        all_lkps_maps = NULL) |>
   dplyr::select(dplyr::all_of(c("sourceId", "destinationId"))) |>
-  dplyr::distinct() |>
-  dplyr::collect()
+  dplyr::distinct()
 
 # ensure top level nodes are all included in query results (otherwise may add to
 # duplicated codes in final tree e.g. a search for 'diabetic retinopathy'
