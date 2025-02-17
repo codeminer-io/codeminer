@@ -198,24 +198,12 @@ get_sct_inactive_codes <- function(sct_codes) {
     suppressWarnings()
 }
 
-build_tree <- function(edges, from_col = "from", to_col = "to", parent = NULL) {
-  # Find children (without assuming full paths in 'to' column)
-  children <- edges %>%
-    dplyr::filter(.data[[from_col]] == parent) %>%
-    dplyr::pull(.data[[to_col]])
 
-  if (length(children) == 0) {
-    return("")
-  }
-
-  # Recursively build the tree, passing down the full path
-  purrr::set_names(
-    purrr::map(children, \(.x) build_tree(edges, from_col, to_col, .x)),
-    children
-  )
-}
-
-build_tree <- function(edges, from_col = "from", to_col = "to", parent = NULL, selected_values = character()) {
+build_tree <- function(edges,
+                       from_col = "from",
+                       to_col = "to",
+                       parent = NULL,
+                       selected_values = character()) {
   # Find children (without assuming full paths in 'to' column)
   children <- edges %>%
     dplyr::filter(.data[[from_col]] == parent) %>%
@@ -226,12 +214,12 @@ build_tree <- function(edges, from_col = "from", to_col = "to", parent = NULL, s
   }
 
   # Recursively build the tree
-  tree <- purrr::set_names(
-    purrr::map(children, \(child) build_tree(edges, from_col, to_col, child, selected_values)),
-    children
-  )
+  tree <- purrr::set_names(purrr::map(
+    children,
+    \(child) build_tree(edges, from_col, to_col, child, selected_values)
+  ), children)
 
-  # Set attributes for selected values
+  # Set attributes for selected values. See https://stackoverflow.com/a/56140793
   for (child in children) {
     if (child %in% selected_values) {
       attr(tree[[child]], "stselected") <- TRUE
@@ -243,4 +231,3 @@ build_tree <- function(edges, from_col = "from", to_col = "to", parent = NULL, s
 
   return(tree)
 }
-
