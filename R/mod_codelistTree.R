@@ -4,7 +4,7 @@ codelistTreeInput <- function(id) {
   # UI
   tagList(
     actionButton(ns("show_tree"), "Show codelist tree", class = "btn btn-success"),
-    shinyTree(
+    shinyTree::shinyTree(
       ns("tree"),
       search = TRUE,
       searchtime = 1000,
@@ -17,11 +17,16 @@ codelistTreeInput <- function(id) {
   )
 }
 
-codelistTreeServer <- function(id, codelist_df, reset_signal) {
+codelistTreeServer <- function(id, query_result, extract_fn, reset_signal) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
 
     tree_data <- reactiveVal(NULL)
+
+    df <- reactive({
+      stopifnot(is.reactive(query_result))
+      extract_fn(query_result())
+    })
 
     observeEvent(input$show_tree, {
       # Notifcation
@@ -33,7 +38,7 @@ codelistTreeServer <- function(id, codelist_df, reset_signal) {
           closeButton = FALSE
         )
       on.exit(removeNotification(id), add = TRUE)
-      tree_data(query_result_df_to_shinytree_input(codelist_df))
+      tree_data(query_result_df_to_shinytree_input(df()))
     })
 
     observeEvent(reset_signal(), {
@@ -43,14 +48,14 @@ codelistTreeServer <- function(id, codelist_df, reset_signal) {
       tree_data(empty_tree)
     }, ignoreInit = TRUE)
 
-    output$tree <- renderTree({
+    output$tree <- shinyTree::renderTree({
       tree_data()
     })
 
     selected_tree_items <- reactive({
       tree <- input$tree
       req(tree)
-      get_selected(tree, format = "slices")
+      shinyTree::get_selected(tree, format = "slices")
     })
 
     selected_tree_items
@@ -64,8 +69,11 @@ codelistTreeApp <- function() {
                   verbatimTextOutput("selected_tree_items"))
 
   server <- function(input, output, session) {
-    selected_tree_items <- codelistTreeServer("codelist_tree", codelist_df = CODES("16747741000119100", "sct"),
-    reset_signal = reactive(input$reset)
+    selected_tree_items <- codelistTreeServer(
+      "codelist_tree",
+      query_result = reactive(CODES("16747741000119100", "sct")),
+      extract_fn = function(x) x,
+      reset_signal = reactive(input$reset)
     )
 
     output$selected_tree_items <- renderPrint(selected_tree_items())

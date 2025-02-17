@@ -52,11 +52,12 @@ codelistReactableServer <-
   }
 
 # for testing
-codelistReactablesApp <- function(df) {
+codelistReactablesApp <- function(df_reactable = reactive(CHILDREN("16747741000119100", "sct")),
+                                  extract_fn = function(x) x) {
   ui <- fluidPage(codelistReactableInput("codelist_reactable"))
 
   server <- function(input, output, session) {
-    codelistReactableServer("codelist_reactable", df)
+    codelistReactableServer("codelist_reactable", df_reactable, extract_fn)
   }
 
   shinyApp(ui, server)

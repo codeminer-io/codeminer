@@ -96,8 +96,8 @@ codelistBuilderInput <-
                              rules = list(
                                list(
                                  id = "description",
-                                 operator = "read2",
-                                 value = "diab",
+                                 operator = "sct",
+                                 value = "diabetic retinopathy",
                                  description = "I'm a description"
                                )
                              )),
@@ -161,7 +161,7 @@ codelistBuilderInput <-
                                        codelistReactableInput(ns("result"))),
                               tabPanel(title = "Tree",
                                        icon = icon("folder-tree"),
-                                       codelistTreeInput(ns("result-tree"))))
+                                       codelistTreeInput(ns("result_tree"))))
                 )
               )
             )
@@ -442,6 +442,13 @@ codelistBuilderServer <-
       })
 
       codelistReactableServer("result", query_result, function(x) x$result)
+
+      codelistTreeServer(
+        "result_tree",
+        query_result = query_result,
+        extract_fn = function(x) x$result,
+        reset_signal = reactive(input$run)
+      )
 
       output$result_query <- renderPrint({
         req(query_result_type() == "query_result")
