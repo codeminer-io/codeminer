@@ -51,6 +51,7 @@ Imports:
     readxl,
     rlang,
     shiny,
+    shinyTree,
     stats,
     stringr,
     tibble,
