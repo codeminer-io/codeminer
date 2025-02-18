@@ -29,6 +29,20 @@ codelistTreeServer <- function(id, query_result, extract_fn, reset_signal) {
     })
 
     observeEvent(input$show_tree, {
+      # currently only SNOMED is implemented
+      query_code_type <- df()$code_type[1]
+
+      if (query_code_type != "sct") {
+        showNotification(
+          stringr::str_glue("Unable to build tree for {as.character(get_code_type_labels('icd10', 'id_label'))}. Currently only SNOMED is implemented for this feature."),
+          type = "error",
+          duration = 5,
+          closeButton = TRUE
+        )
+      }
+
+      req(query_code_type == "sct")
+
       # Notifcation
       id <-
         showNotification(
