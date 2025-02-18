@@ -550,6 +550,7 @@ format:
   html:
     code-fold: true
     code-link: true
+    code-overflow: wrap
     embed-resources: true
     code-tools:
       source: true
