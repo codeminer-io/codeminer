@@ -127,12 +127,6 @@ shinyAceToQbrApp <- function() {
       req(valid_new_rules)
 
       # finalise qbr input before `jqbr::updateQueryBuilder()`
-      if (purrr::pluck_depth(new_rules) == 2L) {
-        # needed if single query statement e.g. `DESCRIPTION("diab")` (but not
-        # `DESCRIPTION("diab") %OR% DESCRIPTION("retin")`)
-        new_rules <- list(new_rules)
-      }
-
       new_rules$valid <- NULL
 
       jqbr::updateQueryBuilder(inputId = "qb", setRules = new_rules)
@@ -158,12 +152,21 @@ shinyAceToQbrApp <- function() {
 # Helper functions --------------------------------------------------------
 
 translate_codeminer_query_to_qbr_list <- function(query_string) {
-  tryCatch(query_string |>
+  result <- tryCatch(query_string |>
     rlang::parse_expr() |>
     expr_to_list() |>
     flatten_brackets() |>
     transform_query(),
     error = function(cnd) list())
+
+  if (identical(purrr::pluck_depth(result), 2L)) {
+    # needed if single query statement e.g. `DESCRIPTION("diab")` (but not
+    # `DESCRIPTION("diab") %OR% DESCRIPTION("retin")`)
+    result$valid <- NULL
+    result <- list(result)
+  }
+
+  return(result)
 }
 
 expr_to_list <- function(expr) {
