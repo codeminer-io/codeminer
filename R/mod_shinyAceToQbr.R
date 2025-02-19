@@ -53,10 +53,7 @@ shinyAceToQbrServer <- function(id) {
     current_query <- reactive({
       req(input$editor)
       result <- input$editor |>
-        rlang::parse_expr() |>
-        expr_to_list() |>
-        flatten_brackets() |>
-        transform_query()
+        translate_codeminer_query_to_qbr_list()
 
       result$valid <- NULL
       result
@@ -115,6 +112,19 @@ shinyAceToQbrApp <- function() {
 
       new_rules <- current_query()
 
+      valid_new_rules <- !identical(current_query(), list())
+
+      if (!valid_new_rules) {
+        showNotification(
+          "Invalid query",
+          type = "error",
+          duration = 5,
+          closeButton = TRUE
+        )
+      }
+
+      req(valid_new_rules)
+
       if (purrr::pluck_depth(new_rules) == 2L) {
         # needed if single query statement e.g. `DESCRIPTION("diab")` (but not
         # `DESCRIPTION("diab") %OR% DESCRIPTION("retin")`)
@@ -137,6 +147,15 @@ shinyAceToQbrApp <- function() {
 }
 
 # Helper functions --------------------------------------------------------
+
+translate_codeminer_query_to_qbr_list <- function(query_string) {
+  tryCatch(query_string |>
+    rlang::parse_expr() |>
+    expr_to_list() |>
+    flatten_brackets() |>
+    transform_query(),
+    error = function(cnd) list())
+}
 
 expr_to_list <- function(expr) {
   if (rlang::is_call(expr)) {
