@@ -55,7 +55,6 @@ shinyAceToQbrServer <- function(id) {
       result <- input$editor |>
         translate_codeminer_query_to_qbr_list()
 
-      result$valid <- NULL
       result
     })
 
@@ -93,7 +92,9 @@ shinyAceToQbrApp <- function() {
                     display_errors = TRUE
                   ),
 
-                  # TODO
+                  h4("Translation identical to QBR?"),
+                  verbatimTextOutput("identical_translation_qbr"),
+
                   fluidRow(column(6, wellPanel(
                     h4("Translated shinyACE input"),
                     verbatimTextOutput("current_query_tree")
@@ -125,22 +126,30 @@ shinyAceToQbrApp <- function() {
 
       req(valid_new_rules)
 
+      # finalise qbr input before `jqbr::updateQueryBuilder()`
       if (purrr::pluck_depth(new_rules) == 2L) {
         # needed if single query statement e.g. `DESCRIPTION("diab")` (but not
         # `DESCRIPTION("diab") %OR% DESCRIPTION("retin")`)
         new_rules <- list(new_rules)
       }
 
+      new_rules$valid <- NULL
+
       jqbr::updateQueryBuilder(inputId = "qb", setRules = new_rules)
     })
 
     output$current_query_tree <- renderPrint({
-      list(update_qb_operator_code_type(current_query(), code_type = "read2")) |>
+      # list(update_qb_operator_code_type(current_query(), code_type = "read2")) |>
+      current_query() |>
         lobstr::tree()
     })
 
     output$current_qbr <- renderPrint(input$qb |>
                                         lobstr::tree())
+
+    output$identical_translation_qbr <- renderPrint(
+      identical(current_query(), input$qb)
+    )
   }
 
   shinyApp(ui, server)
