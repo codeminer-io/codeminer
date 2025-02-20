@@ -543,7 +543,7 @@ get_nhsbsa_snomed_bnf <- function(path = file.path(
                                     "bnf_dmd.zip"
                                   )) {
   download_file(
-    download_url = "https://www.nhsbsa.nhs.uk/sites/default/files/2024-04/BNF%20Snomed%20Mapping%20data%2020240423.zip",
+    download_url = "https://www.nhsbsa.nhs.uk/sites/default/files/2025-01/BNF%20Snomed%20Mapping%20data%2020250120.zip",
     path = path
   )
 }
