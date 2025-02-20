@@ -155,6 +155,9 @@ all_lkps_maps_to_db <- function(all_lkps_maps = build_all_lkps_maps(),
 #'   file (see [get_phecode_icd9_map()]).
 #' @param snomed_ct_nhs_data_migration Optional: path to the unzipped [NHS Data
 #'   Migration](https://isd.digital.nhs.uk/trud/users/guest/filters/0/categories/9/items/9/releases).
+#' @param cprd_aurum_codebrowser_dir Optional: path to the unzipped CPRD Aurum
+#'   CodeBrowser folder. The folder name should contain the release date e.g.
+#'   "CPRD_CodeBrowser_202412_Aurum".
 #'
 #' @return Returns a named list of data frames.
 #' @seealso [all_lkps_maps_to_db()]
@@ -180,7 +183,8 @@ build_all_lkps_maps <-
            icd10_phecode_1_2 = get_phecode_icd10_map(),
            icd9_phecode_1_2 = get_phecode_icd9_map(),
            snomed_ct_uk_monolith = NULL,
-           snomed_ct_nhs_data_migration = NULL) {
+           snomed_ct_nhs_data_migration = NULL,
+           cprd_aurum_codebrowser_dir = NULL) {
     # ukb resource 592 ----------------
 
     ## reformat tables individually ---------------
@@ -351,6 +355,11 @@ build_all_lkps_maps <-
         read_snomed_ct_nhs_data_migration_mapping_tables(nhs_data_migration_dir = snomed_ct_nhs_data_migration)
     }
 
+    ## CPRD Aurum --------------------
+
+    if (!is.null(cprd_aurum_codebrowser_dir)) {
+      cprd_aurum_medcodes_and_prodcodes <- read_cprd_aurum_codebrowser_dir(cprd_aurum_codebrowser_dir)
+    }
 
     ## Phecode lookup ----------------
     if (!is.null(phecode_1_2_lkp)) {
@@ -461,6 +470,13 @@ build_all_lkps_maps <-
           rcsctmap2 = nhs_data_migration_mapping_tables$clinically_assured$rcsctmap2_uk_20200401000001.txt,
           metadata_snomed_ct_nhs_data_migration = data.frame(metadata = fs::path_file(snomed_ct_nhs_data_migration))
         )
+      )
+    }
+
+    if (!is.null(cprd_aurum_codebrowser_dir)) {
+      all_lkps_maps <- c(
+        all_lkps_maps,
+        cprd_aurum_medcodes_and_prodcodes
       )
     }
 
@@ -1225,4 +1241,39 @@ read_snomed_ct_nhs_data_migration_mapping_tables <- function(nhs_data_migration_
           colClasses = "character"
         ))
     )
+}
+
+read_cprd_aurum_codebrowser_dir <- function(cprd_aurum_codebrowser_dir) {
+  # validate file paths
+  stopifnot(dir.exists(cprd_aurum_codebrowser_dir))
+
+  result <- list(
+    cprd_prodcodes = file.path(cprd_aurum_codebrowser_dir, "CPRDAurumProduct.txt"),
+    cprd_medcodes = file.path(cprd_aurum_codebrowser_dir, "CPRDAurumMedical.txt")
+  )
+
+  stopifnot(file.exists(result$cprd_prodcodes))
+  stopifnot(file.exists(result$cprd_medcodes))
+
+  # extract date from directory for metadata - TODO
+
+  # read into named list
+  result <- result |>
+    purrr::map(\(.x) data.table::fread(
+      .x,
+      colClasses = c("character"),
+      sep = "\t",
+      quote = " ",
+      na.strings = c("", "NA")
+    ))
+
+  # minimally reformat
+  result$cprd_prodcodes <- result$cprd_prodcodes |>
+    dplyr::rename_with(\(x) stringr::str_replace_all(x, " ", "_")) |>
+    dplyr::mutate(DrugIssues = as.integer(DrugIssues))
+
+  result$cprd_medcodes <- result$cprd_medcodes |>
+    dplyr::mutate(Observations = as.integer(Observations))
+
+  return(result)
 }

@@ -15,6 +15,12 @@ NHS_DATA_MIGRATION <- ifelse(
   Sys.getenv("NHS_DATA_MIGRATION")
 )
 
+CPRD_AURUM_CODEBROWSER <- ifelse(
+  identical(Sys.getenv("CPRD_AURUM_CODEBROWSER"), ""),
+  NULL,
+  Sys.getenv("CPRD_AURUM_CODEBROWSER")
+)
+
 ALL_LKPS_MAPS_DB <- Sys.getenv("ALL_LKPS_MAPS_DB")
 
 # Build db ----------------------------------------------------------------
@@ -28,7 +34,8 @@ all_lkps_maps <- build_all_lkps_maps(
   icd10_phecode_1_2 = get_phecode_icd10_map(),
   icd9_phecode_1_2 = get_phecode_icd9_map(),
   snomed_ct_uk_monolith = SNOMED_CT_UK_MONOLITH,
-  snomed_ct_nhs_data_migration = NHS_DATA_MIGRATION
+  snomed_ct_nhs_data_migration = NHS_DATA_MIGRATION,
+  cprd_aurum_codebrowser_dir = CPRD_AURUM_CODEBROWSER
 )
 
 all_lkps_maps |>

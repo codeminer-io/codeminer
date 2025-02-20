@@ -72,6 +72,8 @@ CODE_TYPE_TO_LKP_TABLE_MAP <- tibble::tribble(
   "data_coding_4", "Self-reported medications (dc-4)", "self_report_medication", "data_coding_4", "description", NA, NA, "category", NA,
   "data_coding_5", "Self-reported operations (dc-5)", "self_report_operation", "data_coding_5", "description", NA, NA, "category", NA,
   "data_coding_6", "Self-reported non-cancer (dc-6)", "self_report_non_cancer", "data_coding_6", "description", NA, NA, "category", NA,
+  "medcode_aurum", "MedCode (CPRD Aurum)", "medcode_aurum", "MedCodeId", "Term", NA, NA, NA, NA,
+  "prodcode_aurum", "ProdCode (CPRD Aurum)", "prodcode_aurum", "ProdCodeId", "Term_from_EMIS", NA, NA, NA, NA
 )
 
 # CLINICAL_CODE_MAPPINGS_MAP ----------------------------------------------
@@ -99,7 +101,9 @@ CLINICAL_CODE_MAPPINGS_MAP <- tibble::tribble(
   "sct", "icd10", "sct_icd10", "referencedComponentId", "mapTarget", NA, NA, NA,
   "sct", "opcs4", "sct_opcs4", "referencedComponentId", "mapTarget", NA, NA, NA,
   "read2", "sct", "rcsctmap2", "ReadCode", "ConceptId", NA, NA, list(list(IS_ASSURED = "*1*", MapStatus = "*1*")),
-  "read3", "sct", "ctv3sctmap2", "CTV3_CONCEPTID", "SCT_CONCEPTID", NA, NA, list(list(IS_ASSURED = "*1*", MAPSTATUS = "*1*"))
+  "read3", "sct", "ctv3sctmap2", "CTV3_CONCEPTID", "SCT_CONCEPTID", NA, NA, list(list(IS_ASSURED = "*1*", MAPSTATUS = "*1*")),
+  "medcode_aurum", "sct", "medcode_aurum", "SnomedCTConceptId", "MedCodeId", NA, NA, NA,
+  "prodcode_aurum", "dmdid", "prodcode_aurum", "SnomedCTConceptId", "ProdCodeId", NA, NA, NA
 )
 
 # PUBLIC ------------------------------------------------------------------
