@@ -385,7 +385,10 @@ build_all_lkps_maps <-
     ## Phecode to ICD9 map ------------------
     message("Reformatting ICD9-Phecode map")
     if (!is.null(icd9_phecode_1_2)) {
-      icd9_phecode <- readr::read_csv(icd9_phecode_1_2) %>%
+      icd9_phecode_env <- new.env()
+      load(icd9_phecode_1_2, envir = icd9_phecode_env)
+      icd9_phecode_var_name <- ls(icd9_phecode_env)
+      icd9_phecode <- icd9_phecode_env[[icd9_phecode_var_name]] %>%
         dplyr::mutate("icd9" = stringr::str_remove(.data[["icd9"]],
           pattern = "\\."
         ))
@@ -695,14 +698,14 @@ get_phecode_definitions <- function(path = file.path(
                                       "phecode_definitions1.2.csv.zip"
                                     )) {
   download_file(
-    download_url = "https://phewascatalog.org/files/phecode_definitions1.2.csv.zip",
+    download_url = "https://phewascatalog.org/phewas/_w_383d92ec/data/phecode_definitions1.2.csv.zip",
     path = path
   )
 }
 
 #' Download the Phecode 1.2 to ICD9 mapping file
 #'
-#' Download link obtained from https://phewascatalog.org/phecodes.
+#' Download link obtained from https://github.com/PheWAS/PheWAS/tree/master.
 #'
 #' @param path Path where file will be downloaded to.
 #'
@@ -714,10 +717,10 @@ get_phecode_definitions <- function(path = file.path(
 #' }
 get_phecode_icd9_map <- function(path = file.path(
                                    tempdir(),
-                                   "phecode_icd9_map_unrolled.csv.zip"
+                                   "phemap.rda"
                                  )) {
   download_file(
-    download_url = "https://phewascatalog.org/files/phecode_icd9_map_unrolled.csv.zip",
+    download_url = "https://github.com/PheWAS/PheWAS/raw/refs/heads/master/data/phemap.rda",
     path = path
   )
 }
@@ -739,7 +742,7 @@ get_phecode_icd10_map <- function(path = file.path(
                                     "Phecode_map_v1_2_icd10_beta.csv.zip"
                                   )) {
   download_file(
-    download_url = "https://phewascatalog.org/files/Phecode_map_v1_2_icd10_beta.csv.zip",
+    download_url = "https://phewascatalog.org/phewas/_w_383d92ec/data/Phecode_map_v1_2_icd10_WHO_beta.csv.zip",
     path = path
   )
 }
