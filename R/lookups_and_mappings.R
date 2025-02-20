@@ -1251,12 +1251,12 @@ read_cprd_aurum_codebrowser_dir <- function(cprd_aurum_codebrowser_dir) {
   stopifnot(dir.exists(cprd_aurum_codebrowser_dir))
 
   result <- list(
-    cprd_prodcodes = file.path(cprd_aurum_codebrowser_dir, "CPRDAurumProduct.txt"),
-    cprd_medcodes = file.path(cprd_aurum_codebrowser_dir, "CPRDAurumMedical.txt")
+    prodcode_aurum = file.path(cprd_aurum_codebrowser_dir, "CPRDAurumProduct.txt"),
+    medcode_aurum = file.path(cprd_aurum_codebrowser_dir, "CPRDAurumMedical.txt")
   )
 
-  stopifnot(file.exists(result$cprd_prodcodes))
-  stopifnot(file.exists(result$cprd_medcodes))
+  stopifnot(file.exists(result$prodcode_aurum))
+  stopifnot(file.exists(result$medcode_aurum))
 
   # extract date from directory for metadata - TODO
 
@@ -1271,11 +1271,11 @@ read_cprd_aurum_codebrowser_dir <- function(cprd_aurum_codebrowser_dir) {
     ))
 
   # minimally reformat
-  result$cprd_prodcodes <- result$cprd_prodcodes |>
+  result$prodcode_aurum <- result$prodcode_aurum |>
     dplyr::rename_with(\(x) stringr::str_replace_all(x, " ", "_")) |>
     dplyr::mutate(DrugIssues = as.integer(DrugIssues))
 
-  result$cprd_medcodes <- result$cprd_medcodes |>
+  result$medcode_aurum <- result$medcode_aurum |>
     dplyr::mutate(Observations = as.integer(Observations))
 
   return(result)

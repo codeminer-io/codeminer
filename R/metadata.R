@@ -102,8 +102,8 @@ CLINICAL_CODE_MAPPINGS_MAP <- tibble::tribble(
   "sct", "opcs4", "sct_opcs4", "referencedComponentId", "mapTarget", NA, NA, NA,
   "read2", "sct", "rcsctmap2", "ReadCode", "ConceptId", NA, NA, list(list(IS_ASSURED = "*1*", MapStatus = "*1*")),
   "read3", "sct", "ctv3sctmap2", "CTV3_CONCEPTID", "SCT_CONCEPTID", NA, NA, list(list(IS_ASSURED = "*1*", MAPSTATUS = "*1*")),
-  "medcode_aurum", "sct", "medcode_aurum", "SnomedCTConceptId", "MedCodeId", NA, NA, NA,
-  "prodcode_aurum", "dmdid", "prodcode_aurum", "SnomedCTConceptId", "ProdCodeId", NA, NA, NA
+  "medcode_aurum", "sct", "medcode_aurum", "MedCodeId", "SnomedCTConceptId", NA, NA, NA,
+  "prodcode_aurum", "sct", "prodcode_aurum", "ProdCodeId", "dmdid", NA, NA, NA
 )
 
 # PUBLIC ------------------------------------------------------------------
