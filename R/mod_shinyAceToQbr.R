@@ -4,7 +4,6 @@ shinyAceToQbrInput <- function(id) {
 
   shinyUI(fluidPage(
     jqbr::useQueryBuilder(),
-    titlePanel("shinyAce auto completion - combine completion lists"),
     uiOutput(ns("ace_editor")),
   ))
 }
@@ -64,7 +63,8 @@ shinyAceToQbrServer <- function(id) {
 
 # for testing
 shinyAceToQbrApp <- function() {
-  ui <- fluidPage(shinyAceToQbrInput("shiny_ace_input"),
+  ui <- fluidPage(titlePanel("shinyAce auto completion - combine completion lists"),
+                  shinyAceToQbrInput("shiny_ace_input"),
                   actionButton("update_qbr", "Update qbr"),
                   jqbr::queryBuilderInput(
                     "qb",

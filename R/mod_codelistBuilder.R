@@ -78,6 +78,12 @@ codelistBuilderInput <-
 
             ## Main panel ------------------------------------
             mainPanel = mainPanel(
+
+              ### shinyAce input --------------------
+
+              shinyAceToQbrInput(ns("shiny_ace_input")),
+              actionButton(ns("shinyace_update_qbr"), "Update builder"),
+
               ### Query builder input -----------------------------------------------------
               jqbr::queryBuilderInput(
                 ns("qb"),
@@ -250,6 +256,35 @@ codelistBuilderServer <-
             rlang::expr_text() %>%
             cat()
         }
+      })
+
+      ## Update query builder from shinyAce --------------------------
+
+      shinyace_qbr_query <- shinyAceToQbrServer("shiny_ace_input")
+
+      observeEvent(input$shinyace_update_qbr, {
+        # update qbr saved query filter
+        req(input$shinyace_update_qbr)
+
+        new_rules <- shinyace_qbr_query()
+
+        valid_new_rules <- !identical(shinyace_qbr_query(), list())
+
+        if (!valid_new_rules) {
+          showNotification(
+            "Invalid query",
+            type = "error",
+            duration = 5,
+            closeButton = TRUE
+          )
+        }
+
+        req(valid_new_rules)
+
+        # finalise qbr input before `jqbr::updateQueryBuilder()`
+        new_rules$valid <- NULL
+
+        jqbr::updateQueryBuilder(inputId = "qb", setRules = new_rules)
       })
 
       ## Reset query builder -----------------------------------------------------
