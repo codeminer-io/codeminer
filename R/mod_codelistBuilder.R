@@ -81,8 +81,11 @@ codelistBuilderInput <-
 
               ### shinyAce input --------------------
 
+              a(id = ns("toggleshiny_ace_input"), "Show/hide CodeMiner query text editor", href = "#"),
+              shinyjs::hidden(div(id = ns("hide_show_shiny_ace_input"),
               shinyAceToQbrInput(ns("shiny_ace_input")),
-              actionButton(ns("shinyace_update_qbr"), "Update builder"),
+              actionButton(ns("shinyace_update_qbr"), "Update builder", class = "btn btn-success")
+              )),
 
               ### Query builder input -----------------------------------------------------
               jqbr::queryBuilderInput(
@@ -259,6 +262,10 @@ codelistBuilderServer <-
       })
 
       ## Update query builder from shinyAce --------------------------
+
+      shinyjs::onclick("toggleshiny_ace_input",
+        shinyjs::toggle(id = "hide_show_shiny_ace_input", anim = TRUE)
+      )
 
       shinyace_qbr_query <- shinyAceToQbrServer("shiny_ace_input")
 
