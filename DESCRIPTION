@@ -18,15 +18,20 @@ Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.3
 Suggests: 
     covr,
+    jsonlite,
     knitr,
     PheWAS,
+    plumber,
     reactable,
     rmarkdown,
     sessioninfo,
+    shiny,
+    shinyAce,
     shinydashboard,
     shinyFeedback,
     shinyjs,
     shinytest,
+    shinyTree,
     visNetwork,
     withr,
     igraph,
@@ -45,13 +50,12 @@ Imports:
     duckdb,
     fs,
     glue,
+    jqbr,
     magrittr,
     purrr,
     readr,
     readxl,
     rlang,
-    shiny,
-    shinyTree,
     stats,
     stringr,
     tibble,
@@ -61,6 +65,5 @@ Imports:
     utils
 Remotes: 
     github::rmgpanw/ukbwranglr,
-    github::PheWAS/PheWAS,
-    github::hfshr/jqbr
+    github::PheWAS/PheWAS
 VignetteBuilder: knitr
