@@ -1,6 +1,7 @@
 # plumber.R
 library(plumber)
 library(jsonlite)
+library(codemapper)
 
 #* @apiTitle My API for Clinical Events and Code Lookup
 #* @apiDescription A simple API that serves dummy clinical events and allows searching for clinical codes.
