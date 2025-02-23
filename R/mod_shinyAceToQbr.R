@@ -8,7 +8,7 @@ shinyAceToQbrInput <- function(id) {
   ))
 }
 
-shinyAceToQbrServer <- function(id) {
+shinyAceToQbrServer <- function(id, single_query_only = TRUE) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
 
@@ -49,15 +49,23 @@ shinyAceToQbrServer <- function(id) {
     ace_tooltip   <- shinyAce::aceTooltip("editor")
 
     # show query
-    current_query <- reactive({
+    query_qbr_list <- reactive({
       req(input$editor)
-      result <- input$editor |>
-        translate_codeminer_query_to_qbr_list()
+
+      query_call <- input$editor |>
+        rlang::parse_exprs()
+
+      if(single_query_only & length(query_call) > 1) {
+        # Invalid if expecting a single query only
+        result <- list()
+      } else {
+        result <- translate_codeminer_query_to_qbr_list(query_call[[1]])
+      }
 
       result
     })
 
-    current_query
+    query_qbr_list
   })
 }
 
@@ -151,12 +159,17 @@ shinyAceToQbrApp <- function() {
 
 # Helper functions --------------------------------------------------------
 
-translate_codeminer_query_to_qbr_list <- function(query_string) {
+translate_codeminer_query_to_qbr_list <- function(query_call) {
 
-  stopifnot(rlang::is_string(query_string))
+  stopifnot(rlang::is_call(query_call))
 
-  result <- tryCatch(query_string |>
-    rlang::parse_expr() |>
+  # remove assignment, if present
+  if (identical(rlang::sym("="), query_call[[1]]) |
+      identical(rlang::sym("<-"), query_call[[1]])) {
+    query_call <- query_call[[3]]
+  }
+
+  result <- tryCatch(query_call |>
     expr_to_list() |>
     flatten_brackets() |>
     transform_query(),
