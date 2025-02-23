@@ -152,6 +152,9 @@ shinyAceToQbrApp <- function() {
 # Helper functions --------------------------------------------------------
 
 translate_codeminer_query_to_qbr_list <- function(query_string) {
+
+  stopifnot(rlang::is_string(query_string))
+
   result <- tryCatch(query_string |>
     rlang::parse_expr() |>
     expr_to_list() |>

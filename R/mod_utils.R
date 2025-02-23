@@ -2,6 +2,199 @@
 
 ## Utils -------------------------------------------------------------------
 
+#' Execute a query statement
+#'
+#' To be used in codelistBuilder app
+#'
+#' @param query A call object.
+#' @param code_type Character. Code type e.g. "icd10"
+#' @param qb List. Raw query from jqbr query builder
+#' @param query_options Reactive.
+#' @param saved_queries Reactive.
+#' @param dag_igraph Reactive.
+#'
+#' @return A list
+#' @noRd
+run_query <- function(query,
+                      code_type,
+                      qb,
+                      query_options,
+                      saved_queries,
+                      dag_igraph) {
+  # query should only use codeminer exports
+  validate_codemapper_calls(query)
+
+  if (is.null(qb)) {
+    qb <- translate_codeminer_query_to_qbr_list(query)
+  }
+
+  execute_query <-
+    purrr::safely(\(x) withr::with_options(
+      eval(query_options()),
+      eval(query, envir = saved_queries()$results)
+    ))
+
+  x <- list(
+    query = query,
+    result = execute_query(),
+    qb = qb,
+    code_type = code_type
+  )
+
+  if (!rlang::is_empty(x$result$error) ||
+      nrow(x$result$result) == 0) {
+    # error, or empty result (no codes matching search criteria)
+    x <- x$result
+  } else {
+    # success
+    x$result <- x$result$result
+
+    # get saved query dependencies (if any)
+    dependencies <- get_qbr_saved_queries(x$qb) %>%
+      unique()
+
+    # append dependencies
+    if ((length(dependencies) > 0)) {
+      if (nrow(saved_queries()$dag$edges) > 0) {
+        dependencies <- dependencies %>%
+          purrr::set_names() %>%
+          purrr::map(
+            ~ find_node_dependencies(
+              graph = dag_igraph(),
+              node = .x,
+              mode = "in",
+              node_rm = FALSE
+            )
+          ) %>%
+          purrr::compact() %>%
+          purrr::reduce(c, .init = NULL) %>%
+          unique() %>%
+          c(dependencies)
+
+        dependencies <- saved_queries()$dag$nodes %>%
+          dplyr::filter(.data[["id"]] %in% !!dependencies) %>%
+
+          # TODO - remove this, temp fix for previously saved codelist
+          # bookmarks
+          dplyr::mutate("order" = as.integer(.data[["order"]])) %>%
+
+          dplyr::arrange(.data[["order"]]) %>%
+          dplyr::pull(tidyselect::all_of("id"))
+      }
+
+      # ordered dependencies
+      x$dependencies <- dependencies
+    }
+
+    # code to generate query result
+    query_code <- list(rlang::call2(.fn = "=",
+                                    rlang::sym("RESULT"),
+                                    query))
+
+    if (length(dependencies) > 0) {
+      if (length(dependencies) == 1) {
+        query_code_deps <- dependencies %>%
+          purrr::map(
+            ~ rlang::call2(
+              .fn = "=",
+              rlang::sym(.x),
+              saved_queries()$results_meta[[.x]]$query
+            )
+          )
+
+      } else {
+        query_code_deps <- dependencies %>%
+          purrr::map(~ {
+            rlang::call2(.fn = "=",
+                         rlang::sym(.x),
+                         saved_queries()$results_meta[[.x]]$query)
+          })
+      }
+
+      # then append final query
+      query_code <- c(query_code_deps,
+                      query_code)
+
+      # add indicator columns, showing which codes came from which query(/queries)
+      for (dep in dependencies) {
+        print(dep)
+        x$result[[dep]] <-
+          dplyr::case_when(x$result$code %in% saved_queries()$results[[dep]]$code ~ "1",
+                           TRUE ~ ".")
+      }
+    }
+    # add indicator column for inactive snomed codes
+    if (code_type == "sct") {
+      inactive_codes <- CODES(
+        x$result$code,
+        code_type = "sct",
+        preferred_description_only = TRUE,
+        standardise_output = TRUE,
+        unrecognised_codes = "warning",
+        col_filters = list(
+          sct_description = list(
+            active_concept = '0',
+            active_description = '1'
+          )
+        )
+      ) %>%
+        .$code %>%
+        suppressWarnings()
+
+      x$result <- x$result %>%
+        dplyr::mutate("...inactive_sct" = dplyr::case_when(.data[["code"]] %in% inactive_codes ~ "1",
+                                                           TRUE ~ "."))
+    }
+
+    x$query_code <- query_code
+  }
+
+  return(x)
+}
+
+validate_codemapper_calls <- function(call_obj) {
+  # Get all exported functions from codemapper
+  codemapper_exports <- getNamespaceExports("codemapper")
+
+  # Get all function calls
+  fn_calls <- get_function_calls(call_obj)
+
+  # Check which calls are not in codemapper exports
+  invalid_calls <- setdiff(fn_calls, codemapper_exports)
+
+  # "(" is allowed
+  invalid_calls <- invalid_calls[!invalid_calls == "("]
+
+  if (length(invalid_calls) > 0) {
+    stop(paste0("Invalid function calls found: `",
+         paste(invalid_calls, sep = "", collapse="`, `"),
+         "`. These functions are not exported by codeminer"))
+  }
+
+  # Return the valid function calls if no error
+  invisible(fn_calls)
+}
+
+get_function_calls <- function(call_obj) {
+  if (!is.call(call_obj)) return(character(0))
+
+  # Get function name from current call, handling namespace qualification
+  current_fn <- if (is.name(call_obj[[1]]) || is.call(call_obj[[1]])) {
+    # Convert the function part to character, which handles both name and namespace::fn
+    deparse1(call_obj[[1]])
+  } else {
+    character(0)
+  }
+
+  # Recursively get function calls from all arguments
+  arg_fns <- unlist(lapply(as.list(call_obj[-1]), function(arg) {
+    if (is.call(arg)) get_function_calls(arg)
+    else character(0)
+  }))
+
+  sub("^.*:{2,3}", "", unique(c(current_fn, arg_fns)))
+}
+
 #' Determine which saved queries are down or upstream of a given saved query
 #'
 #' @param graph An igraph object

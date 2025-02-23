@@ -320,126 +320,14 @@ codelistBuilderServer <-
         } else {
           query <- custom_qbr_translation(input$qb)
 
-          execute_query <-
-            purrr::safely(\(x) withr::with_options(
-              eval(query_options()),
-              eval(query, envir = saved_queries()$results)
-            ))
-
-          x <- list(
+          x <- run_query(
             query = query,
-            result = execute_query(),
+            code_type = input$code_type,
             qb = input$qb,
-            code_type = input$code_type
+            query_options = query_options,
+            saved_queries = saved_queries,
+            dag_igraph = dag_igraph
           )
-
-          if (!rlang::is_empty(x$result$error) ||
-              nrow(x$result$result) == 0) {
-            # error, or empty result (no codes matching search criteria)
-            x <- x$result
-          } else {
-            # success
-            x$result <- x$result$result
-
-            # get saved query dependencies (if any)
-            dependencies <- get_qbr_saved_queries(x$qb) %>%
-              unique()
-
-            # append dependencies
-            if ((length(dependencies) > 0)) {
-              if (nrow(saved_queries()$dag$edges) > 0) {
-                dependencies <- dependencies %>%
-                  purrr::set_names() %>%
-                  purrr::map(
-                    ~ find_node_dependencies(
-                      graph = dag_igraph(),
-                      node = .x,
-                      mode = "in",
-                      node_rm = FALSE
-                    )
-                  ) %>%
-                  purrr::compact() %>%
-                  purrr::reduce(c, .init = NULL) %>%
-                  unique() %>%
-                  c(dependencies)
-
-                dependencies <- saved_queries()$dag$nodes %>%
-                  dplyr::filter(.data[["id"]] %in% !!dependencies) %>%
-
-                  # TODO - remove this, temp fix for previously saved codelist
-                  # bookmarks
-                  dplyr::mutate("order" = as.integer(.data[["order"]])) %>%
-
-                  dplyr::arrange(.data[["order"]]) %>%
-                  dplyr::pull(tidyselect::all_of("id"))
-              }
-
-              # ordered dependencies
-              x$dependencies <- dependencies
-            }
-
-            # code to generate query result
-            query_code <- list(rlang::call2(.fn = "=",
-                                            rlang::sym("RESULT"),
-                                            query))
-
-            if (length(dependencies) > 0) {
-              if (length(dependencies) == 1) {
-                query_code_deps <- dependencies %>%
-                  purrr::map(
-                    ~ rlang::call2(
-                      .fn = "=",
-                      rlang::sym(.x),
-                      saved_queries()$results_meta[[.x]]$query
-                    )
-                  )
-
-              } else {
-                query_code_deps <- dependencies %>%
-                  purrr::map(~ {
-                    rlang::call2(.fn = "=",
-                                 rlang::sym(.x),
-                                 saved_queries()$results_meta[[.x]]$query)
-                  })
-              }
-
-              # then append final query
-              query_code <- c(query_code_deps,
-                              query_code)
-
-              # add indicator columns, showing which codes came from which query(/queries)
-              for (dep in dependencies) {
-                print(dep)
-                x$result[[dep]] <-
-                  dplyr::case_when(x$result$code %in% saved_queries()$results[[dep]]$code ~ "1",
-                                   TRUE ~ ".")
-              }
-            }
-            # add indicator column for inactive snomed codes
-            if (input$code_type == "sct") {
-              inactive_codes <- CODES(
-                x$result$code,
-                code_type = "sct",
-                preferred_description_only = TRUE,
-                standardise_output = TRUE,
-                unrecognised_codes = "warning",
-                col_filters = list(
-                  sct_description = list(
-                    active_concept = '0',
-                    active_description = '1'
-                  )
-                )
-              ) %>%
-                .$code %>%
-                suppressWarnings()
-
-              x$result <- x$result %>%
-                dplyr::mutate("...inactive_sct" = dplyr::case_when(.data[["code"]] %in% inactive_codes ~ "1",
-                                                                   TRUE ~ "."))
-            }
-
-            x$query_code <- query_code
-          }
         }
 
         x

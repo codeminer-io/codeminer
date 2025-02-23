@@ -20,6 +20,7 @@ Suggests:
     covr,
     jsonlite,
     knitr,
+    lobstr,
     PheWAS,
     plumber,
     reactable,
