@@ -8,7 +8,12 @@ shinyAceToQbrInput <- function(id) {
   ))
 }
 
-shinyAceToQbrServer <- function(id, single_query_only = TRUE) {
+shinyAceToQbrServer <- function(id,
+                                initial_value = 'DESCRIPTION("diab") %AND% DESCRIPTION("retin|mac") %NOT%
+    DESCRIPTION("absent|without") %OR% ((DESCRIPTION("diab") %AND%
+    DESCRIPTION("nephro|neuro") %NOT% DESCRIPTION("absent|without")))',
+                                single_query_only = TRUE) {
+
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
 
@@ -21,9 +26,7 @@ shinyAceToQbrServer <- function(id, single_query_only = TRUE) {
       shinyAce::aceEditor(
         ns("editor"),
         mode = "r",
-        value = 'DESCRIPTION("diab") %AND% DESCRIPTION("retin|mac") %NOT%
-    DESCRIPTION("absent|without") %OR% ((DESCRIPTION("diab") %AND%
-    DESCRIPTION("nephro|neuro") %NOT% DESCRIPTION("absent|without")))',
+        value = initial_value,
         height = "200px",
         autoComplete = "live",
         autoCompleters = "static",
@@ -48,18 +51,29 @@ shinyAceToQbrServer <- function(id, single_query_only = TRUE) {
     ace_annotator <- shinyAce::aceAnnotate("editor")
     ace_tooltip   <- shinyAce::aceTooltip("editor")
 
-    # show query
+    # get qbr list from query text
     query_qbr_list <- reactive({
       req(input$editor)
 
       query_call <- input$editor |>
         rlang::parse_exprs()
 
-      if(single_query_only & length(query_call) > 1) {
+      empty_result <- list()
+
+      if (single_query_only) {
+
+        if (length(query_call) > 1) {
         # Invalid if expecting a single query only
-        result <- list()
+        result <- empty_result
+        } else {
+          result <- translate_codeminer_query_to_qbr_list(query_call[[1]])
+        }
       } else {
-        result <- translate_codeminer_query_to_qbr_list(query_call[[1]])
+        # if list of multiple queries, all should include an assignment - return
+        # a list of query calls and qbr lists
+        result <- query_call |>
+          purrr::map(\(.x) list(query_call = .x,
+                                        qbr = translate_codeminer_query_to_qbr_list(.x)))
       }
 
       result
@@ -159,13 +173,18 @@ shinyAceToQbrApp <- function() {
 
 # Helper functions --------------------------------------------------------
 
+check_if_call_has_assignment <- function(query_call) {
+  # `TRUE` if assignment, else `FALSE`
+  identical(rlang::sym("="), query_call[[1]]) |
+    identical(rlang::sym("<-"), query_call[[1]])
+}
+
 translate_codeminer_query_to_qbr_list <- function(query_call) {
 
   stopifnot(rlang::is_call(query_call))
 
   # remove assignment, if present
-  if (identical(rlang::sym("="), query_call[[1]]) |
-      identical(rlang::sym("<-"), query_call[[1]])) {
+  if (check_if_call_has_assignment(query_call)) {
     query_call <- query_call[[3]]
   }
 

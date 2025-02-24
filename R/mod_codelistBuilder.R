@@ -192,6 +192,20 @@ codelistBuilderInput <-
           )
         ),
 
+        ### Import from text query -------------------------------
+
+        tabPanel(
+          "Import query",
+          icon = icon("upload"),
+            selectInput(
+              ns("import_code_type"),
+              "Code type",
+              choices = get_code_type_labels(available_code_types = available_code_types)
+            ),
+            shinyAceToQbrInput(ns("shinyace_import_input")),
+            actionButton(ns("shinyace_import_button"), "Import", class = "btn btn-success")
+        ),
+
         ### Advanced settings ------------------------------------
         tabPanel(
           "Advanced settings",
@@ -248,6 +262,86 @@ codelistBuilderServer <-
       observeEvent(col_filters(),
                    recompute_all_queries(saved_queries = saved_queries,
                                          query_options = query_options))
+
+
+      ## Import from query text --------------------------------------------------
+
+      shinyace_queries <- shinyAceToQbrServer("shinyace_import_input",
+                                              initial_value = 'DIABETIC_RETINOPATHY = DESCRIPTION("diab") %AND% DESCRIPTION("retin|mac") %NOT%
+    DESCRIPTION("absent|without") %OR% ((DESCRIPTION("diab") %AND%
+    DESCRIPTION("nephro|neuro") %NOT% DESCRIPTION("absent|without")))\n\nx = DESCRIPTION("cyst")',
+                                              single_query_only = FALSE)
+
+      # confirm selected choices
+      observeEvent(input$shinyace_import_button, {
+        showModal(
+          modalDialog(
+            "This will remove all currently saved queries. Are you sure you want to continue?",
+            title = "Confirm",
+            footer = tagList(
+              actionButton(ns("confirm_cancel_import"), "Cancel"),
+              actionButton(ns("confirm_proceed_import"), "Proceed", class = "btn btn-danger")
+            )
+          )
+        )
+      })
+
+      observeEvent(input$confirm_cancel_import, {
+        removeModal()
+      })
+
+      observeEvent(
+        input$confirm_proceed_import,
+        handlerExpr = {
+          # progress bar
+          withProgress(message = "Importing...", {
+            step <- 1
+
+            # reset
+            saved_queries(list(
+              objects = list(),
+              results = new.env(),
+              results_meta = new.env(),
+              dag = list(nodes = data.frame(), edges = data.frame())
+            ))
+
+            warning(length(shinyace_queries()))
+            # import queries
+            for (i in seq_along(shinyace_queries())) {
+
+              print(deparse1(shinyace_queries()[[i]]$query_call[[2]]))
+
+              .query_result_temp <- reactiveVal(run_query(
+                  query = shinyace_queries()[[i]]$query_call,
+                  code_type = input$import_code_type,
+                  qb = shinyace_queries()[[i]]$qbr,
+                  query_options = query_options,
+                  saved_queries = saved_queries,
+                  dag_igraph = dag_igraph
+                ))
+
+              update_saved_queries(
+                query = deparse1(shinyace_queries()[[i]]$query_call[[2]]),
+                query_result = .query_result_temp,
+                saved_queries = saved_queries,
+                code_type = input$import_code_type,
+                query_options = query_options,
+                ignore_existing_query = FALSE
+              )
+
+              incProgress(1 / length(shinyace_queries()))
+              step <- step + 1
+            }
+          })
+
+          rm(".query_result_temp")
+
+          message("Complete!")
+          print(step)
+          print(saved_queries())
+          removeModal()
+        }
+      )
 
       ## Query -------------------------------------------------------------------
 
