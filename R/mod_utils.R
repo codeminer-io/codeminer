@@ -163,7 +163,7 @@ validate_codemapper_calls <- function(call_obj) {
   invalid_calls <- setdiff(fn_calls, codemapper_exports)
 
   # "(" is allowed
-  invalid_calls <- invalid_calls[!invalid_calls == "("]
+  invalid_calls <- invalid_calls[!invalid_calls %in% c("(", "=", "<-")]
 
   if (length(invalid_calls) > 0) {
     stop(paste0("Invalid function calls found: `",
