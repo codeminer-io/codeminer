@@ -199,10 +199,11 @@ translate_codeminer_query_to_qbr_list <- function(query_call) {
       })
 
   if (identical(purrr::pluck_depth(result), 2L) |
-      (
-        identical(purrr::pluck_depth(result), 3L) &&
-        identical(purrr::pluck(result, "id"), "sct_has_attributes")
-      )) {
+      (identical(purrr::pluck_depth(result), 3L) &&
+       (
+         identical(purrr::pluck(result, "id"), "sct_has_attributes") |
+         identical(purrr::pluck(result, "id"), "sct_get_attributes")
+       ))) {
     # needed if single query statement e.g. `DESCRIPTION("diab")` (but not
     # `DESCRIPTION("diab") %OR% DESCRIPTION("retin")`)
     result$valid <- NULL
@@ -289,15 +290,32 @@ transform_query_base <- function(query) {
         value = if (is.list(query$args) && !is.null(query$args[[1]])) query$args[[1]] else query$args
       ))
 
-    } else if (query$fun %in% c("HAS_ATTRIBUTES")) {
+    } else if (query$fun %in% c("HAS_ATTRIBUTES", "GET_ATTRIBUTES")) {
       # Leaf node
+      id_field <- switch(query$fun,
+                         "HAS_ATTRIBUTES" = "sct_has_attributes",
+                         "GET_ATTRIBUTES" = "sct_get_attributes")
+
       return(list(
-        id = "sct_has_attributes",
-        field = "sct_has_attributes",
+        id = id_field,
+        field = id_field,
         type = "string",
         input = "select",
         operator = "sct_relationship",
         value = list(rlang::as_string(query$args[[1]]), rlang::as_string(query$args[[2]]))
+      ))
+    } else if (query$fun %in% c("ATTRIBUTE_TYPES_TO", "ATTRIBUTE_TYPES_FROM")) {
+      id_field <- switch(query$fun,
+                         "ATTRIBUTE_TYPES_TO" = "sct_attribute_types_to",
+                         "ATTRIBUTE_TYPES_FROM" = "sct_attribute_types_from")
+
+      return(list(
+        id = id_field,
+        field = id_field,
+        type = "string",
+        input = "select",
+        operator = "sct_attribute_types",
+        value = rlang::as_string(query$args[[1]])
       ))
     } else if (query$fun %in% c("MAP")) {
 

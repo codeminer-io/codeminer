@@ -175,6 +175,21 @@ egs <- list(
       )
     )
   ),
+  get_attributes_query = list(
+    query = rlang::parse_expr(
+      'GET_ATTRIBUTES(CHILD_BETA_BLOCKER_SUBSTANCE, relationship = ATTRIBUTES_HAS_INGREDIENT)'
+    ),
+    qbr = list(
+      list(
+        id = "sct_get_attributes",
+        field = "sct_get_attributes",
+        type = "string",
+        input = "select",
+        operator = "sct_relationship",
+        value = list("CHILD_BETA_BLOCKER_SUBSTANCE", "ATTRIBUTES_HAS_INGREDIENT")
+      )
+    )
+  ),
   map_codes_query = list(query = rlang::parse_expr('MAP("E101 << Type 1 diabetes mellitus With ketoacidosis >>", from = "icd10")'), qbr = list(
     list(
       id = "map_codes",
@@ -195,7 +210,29 @@ egs <- list(
                                 operator = "read2",
                                 value = "C10.."
                               )
-                            ))
+                            )),
+  attribute_types_from_query = list(query = rlang::parse_expr('ATTRIBUTE_TYPES_FROM(DR)'),
+                                    qbr = list(
+                                      list(
+                                        id = "sct_attribute_types_from",
+                                        field = "sct_attribute_types_from",
+                                        type = "string",
+                                        input = "select",
+                                        operator = "sct_attribute_types",
+                                        value = "DR"
+                                      )
+                                    )),
+  attribute_types_to_query = list(query = rlang::parse_expr('ATTRIBUTE_TYPES_TO(DR)'),
+                                    qbr = list(
+                                      list(
+                                        id = "sct_attribute_types_to",
+                                        field = "sct_attribute_types_to",
+                                        type = "string",
+                                        input = "select",
+                                        operator = "sct_attribute_types",
+                                        value = "DR"
+                                      )
+                                    ))
 )
 
 # TESTS -------------------------------------------------------------------
@@ -259,13 +296,24 @@ test_that("Simple single saved query statements translate", {
 
 })
 
-test_that("Has attributes (sct) query statements translate", {
+test_that("Has/Get attributes (sct) query statements translate", {
+  # has
   expect_equal(translate_codeminer_query_to_qbr_list(egs$has_attributes_query$query),
                egs$has_attributes_query$qbr)
 
   expect_equal(egs$has_attributes_query$query |>
                  deparse1(),
                egs$has_attributes_query$qbr |>
+                 custom_qbr_translation() |>
+                 deparse1())
+
+  # get
+  expect_equal(translate_codeminer_query_to_qbr_list(egs$get_attributes_query$query),
+               egs$get_attributes_query$qbr)
+
+  expect_equal(egs$get_attributes_query$query |>
+                 deparse1(),
+               egs$get_attributes_query$qbr |>
                  custom_qbr_translation() |>
                  deparse1())
 
@@ -290,6 +338,29 @@ test_that("Map children query statements translate", {
   expect_equal(egs$map_children_query$query |>
                  deparse1(),
                egs$map_children_query$qbr |>
+                 custom_qbr_translation() |>
+                 deparse1())
+
+})
+
+test_that("Attribute types from/to statements translate", {
+  # from
+  expect_equal(translate_codeminer_query_to_qbr_list(egs$attribute_types_from_query$query),
+               egs$attribute_types_from_query$qbr)
+
+  expect_equal(egs$attribute_types_from_query$query |>
+                 deparse1(),
+               egs$attribute_types_from_query$qbr |>
+                 custom_qbr_translation() |>
+                 deparse1())
+
+  # to
+  expect_equal(translate_codeminer_query_to_qbr_list(egs$attribute_types_to_query$query),
+               egs$attribute_types_to_query$qbr)
+
+  expect_equal(egs$attribute_types_to_query$query |>
+                 deparse1(),
+               egs$attribute_types_to_query$qbr |>
                  custom_qbr_translation() |>
                  deparse1())
 
