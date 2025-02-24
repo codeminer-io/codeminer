@@ -182,10 +182,10 @@ check_if_call_has_assignment <- function(query_call) {
 
 translate_codeminer_query_to_qbr_list <- function(query_call) {
 
-  stopifnot(rlang::is_call(query_call))
+  stopifnot(rlang::is_call(query_call) | rlang::is_symbol(query_call))
 
   # remove assignment, if present
-  if (check_if_call_has_assignment(query_call)) {
+  if (rlang::is_call(query_call) && check_if_call_has_assignment(query_call)) {
     query_call <- query_call[[3]]
   }
 
