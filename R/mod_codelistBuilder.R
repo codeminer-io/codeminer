@@ -316,7 +316,21 @@ codelistBuilderServer <-
               print(deparse1(shinyace_queries()[[i]]$query_call[[2]]))
 
               query_call <- shinyace_queries()[[i]]$query_call
-              stopifnot(check_if_call_has_assignment(query_call))
+
+              if (!check_if_call_has_assignment(query_call)) {
+                showNotification(
+                  paste0("Error with: `", deparse1(query_call), "`. Aborting import"),
+                  type = "error",
+                  duration = 10
+                )
+                showNotification(
+                  paste0("All statements should be assigned with `=`"),
+                  type = "warning",
+                  duration = 10
+                )
+                break()
+              }
+
               query_call <- query_call[[3]]
 
               .query_result_temp <- reactiveVal(run_query(
