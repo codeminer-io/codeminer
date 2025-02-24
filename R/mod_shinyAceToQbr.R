@@ -31,6 +31,7 @@ shinyAceToQbrServer <- function(id,
         autoComplete = "live",
         autoCompleters = "static",
         wordWrap = TRUE,
+        autoScrollEditorIntoView = TRUE,
         autoCompleteList = isolate(comps())
       )
     })

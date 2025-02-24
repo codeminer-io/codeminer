@@ -136,7 +136,8 @@ codelistBuilderInput <-
                              p("Please enter a query")),
                 tabPanelBody(
                   value = "query_result",
-                  verbatimTextOutput(ns("result_query")),
+                  uiOutput(ns("result_query")),
+                  # verbatimTextOutput(ns("result_query")),
                   actionButton(ns("download_report"), "Download report", class = "btn-success"),
                   tabsetPanel(
                     id = ns("tabs_save_or_update_query"),
@@ -508,11 +509,20 @@ codelistBuilderServer <-
         reset_signal = reactive(input$run)
       )
 
-      output$result_query <- renderPrint({
+      output$result_query <- renderUI({
         req(query_result_type() == "query_result")
 
-        query_result()$query_code %>%
-          purrr::walk(print)
+        shinyAce::aceEditor(
+          ns("editor"),
+          mode = "r",
+          value = query_result()$query_code |>
+            purrr::map(deparse1) |>
+            paste(sep = "", collapse = "\n"),
+          height = "200px",
+          autoScrollEditorIntoView = TRUE,
+          readOnly = TRUE,
+          wordWrap = TRUE
+        )
       })
 
       # Download query Quarto report -------------------------------------------
