@@ -315,8 +315,12 @@ codelistBuilderServer <-
 
               print(deparse1(shinyace_queries()[[i]]$query_call[[2]]))
 
+              query_call <- shinyace_queries()[[i]]$query_call
+              stopifnot(check_if_call_has_assignment(query_call))
+              query_call <- query_call[[3]]
+
               .query_result_temp <- reactiveVal(run_query(
-                  query = shinyace_queries()[[i]]$query_call,
+                  query = query_call,
                   code_type = input$import_code_type,
                   qb = shinyace_queries()[[i]]$qbr,
                   query_options = import_query_options,
