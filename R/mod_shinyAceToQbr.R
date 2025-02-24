@@ -192,7 +192,10 @@ translate_codeminer_query_to_qbr_list <- function(query_call) {
     expr_to_list() |>
     flatten_brackets() |>
     transform_query(),
-    error = function(cnd) list())
+    error = function(cnd) {
+      warning("An error occurred: ", conditionMessage(cnd))
+      list()
+      })
 
   if (identical(purrr::pluck_depth(result), 2L)) {
     # needed if single query statement e.g. `DESCRIPTION("diab")` (but not
@@ -211,8 +214,8 @@ expr_to_list <- function(expr) {
       args = purrr::map(rlang::call_args(expr), expr_to_list) # Recursively process arguments
     )
   } else if (rlang::is_symbol(expr)) {
-    # For symbols, return the name
-    rlang::as_string(expr)
+    # For symbols, return as-is
+    expr
   } else if (rlang::is_atomic(expr)) {
     # For atomic values (e.g., numbers, characters), return as-is
     expr
@@ -238,7 +241,16 @@ flatten_brackets <- function(node) {
 }
 
 transform_query_base <- function(query) {
-  if (!is.null(query$fun) && !is.null(query$args)) {
+  if (rlang::is_symbol(query)) {
+    return(list(
+      id = "saved_query",
+      field = "saved_query",
+      type = "string",
+      input = "select",
+      operator = "icd10",
+      value = rlang::as_string(query)
+    ))
+  } else if (!is.null(query$fun) && !is.null(query$args)) {
     if (query$fun %in% c("%OR%", "%AND%", "%NOT%")) {
       # Logical operator node
       rules_list <- purrr::map(query$args, transform_query_base)

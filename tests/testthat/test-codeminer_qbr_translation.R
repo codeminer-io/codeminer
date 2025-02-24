@@ -124,7 +124,32 @@ egs <- list(
       operator = "sct",
       value = "diab"
     )
-  ))
+  )),
+  simple_saved_query = list(
+    query = rlang::parse_expr('DIAB %OR% RETINOPATHY'),
+    qbr = list(
+      condition = "OR",
+      rules = list(
+        list(
+          id = "saved_query",
+          field = "saved_query",
+          type = "string",
+          input = "select",
+          operator = "icd10",
+          value = "DIAB"
+        ),
+        list(
+          id = "saved_query",
+          field = "saved_query",
+          type = "string",
+          input = "select",
+          operator = "icd10",
+          value = "RETINOPATHY"
+        )
+      ),
+      valid = TRUE
+    )
+  )
 )
 
 # TESTS -------------------------------------------------------------------
@@ -159,6 +184,18 @@ test_that("Single statement single queries translate", {
   expect_equal(egs$simple_query_single$query |>
                  deparse1(),
                egs$simple_query_single$qbr |>
+                 custom_qbr_translation() |>
+                 deparse1())
+
+})
+
+test_that("Simple saved query statements translate", {
+  expect_equal(translate_codeminer_query_to_qbr_list(egs$simple_saved_query$query),
+               egs$simple_saved_query$qbr)
+
+  expect_equal(egs$simple_saved_query$query |>
+                 deparse1(),
+               egs$simple_saved_query$qbr |>
                  custom_qbr_translation() |>
                  deparse1())
 
