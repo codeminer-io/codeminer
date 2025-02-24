@@ -161,23 +161,18 @@ egs <- list(
     )
   )),
   has_attributes_query = list(
-    query = rlang::parse_expr('HAS_ATTRIBUTES(CHILD_BETA_BLOCKER_SUBSTANCE, relationship = ATTRIBUTES_HAS_INGREDIENT)'),
+    query = rlang::parse_expr(
+      'HAS_ATTRIBUTES(CHILD_BETA_BLOCKER_SUBSTANCE, relationship = ATTRIBUTES_HAS_INGREDIENT)'
+    ),
     qbr = list(
-      condition = "AND",
-      rules = list(
-        list(
-          id = "sct_has_attributes",
-          field = "sct_has_attributes",
-          type = "string",
-          input = "select",
-          operator = "sct_relationship",
-          value = list(
-            "CHILD_BETA_BLOCKER_SUBSTANCE",
-            "ATTRIBUTES_HAS_INGREDIENT"
-          )
-        )
-      ),
-      valid = TRUE
+      list(
+        id = "sct_has_attributes",
+        field = "sct_has_attributes",
+        type = "string",
+        input = "select",
+        operator = "sct_relationship",
+        value = list("CHILD_BETA_BLOCKER_SUBSTANCE", "ATTRIBUTES_HAS_INGREDIENT")
+      )
     )
   )
 )
@@ -238,6 +233,18 @@ test_that("Simple single saved query statements translate", {
   expect_equal(egs$simple_saved_query_single$query |>
                  deparse1(),
                egs$simple_saved_query_single$qbr |>
+                 custom_qbr_translation() |>
+                 deparse1())
+
+})
+
+test_that("Has attributes (sct) query statements translate", {
+  expect_equal(translate_codeminer_query_to_qbr_list(egs$has_attributes_query$query),
+               egs$has_attributes_query$qbr)
+
+  expect_equal(egs$has_attributes_query$query |>
+                 deparse1(),
+               egs$has_attributes_query$qbr |>
                  custom_qbr_translation() |>
                  deparse1())
 

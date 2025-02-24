@@ -198,7 +198,11 @@ translate_codeminer_query_to_qbr_list <- function(query_call) {
       list()
       })
 
-  if (identical(purrr::pluck_depth(result), 2L)) {
+  if (identical(purrr::pluck_depth(result), 2L) |
+      (
+        identical(purrr::pluck_depth(result), 3L) &&
+        identical(purrr::pluck(result, "id"), "sct_has_attributes")
+      )) {
     # needed if single query statement e.g. `DESCRIPTION("diab")` (but not
     # `DESCRIPTION("diab") %OR% DESCRIPTION("retin")`)
     result$valid <- NULL
@@ -270,6 +274,16 @@ transform_query_base <- function(query) {
         input = "text",
         operator = if (is.list(query$args) && !is.null(query$args$code_type)) query$args$code_type else "sct",
         value = if (is.list(query$args) && !is.null(query$args[[1]])) query$args[[1]] else query$args
+      ))
+    } else if (query$fun %in% c("HAS_ATTRIBUTES")) {
+      # Leaf node
+      return(list(
+        id = "sct_has_attributes",
+        field = "sct_has_attributes",
+        type = "string",
+        input = "select",
+        operator = "sct_relationship",
+        value = list(rlang::as_string(query$args[[1]]), rlang::as_string(query$args[[2]]))
       ))
     }
   }
