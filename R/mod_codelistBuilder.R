@@ -305,8 +305,12 @@ codelistBuilderServer <-
               dag = list(nodes = data.frame(), edges = data.frame())
             ))
 
-            warning(length(shinyace_queries()))
             # import queries
+            import_query_options <- query_options()
+            import_query_options$codemapper.code_type <- input$import_code_type
+            import_query_options$codemapper.map_to <- input$import_code_type
+            import_query_options <- reactiveVal(import_query_options)
+
             for (i in seq_along(shinyace_queries())) {
 
               print(deparse1(shinyace_queries()[[i]]$query_call[[2]]))
@@ -315,10 +319,20 @@ codelistBuilderServer <-
                   query = shinyace_queries()[[i]]$query_call,
                   code_type = input$import_code_type,
                   qb = shinyace_queries()[[i]]$qbr,
-                  query_options = query_options,
+                  query_options = import_query_options,
                   saved_queries = saved_queries,
                   dag_igraph = dag_igraph
                 ))
+
+              if (is.null(.query_result_temp()$result)) {
+                showNotification(paste0(
+                  "No matching codes found for `",
+                  deparse1(shinyace_queries()[[i]]$query_call[[2]]),
+                  "`. Aborting import"
+                ),
+                type = "error")
+                break()
+              }
 
               update_saved_queries(
                 query = deparse1(shinyace_queries()[[i]]$query_call[[2]]),
@@ -422,6 +436,8 @@ codelistBuilderServer <-
             saved_queries = saved_queries,
             dag_igraph = dag_igraph
           )
+
+          print(lobstr::tree(input$qb))
         }
 
         x

@@ -30,6 +30,7 @@ shinyAceToQbrServer <- function(id,
         height = "200px",
         autoComplete = "live",
         autoCompleters = "static",
+        wordWrap = TRUE,
         autoCompleteList = isolate(comps())
       )
     })
