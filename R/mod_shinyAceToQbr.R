@@ -265,11 +265,10 @@ transform_query_base <- function(query) {
         condition = gsub("%", "", toupper(query$fun)), # Remove % and convert to uppercase
         rules = rules_list
       ))
-    } else if (query$fun %in% c("DESCRIPTION", "MAP", "CHILDREN", "CODES")) {
+    } else if (query$fun %in% c("DESCRIPTION", "CHILDREN", "CODES")) {
       # Leaf node
       id_field <- switch(query$fun,
                          "DESCRIPTION" = "description",
-                         "MAP" = "map_codes",
                          "CHILDREN" = "children",
                          "CODES" = "codes")
 
@@ -278,8 +277,6 @@ transform_query_base <- function(query) {
       if (is.list(query$args)) {
         if (!is.null(query$args$code_type)) {
           operator <- query$args$code_type
-        } else if (!is.null(query$args$from)) {
-          operator <- query$args$from
         }
       }
 
@@ -301,6 +298,28 @@ transform_query_base <- function(query) {
         input = "select",
         operator = "sct_relationship",
         value = list(rlang::as_string(query$args[[1]]), rlang::as_string(query$args[[2]]))
+      ))
+    } else if (query$fun %in% c("MAP")) {
+
+      if (is.list(query$args)) {
+        if (identical(purrr::pluck(query, "args", 1, "fun"), "CHILDREN")) {
+          operator <- purrr::pluck(query, "args", 1, "args", "code_type")
+          value <- purrr::pluck(query, "args", 1, "args", 1)
+          id_field <- "map_children"
+        } else {
+          operator <- query$args$from
+          value <- query$args[[1]]
+          id_field <- "map_codes"
+        }
+      }
+
+      return(list(
+        id = id_field,
+        field = id_field,
+        type = "string",
+        input = "text",
+        operator = operator,
+        value = value
       ))
     }
   }

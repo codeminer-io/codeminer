@@ -184,7 +184,18 @@ egs <- list(
       operator = "icd10",
       value = "E101 << Type 1 diabetes mellitus With ketoacidosis >>"
     )
-  ))
+  )),
+  map_children_query = list(query = rlang::parse_expr('MAP(CHILDREN("C10..", code_type = "read2"))'),
+                            qbr = list(
+                              list(
+                                id = "map_children",
+                                field = "map_children",
+                                type = "string",
+                                input = "text",
+                                operator = "read2",
+                                value = "C10.."
+                              )
+                            ))
 )
 
 # TESTS -------------------------------------------------------------------
@@ -272,4 +283,14 @@ test_that("Map codes query statements translate", {
 
 })
 
+test_that("Map children query statements translate", {
+  expect_equal(translate_codeminer_query_to_qbr_list(egs$map_children_query$query),
+               egs$map_children_query$qbr)
 
+  expect_equal(egs$map_children_query$query |>
+                 deparse1(),
+               egs$map_children_query$qbr |>
+                 custom_qbr_translation() |>
+                 deparse1())
+
+})
