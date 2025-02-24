@@ -1,3 +1,9 @@
+"""
+This is an early proof of concept implementation of a Python wrapper for the codeminer API.
+Search strategies may be composed using the infix operators, e.g.:
+`DESCRIPTION("diab", "icd10") >>AND>> (CHILDREN("E10", "icd10") >>OR>> CHILDREN("E11", "icd10"))`
+"""
+
 import requests
 import pandas as pd
 from typing import List
@@ -60,3 +66,70 @@ def CHILDREN(codes: List[str], code_type: str) -> pd.DataFrame:
     """
     response = requests.get(f"{BASE_URL}/CHILDREN", params={"codes": codes, "code_type": code_type})
     return pd.DataFrame(response.json())
+
+class Infix:
+    def __init__(self, function):
+        self.function = function
+
+    def __rlshift__(self, other):
+        return Infix(lambda x: self.function(other, x))
+
+    def __lshift__(self, other):
+        return self.function(other)
+
+    def __rrshift__(self, other):
+        return Infix(lambda x: self.function(other, x))
+
+    def __rshift__(self, other):
+        return self.function(other)
+
+@Infix
+def OR(df1: pd.DataFrame, df2: pd.DataFrame) -> pd.DataFrame:
+    """
+    Union of two DataFrames.
+
+    Parameters:
+    df1 (pd.DataFrame): First DataFrame.
+    df2 (pd.DataFrame): Second DataFrame.
+
+    Returns:
+    pd.DataFrame: Union of the two DataFrames.
+
+    Example:
+    >>> df1 >>OR>> df2
+    """
+    return pd.concat([df1, df2]).drop_duplicates().reset_index(drop=True)
+
+@Infix
+def AND(df1: pd.DataFrame, df2: pd.DataFrame) -> pd.DataFrame:
+    """
+    Intersection of two DataFrames.
+
+    Parameters:
+    df1 (pd.DataFrame): First DataFrame.
+    df2 (pd.DataFrame): Second DataFrame.
+
+    Returns:
+    pd.DataFrame: Intersection of the two DataFrames.
+
+    Example:
+    >>> df1 >>AND>> df2
+    """
+    return df1.merge(df2, how='inner')
+
+@Infix
+def NOT(df1: pd.DataFrame, df2: pd.DataFrame) -> pd.DataFrame:
+    """
+    Set difference of two DataFrames (df1 - df2).
+
+    Parameters:
+    df1 (pd.DataFrame): First DataFrame.
+    df2 (pd.DataFrame): Second DataFrame.
+
+    Returns:
+    pd.DataFrame: Set difference of the two DataFrames.
+
+    Example:
+    >>> df1 >>NOT>> df2
+    """
+    return df1.merge(df2, how='left', indicator=True).query('_merge == "left_only"').drop(columns=['_merge'])
