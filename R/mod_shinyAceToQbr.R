@@ -267,14 +267,31 @@ transform_query_base <- function(query) {
       ))
     } else if (query$fun %in% c("DESCRIPTION", "MAP", "CHILDREN", "CODES")) {
       # Leaf node
+      id_field <- switch(query$fun,
+                         "DESCRIPTION" = "description",
+                         "MAP" = "map_codes",
+                         "CHILDREN" = "children",
+                         "CODES" = "codes")
+
+      operator <- "sct"
+
+      if (is.list(query$args)) {
+        if (!is.null(query$args$code_type)) {
+          operator <- query$args$code_type
+        } else if (!is.null(query$args$from)) {
+          operator <- query$args$from
+        }
+      }
+
       return(list(
-        id = tolower(query$fun),
-        field = tolower(query$fun),
+        id = id_field,
+        field = id_field,
         type = "string",
         input = "text",
-        operator = if (is.list(query$args) && !is.null(query$args$code_type)) query$args$code_type else "sct",
+        operator = operator,
         value = if (is.list(query$args) && !is.null(query$args[[1]])) query$args[[1]] else query$args
       ))
+
     } else if (query$fun %in% c("HAS_ATTRIBUTES")) {
       # Leaf node
       return(list(

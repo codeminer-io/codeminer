@@ -174,7 +174,17 @@ egs <- list(
         value = list("CHILD_BETA_BLOCKER_SUBSTANCE", "ATTRIBUTES_HAS_INGREDIENT")
       )
     )
-  )
+  ),
+  map_codes_query = list(query = rlang::parse_expr('MAP("E101 << Type 1 diabetes mellitus With ketoacidosis >>", from = "icd10")'), qbr = list(
+    list(
+      id = "map_codes",
+      field = "map_codes",
+      type = "string",
+      input = "text",
+      operator = "icd10",
+      value = "E101 << Type 1 diabetes mellitus With ketoacidosis >>"
+    )
+  ))
 )
 
 # TESTS -------------------------------------------------------------------
@@ -249,3 +259,17 @@ test_that("Has attributes (sct) query statements translate", {
                  deparse1())
 
 })
+
+test_that("Map codes query statements translate", {
+  expect_equal(translate_codeminer_query_to_qbr_list(egs$map_codes_query$query),
+               egs$map_codes_query$qbr)
+
+  expect_equal(egs$map_codes_query$query |>
+                 deparse1(),
+               egs$map_codes_query$qbr |>
+                 custom_qbr_translation() |>
+                 deparse1())
+
+})
+
+
