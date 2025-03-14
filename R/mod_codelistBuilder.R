@@ -761,11 +761,9 @@ sessioninfo::session_info()
       ),
       {
         # update qbr saved query filter
-        available_saved_queries <- saved_queries()$objects[[input$code_type]]
-
         new_filters <- update_qbr_filters(input_code_type = input$code_type,
                                           available_maps = available_maps,
-                                          available_saved_queries = as.list(available_saved_queries))
+                                          saved_query_objects = as.list(saved_queries()$objects))
 
         jqbr::updateQueryBuilder(
           inputId = "qb",
@@ -902,10 +900,15 @@ sessioninfo::session_info()
     observeEvent(input$btn_update_query, {
       selected_saved_query <- input$select_qb_load_saved_query
 
-      available_saved_queries <-
-        as.list(saved_queries()$objects[[input$code_type]]) %>%
-        purrr::discard(\(x) x == selected_saved_query) %>%
-        as.character()
+      available_saved_queries <- character()
+
+      if (!is.null(saved_queries()$objects)) {
+        available_saved_queries <- saved_queries()$objects |>
+          purrr::list_flatten() |>
+          as.character()
+
+        available_saved_queries <- available_saved_queries[!available_saved_queries == selected_saved_query]
+      }
 
       # ensure saved query filter only shows upstream dependencies for selected
       # query
@@ -914,7 +917,7 @@ sessioninfo::session_info()
                                                node = selected_saved_query,
                                                mode = "out")
 
-        available_saved_queries <- subset(available_saved_queries,!available_saved_queries %in% downstream_dependencies)
+        available_saved_queries <- available_saved_queries[!available_saved_queries %in% downstream_dependencies]
       }
 
       # finally
@@ -930,9 +933,16 @@ sessioninfo::session_info()
       updateTabsetPanel(inputId = "tabs_select_code_type",
                         selected = "tab_select_code_type_hide")
 
+      saved_query_objects <- as.list(saved_queries()$objects)
+
+      if (!rlang::is_empty(saved_query_objects)) {
+        saved_query_objects <- saved_queries()$objects |>
+          purrr::map(\(code_type) purrr::keep(code_type, .p = \(x) x %in% downstream_dependencies))
+      }
+
       new_filters <- update_qbr_filters(input_code_type = code_type,
                                         available_maps = available_maps,
-                                        available_saved_queries = as.list(available_saved_queries))
+                                        saved_query_objects = saved_query_objects)
 
 
       jqbr::updateQueryBuilder(

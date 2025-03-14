@@ -588,15 +588,31 @@ get_available_map_from_code_types <- function(available_maps, to) {
 #' Update jqbr filter code types
 #'
 #' @param input_code_type Character
-#' @param available_maps Character vector
-#' @param available_saved_queries Character vector
-#' @param sct_attributes_filters List of filters
+#' @param available_maps Tibble with cols "from" and "to"
+#' @param saved_query_objects List
 #'
 #' @return A list
 #' @noRd
 update_qbr_filters <- function(input_code_type,
                                available_maps,
-                               available_saved_queries) {
+                               saved_query_objects) {
+
+  # set up
+  if ("DIAB" %in% as.character(saved_query_objects$icd10)) {
+    browser()
+  }
+
+  mappable_code_types <- get_available_map_from_code_types(available_maps = available_maps,
+                                                           to = input_code_type)
+
+  available_saved_queries <- saved_query_objects[[input_code_type]]
+
+  mappable_saved_queries <- saved_query_objects |>
+    purrr::keep_at(as.character(mappable_code_types)) |>
+    purrr::list_flatten() |>
+    purrr::set_names(nm = NULL)
+
+  # create filters
   new_description_contains_filter <- description_contains_filter
   new_description_contains_filter$operators <-
     list(input_code_type)
@@ -605,14 +621,10 @@ update_qbr_filters <- function(input_code_type,
   new_codes_filter$operators <- list(input_code_type)
 
   new_map_codes_filter <- map_codes_filter
-  new_map_codes_filter$operators <-
-    get_available_map_from_code_types(available_maps = available_maps,
-                                      to = input_code_type)
+  new_map_codes_filter$operators <- mappable_code_types
 
   new_map_children_filter <- map_children_filter
-  new_map_children_filter$operators <-
-    get_available_map_from_code_types(available_maps = available_maps,
-                                      to = input_code_type)
+  new_map_children_filter$operators <- mappable_code_types
 
   new_child_codes_filter <- child_codes_filter
   new_child_codes_filter$operators <- list(input_code_type)
@@ -621,8 +633,13 @@ update_qbr_filters <- function(input_code_type,
   new_saved_query_filter$values <- available_saved_queries
   new_saved_query_filter$operators <- list(input_code_type)
 
+  new_map_saved_query_filter <- map_saved_query_filter
+  new_map_saved_query_filter$values <- mappable_saved_queries
+  new_map_saved_query_filter$operators <- list(input_code_type)
+
   new_filters <- list(
     new_saved_query_filter,
+    new_map_saved_query_filter,
     new_description_contains_filter,
     new_codes_filter,
     new_child_codes_filter,
@@ -649,6 +666,8 @@ update_qbr_filters <- function(input_code_type,
                           new_sct_attribute_types_from_filter,
                           new_sct_attribute_types_to_filter))
   }
+
+  lobstr::tree(new_saved_query_filter)
 
   new_filters
 }
@@ -767,6 +786,16 @@ codes_filter <- list(
   type = "string",
   operators = list("read2"),
   description = "Search for one or more codes separated by '|' e.g. 'E10 | E101' for ICD10. Comments may also be included between '<< >>' e.g. 'E10 << T1DM >> | E101 << T1DM with coma >>'."
+)
+
+map_saved_query_filter <- list(
+  id = "map_saved_query",
+  label = "Map",
+  type = "string",
+  input = "select",
+  values = list(""),
+  operators = list("read2"),
+  description = "Map a saved query from another coding system."
 )
 
 map_codes_filter <- list(
@@ -906,6 +935,7 @@ filters <- list(
   map_children_filter,
   child_codes_filter,
   empty_saved_query_filter,
+  map_saved_query_filter,
   sct_has_attributes_filter,
   sct_get_attributes_filter,
   sct_attribute_types_to_filter,
