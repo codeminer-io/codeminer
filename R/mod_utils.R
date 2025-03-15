@@ -442,6 +442,7 @@ get_qbr_saved_queries <- function(x) {
         "children" = NULL,
         "codes" = NULL,
         "saved_query" = x$value,
+        "map_saved_query" = x$value,
         "map_children" = NULL,
         "map_codes" = NULL,
         "sct_has_attributes" = x$value,
@@ -462,10 +463,14 @@ get_qbr_saved_queries <- function(x) {
 }
 
 # function to convert rules to expressions
-convert_rules_to_expr <- function(x) {
+convert_rules_to_expr <- function(x, nodes) {
   if (is.list(x) &
       identical(names(x),
                 c("id", "field", "type", "input", "operator", "value"))) {
+
+    if (x$id == "map_saved_query") {
+      from <- nodes[nodes$id == x$value, ]$group
+    }
 
     switch(
       x$id,
@@ -485,6 +490,9 @@ convert_rules_to_expr <- function(x) {
                      x$value,
                      code_type = x$operator)
       ),
+      "map_saved_query" = rlang::call2(.fn = "MAP",
+                                       as.symbol(x$value),
+                                       from = from),
       "sct_has_attributes" = rlang::call2(.fn = "HAS_ATTRIBUTES",
                                           as.symbol(x$value[[1]]),
                                           relationship = as.symbol(x$value[[2]])),
@@ -499,7 +507,7 @@ convert_rules_to_expr <- function(x) {
     )
 
   } else if (is.list(x)) {
-    purrr::map(x, convert_rules_to_expr)
+    purrr::map(x, \(.x ) convert_rules_to_expr(.x, nodes))
   } else {
     x
   }
@@ -532,10 +540,10 @@ apply_setops <- function(x) {
 }
 
 # function to process qbr rules
-custom_qbr_translation <- function(qbr_rules) {
+custom_qbr_translation <- function(qbr_rules, nodes) {
   # process qb rules
   qbr_rules %>%
-    purrr::map(convert_rules_to_expr) %>%
+    purrr::map(\(x) convert_rules_to_expr(x, nodes)) %>%
     apply_setops()
 }
 
@@ -749,6 +757,19 @@ recompute_all_queries <- function(saved_queries,
     updateTabsetPanel(inputId = "tabs_select_code_type",
                       selected = "tab_select_code_type_show")
   }
+}
+
+wrap_query_expr_with_code_type <- function(code_expr, code_type, nodes) {
+  # used when writing full set of query statements used to generate a 'final'
+  # query
+  code_type_fn <- nodes[nodes$id == rlang::as_string(code_expr[[2]]), ]$group
+
+  if (!rlang::is_empty(code_type_fn) && (code_type_fn != code_type)) {
+    # wrap statement in `with_code_type` options, if appropriate
+    code_expr <- rlang::call2(.fn = code_type_fn, code_expr)
+  }
+
+  return(code_expr)
 }
 
 ## jqbr filters and operators --------------------------------------------------------------------

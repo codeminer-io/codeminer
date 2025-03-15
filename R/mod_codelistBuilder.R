@@ -382,7 +382,7 @@ codelistBuilderServer <-
         if (is.null(input$qb)) {
           cat("<Enter query>")
         } else {
-          custom_qbr_translation(input$qb) %>%
+          custom_qbr_translation(input$qb, saved_queries()$dag$nodes) %>%
             rlang::expr_text() %>%
             cat()
         }
@@ -445,7 +445,7 @@ codelistBuilderServer <-
         if (is.null(input$qb)) {
           x <- FALSE
         } else {
-          query <- custom_qbr_translation(input$qb)
+          query <- custom_qbr_translation(input$qb, saved_queries()$dag$nodes)
 
           x <- run_query(
             query = query,
@@ -512,13 +512,21 @@ codelistBuilderServer <-
       output$result_query <- renderUI({
         req(query_result_type() == "query_result")
 
+        # render ACE (read only)
         shinyAce::aceEditor(
           ns("editor"),
           mode = "r",
           value = query_result()$query_code |>
+            purrr::map(
+              \(code_expr) wrap_query_expr_with_code_type(
+                code_expr,
+                query_result()$code_type,
+                saved_queries()$dag$nodes
+              )
+            ) |>
             purrr::map(deparse1) |>
             paste(sep = "", collapse = "\n"),
-          height = "200px",
+          height = "100px",
           autoScrollEditorIntoView = TRUE,
           readOnly = TRUE,
           wordWrap = TRUE
@@ -703,7 +711,15 @@ sessioninfo::session_info()
           DATE = input$qmd_date,
           QUERY_OPTIONS = rlang::expr_text(query_options()),
           DESCRIPTION = stringr::str_remove_all(input$qmd_description, "`"),
-          QUERY_CODE = paste(query_result()$query_code, sep = "", collapse = "\n"),
+          QUERY_CODE = query_result()$query_code |>
+            purrr::map(
+              \(code_expr) wrap_query_expr_with_code_type(
+                code_expr,
+                query_result()$code_type,
+                saved_queries()$dag$nodes
+              )
+            ) |>
+            paste(sep = "", collapse = "\n"),
           APPEND_INDICATORS_CODE = APPEND_INDICATORS_CODE,
           ONCLICK = stringr::str_glue("Reactable.downloadDataCSV('codelist-download', '{input$qmd_filename}.csv')")
         ) |>
