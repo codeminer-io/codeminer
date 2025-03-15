@@ -2339,8 +2339,8 @@ get_value_for_mapping_sheet <- function(mapping_table,
 #' @family Clinical code lookups and mappings
 get_lookup_sheet <- function(code_type) {
   # validate args
-  match.arg(code_type,
-    choices = CODE_TYPE_TO_LKP_TABLE_MAP$code
+  rlang::arg_match(code_type,
+    values = CODE_TYPE_TO_LKP_TABLE_MAP$code
   )
 
   # get lookup sheet
