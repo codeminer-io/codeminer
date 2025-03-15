@@ -13,7 +13,8 @@ build_all_lkps_maps(
   icd10_phecode_1_2 = get_phecode_icd10_map(),
   icd9_phecode_1_2 = get_phecode_icd9_map(),
   snomed_ct_uk_monolith = NULL,
-  snomed_ct_nhs_data_migration = NULL
+  snomed_ct_nhs_data_migration = NULL,
+  cprd_aurum_codebrowser_dir = NULL
 )
 }
 \arguments{
@@ -42,6 +43,10 @@ file (see \code{\link[=get_phecode_icd9_map]{get_phecode_icd9_map()}}).}
 \item{snomed_ct_uk_monolith}{Optional: path to the unzipped \href{https://isd.digital.nhs.uk/trud/users/guest/filters/2/categories/26/items/1799/releases}{SNOMED CT UK Monolith Edition}.}
 
 \item{snomed_ct_nhs_data_migration}{Optional: path to the unzipped \href{https://isd.digital.nhs.uk/trud/users/guest/filters/0/categories/9/items/9/releases}{NHS Data Migration}.}
+
+\item{cprd_aurum_codebrowser_dir}{Optional: path to the unzipped CPRD Aurum
+CodeBrowser folder. The folder name should contain the release date e.g.
+"CPRD_CodeBrowser_202412_Aurum".}
 }
 \value{
 Returns a named list of data frames.

@@ -4,9 +4,7 @@
 \alias{get_phecode_icd9_map}
 \title{Download the Phecode 1.2 to ICD9 mapping file}
 \usage{
-get_phecode_icd9_map(
-  path = file.path(tempdir(), "phecode_icd9_map_unrolled.csv.zip")
-)
+get_phecode_icd9_map(path = file.path(tempdir(), "phemap.rda"))
 }
 \arguments{
 \item{path}{Path where file will be downloaded to.}
@@ -15,7 +13,7 @@ get_phecode_icd9_map(
 File path to downloaded file.
 }
 \description{
-Download link obtained from https://phewascatalog.org/phecodes.
+Download link obtained from https://github.com/PheWAS/PheWAS/tree/master.
 }
 \examples{
 \dontrun{

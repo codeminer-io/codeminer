@@ -31,7 +31,7 @@ DESCRIPTION(
 \item{reg_expr}{a regular expression to search for}
 
 \item{code_type}{character. Type of clinical code system to be searched. One
-of icd10, icd9, read3, read2, sct, opcs4, phecode, read2_drugs, bnf, dmd, data_coding_3, data_coding_4, data_coding_5, or data_coding_6.}
+of icd10, icd9, read3, read2, sct, opcs4, phecode, read2_drugs, bnf, dmd, data_coding_3, data_coding_4, data_coding_5, data_coding_6, medcode_aurum, or prodcode_aurum.}
 
 \item{all_lkps_maps}{Either a named list of lookup and mapping tables
 (either data frames or \code{tbl_dbi} objects), or the path to a Duckdb database
