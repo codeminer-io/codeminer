@@ -643,7 +643,7 @@ update_qbr_filters <- function(input_code_type,
 
   new_map_saved_query_filter <- map_saved_query_filter
   new_map_saved_query_filter$values <- mappable_saved_queries
-  new_map_saved_query_filter$operators <- list(input_code_type)
+  new_map_saved_query_filter$operators <- list("from")
 
   new_filters <- list(
     new_saved_query_filter,
@@ -815,7 +815,7 @@ map_saved_query_filter <- list(
   type = "string",
   input = "select",
   values = list(""),
-  operators = list("read2"),
+  operators = list("from"),
   description = "Map a saved query from another coding system."
 )
 
@@ -976,6 +976,12 @@ code_type_operators <- CODE_TYPE_TO_LKP_TABLE_MAP %>%
 
 operators <- c(code_type_operators,
                list(
+                 list(
+                   type = "from",
+                   nb_inputs = 1,
+                   multiple = FALSE,
+                   apply_to = "string"
+                 ),
                  list(
                    type = "equals",
                    nb_inputs = 1,

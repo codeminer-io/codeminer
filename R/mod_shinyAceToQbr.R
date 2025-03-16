@@ -12,6 +12,7 @@ shinyAceToQbrServer <- function(id,
                                 initial_value = 'DESCRIPTION("diab") %AND% DESCRIPTION("retin|mac") %NOT%
     DESCRIPTION("absent|without") %OR% ((DESCRIPTION("diab") %AND%
     DESCRIPTION("nephro|neuro") %NOT% DESCRIPTION("absent|without")))',
+                                height = "200px",
                                 single_query_only = TRUE) {
 
   moduleServer(id, function(input, output, session) {
@@ -27,7 +28,7 @@ shinyAceToQbrServer <- function(id,
         ns("editor"),
         mode = "r",
         value = initial_value,
-        height = "200px",
+        height = height,
         autoComplete = "live",
         autoCompleters = "static",
         wordWrap = TRUE,
@@ -74,6 +75,15 @@ shinyAceToQbrServer <- function(id,
         # if list of multiple queries, all should include an assignment - return
         # a list of query calls and qbr lists
         result <- query_call |>
+
+          # first, deal with statements wrapped in a with_code_type helper
+          purrr::map(\(.x) extract_query_from_with_code_type_call(.x)) |>
+
+          # ...in such cases, the helper function gets removed and is now
+          # applied as the name of that list item
+          purrr::list_flatten() |>
+
+          # translate to qbr
           purrr::map(\(.x) list(query_call = .x,
                                         qbr = translate_codeminer_query_to_qbr_list(.x)))
       }
@@ -180,6 +190,7 @@ check_if_call_has_assignment <- function(query_call) {
   identical(rlang::sym("="), query_call[[1]]) |
     identical(rlang::sym("<-"), query_call[[1]])
 }
+
 
 translate_codeminer_query_to_qbr_list <- function(query_call) {
 
@@ -321,14 +332,24 @@ transform_query_base <- function(query) {
     } else if (query$fun %in% c("MAP")) {
 
       if (is.list(query$args)) {
-        if (identical(purrr::pluck(query, "args", 1, "fun"), "CHILDREN")) {
-          operator <- purrr::pluck(query, "args", 1, "args", "code_type")
-          value <- purrr::pluck(query, "args", 1, "args", 1)
-          id_field <- "map_children"
+        if (rlang::is_symbol(purrr::pluck(query, "args", 1))) {
+          operator <- purrr::pluck(query, "args", "from")
+          value <- rlang::as_string(purrr::pluck(query, "args", 1))
+          id_field <- "map_saved_query"
+          input <- "select"
         } else {
-          operator <- query$args$from
-          value <- query$args[[1]]
-          id_field <- "map_codes"
+
+          input <- "text"
+
+          if (identical(purrr::pluck(query, "args", 1, "fun"), "CHILDREN")) {
+            operator <- purrr::pluck(query, "args", 1, "args", "code_type")
+            value <- purrr::pluck(query, "args", 1, "args", 1)
+            id_field <- "map_children"
+          } else {
+            operator <- query$args$from
+            value <- query$args[[1]]
+            id_field <- "map_codes"
+          }
         }
       }
 
@@ -336,7 +357,7 @@ transform_query_base <- function(query) {
         id = id_field,
         field = id_field,
         type = "string",
-        input = "text",
+        input = input,
         operator = operator,
         value = value
       ))
@@ -348,6 +369,44 @@ transform_query <- function(query) {
   result <- transform_query_base(query)
 
   result$valid <- TRUE
+
+  return(result)
+}
+
+#' Remove with_code_type helper from codeminer query
+#'
+#' @param code A single expression
+#'
+#' @return Either the expression unchanged, or a list named with the extracted
+#'   code_type
+#' @noRd
+#'
+#' @examples
+#' example_query <- '
+#' icd10((DR = DESCRIPTION("diabetic retinopathy")))
+#' RESULT = MAP(DR, from = "icd10")
+#' ' |> rlang::parse_exprs()
+extract_query_from_with_code_type_call <- function(code) {
+  # code is a single expression
+  result <- code
+
+  fn <- as.character(result[[1]])
+
+  # if wrapped in a with_code_type helper function, extract out the query
+  if(fn %in% CODE_TYPE_TO_LKP_TABLE_MAP$code) {
+
+    result <- result |>
+      rlang::call_args()
+
+    # remove outer parentheses, if present
+    if (identical(rlang::as_string(result[[1]][[1]]), "(")) {
+      result <- result[[1]][[2]]
+    }
+
+    # return a named list
+    result <- list(result)
+    names(result) <- fn
+  }
 
   return(result)
 }

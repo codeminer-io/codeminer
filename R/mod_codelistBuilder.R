@@ -268,9 +268,18 @@ codelistBuilderServer <-
       ## Import from query text --------------------------------------------------
 
       shinyace_queries <- shinyAceToQbrServer("shinyace_import_input",
-                                              initial_value = 'DIABETIC_RETINOPATHY = DESCRIPTION("diab") %AND% DESCRIPTION("retin|mac") %NOT%
-    DESCRIPTION("absent|without") %OR% ((DESCRIPTION("diab") %AND%
-    DESCRIPTION("nephro|neuro") %NOT% DESCRIPTION("absent|without")))\n\nx = DESCRIPTION("cyst")',
+                                              height = "500px",
+                                              initial_value = '# BNF child codes, mapped to SCT
+bnf((BNF_STATIN_CHEMICAL_SUBSTANCES = CHILDREN("0212000AA << Rosuvastatin Calcium >> | 0212000AC << Simvastatin & Ezetimibe >> | 0212000AJ << Fenofibrate/Simvastatin >> | 0212000B0 << Atorvastatin >> | 0212000C0 << Cerivastatin >> | 0212000M0 << Fluvastatin Sodium >> | 0212000R0 << Lovastatin >> | 0212000X0 << Pravastatin Sodium >> | 0212000Y0 << Simvastatin >>")))\n
+sct((CHILDREN_MAPPED_BNF_STATIN_CHEMICAL_SUBSTANCES = MAP(BNF_STATIN_CHEMICAL_SUBSTANCES, from = "bnf")))\n
+# SCT child codes
+sct((CHILDREN_PRODUCT_CONTAINING_STATIN = CHILDREN("96302009 << Product containing 3-hydroxy-3-methylglutaryl-coenzyme A reductase inhibitor (product) >>")))\n
+# SCT codes with statin active ingredient
+sct((CHILDREN_STATIN_SUBSTANCE = CHILDREN("372912004 << Substance with 3-hydroxy-3-methylglutaryl-coenzyme A reductase inhibitor mechanism of action (substance) >>")))\nsct((HAS_INGREDIENT = CODES("127489000 << Has active ingredient (attribute) >> | 762949000 << Has precise active ingredient (attribute) >> |  10362801000001104 << Has specific active ingredient (attribute) >>")))\nsct((HAS_STATIN_SUBSTANCE = HAS_ATTRIBUTES(CHILDREN_STATIN_SUBSTANCE, relationship = HAS_INGREDIENT)))\n
+# Combine above to a single SCT codelist
+sct((STATINS_CODELIST_SCT = CHILDREN_MAPPED_BNF_STATIN_CHEMICAL_SUBSTANCES %OR% CHILDREN_PRODUCT_CONTAINING_STATIN %OR% HAS_STATIN_SUBSTANCE))\n
+# Map to CPRD prodcodes
+STATINS_CODELIST_PRODCODE = MAP(STATINS_CODELIST_SCT, from = "sct")',
                                               single_query_only = FALSE)
 
       # confirm selected choices
@@ -298,25 +307,34 @@ codelistBuilderServer <-
           withProgress(message = "Importing...", {
             step <- 1
 
-            # reset
-            saved_queries(list(
+            # reset, saving current environment in case import fails
+            empty_saved_queries <- list(
               objects = list(),
               results = new.env(),
               results_meta = new.env(),
               dag = list(nodes = data.frame(), edges = data.frame())
-            ))
+            )
+
+            old_saved_queries <- saved_queries()
+
+            saved_queries(empty_saved_queries)
 
             # import queries
-            import_query_options <- query_options()
-            import_query_options$codemapper.code_type <- input$import_code_type
-            import_query_options$codemapper.map_to <- input$import_code_type
-            import_query_options <- reactiveVal(import_query_options)
-
             for (i in seq_along(shinyace_queries())) {
 
               print(deparse1(shinyace_queries()[[i]]$query_call[[2]]))
 
               query_call <- shinyace_queries()[[i]]$query_call
+
+              # determine whether query statement is from a different code_type
+              # e.g. `icd10(CYST = DESCRIPTION("cyst"))` needs code_type "icd10"
+              query_code_type <- names(shinyace_queries())[i]
+
+              if (!is.null(query_code_type) & !identical(input$import_code_type, query_code_type) & query_code_type %in% CODE_TYPE_TO_LKP_TABLE_MAP$code) {
+                query_code_type <- query_code_type
+              } else {
+                query_code_type <- input$import_code_type
+              }
 
               if (!check_if_call_has_assignment(query_call)) {
                 showNotification(
@@ -329,35 +347,65 @@ codelistBuilderServer <-
                   type = "warning",
                   duration = 10
                 )
+                # reset to previous state
+                saved_queries(old_saved_queries)
+                showNotification(
+                  paste0("Previous state has been restored"),
+                  type = "default",
+                  duration = 10
+                )
                 break()
               }
 
+              # get
               query_call <- query_call[[3]]
+
+              import_query_options <- query_options()
+              import_query_options$codemapper.code_type <- query_code_type
+              import_query_options$codemapper.map_to <- query_code_type
+              import_query_options <- reactiveVal(import_query_options)
 
               .query_result_temp <- reactiveVal(run_query(
                   query = query_call,
-                  code_type = input$import_code_type,
+                  code_type = query_code_type,
                   qb = shinyace_queries()[[i]]$qbr,
                   query_options = import_query_options,
                   saved_queries = saved_queries,
                   dag_igraph = dag_igraph
                 ))
 
-              if (is.null(.query_result_temp()$result)) {
+              if (identical(nrow(.query_result_temp()$result), 0L)) {
                 showNotification(paste0(
                   "No matching codes found for `",
                   deparse1(shinyace_queries()[[i]]$query_call[[2]]),
                   "`. Aborting import"
                 ),
                 type = "error")
+
+                # reset to previous state
+                saved_queries(old_saved_queries)
+                showNotification(
+                  paste0("Did you mean to select a different import code type?"),
+                  type = "message",
+                  duration = 10
+                )
+                showNotification(
+                  paste0("Previous state has been restored"),
+                  type = "default",
+                  duration = 10
+                )
                 break()
               }
+
+               # if (deparse1(shinyace_queries()[[i]]$query_call[[2]]) == "STATINS_CODELIST_PRODCODE") {
+               #   browser()
+               # }
 
               update_saved_queries(
                 query = deparse1(shinyace_queries()[[i]]$query_call[[2]]),
                 query_result = .query_result_temp,
                 saved_queries = saved_queries,
-                code_type = input$import_code_type,
+                code_type = query_code_type,
                 query_options = query_options,
                 ignore_existing_query = FALSE
               )
@@ -394,7 +442,8 @@ codelistBuilderServer <-
         shinyjs::toggle(id = "hide_show_shiny_ace_input", anim = TRUE)
       )
 
-      shinyace_qbr_query <- shinyAceToQbrServer("shiny_ace_input")
+      shinyace_qbr_query <- shinyAceToQbrServer("shiny_ace_input",
+                                                height = "150px")
 
       observeEvent(input$shinyace_update_qbr, {
         # update qbr saved query filter
@@ -526,7 +575,7 @@ codelistBuilderServer <-
             ) |>
             purrr::map(deparse1) |>
             paste(sep = "", collapse = "\n"),
-          height = "100px",
+          height = "150px",
           autoScrollEditorIntoView = TRUE,
           readOnly = TRUE,
           wordWrap = TRUE

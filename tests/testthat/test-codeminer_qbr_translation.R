@@ -211,6 +211,17 @@ egs <- list(
                                 value = "C10.."
                               )
                             )),
+  map_saved_query = list(query = rlang::parse_expr('MAP(SAVED_QUERY, from = "bnf")'),
+                            qbr = list(
+                              list(
+                                id = "map_saved_query",
+                                field = "map_saved_query",
+                                type = "string",
+                                input = "select",
+                                operator = "bnf",
+                                value = "SAVED_QUERY"
+                              )
+                            )),
   attribute_types_from_query = list(query = rlang::parse_expr('ATTRIBUTE_TYPES_FROM(DR)'),
                                     qbr = list(
                                       list(
@@ -339,6 +350,19 @@ test_that("Map children query statements translate", {
                  deparse1(),
                egs$map_children_query$qbr |>
                  custom_qbr_translation() |>
+                 deparse1())
+
+})
+
+test_that("Map saved query statements translate", {
+  expect_equal(translate_codeminer_query_to_qbr_list(egs$map_saved_query$query),
+               egs$map_saved_query$qbr)
+
+  expect_equal(egs$map_saved_query$query |>
+                 deparse1(),
+               egs$map_saved_query$qbr |>
+                 custom_qbr_translation(nodes = data.frame(id = "SAVED_QUERY",
+                                                           group = "bnf")) |>
                  deparse1())
 
 })
