@@ -374,6 +374,30 @@ STATINS_CODELIST_PRODCODE = MAP(STATINS_CODELIST_SCT, from = "sct")',
                   dag_igraph = dag_igraph
                 ))
 
+              if (rlang::is_error(.query_result_temp()$error)) {
+                showNotification(paste0(
+                  "Error for `",
+                  deparse1(shinyace_queries()[[i]]$query_call[[2]]),
+                  "`. Aborting import - ",
+                  as.character(.query_result_temp()$error)
+                ),
+                type = "error")
+
+                # reset to previous state
+                saved_queries(old_saved_queries)
+                showNotification(
+                  paste0("Did you mean to select a different import code type?"),
+                  type = "message",
+                  duration = 10
+                )
+                showNotification(
+                  paste0("Previous state has been restored"),
+                  type = "default",
+                  duration = 10
+                )
+                break()
+              }
+
               if (identical(nrow(.query_result_temp()$result), 0L)) {
                 showNotification(paste0(
                   "No matching codes found for `",
@@ -396,10 +420,6 @@ STATINS_CODELIST_PRODCODE = MAP(STATINS_CODELIST_SCT, from = "sct")',
                 )
                 break()
               }
-
-               # if (deparse1(shinyace_queries()[[i]]$query_call[[2]]) == "STATINS_CODELIST_PRODCODE") {
-               #   browser()
-               # }
 
               update_saved_queries(
                 query = deparse1(shinyace_queries()[[i]]$query_call[[2]]),
