@@ -201,6 +201,7 @@ codelistBuilderInput <-
             selectInput(
               ns("import_code_type"),
               "Code type",
+              selected = "sct",
               choices = get_code_type_labels(available_code_types = available_code_types)
             ),
             shinyAceToQbrInput(ns("shinyace_import_input")),
@@ -271,15 +272,14 @@ codelistBuilderServer <-
                                               height = "500px",
                                               initial_value = '# BNF child codes, mapped to SCT
 bnf((BNF_STATIN_CHEMICAL_SUBSTANCES = CHILDREN("0212000AA << Rosuvastatin Calcium >> | 0212000AC << Simvastatin & Ezetimibe >> | 0212000AJ << Fenofibrate/Simvastatin >> | 0212000B0 << Atorvastatin >> | 0212000C0 << Cerivastatin >> | 0212000M0 << Fluvastatin Sodium >> | 0212000R0 << Lovastatin >> | 0212000X0 << Pravastatin Sodium >> | 0212000Y0 << Simvastatin >>")))\n
-sct((CHILDREN_MAPPED_BNF_STATIN_CHEMICAL_SUBSTANCES = MAP(BNF_STATIN_CHEMICAL_SUBSTANCES, from = "bnf")))\n
+CHILDREN_MAPPED_BNF_STATIN_CHEMICAL_SUBSTANCES = MAP(BNF_STATIN_CHEMICAL_SUBSTANCES, from = "bnf")\n
 # SCT child codes
-sct((CHILDREN_PRODUCT_CONTAINING_STATIN = CHILDREN("96302009 << Product containing 3-hydroxy-3-methylglutaryl-coenzyme A reductase inhibitor (product) >>")))\n
+CHILDREN_PRODUCT_CONTAINING_STATIN = CHILDREN("96302009 << Product containing 3-hydroxy-3-methylglutaryl-coenzyme A reductase inhibitor (product) >>")\n
 # SCT codes with statin active ingredient
-sct((CHILDREN_STATIN_SUBSTANCE = CHILDREN("372912004 << Substance with 3-hydroxy-3-methylglutaryl-coenzyme A reductase inhibitor mechanism of action (substance) >>")))\nsct((HAS_INGREDIENT = CODES("127489000 << Has active ingredient (attribute) >> | 762949000 << Has precise active ingredient (attribute) >> |  10362801000001104 << Has specific active ingredient (attribute) >>")))\nsct((HAS_STATIN_SUBSTANCE = HAS_ATTRIBUTES(CHILDREN_STATIN_SUBSTANCE, relationship = HAS_INGREDIENT)))\n
+CHILDREN_STATIN_SUBSTANCE = CHILDREN("372912004 << Substance with 3-hydroxy-3-methylglutaryl-coenzyme A reductase inhibitor mechanism of action (substance) >>")\nHAS_INGREDIENT = CODES("127489000 << Has active ingredient (attribute) >> | 762949000 << Has precise active ingredient (attribute) >> |  10362801000001104 << Has specific active ingredient (attribute) >>")\nHAS_STATIN_SUBSTANCE = HAS_ATTRIBUTES(CHILDREN_STATIN_SUBSTANCE, relationship = HAS_INGREDIENT)\n
 # Combine above to a single SCT codelist
-sct((STATINS_CODELIST_SCT = CHILDREN_MAPPED_BNF_STATIN_CHEMICAL_SUBSTANCES %OR% CHILDREN_PRODUCT_CONTAINING_STATIN %OR% HAS_STATIN_SUBSTANCE))\n
-# Map to CPRD prodcodes
-STATINS_CODELIST_PRODCODE = MAP(STATINS_CODELIST_SCT, from = "sct")',
+STATINS_CODELIST_SCT = CHILDREN_MAPPED_BNF_STATIN_CHEMICAL_SUBSTANCES %OR% CHILDREN_PRODUCT_CONTAINING_STATIN %OR% HAS_STATIN_SUBSTANCE
+',
                                               single_query_only = FALSE)
 
       # confirm selected choices
