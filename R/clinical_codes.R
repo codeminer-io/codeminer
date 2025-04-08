@@ -16,8 +16,8 @@
 
 #' Search for codes that match a description
 #'
-#' Returns a data frame with clinical codes that match the supplied regular
-#' expression. Ignores case by default.
+#' Returns a data frame with clinical codes with descriptions that match the
+#' supplied regular expression. Ignores case by default.
 #'
 #' @param reg_expr a regular expression to search for
 #' @inheritParams stringr::regex
@@ -162,6 +162,127 @@ code_descriptions_like <- function(reg_expr,
 
   codes <- subset(codes,
                   !is.na(codes))
+
+  result <- lookup_codes(
+    codes = codes,
+    code_type = code_type,
+    all_lkps_maps = all_lkps_maps,
+    preferred_description_only = preferred_description_only,
+    standardise_output = standardise_output,
+    col_filters = col_filters,
+    unrecognised_codes = "error",
+    .return_unrecognised_codes = FALSE
+  )
+
+  if (codes_only) {
+    if (standardise_output) {
+      return(result$code)
+    } else {
+      return(result[[code_col]])
+    }
+  } else {
+    return(result)
+  }
+}
+
+#' Search for codes matching a regular expression
+#'
+#' Returns a data frame with clinical codes that match the supplied regular
+#' expression. Case is *not* ignored.
+#'
+#' @param reg_expr a regular expression to search for
+#' @inheritParams stringr::regex
+#' @inheritParams lookup_codes
+#' @param codes_only bool. If \code{TRUE}, return a character vector of
+#'   \emph{unique} codes. If \code{FALSE} (default), return a data frame of all
+#'   results including code descriptions (useful for manual validation).
+#'
+#' @return data frame by default, or a character vector of codes if
+#'   \code{codes_only} is \code{TRUE}.
+#' @export
+#' @name codes_like
+#' @examples
+#' # build dummy all_lkps_maps
+#' all_lkps_maps_dummy <- build_all_lkps_maps_dummy()
+#'
+#' # lookup ICD10 code descriptions matching 'cyst'
+#' CODES_LIKE(
+#'   reg_expr = "^E10.*",
+#'   code_type = "icd10",
+#'   all_lkps_maps = all_lkps_maps_dummy
+#' )
+CODES_LIKE <- function(reg_expr,
+                       code_type = getOption("codemapper.code_type"),
+                       all_lkps_maps = NULL,
+                       codes_only = FALSE,
+                       preferred_description_only = TRUE,
+                       standardise_output = TRUE,
+                       col_filters = getOption("codemapper.col_filters")) {
+  # validate args
+  assertthat::is.string(reg_expr)
+
+  assertthat::assert_that(!(codes_only & standardise_output), msg = "Error! `codes_only` and `standardise_output` cannot both be `TRUE`")
+
+  match.arg(arg = code_type, choices = CODE_TYPE_TO_LKP_TABLE_MAP$code)
+
+  # connect to database file path if `all_lkps_maps` is a string, or `NULL`
+  if (is.character(all_lkps_maps)) {
+    con <- check_all_lkps_maps_path(all_lkps_maps)
+    all_lkps_maps <- ukbwranglr::db_tables_to_list(con)
+    on.exit(DBI::dbDisconnect(con, shutdown = TRUE))
+  } else if (is.null(all_lkps_maps)) {
+    if (Sys.getenv("ALL_LKPS_MAPS_DB") != "") {
+      # message(paste0("Attempting to connect to ", Sys.getenv("ALL_LKPS_MAPS_DB")))
+      con <-
+        check_all_lkps_maps_path(Sys.getenv("ALL_LKPS_MAPS_DB"))
+      all_lkps_maps <- ukbwranglr::db_tables_to_list(con)
+      on.exit(DBI::dbDisconnect(con, shutdown = TRUE))
+    } else if (file.exists("all_lkps_maps.db")) {
+      # message("Attempting to connect to all_lkps_maps.db in current working directory")
+      con <- check_all_lkps_maps_path("all_lkps_maps.db")
+      all_lkps_maps <- ukbwranglr::db_tables_to_list(con)
+      on.exit(DBI::dbDisconnect(con, shutdown = TRUE))
+    } else {
+      stop(
+        "No/invalid path supplied to `all_lkps_maps` and no file called 'all_lkps_maps.db' found in current working directory. See `?all_lkps_maps_to_db()`"
+      )
+    }
+  }
+
+  validate_all_lkps_maps()
+
+  # determine relevant lookup sheet
+  lkp_table <- get_lookup_sheet(code_type = code_type)
+
+  # determine code and description columns for lookup sheet
+  code_col <- get_col_for_lookup_sheet(lookup_sheet = lkp_table, column = "code_col")
+
+  description_col <-
+    get_col_for_lookup_sheet(lookup_sheet = lkp_table, column = "description_col")
+
+  # determine relevant column indicating whether code description is preferred
+  # (for code types with synonymous code descriptions like read 2 and read 3)
+  preferred_description_col <-
+    get_col_for_lookup_sheet(lookup_sheet = lkp_table, column = "preferred_synonym_col")
+
+  # get preferred code, if appropriate
+  if (!is.na(preferred_description_col)) {
+    preferred_description_code <-
+      get_preferred_description_code_for_lookup_sheet(lookup_sheet = lkp_table)
+  }
+
+  # search for codes
+
+  ## get all codes matching regex
+
+  result <- all_lkps_maps[[lkp_table]] %>%
+    dplyr::filter(stringr::str_detect(string = .data[[code_col]], pattern = reg_expr)) %>%
+    dplyr::collect()
+
+  ## then expand, optionally including both primary and secondary descriptions
+  codes <- unique(result[[code_col]])
+
+  codes <- subset(codes, !is.na(codes))
 
   result <- lookup_codes(
     codes = codes,
