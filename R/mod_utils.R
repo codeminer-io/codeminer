@@ -441,6 +441,7 @@ get_qbr_saved_queries <- function(x) {
         "description" = NULL,
         "children" = NULL,
         "codes" = NULL,
+        "codes_like" = NULL,
         "saved_query" = x$value,
         "map_saved_query" = x$value,
         "map_children" = NULL,
@@ -481,6 +482,8 @@ convert_rules_to_expr <- function(x, nodes) {
                                    x$value),
       "codes" = rlang::call2(.fn = "CODES",
                              x$value),
+      "codes_like" = rlang::call2(.fn = "CODES_LIKE",
+                                 x$value),
       "map_codes" = rlang::call2(.fn = "MAP",
                                  x$value,
                                  from = x$operator),
@@ -628,6 +631,9 @@ update_qbr_filters <- function(input_code_type,
   new_codes_filter <- codes_filter
   new_codes_filter$operators <- list(input_code_type)
 
+  new_codes_like_filter <- codes_like_filter
+  new_codes_like_filter$operators <- list(input_code_type)
+
   new_map_codes_filter <- map_codes_filter
   new_map_codes_filter$operators <- mappable_code_types
 
@@ -650,6 +656,7 @@ update_qbr_filters <- function(input_code_type,
     new_map_saved_query_filter,
     new_description_contains_filter,
     new_codes_filter,
+    new_codes_like_filter,
     new_child_codes_filter,
     new_map_codes_filter,
     new_map_children_filter
@@ -798,7 +805,15 @@ description_contains_filter <- list(
   label = "Description",
   type = "string",
   operators = list("read2"),
-  description = "Search for codes that match a regular expression (case insensitive). For example, '^a' will search for all codes starting with either 'A' or 'a'."
+  description = "Search for codes with descriptions that match a regular expression (case insensitive). For example, '^a' will search for all codes with descriptions that start with either 'A' or 'a'."
+)
+
+codes_like_filter <- list(
+  id = "codes_like",
+  label = "Codes like",
+  type = "string",
+  operators = list("read2"),
+  description = "Search for codes that match a regular expression (case insensitive). For example, '^E10[1|2]' will search for all codes starting with 'E10' follwed by either '1' or '2'."
 )
 
 codes_filter <- list(
@@ -952,6 +967,7 @@ sct_attribute_types_from_filter <- list(
 filters <- list(
   description_contains_filter,
   codes_filter,
+  codes_like_filter,
   map_codes_filter,
   map_children_filter,
   child_codes_filter,
