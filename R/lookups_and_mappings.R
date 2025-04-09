@@ -139,6 +139,9 @@ all_lkps_maps_to_db <- function(all_lkps_maps = build_all_lkps_maps(),
 #'   \code{\link{get_ukb_all_lkps_maps}}.
 #' @param ukb_codings The UK Biobank codings file, as returned by
 #'   \code{\link[ukbwranglr]{get_ukb_codings}}.
+#' @param bnf_lkp Optional: default is to obtain a BNF lookup from the
+#'   OpenPrescribing API. If `NULL`, the BNF look up table from UK Biobank
+#'   resource 592 will be used instead.
 #' @param bnf_dmd Optional: path to the NHSBSA BNF-SNOMED mapping table (see
 #'   [get_nhsbsa_snomed_bnf()]).
 #' @param self_report_med_to_atc_map Optional: path to a UK Biobank
@@ -167,6 +170,7 @@ all_lkps_maps_to_db <- function(all_lkps_maps = build_all_lkps_maps(),
 #' build_all_lkps_maps(
 #'   all_lkps_maps = read_all_lkps_maps_dummy(),
 #'   ukb_codings = read_ukb_codings_dummy(),
+#'   bnf_lkp = NULL,
 #'   bnf_dmd = NULL,
 #'   self_report_med_to_atc_map = NULL,
 #'   snomed_ct_uk_monolith = NULL,
@@ -177,6 +181,7 @@ all_lkps_maps_to_db <- function(all_lkps_maps = build_all_lkps_maps(),
 build_all_lkps_maps <-
   function(all_lkps_maps = read_all_lkps_maps(),
            ukb_codings = ukbwranglr::get_ukb_codings(),
+           bnf_lkp = get_bnf_from_open_prescribing(),
            bnf_dmd = get_nhsbsa_snomed_bnf(),
            self_report_med_to_atc_map = get_ukb_self_report_med_to_atc_map(),
            phecode_1_2_lkp = get_phecode_definitions(),
@@ -223,8 +228,14 @@ build_all_lkps_maps <-
     message("Extending tables in UKB resource 592")
     all_lkps_maps$read_v2_drugs_bnf <-
       extend_read_v2_drugs_bnf(all_lkps_maps)
-    all_lkps_maps$bnf_lkp <-
-      extend_bnf_lkp(all_lkps_maps)
+
+    if (!is.null(bnf_lkp)) {
+      all_lkps_maps$bnf_lkp <- bnf_lkp
+    } else {
+      # if no BNF lookup supplied, use UKB resouce 592
+      all_lkps_maps$bnf_lkp <-
+        extend_bnf_lkp(all_lkps_maps)
+    }
 
     # opcs4 -------------------------
 
@@ -602,6 +613,45 @@ get_ukb_all_lkps_maps <- function(dir_path = tempdir()) {
 
   # return file path
   return(file.path(dir_path, primarycare_codings))
+}
+
+#' Get the BNF terminology from OpenPrescribing
+#'
+#' Downloads the full BNF via the OpenPrescribing API
+#'
+#' @returns Tibble.
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' get_bnf_from_open_prescribing()
+#' }
+get_bnf_from_open_prescribing <- function() {
+  # retrieve full BNF terminology
+  result <- 0:9 |>
+    purrr::map(
+      \(x) stringr::str_glue(
+        'https://openprescribing.net/api/1.0/bnf_code/?q={x}&format=csv'
+      )
+    ) |>
+    purrr::map(readr::read_csv,
+               col_types = readr::cols(.default = "c"),
+               .progress = TRUE) |>
+    dplyr::bind_rows() |>
+    dplyr::distinct()
+
+  # bnf codes with '.' - each part of the 'id' (separated by .) should be padded
+  # to two digits, then concatenated
+  result <- result |>
+    dplyr::mutate(id = stringr::str_split(.data[["id"]], "\\.")) |>
+    dplyr::mutate(id = purrr::map_chr(.data[["id"]], \(.x) paste0(
+      stringr::str_pad(.x, 2, pad = "0"), collapse = ""
+    ), .progress = TRUE))
+
+  # rename to match UKB resource
+  result |>
+    dplyr::rename(BNF_Code = dplyr::all_of("id"),
+                  Description =dplyr::all_of("name"))
 }
 
 #' Download and read a UKB welf-reported medication code to ATC mapping file
@@ -1273,10 +1323,10 @@ read_cprd_aurum_codebrowser_dir <- function(cprd_aurum_codebrowser_dir) {
   # minimally reformat
   result$prodcode_aurum <- result$prodcode_aurum |>
     dplyr::rename_with(\(x) stringr::str_replace_all(x, " ", "_")) |>
-    dplyr::mutate(DrugIssues = as.integer(DrugIssues))
+    dplyr::mutate("DrugIssues" = as.integer(.data[["DrugIssues"]]))
 
   result$medcode_aurum <- result$medcode_aurum |>
-    dplyr::mutate(Observations = as.integer(Observations))
+    dplyr::mutate("Observations" = as.integer(.data[["Observations"]]))
 
   return(result)
 }

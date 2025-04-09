@@ -82,6 +82,7 @@ build_all_lkps_maps_dummy <- function() {
   suppressMessages(build_all_lkps_maps(
     all_lkps_maps = read_all_lkps_maps_dummy(),
     ukb_codings = read_ukb_codings_dummy(),
+    bnf_lkp = NULL,
     bnf_dmd = NULL,
     self_report_med_to_atc_map = NULL,
     snomed_ct_uk_monolith = NULL,
