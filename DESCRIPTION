@@ -35,7 +35,6 @@ Suggests:
     visNetwork,
     withr,
     igraph,
-    jqbr,
     quarto,
     downlit,
     xml2,

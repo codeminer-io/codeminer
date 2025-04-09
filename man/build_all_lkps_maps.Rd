@@ -7,6 +7,7 @@
 build_all_lkps_maps(
   all_lkps_maps = read_all_lkps_maps(),
   ukb_codings = ukbwranglr::get_ukb_codings(),
+  bnf_lkp = get_bnf_from_open_prescribing(),
   bnf_dmd = get_nhsbsa_snomed_bnf(),
   self_report_med_to_atc_map = get_ukb_self_report_med_to_atc_map(),
   phecode_1_2_lkp = get_phecode_definitions(),
@@ -23,6 +24,10 @@ build_all_lkps_maps(
 
 \item{ukb_codings}{The UK Biobank codings file, as returned by
 \code{\link[ukbwranglr]{get_ukb_codings}}.}
+
+\item{bnf_lkp}{Optional: default is to obtain a BNF lookup from the
+OpenPrescribing API. If \code{NULL}, the BNF look up table from UK Biobank
+resource 592 will be used instead.}
 
 \item{bnf_dmd}{Optional: path to the NHSBSA BNF-SNOMED mapping table (see
 \code{\link[=get_nhsbsa_snomed_bnf]{get_nhsbsa_snomed_bnf()}}).}

@@ -10,8 +10,6 @@ start_api(host = "0.0.0.0", port = 8000)
 \item{host}{The host IP (default: "0.0.0.0")}
 
 \item{port}{The port number (default: 8000)}
-
-\item{plumber_file}{Path to plumber.R}
 }
 \description{
 Exposes API endpoints for dummy clinical events and code descriptions.

@@ -106,7 +106,7 @@ query_result_df_to_shinytree_input <- function(query_result) {
     unite_code_with_description(new_col = "code",
                                 description_col = "description",
                                 code_col = "code") |>
-    dplyr::select(-code_type)
+    dplyr::select(-dplyr::all_of("code_type"))
 
   # subset relationships table for query results and their children
   result_relations <- filter_sct_relationship(
@@ -128,8 +128,8 @@ query_result_df_to_shinytree_input <- function(query_result) {
   # relationships table, meaning "4855003" and all its children will appear twice
   # in the tree, once under each of the 2 parents)
   result_relations_top_nodes_to_remove <- result_relations |>
-    dplyr::filter(!destinationId %in% sourceId) |>
-    dplyr::filter(!destinationId %in% !!query_result_children$code)
+    dplyr::filter(!.data[["destinationId"]] %in% .data[["sourceId"]]) |>
+    dplyr::filter(!.data[["destinationId"]] %in% !!query_result_children$code)
 
   result_relations <- result_relations |>
     dplyr::anti_join(
@@ -144,8 +144,8 @@ query_result_df_to_shinytree_input <- function(query_result) {
     suppressWarnings() |>
     dplyr::bind_rows(query_result_children) |>
     dplyr::distinct() |>
-    dplyr::mutate(selected = dplyr::case_when(code %in% !!query_result$code ~ TRUE, TRUE ~ FALSE)) |>
-    dplyr::select(-code_type) |>
+    dplyr::mutate(selected = dplyr::case_when(.data[["code"]] %in% !!query_result$code ~ TRUE, TRUE ~ FALSE)) |>
+    dplyr::select(-dplyr::all_of("code_type")) |>
     unite_code_with_description(
       new_col = "description",
       description_col = "description",
@@ -160,9 +160,10 @@ query_result_df_to_shinytree_input <- function(query_result) {
 
   result_relations_with_descriptions <- result_relations |>
     dplyr::left_join(result_descriptions, by = c("sourceId" = "code")) |>
-    dplyr::select(sourceId = description, destinationId) |>
+    dplyr::select(sourceId = dplyr::all_of("description"),
+                  dplyr::all_of("destinationId")) |>
     dplyr::left_join(result_descriptions, by = c("destinationId" = "code")) |>
-    dplyr::select(sourceId, destinationId = description)
+    dplyr::select(dplyr::all_of("sourceId"), destinationId = dplyr::all_of("description"))
 
   # check all codes in relationships table are included in descriptions table
   stopifnot(all(
@@ -175,8 +176,8 @@ query_result_df_to_shinytree_input <- function(query_result) {
 
   # get top level ancestors and categorise
   rels_top <- result_relations_with_descriptions |>
-    dplyr::filter(!destinationId %in% sourceId) |>
-    dplyr::select(sourceId = destinationId) |>
+    dplyr::filter(!.data[["destinationId"]] %in% .data[["sourceId"]]) |>
+    dplyr::select(sourceId = dplyr::all_of("destinationId")) |>
     dplyr::distinct() |>
     mutate_category_from_sct_description(new_col = "destinationId", description_col = "sourceId")
 
@@ -184,13 +185,13 @@ query_result_df_to_shinytree_input <- function(query_result) {
   # get codes from descriptions table that are not in relationships table (e.g. inactive codes)
   descriptions_to_append_to_relationships <- result_descriptions |>
     dplyr::filter((
-      !description %in% !!result_relations_with_descriptions$sourceId
+      !.data[["description"]] %in% !!result_relations_with_descriptions$sourceId
     ) &
       (
-        !description %in% !!result_relations_with_descriptions$destinationId
+        !.data[["description"]] %in% !!result_relations_with_descriptions$destinationId
       )
     ) |>
-    dplyr::select(sourceId = description) |>
+    dplyr::select(sourceId = dplyr::all_of("description")) |>
     mutate_category_from_sct_description(new_col = "destinationId", description_col = "sourceId")
 
   result_relations_with_descriptions <- list(
@@ -252,29 +253,28 @@ update_description_col <- function(.df,
                                    description_col,
                                    values_to_update,
                                    appended_text = "INACTIVE") {
-  .df |>
-    dplyr::mutate(
-      !!description_col := dplyr::case_when(
-        .data[[description_col]] %in% !!values_to_update &
-          stringr::str_detect(.data[[description_col]], "\\(([^)]+)\\)$", negate = FALSE) ~ stringr::str_replace(
-            .data[[description_col]],
-            pattern = "\\)$",
-            replacement = paste0(" ", appended_text, ")")
-          ),
-        .data[[description_col]] %in% !!values_to_update &
-          stringr::str_detect(.data[[description_col]], "\\(([^)]+)\\)$", negate = TRUE) ~ paste0(.data[[description_col]], " (", appended_text, ")"),
-        TRUE ~ .data[[description_col]]
-      )
-    )
+
+  .df[[description_col]] <- dplyr::case_when(
+    .df[[description_col]] %in% values_to_update &
+      stringr::str_detect(.df[[description_col]], "\\(([^)]+)\\)$", negate = FALSE) ~ stringr::str_replace(
+        .df[[description_col]],
+        pattern = "\\)$",
+        replacement = paste0(" ", appended_text, ")")
+      ),
+    .df[[description_col]] %in% values_to_update &
+      stringr::str_detect(.df[[description_col]], "\\(([^)]+)\\)$", negate = TRUE) ~ paste0(.df[[description_col]], " (", appended_text, ")"),
+    TRUE ~ .df[[description_col]]
+  )
+
+  return(.df)
 }
 
 mutate_category_from_sct_description <- function(.df, new_col, description_col) {
-  .df |>
-    dplyr::mutate(
-      !!new_col := stringr::str_extract(.data[[description_col]], "\\([^()]+\\)$") |>
-        stringr::str_remove_all("[()]") |>
-        stringr::str_to_sentence()
-    )
+  .df[[new_col]] <- stringr::str_extract(.df[[description_col]], "\\([^()]+\\)$") |>
+    stringr::str_remove_all("[()]") |>
+    stringr::str_to_sentence()
+
+  return(.df)
 }
 
 get_sct_inactive_codes <- function(sct_codes) {

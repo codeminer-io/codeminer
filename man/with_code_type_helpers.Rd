@@ -88,7 +88,11 @@ Available functions:
 \dontrun{
 icd10(DESCRIPTION("diabetes"))
 bnf(CODES("0204 << Beta-Adrenoceptor Blocking Drugs >>"))
-sct(CHILDREN("770765001 << Proliferative retinopathy of right eye due to diabetes mellitus (disorder) >>"))
+sct(
+  CHILDREN(
+    "770765001 << Proliferative retinopathy of right eye due to diabetes mellitus (disorder) >>"
+  )
+)
 }
 
 }
