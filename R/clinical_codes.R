@@ -122,30 +122,15 @@ code_descriptions_like <- function(reg_expr,
   ## description though e.g. searching for 'QOF' won't capture the primary
   ## description 'Quality and Outcome...'
 
-  # Note - it isn't possible to specify `ignore_case` when using dbplyr
+  # Note - it isn't possible to specify `ignore_case` when using dbplyr, so use
+  # `tolower()`
   if (ignore_case) {
-    if (is.data.frame(all_lkps_maps[[lkp_table]])) {
-      result <- all_lkps_maps[[lkp_table]] %>%
-        dplyr::filter(stringr::str_detect(
-          string = .data[[description_col]],
-          pattern = stringr::regex(
-            pattern = reg_expr,
-            ignore_case = TRUE
-          )
-        ))
-    } else if (dplyr::is.tbl(all_lkps_maps[[lkp_table]])) {
-      # build SQL query
-      sql <- glue::glue_sql(
-        "SELECT *
-        FROM {`lkp_table`}
-        WHERE (REGEXP_MATCHES({`description_col`}, {reg_expr}, 'i'))",
-        .con = dbplyr::remote_con(x = all_lkps_maps[[lkp_table]])
-      )
-
-      # collect results
-      query <- DBI::dbSendQuery(dbplyr::remote_con(x = all_lkps_maps[[lkp_table]]), sql)
-      result <- DBI::dbFetch(query, Inf)
-    }
+    result <- all_lkps_maps[[lkp_table]] %>%
+      dplyr::filter(stringr::str_detect(
+        string = tolower(.data[[description_col]]),
+        pattern = tolower(reg_expr)
+      )) %>%
+      dplyr::collect()
   } else {
     # if `ignore_case` is `FALSE`, then same code will work for both data
     # frame/tbl_dbi object
