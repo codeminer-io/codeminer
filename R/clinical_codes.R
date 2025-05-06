@@ -61,29 +61,7 @@ code_descriptions_like <- function(reg_expr,
     choices = CODE_TYPE_TO_LKP_TABLE_MAP$code
   )
 
-  # connect to database file path if `all_lkps_maps` is a string, or `NULL`
-  if (is.character(all_lkps_maps)) {
-    con <- check_all_lkps_maps_path(all_lkps_maps)
-    all_lkps_maps <- ukbwranglr::db_tables_to_list(con)
-    on.exit(DBI::dbDisconnect(con, shutdown = TRUE))
-  } else if (is.null(all_lkps_maps)) {
-    if (Sys.getenv("ALL_LKPS_MAPS_DB") != "") {
-      # message(paste0("Attempting to connect to ", Sys.getenv("ALL_LKPS_MAPS_DB")))
-      con <-
-        check_all_lkps_maps_path(Sys.getenv("ALL_LKPS_MAPS_DB"))
-      all_lkps_maps <- ukbwranglr::db_tables_to_list(con)
-      on.exit(DBI::dbDisconnect(con, shutdown = TRUE))
-    } else if (file.exists("all_lkps_maps.db")) {
-      # message("Attempting to connect to all_lkps_maps.db in current working directory")
-      con <- check_all_lkps_maps_path("all_lkps_maps.db")
-      all_lkps_maps <- ukbwranglr::db_tables_to_list(con)
-      on.exit(DBI::dbDisconnect(con, shutdown = TRUE))
-    } else {
-      stop(
-        "No/invalid path supplied to `all_lkps_maps` and no file called 'all_lkps_maps.db' found in current working directory. See `?all_lkps_maps_to_db()`"
-      )
-    }
-  }
+  rlang::eval_bare(create_db_connection(all_lkps_maps), env = rlang::current_env())
 
   validate_all_lkps_maps()
 
@@ -210,29 +188,7 @@ CODES_LIKE <- function(reg_expr,
 
   match.arg(arg = code_type, choices = CODE_TYPE_TO_LKP_TABLE_MAP$code)
 
-  # connect to database file path if `all_lkps_maps` is a string, or `NULL`
-  if (is.character(all_lkps_maps)) {
-    con <- check_all_lkps_maps_path(all_lkps_maps)
-    all_lkps_maps <- ukbwranglr::db_tables_to_list(con)
-    on.exit(DBI::dbDisconnect(con, shutdown = TRUE))
-  } else if (is.null(all_lkps_maps)) {
-    if (Sys.getenv("ALL_LKPS_MAPS_DB") != "") {
-      # message(paste0("Attempting to connect to ", Sys.getenv("ALL_LKPS_MAPS_DB")))
-      con <-
-        check_all_lkps_maps_path(Sys.getenv("ALL_LKPS_MAPS_DB"))
-      all_lkps_maps <- ukbwranglr::db_tables_to_list(con)
-      on.exit(DBI::dbDisconnect(con, shutdown = TRUE))
-    } else if (file.exists("all_lkps_maps.db")) {
-      # message("Attempting to connect to all_lkps_maps.db in current working directory")
-      con <- check_all_lkps_maps_path("all_lkps_maps.db")
-      all_lkps_maps <- ukbwranglr::db_tables_to_list(con)
-      on.exit(DBI::dbDisconnect(con, shutdown = TRUE))
-    } else {
-      stop(
-        "No/invalid path supplied to `all_lkps_maps` and no file called 'all_lkps_maps.db' found in current working directory. See `?all_lkps_maps_to_db()`"
-      )
-    }
-  }
+  rlang::eval_bare(create_db_connection(all_lkps_maps), env = rlang::current_env())
 
   validate_all_lkps_maps()
 
@@ -372,29 +328,7 @@ lookup_codes <- function(codes,
     choices = CODE_TYPE_TO_LKP_TABLE_MAP$code
   )
 
-  # connect to database file path if `all_lkps_maps` is a string, or `NULL`
-  if (is.character(all_lkps_maps)) {
-    con <- check_all_lkps_maps_path(all_lkps_maps)
-    all_lkps_maps <- ukbwranglr::db_tables_to_list(con)
-    on.exit(DBI::dbDisconnect(con, shutdown = TRUE))
-  } else if (is.null(all_lkps_maps)) {
-    if (Sys.getenv("ALL_LKPS_MAPS_DB") != "") {
-      # message(paste0("Attempting to connect to ", Sys.getenv("ALL_LKPS_MAPS_DB")))
-      con <-
-        check_all_lkps_maps_path(Sys.getenv("ALL_LKPS_MAPS_DB"))
-      all_lkps_maps <- ukbwranglr::db_tables_to_list(con)
-      on.exit(DBI::dbDisconnect(con, shutdown = TRUE))
-    } else if (file.exists("all_lkps_maps.db")) {
-      # message("Attempting to connect to all_lkps_maps.db in current working directory")
-      con <- check_all_lkps_maps_path("all_lkps_maps.db")
-      all_lkps_maps <- ukbwranglr::db_tables_to_list(con)
-      on.exit(DBI::dbDisconnect(con, shutdown = TRUE))
-    } else {
-      stop(
-        "No/invalid path supplied to `all_lkps_maps` and no file called 'all_lkps_maps.db' found in current working directory. See `?all_lkps_maps_to_db()`"
-      )
-    }
-  }
+  rlang::eval_bare(create_db_connection(all_lkps_maps), env = rlang::current_env())
 
   validate_all_lkps_maps()
 
@@ -1079,29 +1013,7 @@ get_children_sct_old <- function(codes,
 
   out_codes <- out_codes$code
 
-  # connect to database file path if `all_lkps_maps` is a string, or `NULL`
-  if (is.character(all_lkps_maps)) {
-    con <- check_all_lkps_maps_path(all_lkps_maps)
-    all_lkps_maps <- ukbwranglr::db_tables_to_list(con)
-    on.exit(DBI::dbDisconnect(con, shutdown = TRUE))
-  } else if (is.null(all_lkps_maps)) {
-    if (Sys.getenv("ALL_LKPS_MAPS_DB") != "") {
-      # message(paste0("Attempting to connect to ", Sys.getenv("ALL_LKPS_MAPS_DB")))
-      con <-
-        check_all_lkps_maps_path(Sys.getenv("ALL_LKPS_MAPS_DB"))
-      all_lkps_maps <- ukbwranglr::db_tables_to_list(con)
-      on.exit(DBI::dbDisconnect(con, shutdown = TRUE))
-    } else if (file.exists("all_lkps_maps.db")) {
-      # message("Attempting to connect to all_lkps_maps.db in current working directory")
-      con <- check_all_lkps_maps_path("all_lkps_maps.db")
-      all_lkps_maps <- ukbwranglr::db_tables_to_list(con)
-      on.exit(DBI::dbDisconnect(con, shutdown = TRUE))
-    } else {
-      stop(
-        "No/invalid path supplied to `all_lkps_maps` and no file called 'all_lkps_maps.db' found in current working directory. See `?all_lkps_maps_to_db()`"
-      )
-    }
-  }
+  rlang::eval_bare(create_db_connection(all_lkps_maps), env = rlang::current_env())
 
   if (!include_self) {
     out_codes <- subset(out_codes,
@@ -1405,29 +1317,7 @@ map_codes <- function(codes,
     codes <- codes_string_to_vector(codes)
   }
 
-  # connect to database file path if `all_lkps_maps` is a string, or `NULL`
-  if (is.character(all_lkps_maps)) {
-    con <- check_all_lkps_maps_path(all_lkps_maps)
-    all_lkps_maps <- ukbwranglr::db_tables_to_list(con)
-    on.exit(DBI::dbDisconnect(con, shutdown = TRUE))
-  } else if (is.null(all_lkps_maps)) {
-    if (Sys.getenv("ALL_LKPS_MAPS_DB") != "") {
-      # message(paste0("Attempting to connect to ", Sys.getenv("ALL_LKPS_MAPS_DB")))
-      con <-
-        check_all_lkps_maps_path(Sys.getenv("ALL_LKPS_MAPS_DB"))
-      all_lkps_maps <- ukbwranglr::db_tables_to_list(con)
-      on.exit(DBI::dbDisconnect(con, shutdown = TRUE))
-    } else if (file.exists("all_lkps_maps.db")) {
-      # message("Attempting to connect to all_lkps_maps.db in current working directory")
-      con <- check_all_lkps_maps_path("all_lkps_maps.db")
-      all_lkps_maps <- ukbwranglr::db_tables_to_list(con)
-      on.exit(DBI::dbDisconnect(con, shutdown = TRUE))
-    } else {
-      stop(
-        "No/invalid path supplied to `all_lkps_maps` and no file called 'all_lkps_maps.db' found in current working directory. See `?all_lkps_maps_to_db()`"
-      )
-    }
-  }
+  rlang::eval_bare(create_db_connection(all_lkps_maps), env = rlang::current_env())
 
   validate_all_lkps_maps()
 
@@ -1596,29 +1486,7 @@ get_mapping_df <- function(to = getOption("codemapper.map_to"),
     )
   }
 
-  # connect to database file path if `all_lkps_maps` is a string, or `NULL`
-  if (is.character(all_lkps_maps)) {
-    con <- check_all_lkps_maps_path(all_lkps_maps)
-    all_lkps_maps <- ukbwranglr::db_tables_to_list(con)
-    on.exit(DBI::dbDisconnect(con, shutdown = TRUE))
-  } else if (is.null(all_lkps_maps)) {
-    if (Sys.getenv("ALL_LKPS_MAPS_DB") != "") {
-      # message(paste0("Attempting to connect to ", Sys.getenv("ALL_LKPS_MAPS_DB")))
-      con <-
-        check_all_lkps_maps_path(Sys.getenv("ALL_LKPS_MAPS_DB"))
-      all_lkps_maps <- ukbwranglr::db_tables_to_list(con)
-      on.exit(DBI::dbDisconnect(con, shutdown = TRUE))
-    } else if (file.exists("all_lkps_maps.db")) {
-      # message("Attempting to connect to all_lkps_maps.db in current working directory")
-      con <- check_all_lkps_maps_path("all_lkps_maps.db")
-      all_lkps_maps <- ukbwranglr::db_tables_to_list(con)
-      on.exit(DBI::dbDisconnect(con, shutdown = TRUE))
-    } else {
-      stop(
-        "No/invalid path supplied to `all_lkps_maps` and no file called 'all_lkps_maps.db' found in current working directory. See `?all_lkps_maps_to_db()`"
-      )
-    }
-  }
+  rlang::eval_bare(create_db_connection(all_lkps_maps), env = rlang::current_env())
 
   check_table_exists_in_all_lkps_maps(all_lkps_maps = all_lkps_maps,
                                       table_name = mapping_table)
@@ -1755,29 +1623,7 @@ reformat_icd10_codes <- function(icd10_codes,
     stop("`strip_x` can only be `TRUE` if `output_icd10_format` is 'ALT_CODE'")
   }
 
-  # connect to database file path if `all_lkps_maps` is a string, or `NULL`
-  if (is.character(all_lkps_maps)) {
-    con <- check_all_lkps_maps_path(all_lkps_maps)
-    all_lkps_maps <- ukbwranglr::db_tables_to_list(con)
-    on.exit(DBI::dbDisconnect(con, shutdown = TRUE))
-  } else if (is.null(all_lkps_maps)) {
-    if (Sys.getenv("ALL_LKPS_MAPS_DB") != "") {
-      message(paste0("Attempting to connect to ", Sys.getenv("ALL_LKPS_MAPS_DB")))
-      con <-
-        check_all_lkps_maps_path(Sys.getenv("ALL_LKPS_MAPS_DB"))
-      all_lkps_maps <- ukbwranglr::db_tables_to_list(con)
-      on.exit(DBI::dbDisconnect(con, shutdown = TRUE))
-    } else if (file.exists("all_lkps_maps.db")) {
-      message("Attempting to connect to all_lkps_maps.db in current working directory")
-      con <- check_all_lkps_maps_path("all_lkps_maps.db")
-      all_lkps_maps <- ukbwranglr::db_tables_to_list(con)
-      on.exit(DBI::dbDisconnect(con, shutdown = TRUE))
-    } else {
-      stop(
-        "No/invalid path supplied to `all_lkps_maps` and no file called 'all_lkps_maps.db' found in current working directory. See `?all_lkps_maps_to_db()`"
-      )
-    }
-  }
+  rlang::eval_bare(create_db_connection(all_lkps_maps), env = rlang::current_env())
 
   validate_all_lkps_maps()
 
@@ -1880,6 +1726,41 @@ default_col_filters <- function() {
 
 # PRIVATE FUNCTIONS -------------------------------------------------------
 
+create_db_connection <- function(all_lkps_maps) {
+  # connect to database file path if `all_lkps_maps` is a string, or `NULL`
+  if (is.character(all_lkps_maps)) {
+    expr <- rlang::expr({
+      con <- check_all_lkps_maps_path(all_lkps_maps)
+      all_lkps_maps <- ukbwranglr::db_tables_to_list(con)
+      on.exit(DBI::dbDisconnect(con, shutdown = TRUE))
+    })
+  } else if (is.null(all_lkps_maps)) {
+    if (Sys.getenv("ALL_LKPS_MAPS_DB") != "") {
+      # message(paste0("Attempting to connect to ", Sys.getenv("ALL_LKPS_MAPS_DB")))
+      expr <- rlang::expr({
+        con <-
+          check_all_lkps_maps_path(Sys.getenv("ALL_LKPS_MAPS_DB"))
+        all_lkps_maps <- ukbwranglr::db_tables_to_list(con)
+        on.exit(DBI::dbDisconnect(con, shutdown = TRUE))
+      })
+    } else if (file.exists("all_lkps_maps.db")) {
+      # message("Attempting to connect to all_lkps_maps.db in current working directory")
+      expr <- rlang::expr({
+        con <- check_all_lkps_maps_path("all_lkps_maps.db")
+        all_lkps_maps <- ukbwranglr::db_tables_to_list(con)
+        on.exit(DBI::dbDisconnect(con, shutdown = TRUE))
+      })
+    } else {
+      stop(
+        "No/invalid path supplied to `all_lkps_maps` and no file called 'all_lkps_maps.db' found in current working directory. See `?all_lkps_maps_to_db()`"
+      )
+    }
+
+    return(expr)
+    # rlang::eval_bare(expr, env = rlang::caller_env())
+  }
+}
+
 #' Get all available SNOMED CT relationship types
 #'
 #' @inheritParams lookup_codes
@@ -1887,29 +1768,7 @@ default_col_filters <- function() {
 #' @return A data frame
 #' @noRd
 get_all_sct_relation_types <- function(all_lkps_maps = NULL) {
-  # connect to database file path if `all_lkps_maps` is a string, or `NULL`
-  if (is.character(all_lkps_maps)) {
-    con <- check_all_lkps_maps_path(all_lkps_maps)
-    all_lkps_maps <- ukbwranglr::db_tables_to_list(con)
-    on.exit(DBI::dbDisconnect(con, shutdown = TRUE))
-  } else if (is.null(all_lkps_maps)) {
-    if (Sys.getenv("ALL_LKPS_MAPS_DB") != "") {
-      # message(paste0("Attempting to connect to ", Sys.getenv("ALL_LKPS_MAPS_DB")))
-      con <-
-        check_all_lkps_maps_path(Sys.getenv("ALL_LKPS_MAPS_DB"))
-      all_lkps_maps <- ukbwranglr::db_tables_to_list(con)
-      on.exit(DBI::dbDisconnect(con, shutdown = TRUE))
-    } else if (file.exists("all_lkps_maps.db")) {
-      # message("Attempting to connect to all_lkps_maps.db in current working directory")
-      con <- check_all_lkps_maps_path("all_lkps_maps.db")
-      all_lkps_maps <- ukbwranglr::db_tables_to_list(con)
-      on.exit(DBI::dbDisconnect(con, shutdown = TRUE))
-    } else {
-      stop(
-        "No/invalid path supplied to `all_lkps_maps` and no file called 'all_lkps_maps.db' found in current working directory. See `?all_lkps_maps_to_db()`"
-      )
-    }
-  }
+  rlang::eval_bare(create_db_connection(all_lkps_maps), env = rlang::current_env())
 
   all_lkps_maps$sct_relationship %>%
     dplyr::select(tidyselect::all_of("typeId")) %>%
@@ -1942,29 +1801,7 @@ filter_sct_relationship <- function(codes = NULL,
     stopifnot(is.null(sourceId_filter) | is.null(destinationId_filter))
   }
 
-  # connect to database file path if `all_lkps_maps` is a string, or `NULL`
-  if (is.character(all_lkps_maps)) {
-    con <- check_all_lkps_maps_path(all_lkps_maps)
-    all_lkps_maps <- ukbwranglr::db_tables_to_list(con)
-    on.exit(DBI::dbDisconnect(con, shutdown = TRUE))
-  } else if (is.null(all_lkps_maps)) {
-    if (Sys.getenv("ALL_LKPS_MAPS_DB") != "") {
-      # message(paste0("Attempting to connect to ", Sys.getenv("ALL_LKPS_MAPS_DB")))
-      con <-
-        check_all_lkps_maps_path(Sys.getenv("ALL_LKPS_MAPS_DB"))
-      all_lkps_maps <- ukbwranglr::db_tables_to_list(con)
-      on.exit(DBI::dbDisconnect(con, shutdown = TRUE))
-    } else if (file.exists("all_lkps_maps.db")) {
-      # message("Attempting to connect to all_lkps_maps.db in current working directory")
-      con <- check_all_lkps_maps_path("all_lkps_maps.db")
-      all_lkps_maps <- ukbwranglr::db_tables_to_list(con)
-      on.exit(DBI::dbDisconnect(con, shutdown = TRUE))
-    } else {
-      stop(
-        "No/invalid path supplied to `all_lkps_maps` and no file called 'all_lkps_maps.db' found in current working directory. See `?all_lkps_maps_to_db()`"
-      )
-    }
-  }
+  rlang::eval_bare(create_db_connection(all_lkps_maps), env = rlang::current_env())
 
   check_table_exists_in_all_lkps_maps(all_lkps_maps = all_lkps_maps,
                                       table_name = "sct_relationship")
@@ -2097,29 +1934,7 @@ get_relatives_attributes_sct <- function(codes = NULL,
     }
   }
 
-  # connect to database file path if `all_lkps_maps` is a string, or `NULL`
-  if (is.character(all_lkps_maps)) {
-    con <- check_all_lkps_maps_path(all_lkps_maps)
-    all_lkps_maps <- ukbwranglr::db_tables_to_list(con)
-    on.exit(DBI::dbDisconnect(con, shutdown = TRUE))
-  } else if (is.null(all_lkps_maps)) {
-    if (Sys.getenv("ALL_LKPS_MAPS_DB") != "") {
-      # message(paste0("Attempting to connect to ", Sys.getenv("ALL_LKPS_MAPS_DB")))
-      con <-
-        check_all_lkps_maps_path(Sys.getenv("ALL_LKPS_MAPS_DB"))
-      all_lkps_maps <- ukbwranglr::db_tables_to_list(con)
-      on.exit(DBI::dbDisconnect(con, shutdown = TRUE))
-    } else if (file.exists("all_lkps_maps.db")) {
-      # message("Attempting to connect to all_lkps_maps.db in current working directory")
-      con <- check_all_lkps_maps_path("all_lkps_maps.db")
-      all_lkps_maps <- ukbwranglr::db_tables_to_list(con)
-      on.exit(DBI::dbDisconnect(con, shutdown = TRUE))
-    } else {
-      stop(
-        "No/invalid path supplied to `all_lkps_maps` and no file called 'all_lkps_maps.db' found in current working directory. See `?all_lkps_maps_to_db()`"
-      )
-    }
-  }
+  rlang::eval_bare(create_db_connection(all_lkps_maps), env = rlang::current_env())
 
   # TO DELETE - too slow (maybe)
 
@@ -2262,29 +2077,7 @@ codes_starting_with <- function(codes,
     choices = CODE_TYPE_TO_LKP_TABLE_MAP$code
   )
 
-  # connect to database file path if `all_lkps_maps` is a string, or `NULL`
-  if (is.character(all_lkps_maps)) {
-    con <- check_all_lkps_maps_path(all_lkps_maps)
-    all_lkps_maps <- ukbwranglr::db_tables_to_list(con)
-    on.exit(DBI::dbDisconnect(con, shutdown = TRUE))
-  } else if (is.null(all_lkps_maps)) {
-    if (Sys.getenv("ALL_LKPS_MAPS_DB") != "") {
-      message(paste0("Attempting to connect to ", Sys.getenv("ALL_LKPS_MAPS_DB")))
-      con <-
-        check_all_lkps_maps_path(Sys.getenv("ALL_LKPS_MAPS_DB"))
-      all_lkps_maps <- ukbwranglr::db_tables_to_list(con)
-      on.exit(DBI::dbDisconnect(con, shutdown = TRUE))
-    } else if (file.exists("all_lkps_maps.db")) {
-      message("Attempting to connect to all_lkps_maps.db in current working directory")
-      con <- check_all_lkps_maps_path("all_lkps_maps.db")
-      all_lkps_maps <- ukbwranglr::db_tables_to_list(con)
-      on.exit(DBI::dbDisconnect(con, shutdown = TRUE))
-    } else {
-      stop(
-        "No/invalid path supplied to `all_lkps_maps` and no file called 'all_lkps_maps.db' found in current working directory. See `?all_lkps_maps_to_db()`"
-      )
-    }
-  }
+  rlang::eval_bare(create_db_connection(all_lkps_maps), env = rlang::current_env())
 
   check_codes(codes)
 
