@@ -61,7 +61,7 @@ code_descriptions_like <- function(reg_expr,
     choices = CODE_TYPE_TO_LKP_TABLE_MAP$code
   )
 
-  rlang::eval_bare(create_db_connection(all_lkps_maps), env = rlang::current_env())
+  create_db_connection(all_lkps_maps)
 
   validate_all_lkps_maps()
 
@@ -188,7 +188,7 @@ CODES_LIKE <- function(reg_expr,
 
   match.arg(arg = code_type, choices = CODE_TYPE_TO_LKP_TABLE_MAP$code)
 
-  rlang::eval_bare(create_db_connection(all_lkps_maps), env = rlang::current_env())
+  create_db_connection(all_lkps_maps)
 
   validate_all_lkps_maps()
 
@@ -328,7 +328,7 @@ lookup_codes <- function(codes,
     choices = CODE_TYPE_TO_LKP_TABLE_MAP$code
   )
 
-  rlang::eval_bare(create_db_connection(all_lkps_maps), env = rlang::current_env())
+  create_db_connection(all_lkps_maps)
 
   validate_all_lkps_maps()
 
@@ -1013,7 +1013,7 @@ get_children_sct_old <- function(codes,
 
   out_codes <- out_codes$code
 
-  rlang::eval_bare(create_db_connection(all_lkps_maps), env = rlang::current_env())
+  create_db_connection(all_lkps_maps)
 
   if (!include_self) {
     out_codes <- subset(out_codes,
@@ -1317,7 +1317,7 @@ map_codes <- function(codes,
     codes <- codes_string_to_vector(codes)
   }
 
-  rlang::eval_bare(create_db_connection(all_lkps_maps), env = rlang::current_env())
+  create_db_connection(all_lkps_maps)
 
   validate_all_lkps_maps()
 
@@ -1486,7 +1486,7 @@ get_mapping_df <- function(to = getOption("codemapper.map_to"),
     )
   }
 
-  rlang::eval_bare(create_db_connection(all_lkps_maps), env = rlang::current_env())
+  create_db_connection(all_lkps_maps)
 
   check_table_exists_in_all_lkps_maps(all_lkps_maps = all_lkps_maps,
                                       table_name = mapping_table)
@@ -1623,7 +1623,7 @@ reformat_icd10_codes <- function(icd10_codes,
     stop("`strip_x` can only be `TRUE` if `output_icd10_format` is 'ALT_CODE'")
   }
 
-  rlang::eval_bare(create_db_connection(all_lkps_maps), env = rlang::current_env())
+  create_db_connection(all_lkps_maps)
 
   validate_all_lkps_maps()
 
@@ -1726,9 +1726,20 @@ default_col_filters <- function() {
 
 # PRIVATE FUNCTIONS -------------------------------------------------------
 
+#' Connect to duckdb
+#'
+#' If a valid path to a duckdb database is supplied, then will create *in the
+#' calling function environment* (i) a connection object `con` and (ii) a list
+#' of tbl objects `all_lkps_maps`.
+#'
+#' @inheritParams CODES
+#'
+#' @return `NULL`
+#' @noRd
 create_db_connection <- function(all_lkps_maps) {
+  expr <- NULL
   # connect to database file path if `all_lkps_maps` is a string, or `NULL`
-  if (is.character(all_lkps_maps)) {
+  if (rlang::is_string(all_lkps_maps)) {
     expr <- rlang::expr({
       con <- check_all_lkps_maps_path(all_lkps_maps)
       all_lkps_maps <- ukbwranglr::db_tables_to_list(con)
@@ -1755,10 +1766,8 @@ create_db_connection <- function(all_lkps_maps) {
         "No/invalid path supplied to `all_lkps_maps` and no file called 'all_lkps_maps.db' found in current working directory. See `?all_lkps_maps_to_db()`"
       )
     }
-
-    return(expr)
-    # rlang::eval_bare(expr, env = rlang::caller_env())
   }
+  rlang::eval_bare(expr, env = rlang::caller_env())
 }
 
 #' Get all available SNOMED CT relationship types
@@ -1768,7 +1777,7 @@ create_db_connection <- function(all_lkps_maps) {
 #' @return A data frame
 #' @noRd
 get_all_sct_relation_types <- function(all_lkps_maps = NULL) {
-  rlang::eval_bare(create_db_connection(all_lkps_maps), env = rlang::current_env())
+  create_db_connection(all_lkps_maps)
 
   all_lkps_maps$sct_relationship %>%
     dplyr::select(tidyselect::all_of("typeId")) %>%
@@ -1801,7 +1810,7 @@ filter_sct_relationship <- function(codes = NULL,
     stopifnot(is.null(sourceId_filter) | is.null(destinationId_filter))
   }
 
-  rlang::eval_bare(create_db_connection(all_lkps_maps), env = rlang::current_env())
+  create_db_connection(all_lkps_maps)
 
   check_table_exists_in_all_lkps_maps(all_lkps_maps = all_lkps_maps,
                                       table_name = "sct_relationship")
@@ -1934,7 +1943,7 @@ get_relatives_attributes_sct <- function(codes = NULL,
     }
   }
 
-  rlang::eval_bare(create_db_connection(all_lkps_maps), env = rlang::current_env())
+  create_db_connection(all_lkps_maps)
 
   # TO DELETE - too slow (maybe)
 
@@ -2077,7 +2086,7 @@ codes_starting_with <- function(codes,
     choices = CODE_TYPE_TO_LKP_TABLE_MAP$code
   )
 
-  rlang::eval_bare(create_db_connection(all_lkps_maps), env = rlang::current_env())
+  create_db_connection(all_lkps_maps)
 
   check_codes(codes)
 
