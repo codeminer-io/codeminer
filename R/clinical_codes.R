@@ -1741,24 +1741,27 @@ create_db_connection <- function(all_lkps_maps) {
   # connect to database file path if `all_lkps_maps` is a string, or `NULL`
   if (rlang::is_string(all_lkps_maps)) {
     expr <- rlang::expr({
-      con <- check_all_lkps_maps_path(all_lkps_maps)
-      all_lkps_maps <- ukbwranglr::db_tables_to_list(con)
+      md <- stringr::str_starts(all_lkps_maps, "md:")
+      con <- check_all_lkps_maps_path(all_lkps_maps, md)
+      all_lkps_maps <- db_tables_to_list(con, md)
       on.exit(DBI::dbDisconnect(con, shutdown = TRUE))
     })
   } else if (is.null(all_lkps_maps)) {
     if (Sys.getenv("ALL_LKPS_MAPS_DB") != "") {
       # message(paste0("Attempting to connect to ", Sys.getenv("ALL_LKPS_MAPS_DB")))
       expr <- rlang::expr({
+        all_lkps_maps <- Sys.getenv("ALL_LKPS_MAPS_DB")
+        md <- stringr::str_starts(all_lkps_maps, "md:")
         con <-
-          check_all_lkps_maps_path(Sys.getenv("ALL_LKPS_MAPS_DB"))
-        all_lkps_maps <- ukbwranglr::db_tables_to_list(con)
+          check_all_lkps_maps_path(Sys.getenv("ALL_LKPS_MAPS_DB"), md)
+        all_lkps_maps <- db_tables_to_list(con, md)
         on.exit(DBI::dbDisconnect(con, shutdown = TRUE))
       })
     } else if (file.exists("all_lkps_maps.db")) {
       # message("Attempting to connect to all_lkps_maps.db in current working directory")
       expr <- rlang::expr({
-        con <- check_all_lkps_maps_path("all_lkps_maps.db")
-        all_lkps_maps <- ukbwranglr::db_tables_to_list(con)
+        con <- check_all_lkps_maps_path("all_lkps_maps.db", FALSE)
+        all_lkps_maps <- db_tables_to_list(con, FALSE)
         on.exit(DBI::dbDisconnect(con, shutdown = TRUE))
       })
     } else {
@@ -1768,6 +1771,34 @@ create_db_connection <- function(all_lkps_maps) {
     }
   }
   rlang::eval_bare(expr, env = rlang::caller_env())
+}
+
+db_tables_to_list <- function(con, md) {
+
+  # use "db" schema if motherduck connection
+  schema <- NULL
+  if(md) {
+    schema <- "db"
+  }
+
+  tables <- DBI::dbListTables(con, schema = md) |>
+    setdiff(c("shared_with_me", "databases", "owned_shares"))
+
+  tables_named <- purrr::set_names(tables)
+
+  if (md) {
+    result <-  purrr::map(
+      tables_named,
+      \(.x) dplyr::tbl(con, DBI::Id(schema = schema, table = .x))
+    )
+  } else {
+    result <- purrr::map(
+      tables_named,
+      \(.x) dplyr::tbl(con, .x)
+    )
+  }
+
+  return(result)
 }
 
 #' Get all available SNOMED CT relationship types
@@ -2929,23 +2960,30 @@ check_mapping_args <- function(from,
   ))
 }
 
-check_all_lkps_maps_path <- function(file_path) {
-  # check file exists
-  assertthat::assert_that(file.exists(file_path),
-                          msg = paste0(
-                            "Error! No file found at ",
-                            file_path
-                          )
-  )
+check_all_lkps_maps_path <- function(file_path, md = FALSE) {
 
-  # check file ends with '.db'
-  assertthat::assert_that(stringr::str_detect(
-    file_path,
-    ".+\\.db"
-  ))
+  # determine whether using motherduck
+  if (md) {
+    # connect - requires motherduck extension and `motherduck_token`
+    # environmental variable
+    con <- DBI::dbConnect(duckdb::duckdb(), read_only = TRUE)
+    DBI::dbExecute(con, stringr::str_glue("ATTACH '{file_path}' AS db;"))
+  } else {
+    # check file exists
+    assertthat::assert_that(file.exists(file_path),
+                            msg = paste0("Error! No file found at ", file_path))
 
+    # check file ends with '.db'
+    assertthat::assert_that(stringr::str_detect(
+      file_path,
+      ".+\\.db"
+    ))
+
+    # connect
+    con <- DBI::dbConnect(duckdb::duckdb(), file_path, read_only = TRUE)
+  }
   # return con object if tests pass
-  DBI::dbConnect(duckdb::duckdb(), file_path, read_only = TRUE)
+  return(con)
 }
 
 check_rowid_col_present <- function(df,
