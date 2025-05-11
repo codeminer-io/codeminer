@@ -1736,8 +1736,10 @@ default_col_filters <- function() {
 #'
 #' @return `NULL`
 #' @noRd
-create_db_connection <- function(all_lkps_maps) {
+create_db_connection <- function(all_lkps_maps = NULL, overwrite = FALSE) {
+
   expr <- NULL
+
   # connect to database file path if `all_lkps_maps` is a string, or `NULL`
   if (rlang::is_string(all_lkps_maps)) {
     expr <- rlang::expr({
@@ -1747,7 +1749,14 @@ create_db_connection <- function(all_lkps_maps) {
       on.exit(DBI::dbDisconnect(con, shutdown = TRUE))
     })
   } else if (is.null(all_lkps_maps)) {
-    if (Sys.getenv("ALL_LKPS_MAPS_DB") != "") {
+    if (Sys.getenv("CODEMINER_DB_GLOBAL_OBJECT") != "" &&
+        exists(Sys.getenv("CODEMINER_DB_GLOBAL_OBJECT"), envir = .GlobalEnv)) {
+
+      expr <- rlang::expr({
+        all_lkps_maps <- get(Sys.getenv("CODEMINER_DB_GLOBAL_OBJECT"), envir = .GlobalEnv)
+      })
+
+    } else if (Sys.getenv("ALL_LKPS_MAPS_DB") != "") {
       # message(paste0("Attempting to connect to ", Sys.getenv("ALL_LKPS_MAPS_DB")))
       expr <- rlang::expr({
         all_lkps_maps <- Sys.getenv("ALL_LKPS_MAPS_DB")
