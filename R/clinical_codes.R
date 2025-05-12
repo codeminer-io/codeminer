@@ -310,7 +310,7 @@ lookup_codes <- function(codes,
 
   # TODO - create df and string methods; validate codes df
   if (is.data.frame(codes)) {
-    code_type <- unique(codes$code_type)
+    code_type <- codes$code_type[1]
     codes <- codes$code
   }
 
@@ -472,9 +472,11 @@ get_child_codes <- function(codes,
   )
 
   if (!is.null(codes)) {
-   codes <- codes %>%
-    dplyr::pull(tidyselect::all_of("code")) %>%
-    unique()
+    code_type <- codes$code_type[1]
+
+    codes <- codes %>%
+      dplyr::pull(tidyselect::all_of("code")) %>%
+      unique()
   } else {
     return(codes)
   }
