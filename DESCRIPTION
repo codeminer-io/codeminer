@@ -1,6 +1,6 @@
 Package: codemapper
 Title: Functions for Mapping Between Clinical Coding Systems
-Version: 0.0.0.9003
+Version: 0.0.0.9004
 Authors@R: 
     person(given = "Alasdair",
            family = "Warwick",
