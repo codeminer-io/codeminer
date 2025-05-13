@@ -32,7 +32,7 @@ codelistTreeServer <- function(id, query_result, extract_fn, reset_signal) {
       # currently only certain terminologies are implemented
       query_code_type <- df()$code_type[1]
 
-      supported_code_type <- stringr::str_glue("create_relationships_df.{query_code_type}") %in% methods(create_relationships_df)
+      supported_code_type <- stringr::str_glue("create_relationships_df.{query_code_type}") %in% utils::methods(create_relationships_df)
 
       if (!supported_code_type) {
         showNotification(

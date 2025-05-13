@@ -1,5 +1,5 @@
 # Use the rocker/verse as the base image
-FROM rocker/verse:4.3.0
+FROM rocker/verse:4.4.0
 
 # To add shiny server to a RStudio server base image (e.g. rocker/verse), see https://www.bioconductor.org/packages/devel/bioc/vignettes/sevenbridges/inst/doc/rstudio.html#3_Launch_RStudio_Server_from_Docker_container and https://github.com/sbg/sevenbridges-r/blob/master/inst/docker/sevenbridges/Dockerfile
 # Install necessary dependencies for Shiny Server
@@ -20,8 +20,8 @@ RUN apt-get update && apt-get install -y supervisor
 
 # Install/set up shiny apps for shiny server e.g.
 COPY . /codemapper
-RUN Rscript -e 'devtools::install_local(path = "/codemapper", dependencies = TRUE)'
-RUN Rscript -e 'install.packages("duckdb", repos="http://cran.us.r-project.org", dependencies=TRUE)' # latest duckdb version not available from posit package manager yet
+RUN Rscript -e 'options(repos = c(CRAN = "https://packagemanager.posit.co/cran/latest))"; devtools::install_local(path = "/codemapper", dependencies = TRUE)'
+# RUN Rscript -e 'install.packages("duckdb", repos="http://cran.us.r-project.org", dependencies=TRUE)' # latest duckdb version not available from posit package manager yet
 RUN cd /srv/shiny-server && rm -rf * && Rscript -e 'codemapper::all_lkps_maps_to_db()'
 COPY inst/docker/app.R /srv/shiny-server/app.R
 
