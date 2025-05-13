@@ -2,7 +2,7 @@ name: Docker Build & Push
 on:
   push:
     branches:
-      - dev_sct_trud_
+      - map_feature
 
 jobs:
   build:
@@ -40,7 +40,7 @@ jobs:
 
       - name: Build and push dev
         uses: docker/build-push-action@v5
-        if: github.ref == 'refs/heads/dev_sct_trud'
+        if: github.ref == 'refs/heads/map_feature'
         with:
           context: .
           push: true
