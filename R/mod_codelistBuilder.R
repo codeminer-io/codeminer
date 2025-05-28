@@ -330,7 +330,7 @@ STATINS_CODELIST_SCT = CHILDREN_MAPPED_BNF_STATIN_CHEMICAL_SUBSTANCES %OR% CHILD
               # e.g. `icd10(CYST = DESCRIPTION("cyst"))` needs code_type "icd10"
               query_code_type <- names(shinyace_queries())[i]
 
-              if (!is.null(query_code_type) & !identical(input$import_code_type, query_code_type) & query_code_type %in% CODE_TYPE_TO_LKP_TABLE_MAP$code) {
+              if (!is.null(query_code_type) && !identical(input$import_code_type, query_code_type) && query_code_type %in% CODE_TYPE_TO_LKP_TABLE_MAP$code) {
                 query_code_type <- query_code_type
               } else {
                 query_code_type <- input$import_code_type
