@@ -271,7 +271,7 @@ codelistBuilderServer <-
       shinyace_queries <- shinyAceToQbrServer("shinyace_import_input",
                                               height = "500px",
                                               initial_value = '# BNF child codes, mapped to SCT
-bnf((BNF_STATIN_CHEMICAL_SUBSTANCES = CHILDREN("0212000AA << Rosuvastatin Calcium >> | 0212000AC << Simvastatin & Ezetimibe >> | 0212000AJ << Fenofibrate/Simvastatin >> | 0212000B0 << Atorvastatin >> | 0212000C0 << Cerivastatin >> | 0212000M0 << Fluvastatin Sodium >> | 0212000R0 << Lovastatin >> | 0212000X0 << Pravastatin Sodium >> | 0212000Y0 << Simvastatin >>")))\n
+bnf((BNF_STATIN_CHEMICAL_SUBSTANCES = CHILDREN("0212000AA << Rosuvastatin Calcium >> | 0212000AC << Simvastatin & Ezetimibe >> | 0212000AJ << Fenofibrate/Simvastatin >> | 0212000B0 << Atorvastatin >> | 0212000C0 << Cerivastatin >> | 0212000M0 << Fluvastatin Sodium >> | 0212000X0 << Pravastatin Sodium >> | 0212000Y0 << Simvastatin >>")))\n
 CHILDREN_MAPPED_BNF_STATIN_CHEMICAL_SUBSTANCES = MAP(BNF_STATIN_CHEMICAL_SUBSTANCES, from = "bnf")\n
 # SCT child codes
 CHILDREN_PRODUCT_CONTAINING_STATIN = CHILDREN("96302009 << Product containing 3-hydroxy-3-methylglutaryl-coenzyme A reductase inhibitor (product) >>")\n
