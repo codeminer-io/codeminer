@@ -1,4 +1,3 @@
-
 # CONSTANTS ---------------------------------------------------------------
 
 # UKB CODE MAPPINGS -------------------------------------------------------
@@ -55,6 +54,7 @@ ALL_LKPS_MAPS_TABLE_NAMES <- c(
 
 # TODO - category col for tables?
 
+# fmt: skip
 CODE_TYPE_TO_LKP_TABLE_MAP <- tibble::tribble(
   ~code, ~code_label, ~lkp_table, ~code_col, ~description_col, ~preferred_synonym_col, ~preferred_code, ~grouping_col, ~filter_cols,
   "icd10", "ICD-10", "icd10_lkp", "ALT_CODE", "DESCRIPTION", NA, NA, "category", NA,
@@ -83,6 +83,8 @@ CODE_TYPE_TO_LKP_TABLE_MAP <- tibble::tribble(
 # 'mapping_table': the appropriate mapping table to use for a 'from'/'to' combination
 # 'from_col' and 'to_col': the columns to use when mapping
 # Note, `preferred_synonym_col` and `preferred_code` refer to `to_col`
+
+# fmt: skip
 CLINICAL_CODE_MAPPINGS_MAP <- tibble::tribble(
   ~from, ~to, ~mapping_table, ~from_col, ~to_col, ~preferred_synonym_col, ~preferred_code, ~filter_cols,
   "icd9", "icd10", "icd9_icd10", "ICD9", "ICD10", NA, NA, NA,
@@ -165,9 +167,10 @@ get_all_lkps_maps_db_metadata <- function(all_lkps_maps = NULL) {
 
   validate_all_lkps_maps()
 
-  all_lkps_maps[subset(names(all_lkps_maps),
-                       stringr::str_starts(names(all_lkps_maps),
-                                           "metadata_"))] %>%
+  all_lkps_maps[subset(
+    names(all_lkps_maps),
+    stringr::str_starts(names(all_lkps_maps), "metadata_")
+  )] %>%
     purrr::map(dplyr::collect) %>%
     dplyr::bind_rows(.id = "source")
 }
