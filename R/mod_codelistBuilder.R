@@ -1003,6 +1003,8 @@ sessioninfo::session_info()
                                                mode = "out")
 
         available_saved_queries <- available_saved_queries[!available_saved_queries %in% downstream_dependencies]
+      } else {
+        downstream_dependencies <- NULL
       }
 
       # finally
@@ -1020,7 +1022,7 @@ sessioninfo::session_info()
 
       saved_query_objects <- as.list(saved_queries()$objects)
 
-      if (!rlang::is_empty(saved_query_objects)) {
+      if (!rlang::is_empty(saved_query_objects) && !rlang::is_empty(downstream_dependencies)) {
         saved_query_objects <- saved_queries()$objects |>
           purrr::map(\(code_type) purrr::keep(code_type, .p = \(x) x %in% downstream_dependencies))
       }
