@@ -170,9 +170,6 @@ RunCodelistBuilder <- function(all_lkps_maps = NULL,
     })
   }
 
-  withr::with_envvar(
-    new = c("ALL_LKPS_MAPS_DB" = all_lkps_maps),
-    code = shinyApp(ui, server, options = options, ...),
-    action = "replace"
-  )
+  app <- shinyApp(ui, server, ...)
+  runApp(app)
 }
