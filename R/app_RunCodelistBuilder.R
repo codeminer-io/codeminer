@@ -1,9 +1,6 @@
-
-
 # PUBLIC ------------------------------------------------------------------
 
 ## App ---------------------------------------------------------------------
-
 
 #' Shiny app for building clinical codelists.
 #'
@@ -29,9 +26,10 @@
 #' # launch app
 #' RunCodelistBuilder(all_lkps_maps = all_lkps_maps_db)
 #' }
-RunCodelistBuilder <- function(all_lkps_maps = NULL,
-                               options = list(launch.browser = TRUE),
-                               ...) {
+RunCodelistBuilder <- function(
+  all_lkps_maps = NULL,
+  ...
+) {
   # Requires a data base file, the path to which will be made available as an
   # environmental variable
   if (is.null(all_lkps_maps)) {
@@ -73,8 +71,7 @@ RunCodelistBuilder <- function(all_lkps_maps = NULL,
     objects = list(),
     results = new.env(),
     results_meta = new.env(),
-    dag = list(nodes = data.frame(),
-               edges = data.frame())
+    dag = list(nodes = data.frame(), edges = data.frame())
   ))
 
   # reactive value to store saved look ups - to be shared between modules
@@ -85,9 +82,11 @@ RunCodelistBuilder <- function(all_lkps_maps = NULL,
     shinydashboard::dashboardHeader(title = "CODEMINER"),
     shinydashboard::dashboardSidebar(
       shinydashboard::sidebarMenu(
-        shinydashboard::menuItem("Build",
-                                 tabName = "builder_tab",
-                                 icon = icon("pen")),
+        shinydashboard::menuItem(
+          "Build",
+          tabName = "builder_tab",
+          icon = icon("pen")
+        ),
         shinydashboard::menuItem(
           "Search",
           tabName = "lookup_tab",
@@ -107,14 +106,16 @@ RunCodelistBuilder <- function(all_lkps_maps = NULL,
     ),
     shinydashboard::dashboardBody(
       shinydashboard::tabItems(
-        shinydashboard::tabItem(tabName = "builder_tab",
-                                fluidPage(
-                                  codelistBuilderInput(
-                                    "builder",
-                                    available_code_types = available_code_types,
-                                    available_maps = available_maps
-                                  )
-                                )),
+        shinydashboard::tabItem(
+          tabName = "builder_tab",
+          fluidPage(
+            codelistBuilderInput(
+              "builder",
+              available_code_types = available_code_types,
+              available_maps = available_maps
+            )
+          )
+        ),
         shinydashboard::tabItem(
           tabName = "compare_tab",
           h2("Compare codelists"),
@@ -122,11 +123,15 @@ RunCodelistBuilder <- function(all_lkps_maps = NULL,
             compareCodelistsInput("compare_codelists")
           )
         ),
-        shinydashboard::tabItem(tabName = "lookup_tab",
-                                fluidPage(
-                                  lookupCodesInput("lookup_codes",
-                                                   available_code_types = available_code_types)
-                                )),
+        shinydashboard::tabItem(
+          tabName = "lookup_tab",
+          fluidPage(
+            lookupCodesInput(
+              "lookup_codes",
+              available_code_types = available_code_types
+            )
+          )
+        ),
         shinydashboard::tabItem(
           tabName = "bookmark_tab",
           h2("Save/restore codelists"),
@@ -140,26 +145,33 @@ RunCodelistBuilder <- function(all_lkps_maps = NULL,
   )
 
   server <- function(input, output, sesion) {
-    codelistBuilderServer("builder",
-                          available_maps = available_maps,
-                          saved_queries = saved_queries)
+    codelistBuilderServer(
+      "builder",
+      available_maps = available_maps,
+      saved_queries = saved_queries
+    )
 
-    compareCodelistsServer("compare_codelists",
-                           saved_queries = saved_queries,
-                           saved_lookups = saved_lookups)
+    compareCodelistsServer(
+      "compare_codelists",
+      saved_queries = saved_queries,
+      saved_lookups = saved_lookups
+    )
 
-    lookupCodesServer("lookup_codes",
-                      available_maps = available_maps,
-                      saved_lookups = saved_lookups)
+    lookupCodesServer(
+      "lookup_codes",
+      available_maps = available_maps,
+      saved_lookups = saved_lookups
+    )
 
     output$download <- downloadHandler(
       filename = function() {
         "codeminer.rds"
       },
       content = function(file) {
-        saveRDS(list(saved_queries = saved_queries,
-                     saved_lookups = saved_lookups),
-                file = file)
+        saveRDS(
+          list(saved_queries = saved_queries, saved_lookups = saved_lookups),
+          file = file
+        )
       }
     )
 
