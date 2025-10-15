@@ -4,33 +4,13 @@
 \alias{RunCodelistBuilder}
 \title{Shiny app for building clinical codelists.}
 \usage{
-RunCodelistBuilder(
-  all_lkps_maps = NULL,
-  options = list(launch.browser = TRUE),
-  ...
-)
+RunCodelistBuilder(all_lkps_maps = Sys.getenv("ALL_LKPS_MAPS_DB"), ...)
 }
 \arguments{
-\item{all_lkps_maps}{Either a named list of lookup and mapping tables
-(either data frames or \code{tbl_dbi} objects), or the path to a Duckdb database
-containing these tables. If \code{NULL}, will attempt to connect to a Duckdb
-database named 'all_lkps_maps.db' in the current working directory, or to
-a a Duckdb database specified by an environmental variable named
-'ALL_LKPS_MAPS_DB' (see
-\href{https://resources.numbat.space/using-rprofile-and-renviron.html#renviron}{here}
-for how to set environment variables using a \code{.Renviron} file). The latter
-method will be used in preference.}
-
-\item{options}{Named options that should be passed to the \code{runApp} call
-(these can be any of the following: "port", "launch.browser", "host", "quiet",
-"display.mode" and "test.mode"). You can also specify \code{width} and
-\code{height} parameters which provide a hint to the embedding environment
-about the ideal height/width for the app.}
+\item{all_lkps_maps}{The path to a Duckdb database containing the lookup and mapping tables.
+By default, the path is taken from the environmental variable \code{ALL_LKPS_MAPS_DB}.}
 
 \item{...}{Additional args passed on to \code{\link[shiny]{shinyApp}}}
-}
-\value{
-\code{NULL}
 }
 \description{
 Launches a Shiny app. Note, requires \code{all_lkps_maps} database file.
