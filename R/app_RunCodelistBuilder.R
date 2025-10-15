@@ -25,7 +25,7 @@
 #' # launch app
 #' RunCodelistBuilder(all_lkps_maps = all_lkps_maps_db)
 #' }
-RunCodelistBuilder <- function(all_lkps_maps = Sys.getenv("ALL_LKPS_MAPS_DB"), ...) {
+RunCodelistBuilder <- function(all_lkps_maps = Sys.getenv("ALL_LKPS_MAPS_DB"), ..., .envir = parent.frame()) {
   # Requires a data base file, the path to which will be made available as an
   # environmental variable
   if (!file.exists(all_lkps_maps)) {
@@ -33,7 +33,7 @@ RunCodelistBuilder <- function(all_lkps_maps = Sys.getenv("ALL_LKPS_MAPS_DB"), .
   }
 
   # Record db path in envvar, used in downstream queries
-  withr::local_envvar(list("ALL_LKPS_MAPS_DB" = all_lkps_maps))
+  withr::local_envvar(list("ALL_LKPS_MAPS_DB" = all_lkps_maps), .local_envir = .envir)
 
   con <- check_all_lkps_maps_path(all_lkps_maps)
   withr::defer(DBI::dbDisconnect(con, shutdown = TRUE))
