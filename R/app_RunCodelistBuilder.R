@@ -6,11 +6,10 @@
 #'
 #' Launches a Shiny app. Note, requires `all_lkps_maps` database file.
 #'
-#' @inheritParams get_child_codes
+#' @param all_lkps_maps The path to a Duckdb database containing the lookup and mapping tables.
+#'   By default, the path is taken from the environmental variable `ALL_LKPS_MAPS_DB`.
 #' @param ... Additional args passed on to \code{\link[shiny]{shinyApp}}
-#' @inheritParams shiny::shinyApp
 #'
-#' @return `NULL`
 #' @export
 #' @import shiny
 #'
@@ -26,26 +25,18 @@
 #' # launch app
 #' RunCodelistBuilder(all_lkps_maps = all_lkps_maps_db)
 #' }
-RunCodelistBuilder <- function(
-  all_lkps_maps = NULL,
-  ...
-) {
+RunCodelistBuilder <- function(all_lkps_maps = Sys.getenv("ALL_LKPS_MAPS_DB"), ...) {
   # Requires a data base file, the path to which will be made available as an
   # environmental variable
-  if (is.null(all_lkps_maps)) {
-    all_lkps_maps <- Sys.getenv("ALL_LKPS_MAPS_DB")
-    if (all_lkps_maps == "") {
-      all_lkps_maps <- "all_lkps_maps.db"
-    }
-    stopifnot(file.exists(all_lkps_maps))
-  } else {
-    stopifnot(rlang::is_string(all_lkps_maps))
-    stopifnot(file.exists(all_lkps_maps))
+  if (!file.exists(all_lkps_maps)) {
+    stop(sprintf("No database file found at path `%s`", all_lkps_maps))
   }
 
-  # connect to database file path if `all_lkps_maps` is a string, or `NULL`
+  # Record db path in envvar, used in downstream queries
+  withr::local_envvar(list("ALL_LKPS_MAPS_DB" = all_lkps_maps))
+
   con <- check_all_lkps_maps_path(all_lkps_maps)
-  on.exit(DBI::dbDisconnect(con, shutdown = TRUE))
+  withr::defer(DBI::dbDisconnect(con, shutdown = TRUE))
 
   # determine which lookup tables are available
   available_code_types <- CODE_TYPE_TO_LKP_TABLE_MAP %>%
@@ -144,7 +135,7 @@ RunCodelistBuilder <- function(
     )
   )
 
-  server <- function(input, output, sesion) {
+  server <- function(input, output, session) {
     codelistBuilderServer(
       "builder",
       available_maps = available_maps,
@@ -182,6 +173,5 @@ RunCodelistBuilder <- function(
     })
   }
 
-  app <- shinyApp(ui, server, ...)
-  runApp(app)
+  shinyApp(ui, server, ...)
 }
