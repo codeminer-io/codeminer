@@ -1,4 +1,3 @@
-
 # PUBLIC ------------------------------------------------------------------
 
 ## all_lkps_maps ------------
@@ -92,6 +91,19 @@ build_all_lkps_maps_dummy <- function() {
   ))
 }
 
+#' Set up a dummy all_lkps_maps database
+#'
+#' @param db_path Path to the database file. Defaults to a temporary file.
+#' @return Returns the \code{db_path} invisibly
+#' @export
+#' @family Dummy data
+#' @examples
+#' dummy_all_lkps_maps_db()
+dummy_all_lkps_maps_db <- function(db_path = tempfile(fileext = ".db")) {
+  maps <- build_all_lkps_maps_dummy()
+  all_lkps_maps_to_db(all_lkps_maps = maps, db_path = db_path)
+}
+
 ## CALIBER -----------------------------------------------------------------
 
 #' Dummy CALIBER repository
@@ -123,7 +135,8 @@ dummy_caliber_dir_path <- function() {
 #' @examples
 #' dummy_phecode_lkp_path()
 dummy_phecode_lkp_path <- function() {
-  system.file("extdata",
+  system.file(
+    "extdata",
     "dummy_phecode_definitions1.2.csv",
     package = "codemapper"
   )
@@ -141,7 +154,8 @@ dummy_phecode_lkp_path <- function() {
 #' @examples
 #' dummy_icd10_phecode_map_path()
 dummy_icd10_phecode_map_path <- function() {
-  system.file("extdata",
+  system.file(
+    "extdata",
     "dummy_Phecode_map_v1_2_icd10_beta.csv",
     package = "codemapper"
   )
@@ -201,13 +215,45 @@ read_icd10_phecode_map_dummy <- function() {
 #' dummy_clinical_events_tidy()
 dummy_clinical_events_tidy <- function() {
   tibble::tribble(
-    ~eid, ~source, ~index, ~code, ~date,
-    1, "f40001", "0_0", "I10", "1917-10-08",
-    1, "f40002", "0_0", "E109", "1955-02-11",
-    1, "f41271", "0_0", "4019", "1910-02-19",
-    1, "gpc1_r2", "1", "C10..", "1965-08-08",
-    1, "gpc1_r2", "2", "C10..", "1917-10-08",
-    1, "gpc3_r3", "3", "XaIP9", "1917-10-08",
-    1, "gpc3_r3", "3", "XE0Uc", "1917-10-08"
+    ~eid,
+    ~source,
+    ~index,
+    ~code,
+    ~date,
+    1,
+    "f40001",
+    "0_0",
+    "I10",
+    "1917-10-08",
+    1,
+    "f40002",
+    "0_0",
+    "E109",
+    "1955-02-11",
+    1,
+    "f41271",
+    "0_0",
+    "4019",
+    "1910-02-19",
+    1,
+    "gpc1_r2",
+    "1",
+    "C10..",
+    "1965-08-08",
+    1,
+    "gpc1_r2",
+    "2",
+    "C10..",
+    "1917-10-08",
+    1,
+    "gpc3_r3",
+    "3",
+    "XaIP9",
+    "1917-10-08",
+    1,
+    "gpc3_r3",
+    "3",
+    "XE0Uc",
+    "1917-10-08"
   )
 }
