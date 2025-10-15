@@ -40,6 +40,7 @@ test_that("Query execution fails gracefully when ALL_LKPS_MAPS_DB is not set", {
 
 test_that("RunCodelistBuilder properly validates database path parameter", {
   withr::local_envvar(list("ALL_LKPS_MAPS_DB" = NULL))
+
   expect_error(RunCodelistBuilder(), "No database file found at path")
   expect_error(RunCodelistBuilder(all_lkps_maps = "/path/that/does/not/exist.db"), "No database file found at path")
 })
