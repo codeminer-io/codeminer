@@ -2,7 +2,7 @@ test_that("RunCodelistBuilder sets ALL_LKPS_MAPS_DB environment variable for que
   # Regression test for issue #4: https://github.com/UCL-ARC/codemapper/issues/4
 
   # Setup: Create a temporary database
-  temp_db_path <- tempfile(fileext = ".db")
+  temp_db_path <- withr::local_tempfile(fileext = ".db")
   dummy_db <- suppressMessages(dummy_all_lkps_maps_db(db_path = temp_db_path))
 
   # Test: Call the setup portion of RunCodelistBuilder that should set the env var
@@ -19,9 +19,6 @@ test_that("RunCodelistBuilder sets ALL_LKPS_MAPS_DB environment variable for que
 
   expect_s3_class(result, "data.frame")
   expect_true(nrow(result) > 0)
-
-  # Cleanup
-  unlink(temp_db_path)
 })
 
 test_that("Query execution fails gracefully when ALL_LKPS_MAPS_DB is not set", {
