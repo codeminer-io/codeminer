@@ -9,6 +9,7 @@
 #' @param all_lkps_maps The path to a Duckdb database containing the lookup and mapping tables.
 #'   By default, the path is taken from the environmental variable `ALL_LKPS_MAPS_DB`.
 #' @param ... Additional args passed on to \code{\link[shiny]{shinyApp}}
+#' @param .envir Environment to use for scoping environment variables. This should typically not be changed.
 #'
 #' @export
 #' @import shiny

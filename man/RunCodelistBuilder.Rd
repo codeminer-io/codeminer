@@ -4,13 +4,19 @@
 \alias{RunCodelistBuilder}
 \title{Shiny app for building clinical codelists.}
 \usage{
-RunCodelistBuilder(all_lkps_maps = Sys.getenv("ALL_LKPS_MAPS_DB"), ...)
+RunCodelistBuilder(
+  all_lkps_maps = Sys.getenv("ALL_LKPS_MAPS_DB"),
+  ...,
+  .envir = parent.frame()
+)
 }
 \arguments{
 \item{all_lkps_maps}{The path to a Duckdb database containing the lookup and mapping tables.
 By default, the path is taken from the environmental variable \code{ALL_LKPS_MAPS_DB}.}
 
 \item{...}{Additional args passed on to \code{\link[shiny]{shinyApp}}}
+
+\item{.envir}{Environment to use for scoping environment variables. This should typically not be changed.}
 }
 \description{
 Launches a Shiny app. Note, requires \code{all_lkps_maps} database file.
