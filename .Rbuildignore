@@ -15,3 +15,5 @@
 ^\.vscode$
 _build_all_lkps_maps_db.R
 ^Dockerfile$
+^docs$
+^pkgdown$

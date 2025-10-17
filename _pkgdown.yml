@@ -1,4 +1,6 @@
-destination: docs
+url: https://codeminer-io.github.io/codeminer/
+template:
+  bootstrap: 5
 
 reference:
 - title: Setting up
