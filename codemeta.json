@@ -4,7 +4,7 @@
   "identifier": "codeminer",
   "description": "Functions for mapping between clinical coding systems.",
   "name": "codeminer: Functions for mapping between clinical coding systems",
-  "relatedLink": "https://rmgpanw.github.io/codeminer/",
+  "relatedLink": "https://codeminer-io.github.io/codeminer/",
   "codeRepository": "https://github.com/codeminer-io/codeminer",
   "issueTracker": "https://github.com/codeminer-io/codeminer/issues",
   "license": "https://spdx.org/licenses/MIT",

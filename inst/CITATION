@@ -5,5 +5,5 @@ citEntry(
   title = "codeminer: Functions for mapping between clinical coding systems",
   author = as.person("Alasdair Warwick"),
   year = 2022,
-  textVersion = "Warwick A (2022). codeminer: Functions for mapping between clinical coding systems. https://rmgpanw.github.io/codeminer/, https://github.com/codeminer-io/codeminer."
+  textVersion = "Warwick A (2022). codeminer: Functions for mapping between clinical coding systems. https://codeminer-io.github.io/codeminer/, https://github.com/codeminer-io/codeminer."
 )
