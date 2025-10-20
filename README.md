@@ -33,8 +33,8 @@ You can install the development version from
 [GitHub](https://github.com/) with:
 
 ``` r
-# install.packages("devtools")
-devtools::install_github("rmgpanw/codemapper")
+# install.packages("pak")
+pak::pak("codeminer-io/codeminer")
 ```
 
 ## Basic example

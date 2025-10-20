@@ -5,8 +5,8 @@
   "description": "Functions for mapping between clinical coding systems.",
   "name": "codemapper: Functions for mapping between clinical coding systems",
   "relatedLink": "https://rmgpanw.github.io/codemapper/",
-  "codeRepository": "https://github.com/rmgpanw/codemapper",
-  "issueTracker": "https://github.com/rmgpanw/codemapper/issues",
+  "codeRepository": "https://github.com/codeminer-io/codeminer",
+  "issueTracker": "https://github.com/codeminer-io/codeminer/issues",
   "license": "https://spdx.org/licenses/MIT",
   "version": "0.0.0.9001",
   "programmingLanguage": {
@@ -314,7 +314,7 @@
     "SystemRequirements": null
   },
   "fileSize": "1171852.156KB",
-  "readme": "https://github.com/rmgpanw/codemapper/blob/master/README.md",
-  "contIntegration": ["https://github.com/rmgpanw/codemapper/actions", "https://codecov.io/gh/rmgpanw/codemapper?branch=master", "https://github.com/rmgpanw/codemapper/actions"],
+  "readme": "https://github.com/codeminer-io/codeminer/blob/master/README.md",
+  "contIntegration": ["https://github.com/codeminer-io/codeminer/actions", "https://codecov.io/gh/codeminer-io/codeminer?branch=master", "https://github.com/codeminer-io/codeminer/actions"],
   "keywords": ["rpackage", "ukbiobank"]
 }
