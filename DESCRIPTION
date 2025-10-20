@@ -9,9 +9,8 @@ Authors@R:
            comment = c(ORCID = "0000-0002-0800-2890"))
 Description: Functions for mapping between clinical coding systems.
 License: MIT + file LICENSE
-URL: https://rmgpanw.github.io/codemapper/,
-  https://github.com/rmgpanw/codemapper
-BugReports: https://github.com/rmgpanw/codemapper/issues
+URL: https://github.com/codeminer-io/codeminer, https://codeminer-io.github.io/codeminer/
+BugReports: https://github.com/codeminer-io/codeminer/issues
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
