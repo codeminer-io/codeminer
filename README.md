@@ -7,16 +7,14 @@
 
 [![R-CMD-check](https://github.com/codeminer-io/codeminer/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/codeminer-io/codeminer/actions/workflows/R-CMD-check.yaml)
 [![Codecov test
-coverage](https://codecov.io/gh/rmgpanw/codemapper/branch/master/graph/badge.svg)](https://codecov.io/gh/rmgpanw/codemapper?branch=master)
-[![pkgdown](https://github.com/rmgpanw/codemapper/workflows/pkgdown/badge.svg)](https://github.com/rmgpanw/codemapper/actions)
+coverage](https://codecov.io/gh/codeminer-io/codeminer/graph/badge.svg)](https://app.codecov.io/gh/codeminer-io/codeminer)
+[![pkgdown](https://github.com/codeminer-io/codeminer/workflows/pkgdown/badge.svg)](https://github.com/codeminer-io/codeminer/actions)
 [![Launch RStudio
 Cloud](https://img.shields.io/badge/RStudio-Cloud-blue)](https://rstudio.cloud/project/4007004)
 [![DOI](https://zenodo.org/badge/485945478.svg)](https://zenodo.org/badge/latestdoi/485945478)
 [![Project Status: WIP – Initial development is in progress, but there
 has not yet been a stable, usable release suitable for the
 public.](https://www.repostatus.org/badges/latest/wip.svg)](https://www.repostatus.org/#wip)
-[![Codecov test
-coverage](https://codecov.io/gh/codeminer-io/codeminer/graph/badge.svg)](https://app.codecov.io/gh/codeminer-io/codeminer)
 <!-- badges: end -->
 
 The goal of codemapper is to facilitate working with clinical codes used
