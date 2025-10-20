@@ -11,9 +11,9 @@ Functions for mapping between clinical coding systems.
 \seealso{
 Useful links:
 \itemize{
-  \item \url{https://rmgpanw.github.io/codemapper/}
-  \item \url{https://github.com/rmgpanw/codemapper}
-  \item Report bugs at \url{https://github.com/rmgpanw/codemapper/issues}
+  \item \url{https://github.com/codeminer-io/codeminer}
+  \item \url{https://codeminer-io.github.io/codeminer/}
+  \item Report bugs at \url{https://github.com/codeminer-io/codeminer/issues}
 }
 
 }
