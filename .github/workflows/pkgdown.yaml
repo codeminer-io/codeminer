@@ -12,6 +12,11 @@ name: pkgdown
 
 permissions: read-all
 
+# Only run actions on the most recent push to a branch
+concurrency:
+  group: "${{ github.workflow }}-${{ github.head_ref }}"
+  cancel-in-progress: true
+
 jobs:
   pkgdown:
     runs-on: ubuntu-latest
