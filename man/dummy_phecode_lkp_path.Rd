@@ -20,6 +20,7 @@ dummy_phecode_lkp_path()
 \seealso{
 Other Dummy data: 
 \code{\link{build_all_lkps_maps_dummy}()},
+\code{\link{dummy_all_lkps_maps_db}()},
 \code{\link{dummy_all_lkps_maps_path}()},
 \code{\link{dummy_caliber_dir_path}()},
 \code{\link{dummy_clinical_events_tidy}()},
