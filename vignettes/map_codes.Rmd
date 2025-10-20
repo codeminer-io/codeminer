@@ -80,4 +80,4 @@ map_codes(codes = "XaIP9",
           col_filters = default_col_filters())
 ```
 
-See additional notes at <https://rmgpanw.gitlab.io/codeminer_notes/>.
+See additional notes at <https://rmgpanw.gitlab.io/codemapper_notes/>.
