@@ -10,20 +10,24 @@ reference:
   - read_all_lkps_maps
   - build_all_lkps_maps
   - all_lkps_maps_to_db
+  - get_all_lkps_maps_db_metadata
 
 - title: Clinical codes
   desc:  Functions for looking up clinical codes and mapping between different coding systems.
 - contents:
   - lookup_codes
+  - codes_like
   - get_child_codes
+  - get_attributes_sct
   - get_children_sct
-  - get_relatives_sct
+  - get_parents_sct
   - code_descriptions_like
   - map_codes
   - get_mapping_df
   - reformat_icd10_codes
   - default_col_filters
   - RunCodelistBuilder
+  - matches("ATTRIBUTE")
 
 - title: CALIBER
   desc:  Functions for reformatting CALIBER codelists to use with UK Biobank data
@@ -43,25 +47,19 @@ reference:
 - title: Dummy data
   desc: Dummy data for tests.
 - contents:
-  - build_all_lkps_maps_dummy
-  - read_all_lkps_maps_dummy
-  - read_ukb_codings_dummy
-  - read_phecode_lkp_dummy
-  - read_icd10_phecode_map_dummy
-  - dummy_clinical_events_tidy
+  - ends_with("dummy")
+  - starts_with("dummy")
 
 - title:: Utilities
   desc: Miscellaneous utility functions.
 - contents:
   - infix_setops
   - codemapper_metadata
+  - get_bnf_from_open_prescribing
   - get_nhsbsa_snomed_bnf
   - get_ukb_self_report_med_to_atc_map
   - get_phecode_definitions
   - get_phecode_icd9_map
   - get_phecode_icd10_map
-  - dummy_all_lkps_maps_path
-  - dummy_ukb_codings_path
-  - dummy_phecode_lkp_path
-  - dummy_icd10_phecode_map_path
-  - dummy_caliber_dir_path
+  - with_code_type_helpers
+  - start_api
