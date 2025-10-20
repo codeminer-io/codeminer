@@ -2,7 +2,7 @@ Package: codeminer
 Title: Functions for Mapping Between Clinical Coding Systems
 Description: Functions for mapping between clinical coding systems.
 Version: 0.0.0.9004
-Authors@R: 
+Authors@R:
     person(given = "Alasdair",
            family = "Warwick",
            role = c("aut", "cre"),
@@ -37,7 +37,8 @@ Imports:
     tidyr,
     tidyselect,
     ukbwranglr,
-    utils
+    utils,
+    withr
 Suggests: 
     PheWAS,
     covr,
@@ -59,7 +60,6 @@ Suggests:
     shinytest,
     testthat (>= 3.0.0),
     visNetwork,
-    withr,
     xml2
 Remotes: 
     github::rmgpanw/ukbwranglr,

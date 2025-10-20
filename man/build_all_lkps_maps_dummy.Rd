@@ -20,6 +20,7 @@ build_all_lkps_maps_dummy()
 \code{\link[=build_all_lkps_maps]{build_all_lkps_maps()}}
 
 Other Dummy data: 
+\code{\link{dummy_all_lkps_maps_db}()},
 \code{\link{dummy_all_lkps_maps_path}()},
 \code{\link{dummy_caliber_dir_path}()},
 \code{\link{dummy_clinical_events_tidy}()},
