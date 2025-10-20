@@ -119,8 +119,8 @@ CLINICAL_CODE_MAPPINGS_MAP <- tibble::tribble(
 #' @export
 #'
 #' @examples
-#' codemapper_metadata()
-codemapper_metadata <- function() {
+#' codeminer_metadata()
+codeminer_metadata <- function() {
   list(
     lookup_tables = CODE_TYPE_TO_LKP_TABLE_MAP,
     mapping_tables = CLINICAL_CODE_MAPPINGS_MAP

@@ -5,13 +5,13 @@
 \title{Get a 'from-to' mapping data frame}
 \usage{
 get_mapping_df(
-  to = getOption("codemapper.map_to"),
-  from = getOption("codemapper.map_from"),
+  to = getOption("codeminer.map_to"),
+  from = getOption("codeminer.map_from"),
   all_lkps_maps = NULL,
   rename_from_to = NULL,
   na.rm = TRUE,
-  reverse_mapping = getOption("codemapper.reverse_mapping"),
-  col_filters = getOption("codemapper.col_filters")
+  reverse_mapping = getOption("codeminer.reverse_mapping"),
+  col_filters = getOption("codeminer.col_filters")
 )
 }
 \arguments{

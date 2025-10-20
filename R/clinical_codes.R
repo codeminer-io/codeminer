@@ -42,13 +42,13 @@
 #'   all_lkps_maps = all_lkps_maps_dummy
 #' )
 code_descriptions_like <- function(reg_expr,
-                                   code_type = getOption("codemapper.code_type"),
+                                   code_type = getOption("codeminer.code_type"),
                                    all_lkps_maps = NULL,
                                    ignore_case = TRUE,
                                    codes_only = FALSE,
                                    preferred_description_only = TRUE,
                                    standardise_output = TRUE,
-                                   col_filters = getOption("codemapper.col_filters")) {
+                                   col_filters = getOption("codeminer.col_filters")) {
   # validate args
   assertthat::is.string(reg_expr)
 
@@ -175,12 +175,12 @@ code_descriptions_like <- function(reg_expr,
 #'   all_lkps_maps = all_lkps_maps_dummy
 #' )
 CODES_LIKE <- function(reg_expr,
-                       code_type = getOption("codemapper.code_type"),
+                       code_type = getOption("codeminer.code_type"),
                        all_lkps_maps = NULL,
                        codes_only = FALSE,
                        preferred_description_only = TRUE,
                        standardise_output = TRUE,
-                       col_filters = getOption("codemapper.col_filters")) {
+                       col_filters = getOption("codeminer.col_filters")) {
   # validate args
   assertthat::is.string(reg_expr)
 
@@ -300,12 +300,12 @@ DESCRIPTION <- code_descriptions_like
 #'   all_lkps_maps = all_lkps_maps_dummy
 #' )
 lookup_codes <- function(codes,
-                         code_type = getOption("codemapper.code_type"),
+                         code_type = getOption("codeminer.code_type"),
                          all_lkps_maps = NULL,
                          preferred_description_only = TRUE,
                          standardise_output = TRUE,
-                         unrecognised_codes = getOption("codemapper.unrecognised_codes_lookup"),
-                         col_filters = getOption("codemapper.col_filters"),
+                         unrecognised_codes = getOption("codeminer.unrecognised_codes_lookup"),
+                         col_filters = getOption("codeminer.col_filters"),
                          .return_unrecognised_codes = FALSE) {
 
   # TODO - create df and string methods; validate codes df
@@ -451,13 +451,13 @@ CODES <- lookup_codes
 #' @examples
 #' # TODO
 get_child_codes <- function(codes,
-                            code_type = getOption("codemapper.code_type"),
+                            code_type = getOption("codeminer.code_type"),
                             all_lkps_maps = NULL,
                             codes_only = FALSE,
                             preferred_description_only = TRUE,
                             standardise_output = TRUE,
                             unrecognised_codes = "error",
-                            col_filters = getOption("codemapper.col_filters")) {
+                            col_filters = getOption("codeminer.col_filters")) {
 
   # check codes exist
   codes <- lookup_codes(
@@ -511,7 +511,7 @@ get_child_codes <- function(codes,
                         escape_dot = FALSE)
   } else {
     stop(paste0(
-      "Currently codemapper is unable to retrieve child codes for ",
+      "Currently codeminer is unable to retrieve child codes for ",
       code_type
     ))
   }
@@ -544,7 +544,7 @@ get_children_sct <- function(codes,
                             include_descendants = TRUE,
                             all_lkps_maps = NULL,
                             preferred_description_only = TRUE,
-                            col_filters = getOption("codemapper.col_filters")) {
+                            col_filters = getOption("codeminer.col_filters")) {
 
   get_relatives_sct(
     codes = codes,
@@ -581,7 +581,7 @@ get_parents_sct <- function(codes,
                             include_ancestors = TRUE,
                             all_lkps_maps = NULL,
                             preferred_description_only = TRUE,
-                            col_filters = getOption("codemapper.col_filters")) {
+                            col_filters = getOption("codeminer.col_filters")) {
   get_relatives_sct(
     codes = codes,
     filter_col = "sourceId",
@@ -633,7 +633,7 @@ HAS_ATTRIBUTES <- function(attribute_codes,
                           standardise_output = TRUE,
                           all_lkps_maps = NULL,
                           preferred_description_only = TRUE,
-                          col_filters = getOption("codemapper.col_filters")) {
+                          col_filters = getOption("codeminer.col_filters")) {
   get_relatives_sct(
     codes = attribute_codes,
     filter_col = "destinationId",
@@ -676,7 +676,7 @@ GET_ATTRIBUTES <- function(attribute_codes,
                           standardise_output = TRUE,
                           all_lkps_maps = NULL,
                           preferred_description_only = TRUE,
-                          col_filters = getOption("codemapper.col_filters")) {
+                          col_filters = getOption("codeminer.col_filters")) {
   get_relatives_sct(
     codes = attribute_codes,
     filter_col = "sourceId",
@@ -720,7 +720,7 @@ ATTRIBUTE_TYPES_FROM <- function(codes,
                                  standardise_output = TRUE,
                                  all_lkps_maps = NULL,
                                  preferred_description_only = TRUE,
-                                 col_filters = getOption("codemapper.col_filters")) {
+                                 col_filters = getOption("codeminer.col_filters")) {
   get_relatives_sct(
     codes = codes,
     filter_col = "sourceId",
@@ -761,7 +761,7 @@ ATTRIBUTE_TYPES_TO <- function(codes,
                                  standardise_output = TRUE,
                                  all_lkps_maps = NULL,
                                  preferred_description_only = TRUE,
-                                 col_filters = getOption("codemapper.col_filters")) {
+                                 col_filters = getOption("codeminer.col_filters")) {
   get_relatives_sct(
     codes = codes,
     filter_col = "destinationId",
@@ -785,7 +785,7 @@ get_relatives_sct <- function(codes = NULL,
                               recursive = TRUE,
                               all_lkps_maps = NULL,
                               preferred_description_only = TRUE,
-                              col_filters = getOption("codemapper.col_filters")) {
+                              col_filters = getOption("codeminer.col_filters")) {
 
 
   if (!is.null(codes)) {
@@ -885,7 +885,7 @@ get_relatives_sct <- function(codes = NULL,
 
 summarise_attributes_sct <- function(codes,
                                      all_lkps_maps = NULL,
-                                     col_filters = getOption("codemapper.col_filters")) {
+                                     col_filters = getOption("codeminer.col_filters")) {
   # TODO - create df and string methods; validate codes df
   if (is.data.frame(codes)) {
     code_type <- unique(codes$code_type)
@@ -955,7 +955,7 @@ get_attributes_sct <- function(codes,
                                standardise_output = TRUE,
                                all_lkps_maps = NULL,
                                preferred_description_only = TRUE,
-                               col_filters = getOption("codemapper.col_filters")) {
+                               col_filters = getOption("codeminer.col_filters")) {
 
   # TODO - create df and string methods; validate codes df
   if (is.data.frame(codes)) {
@@ -1001,7 +1001,7 @@ get_children_sct_old <- function(codes,
                              all_lkps_maps = NULL,
                              codes_only = FALSE,
                              preferred_description_only = TRUE,
-                             col_filters = getOption("codemapper.col_filters")) {
+                             col_filters = getOption("codeminer.col_filters")) {
 
   # get child codes
   out_codes <- get_relatives_sct_old(
@@ -1144,7 +1144,7 @@ get_relatives_sct_old <- function(codes,
                               relationship_direction = "child",
                               recursive = TRUE,
                               active_only = FALSE,
-                              col_filters = getOption("codemapper.col_filters"),
+                              col_filters = getOption("codeminer.col_filters"),
                               all_lkps_maps = NULL) {
 
   result <- get_relatives_attributes_sct(codes = codes,
@@ -1225,7 +1225,7 @@ get_attributes_sct_old <- function(codes,
                               relationship_direction = "child",
                               recursive = TRUE,
                               active_only = FALSE,
-                              col_filters = getOption("codemapper.col_filters"),
+                              col_filters = getOption("codeminer.col_filters"),
                               all_lkps_maps = NULL) {
 
   result <- get_relatives_attributes_sct(codes = codes,
@@ -1296,15 +1296,15 @@ get_attributes_sct_old <- function(codes,
 #'   all_lkps_maps = all_lkps_maps_dummy
 #' )
 map_codes <- function(codes,
-                      to = getOption("codemapper.map_to"),
-                      from = getOption("codemapper.map_from"),
+                      to = getOption("codeminer.map_to"),
+                      from = getOption("codeminer.map_from"),
                       all_lkps_maps = NULL,
                       codes_only = FALSE,
                       standardise_output = TRUE,
-                      unrecognised_codes = getOption("codemapper.unrecognised_codes_mapped"),
+                      unrecognised_codes = getOption("codeminer.unrecognised_codes_mapped"),
                       preferred_description_only = TRUE,
-                      reverse_mapping = getOption("codemapper.reverse_mapping"),
-                      col_filters = getOption("codemapper.col_filters")) {
+                      reverse_mapping = getOption("codeminer.reverse_mapping"),
+                      col_filters = getOption("codeminer.col_filters")) {
 
   # TODO - create df and string methods; validate codes df
   if (is.data.frame(codes)) {
@@ -1455,13 +1455,13 @@ MAP <- map_codes
 #'   to = "icd10",
 #'   all_lkps_maps = all_lkps_maps_dummy
 #' )
-get_mapping_df <- function(to = getOption("codemapper.map_to"),
-                           from = getOption("codemapper.map_from"),
+get_mapping_df <- function(to = getOption("codeminer.map_to"),
+                           from = getOption("codeminer.map_from"),
                            all_lkps_maps = NULL,
                            rename_from_to = NULL,
                            na.rm = TRUE,
-                           reverse_mapping = getOption("codemapper.reverse_mapping"),
-                           col_filters = getOption("codemapper.col_filters")) {
+                           reverse_mapping = getOption("codeminer.reverse_mapping"),
+                           col_filters = getOption("codeminer.col_filters")) {
   # validate args
 
   # get mapping sheet, from and to cols check mapping args and get required
@@ -2108,12 +2108,12 @@ get_col_filters <- function(defaults_only = TRUE,
 #' @noRd
 #' @family Clinical code lookups and mappings
 codes_starting_with <- function(codes,
-                                code_type = getOption("codemapper.code_type"),
+                                code_type = getOption("codeminer.code_type"),
                                 all_lkps_maps = NULL,
                                 codes_only = FALSE,
                                 preferred_description_only = TRUE,
                                 standardise_output = TRUE,
-                                col_filters = getOption("codemapper.col_filters"),
+                                col_filters = getOption("codeminer.col_filters"),
                                 escape_dot = FALSE) {
   # validate args
   match.arg(
@@ -2367,7 +2367,7 @@ get_preferred_description_code_for_lookup_sheet <-
 #'   'description', 'category', 'code_type', 'code' and 'author'.
 #' @noRd
 reformat_standardised_codelist <- function(standardised_codelist,
-                                           code_type = getOption("codemapper.code_type"),
+                                           code_type = getOption("codeminer.code_type"),
                                            disease,
                                            disease_category,
                                            author) {
@@ -3099,7 +3099,7 @@ handle_unrecognised_codes <-
 check_codes_exist <- function(codes,
                               lkp_codes,
                               table_name,
-                              code_type = getOption("codemapper.code_type"),
+                              code_type = getOption("codeminer.code_type"),
                               return_unrecognised_codes = FALSE,
                               unrecognised_codes = "error") {
   # check for unrecognised('missing') codes

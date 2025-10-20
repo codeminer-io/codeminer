@@ -7,28 +7,28 @@
 \usage{
 map_codes(
   codes,
-  to = getOption("codemapper.map_to"),
-  from = getOption("codemapper.map_from"),
+  to = getOption("codeminer.map_to"),
+  from = getOption("codeminer.map_from"),
   all_lkps_maps = NULL,
   codes_only = FALSE,
   standardise_output = TRUE,
-  unrecognised_codes = getOption("codemapper.unrecognised_codes_mapped"),
+  unrecognised_codes = getOption("codeminer.unrecognised_codes_mapped"),
   preferred_description_only = TRUE,
-  reverse_mapping = getOption("codemapper.reverse_mapping"),
-  col_filters = getOption("codemapper.col_filters")
+  reverse_mapping = getOption("codeminer.reverse_mapping"),
+  col_filters = getOption("codeminer.col_filters")
 )
 
 MAP(
   codes,
-  to = getOption("codemapper.map_to"),
-  from = getOption("codemapper.map_from"),
+  to = getOption("codeminer.map_to"),
+  from = getOption("codeminer.map_from"),
   all_lkps_maps = NULL,
   codes_only = FALSE,
   standardise_output = TRUE,
-  unrecognised_codes = getOption("codemapper.unrecognised_codes_mapped"),
+  unrecognised_codes = getOption("codeminer.unrecognised_codes_mapped"),
   preferred_description_only = TRUE,
-  reverse_mapping = getOption("codemapper.reverse_mapping"),
-  col_filters = getOption("codemapper.col_filters")
+  reverse_mapping = getOption("codeminer.reverse_mapping"),
+  col_filters = getOption("codeminer.col_filters")
 )
 }
 \arguments{

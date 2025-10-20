@@ -1,9 +1,9 @@
-citHeader("To cite codemapper in publications use:")
+citHeader("To cite codeminer in publications use:")
 
 citEntry(
   entry = "Manual",
-  title = "codemapper: Functions for mapping between clinical coding systems",
+  title = "codeminer: Functions for mapping between clinical coding systems",
   author = as.person("Alasdair Warwick"),
   year = 2022,
-  textVersion = "Warwick A (2022). codemapper: Functions for mapping between clinical coding systems. https://rmgpanw.github.io/codemapper/, https://github.com/codeminer-io/codeminer."
+  textVersion = "Warwick A (2022). codeminer: Functions for mapping between clinical coding systems. https://rmgpanw.github.io/codeminer/, https://github.com/codeminer-io/codeminer."
 )

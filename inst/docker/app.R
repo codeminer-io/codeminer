@@ -13,4 +13,4 @@ if (file.exists(USER_SUPPLIED_DB_PATH)) {
 }
 
 # Run app
-codemapper::RunCodelistBuilder(all_lkps_maps = ALL_LKPS_MAPS_DB)
+codeminer::RunCodelistBuilder(all_lkps_maps = ALL_LKPS_MAPS_DB)

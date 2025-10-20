@@ -1,4 +1,4 @@
-library(codemapper)
+library(codeminer)
 library(gitcreds)
 options(shiny.maxRequestSize = 20 * 1024^2)
 

@@ -1,5 +1,5 @@
 # Script to build local copy of all_lkps_maps.db
-library(codemapper)
+library(codeminer)
 
 # Constants ---------------------------------------------------------------
 

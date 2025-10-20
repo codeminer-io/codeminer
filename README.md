@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# codemapper
+# codeminer
 
 <!-- badges: start -->
 
@@ -17,7 +17,7 @@ has not yet been a stable, usable release suitable for the
 public.](https://www.repostatus.org/badges/latest/wip.svg)](https://www.repostatus.org/#wip)
 <!-- badges: end -->
 
-The goal of codemapper is to facilitate working with clinical codes used
+The goal of codeminer is to facilitate working with clinical codes used
 in electronic health records.
 
 This package relies primarily on UK Biobank resource 592 ([Clinical
@@ -47,7 +47,7 @@ First, build a local resource containing lookup and mapping tables for
 various clinical codings systems. A dummy dataset is used here:
 
 ``` r
-library(codemapper)
+library(codeminer)
 
 all_lkps_maps_dummy <- build_all_lkps_maps_dummy()
 ```
@@ -84,7 +84,7 @@ htn_icd10
 #> 1 I10X  Essential (primary) hypertension icd10
 ```
 
-See `vignette('codemapper')` for further details, including how to build
+See `vignette('codeminer')` for further details, including how to build
 a clinical codelist with R Shiny using `RunCodelistBuilder()`.
 
 ## UK Biobank

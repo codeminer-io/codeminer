@@ -515,12 +515,12 @@ build_all_lkps_maps <-
       )
     }
 
-    # add metadata for codemapper version
+    # add metadata for codeminer version
     all_lkps_maps <- c(
       all_lkps_maps,
       list(
-        metadata_codemapper = tibble::as_tibble(utils::installed.packages()) %>%
-          dplyr::filter(.data[["Package"]] == "codemapper") %>%
+        metadata_codeminer = tibble::as_tibble(utils::installed.packages()) %>%
+          dplyr::filter(.data[["Package"]] == "codeminer") %>%
           tidyr::unite(col = "metadata",
                        tidyselect::all_of(c(
                          "Package", "Version", "Built"

@@ -16,7 +16,7 @@ knitr::opts_chunk$set(
 ```
 
 ```{r setup}
-library(codemapper)
+library(codeminer)
 library(dplyr)
 
 all_lkps_maps_dummy <- build_all_lkps_maps_dummy()
@@ -50,7 +50,7 @@ The following data sources (if present in the clinical events data frame) are in
 
 ```{r echo=FALSE}
 ukbwranglr::clinical_events_sources() %>% 
-  filter(source %in% codemapper:::CLINICAL_EVENTS_SOURCES_MAPPED_TO_PHECODES) %>% 
+  filter(source %in% codeminer:::CLINICAL_EVENTS_SOURCES_MAPPED_TO_PHECODES) %>% 
   knitr::kable()
 ```
 

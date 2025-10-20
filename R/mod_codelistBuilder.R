@@ -249,12 +249,12 @@ codelistBuilderServer <-
 
       query_options <- reactive(rlang::expr(
         list(
-          codemapper.code_type = !!input$code_type,
-          codemapper.map_to = !!input$code_type,
-          codemapper.reverse_mapping = "warning",
-          codemapper.unrecognised_codes_mapped = "warning",
-          codemapper.unrecognised_codes_lookup = "error",
-          codemapper.col_filters = !!col_filters()
+          codeminer.code_type = !!input$code_type,
+          codeminer.map_to = !!input$code_type,
+          codeminer.reverse_mapping = "warning",
+          codeminer.unrecognised_codes_mapped = "warning",
+          codeminer.unrecognised_codes_lookup = "error",
+          codeminer.col_filters = !!col_filters()
         )
       ))
 
@@ -361,8 +361,8 @@ STATINS_CODELIST_SCT = CHILDREN_MAPPED_BNF_STATIN_CHEMICAL_SUBSTANCES %OR% CHILD
               query_call <- query_call[[3]]
 
               import_query_options <- query_options()
-              import_query_options$codemapper.code_type <- query_code_type
-              import_query_options$codemapper.map_to <- query_code_type
+              import_query_options$codeminer.code_type <- query_code_type
+              import_query_options$codeminer.map_to <- query_code_type
               import_query_options <- reactiveVal(import_query_options)
 
               .query_result_temp <- reactiveVal(run_query(
@@ -705,7 +705,7 @@ format:
 
 ```{{r}}
 #| message: false
-library(codemapper)
+library(codeminer)
 library(dplyr)
 library(htmltools)
 

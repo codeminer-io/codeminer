@@ -1,7 +1,7 @@
 .onLoad <- function(libname, pkgname) {
 
   all_pkg_opts <- list(
-    codemapper.col_filters = default_col_filters()
+    codeminer.col_filters = default_col_filters()
   )
 
   current_options <- options()

@@ -1,4 +1,4 @@
 library(testthat)
-library(codemapper)
+library(codeminer)
 
-test_check("codemapper")
+test_check("codeminer")

@@ -7,12 +7,12 @@
 \usage{
 CODES_LIKE(
   reg_expr,
-  code_type = getOption("codemapper.code_type"),
+  code_type = getOption("codeminer.code_type"),
   all_lkps_maps = NULL,
   codes_only = FALSE,
   preferred_description_only = TRUE,
   standardise_output = TRUE,
-  col_filters = getOption("codemapper.col_filters")
+  col_filters = getOption("codeminer.col_filters")
 )
 }
 \arguments{

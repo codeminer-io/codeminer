@@ -119,7 +119,7 @@ RESULT = DESCRIPTION("diab") %AND% DESCRIPTION("retin|mac") %NOT%
 # jqbr requirements -------------------------------------------------------
 
 
-## codemapper constants ----------------------------------------------------
+## codeminer constants ----------------------------------------------------
 
 CODE_TYPE_TO_LKP_TABLE_MAP <- tibble::tribble(
   ~code, ~code_label, ~lkp_table, ~code_col, ~description_col, ~preferred_synonym_col, ~preferred_code, ~grouping_col, ~filter_cols,
@@ -478,7 +478,7 @@ server <- function(input, output, session) {
         # `DESCRIPTION("diab") %OR% DESCRIPTION("retin")`)
         new_rules <- list(new_rules)
       }
-# diab_ret_neph_neuro <- readRDS("~/Documents/phd/r_packages/codemapper/diab_ret_neph_neuro.rds")
+# diab_ret_neph_neuro <- readRDS("~/Documents/phd/r_packages/codeminer/diab_ret_neph_neuro.rds")
 
       jqbr::updateQueryBuilder(
         inputId = "qb",

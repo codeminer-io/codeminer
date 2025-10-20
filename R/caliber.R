@@ -20,7 +20,7 @@ get_caliber_categories_mapping <- function() {
     file = system.file(
       "extdata",
       "caliber_phenotype_categories_mapping.csv",
-      package = "codemapper"
+      package = "codeminer"
     ),
     col_types = list(
       phenotype = readr::col_character(),
@@ -394,7 +394,7 @@ reformat_caliber_for_ukb <- function(caliber,
 default_overlapping_disease_categories_csv <- function() {
   system.file("extdata",
     "caliber_mapped_overlapping_disease_categories.csv",
-    package = "codemapper"
+    package = "codeminer"
   )
 }
 

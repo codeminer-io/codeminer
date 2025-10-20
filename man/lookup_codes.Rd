@@ -7,23 +7,23 @@
 \usage{
 lookup_codes(
   codes,
-  code_type = getOption("codemapper.code_type"),
+  code_type = getOption("codeminer.code_type"),
   all_lkps_maps = NULL,
   preferred_description_only = TRUE,
   standardise_output = TRUE,
-  unrecognised_codes = getOption("codemapper.unrecognised_codes_lookup"),
-  col_filters = getOption("codemapper.col_filters"),
+  unrecognised_codes = getOption("codeminer.unrecognised_codes_lookup"),
+  col_filters = getOption("codeminer.col_filters"),
   .return_unrecognised_codes = FALSE
 )
 
 CODES(
   codes,
-  code_type = getOption("codemapper.code_type"),
+  code_type = getOption("codeminer.code_type"),
   all_lkps_maps = NULL,
   preferred_description_only = TRUE,
   standardise_output = TRUE,
-  unrecognised_codes = getOption("codemapper.unrecognised_codes_lookup"),
-  col_filters = getOption("codemapper.col_filters"),
+  unrecognised_codes = getOption("codeminer.unrecognised_codes_lookup"),
+  col_filters = getOption("codeminer.col_filters"),
   .return_unrecognised_codes = FALSE
 )
 }
