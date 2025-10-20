@@ -1,156 +1,67 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc>/404.html</loc>
-  </url>
-  <url>
-    <loc>/CONTRIBUTING.html</loc>
-  </url>
-  <url>
-    <loc>/LICENSE-text.html</loc>
-  </url>
-  <url>
-    <loc>/LICENSE.html</loc>
-  </url>
-  <url>
-    <loc>/articles/caliber.html</loc>
-  </url>
-  <url>
-    <loc>/articles/codemapper.html</loc>
-  </url>
-  <url>
-    <loc>/articles/icd10_formats.html</loc>
-  </url>
-  <url>
-    <loc>/articles/index.html</loc>
-  </url>
-  <url>
-    <loc>/articles/map_codes.html</loc>
-  </url>
-  <url>
-    <loc>/articles/phecodes.html</loc>
-  </url>
-  <url>
-    <loc>/authors.html</loc>
-  </url>
-  <url>
-    <loc>/index.html</loc>
-  </url>
-  <url>
-    <loc>/reference/all_lkps_maps_to_db.html</loc>
-  </url>
-  <url>
-    <loc>/reference/build_all_lkps_maps.html</loc>
-  </url>
-  <url>
-    <loc>/reference/build_all_lkps_maps_dummy.html</loc>
-  </url>
-  <url>
-    <loc>/reference/code_descriptions_like.html</loc>
-  </url>
-  <url>
-    <loc>/reference/codemapper-package.html</loc>
-  </url>
-  <url>
-    <loc>/reference/codemapper_metadata.html</loc>
-  </url>
-  <url>
-    <loc>/reference/codes_starting_with.html</loc>
-  </url>
-  <url>
-    <loc>/reference/default_col_filters.html</loc>
-  </url>
-  <url>
-    <loc>/reference/default_overlapping_disease_categories_csv.html</loc>
-  </url>
-  <url>
-    <loc>/reference/download_caliber_repo.html</loc>
-  </url>
-  <url>
-    <loc>/reference/dummy_all_lkps_maps_path.html</loc>
-  </url>
-  <url>
-    <loc>/reference/dummy_caliber_dir_path.html</loc>
-  </url>
-  <url>
-    <loc>/reference/dummy_clinical_events_tidy.html</loc>
-  </url>
-  <url>
-    <loc>/reference/dummy_icd10_phecode_map_path.html</loc>
-  </url>
-  <url>
-    <loc>/reference/dummy_phecode_lkp_path.html</loc>
-  </url>
-  <url>
-    <loc>/reference/dummy_ukb_codings_path.html</loc>
-  </url>
-  <url>
-    <loc>/reference/get_caliber_categories_mapping.html</loc>
-  </url>
-  <url>
-    <loc>/reference/get_mapping_df.html</loc>
-  </url>
-  <url>
-    <loc>/reference/get_nhsbsa_snomed_bnf.html</loc>
-  </url>
-  <url>
-    <loc>/reference/get_phecode_definitions.html</loc>
-  </url>
-  <url>
-    <loc>/reference/get_phecode_icd10_map.html</loc>
-  </url>
-  <url>
-    <loc>/reference/get_phecode_icd9_map.html</loc>
-  </url>
-  <url>
-    <loc>/reference/get_ukb_all_lkps_maps.html</loc>
-  </url>
-  <url>
-    <loc>/reference/get_ukb_self_report_med_to_atc_map.html</loc>
-  </url>
-  <url>
-    <loc>/reference/index.html</loc>
-  </url>
-  <url>
-    <loc>/reference/lookup_codes.html</loc>
-  </url>
-  <url>
-    <loc>/reference/make_phecode_reverse_map.html</loc>
-  </url>
-  <url>
-    <loc>/reference/map_clinical_events_to_phecodes.html</loc>
-  </url>
-  <url>
-    <loc>/reference/map_codes.html</loc>
-  </url>
-  <url>
-    <loc>/reference/pipe.html</loc>
-  </url>
-  <url>
-    <loc>/reference/read_all_lkps_maps.html</loc>
-  </url>
-  <url>
-    <loc>/reference/read_all_lkps_maps_dummy.html</loc>
-  </url>
-  <url>
-    <loc>/reference/read_caliber_raw.html</loc>
-  </url>
-  <url>
-    <loc>/reference/read_icd10_phecode_map_dummy.html</loc>
-  </url>
-  <url>
-    <loc>/reference/read_phecode_lkp_dummy.html</loc>
-  </url>
-  <url>
-    <loc>/reference/read_ukb_codings_dummy.html</loc>
-  </url>
-  <url>
-    <loc>/reference/reformat_caliber_for_ukb.html</loc>
-  </url>
-  <url>
-    <loc>/reference/reformat_icd10_codes.html</loc>
-  </url>
-  <url>
-    <loc>/reference/runCodelistBuilder.html</loc>
-  </url>
+<urlset xmlns = 'http://www.sitemaps.org/schemas/sitemap/0.9'>
+<url><loc>https://codeminer-io.github.io/codeminer/404.html</loc></url>
+<url><loc>https://codeminer-io.github.io/codeminer/CONTRIBUTING.html</loc></url>
+<url><loc>https://codeminer-io.github.io/codeminer/LICENSE-text.html</loc></url>
+<url><loc>https://codeminer-io.github.io/codeminer/LICENSE.html</loc></url>
+<url><loc>https://codeminer-io.github.io/codeminer/articles/caliber.html</loc></url>
+<url><loc>https://codeminer-io.github.io/codeminer/articles/codemapper.html</loc></url>
+<url><loc>https://codeminer-io.github.io/codeminer/articles/icd10_formats.html</loc></url>
+<url><loc>https://codeminer-io.github.io/codeminer/articles/index.html</loc></url>
+<url><loc>https://codeminer-io.github.io/codeminer/articles/map_codes.html</loc></url>
+<url><loc>https://codeminer-io.github.io/codeminer/articles/phecodes.html</loc></url>
+<url><loc>https://codeminer-io.github.io/codeminer/authors.html</loc></url>
+<url><loc>https://codeminer-io.github.io/codeminer/index.html</loc></url>
+<url><loc>https://codeminer-io.github.io/codeminer/reference/ATTRIBUTE_TYPES_FROM.html</loc></url>
+<url><loc>https://codeminer-io.github.io/codeminer/reference/ATTRIBUTE_TYPES_TO.html</loc></url>
+<url><loc>https://codeminer-io.github.io/codeminer/reference/GET_ATTRIBUTES.html</loc></url>
+<url><loc>https://codeminer-io.github.io/codeminer/reference/HAS_ATTRIBUTES.html</loc></url>
+<url><loc>https://codeminer-io.github.io/codeminer/reference/RunCodelistBuilder.html</loc></url>
+<url><loc>https://codeminer-io.github.io/codeminer/reference/all_lkps_maps_to_db.html</loc></url>
+<url><loc>https://codeminer-io.github.io/codeminer/reference/build_all_lkps_maps.html</loc></url>
+<url><loc>https://codeminer-io.github.io/codeminer/reference/build_all_lkps_maps_dummy.html</loc></url>
+<url><loc>https://codeminer-io.github.io/codeminer/reference/code_descriptions_like.html</loc></url>
+<url><loc>https://codeminer-io.github.io/codeminer/reference/codemapper-package.html</loc></url>
+<url><loc>https://codeminer-io.github.io/codeminer/reference/codemapper_metadata.html</loc></url>
+<url><loc>https://codeminer-io.github.io/codeminer/reference/codes_like.html</loc></url>
+<url><loc>https://codeminer-io.github.io/codeminer/reference/default_col_filters.html</loc></url>
+<url><loc>https://codeminer-io.github.io/codeminer/reference/default_overlapping_disease_categories_csv.html</loc></url>
+<url><loc>https://codeminer-io.github.io/codeminer/reference/download_caliber_repo.html</loc></url>
+<url><loc>https://codeminer-io.github.io/codeminer/reference/dummy_all_lkps_maps_path.html</loc></url>
+<url><loc>https://codeminer-io.github.io/codeminer/reference/dummy_caliber_dir_path.html</loc></url>
+<url><loc>https://codeminer-io.github.io/codeminer/reference/dummy_clinical_events_tidy.html</loc></url>
+<url><loc>https://codeminer-io.github.io/codeminer/reference/dummy_icd10_phecode_map_path.html</loc></url>
+<url><loc>https://codeminer-io.github.io/codeminer/reference/dummy_phecode_lkp_path.html</loc></url>
+<url><loc>https://codeminer-io.github.io/codeminer/reference/dummy_ukb_codings_path.html</loc></url>
+<url><loc>https://codeminer-io.github.io/codeminer/reference/get_all_lkps_maps_db_metadata.html</loc></url>
+<url><loc>https://codeminer-io.github.io/codeminer/reference/get_attributes_sct.html</loc></url>
+<url><loc>https://codeminer-io.github.io/codeminer/reference/get_bnf_from_open_prescribing.html</loc></url>
+<url><loc>https://codeminer-io.github.io/codeminer/reference/get_caliber_categories_mapping.html</loc></url>
+<url><loc>https://codeminer-io.github.io/codeminer/reference/get_child_codes.html</loc></url>
+<url><loc>https://codeminer-io.github.io/codeminer/reference/get_children_sct.html</loc></url>
+<url><loc>https://codeminer-io.github.io/codeminer/reference/get_mapping_df.html</loc></url>
+<url><loc>https://codeminer-io.github.io/codeminer/reference/get_nhsbsa_snomed_bnf.html</loc></url>
+<url><loc>https://codeminer-io.github.io/codeminer/reference/get_parents_sct.html</loc></url>
+<url><loc>https://codeminer-io.github.io/codeminer/reference/get_phecode_definitions.html</loc></url>
+<url><loc>https://codeminer-io.github.io/codeminer/reference/get_phecode_icd10_map.html</loc></url>
+<url><loc>https://codeminer-io.github.io/codeminer/reference/get_phecode_icd9_map.html</loc></url>
+<url><loc>https://codeminer-io.github.io/codeminer/reference/get_ukb_all_lkps_maps.html</loc></url>
+<url><loc>https://codeminer-io.github.io/codeminer/reference/get_ukb_self_report_med_to_atc_map.html</loc></url>
+<url><loc>https://codeminer-io.github.io/codeminer/reference/index.html</loc></url>
+<url><loc>https://codeminer-io.github.io/codeminer/reference/infix_setops.html</loc></url>
+<url><loc>https://codeminer-io.github.io/codeminer/reference/lookup_codes.html</loc></url>
+<url><loc>https://codeminer-io.github.io/codeminer/reference/make_phecode_reverse_map.html</loc></url>
+<url><loc>https://codeminer-io.github.io/codeminer/reference/map_clinical_events_to_phecodes.html</loc></url>
+<url><loc>https://codeminer-io.github.io/codeminer/reference/map_codes.html</loc></url>
+<url><loc>https://codeminer-io.github.io/codeminer/reference/pipe.html</loc></url>
+<url><loc>https://codeminer-io.github.io/codeminer/reference/read_all_lkps_maps.html</loc></url>
+<url><loc>https://codeminer-io.github.io/codeminer/reference/read_all_lkps_maps_dummy.html</loc></url>
+<url><loc>https://codeminer-io.github.io/codeminer/reference/read_caliber_raw.html</loc></url>
+<url><loc>https://codeminer-io.github.io/codeminer/reference/read_icd10_phecode_map_dummy.html</loc></url>
+<url><loc>https://codeminer-io.github.io/codeminer/reference/read_phecode_lkp_dummy.html</loc></url>
+<url><loc>https://codeminer-io.github.io/codeminer/reference/read_ukb_codings_dummy.html</loc></url>
+<url><loc>https://codeminer-io.github.io/codeminer/reference/reformat_caliber_for_ukb.html</loc></url>
+<url><loc>https://codeminer-io.github.io/codeminer/reference/reformat_icd10_codes.html</loc></url>
+<url><loc>https://codeminer-io.github.io/codeminer/reference/start_api.html</loc></url>
+<url><loc>https://codeminer-io.github.io/codeminer/reference/with_code_type_helpers.html</loc></url>
 </urlset>
+
