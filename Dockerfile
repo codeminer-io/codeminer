@@ -19,10 +19,10 @@ COPY inst/docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 RUN apt-get update && apt-get install -y supervisor
 
 # Install/set up shiny apps for shiny server e.g.
-COPY . /codemapper
-RUN Rscript -e 'options(repos = c(CRAN = "https://packagemanager.posit.co/cran/latest")); devtools::install_local(path = "/codemapper", dependencies = TRUE)'
+COPY . /codeminer
+RUN Rscript -e 'options(repos = c(CRAN = "https://packagemanager.posit.co/cran/latest")); devtools::install_local(path = "/codeminer", dependencies = TRUE)'
 # RUN Rscript -e 'install.packages("duckdb", repos="http://cran.us.r-project.org", dependencies=TRUE)' # latest duckdb version not available from posit package manager yet
-RUN cd /srv/shiny-server && rm -rf * && Rscript -e 'codemapper::all_lkps_maps_to_db()'
+RUN cd /srv/shiny-server && rm -rf * && Rscript -e 'codeminer::all_lkps_maps_to_db()'
 COPY inst/docker/app.R /srv/shiny-server/app.R
 
 # Set the entry point

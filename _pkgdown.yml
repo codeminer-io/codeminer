@@ -54,7 +54,7 @@ reference:
   desc: Miscellaneous utility functions.
 - contents:
   - infix_setops
-  - codemapper_metadata
+  - codeminer_metadata
   - get_bnf_from_open_prescribing
   - get_nhsbsa_snomed_bnf
   - get_ukb_self_report_med_to_atc_map

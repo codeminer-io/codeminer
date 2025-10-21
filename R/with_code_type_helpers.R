@@ -9,7 +9,7 @@
 #' @details
 #' Available functions:
 #'
-#' - `r paste(paste0("\\code{", codemapper::codemapper_metadata()$lookup_tables$code, "()}"), sep = "", collapse = "\n- ")`
+#' - `r paste(paste0("\\code{", codeminer::codeminer_metadata()$lookup_tables$code, "()}"), sep = "", collapse = "\n- ")`
 #'
 #' @return The result of executing the code within the specified `code_type`
 #'   context.
@@ -141,8 +141,8 @@ prodcode_aurum <- function(code) {
 
 with_code_type <- function(code_type, code) {
   withr::with_options(list(
-    codemapper.code_type = code_type,
-    codemapper.map_to = code_type
+    codeminer.code_type = code_type,
+    codeminer.map_to = code_type
   ),
   code = code)
 }

@@ -20,7 +20,7 @@ shinyAceToQbrServer <- function(id,
 
     comps <- reactive({
       comps <- list()
-      comps <- c(comps, list(codemapper = getNamespaceExports("codemapper")))
+      comps <- c(comps, list(codeminer = getNamespaceExports("codeminer")))
     })
 
     output$ace_editor <- renderUI({

@@ -10,7 +10,7 @@ HAS_ATTRIBUTES(
   standardise_output = TRUE,
   all_lkps_maps = NULL,
   preferred_description_only = TRUE,
-  col_filters = getOption("codemapper.col_filters")
+  col_filters = getOption("codeminer.col_filters")
 )
 }
 \arguments{

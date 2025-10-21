@@ -14,7 +14,7 @@
 #' @examples
 #' dummy_ukb_codings_path()
 dummy_ukb_codings_path <- function() {
-  system.file("extdata", "dummy_Codings.tsv", package = "codemapper")
+  system.file("extdata", "dummy_Codings.tsv", package = "codeminer")
 }
 
 #' Dummy UK Biobank resource 592 file path
@@ -28,7 +28,7 @@ dummy_ukb_codings_path <- function() {
 #' @examples
 #' dummy_all_lkps_maps_path()
 dummy_all_lkps_maps_path <- function() {
-  system.file("extdata", "dummy_all_lkps_maps_v3.xlsx", package = "codemapper")
+  system.file("extdata", "dummy_all_lkps_maps_v3.xlsx", package = "codeminer")
 }
 
 #' Read dummy UK Biobank codings into R
@@ -117,7 +117,7 @@ dummy_all_lkps_maps_db <- function(db_path = tempfile(fileext = ".db")) {
 #' @examples
 #' dummy_caliber_dir_path()
 dummy_caliber_dir_path <- function() {
-  system.file("extdata", "test_caliber_repo", package = "codemapper")
+  system.file("extdata", "test_caliber_repo", package = "codeminer")
 }
 
 
@@ -138,7 +138,7 @@ dummy_phecode_lkp_path <- function() {
   system.file(
     "extdata",
     "dummy_phecode_definitions1.2.csv",
-    package = "codemapper"
+    package = "codeminer"
   )
 }
 
@@ -157,7 +157,7 @@ dummy_icd10_phecode_map_path <- function() {
   system.file(
     "extdata",
     "dummy_Phecode_map_v1_2_icd10_beta.csv",
-    package = "codemapper"
+    package = "codeminer"
   )
 }
 

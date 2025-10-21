@@ -1,8 +1,8 @@
 ---
-title: "Introduction to codemapper"
+title: "Introduction to codeminer"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{codemapper}
+  %\VignetteIndexEntry{codeminer}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 bibliography: references.bib
@@ -16,17 +16,17 @@ knitr::opts_chunk$set(
 ```
 
 ```{r setup}
-library(codemapper)
+library(codeminer)
 ```
 
 # Introduction
 
-The goal of codemapper is to simplify working with clinical codes for research using electronic health records. The workflow is as follows:
+The goal of codeminer is to simplify working with clinical codes for research using electronic health records. The workflow is as follows:
 
 1.  Create a local resource containing lookup and mapping tables for various clinical codings systems (e.g. ICD10 and Read codes)
 2.  Build clinical code lists for conditions of interest by querying this resource
 
-This vignette demonstrates the above using dummy data included with the package. You can try out the steps either locally by installing codemapper on your own machine, or online by clicking on the following link to RStudio Cloud[^1] and navigating to this Rmd file in the 'vignettes' directory: [![Launch RStudio Cloud](https://img.shields.io/badge/RStudio-Cloud-blue)](https://rstudio.cloud/project/4007004)
+This vignette demonstrates the above using dummy data included with the package. You can try out the steps either locally by installing codeminer on your own machine, or online by clicking on the following link to RStudio Cloud[^1] and navigating to this Rmd file in the 'vignettes' directory: [![Launch RStudio Cloud](https://img.shields.io/badge/RStudio-Cloud-blue)](https://rstudio.cloud/project/4007004)
 
 [^1]: You will be asked to sign up for a free account if you do not have one already.
 

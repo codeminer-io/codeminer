@@ -1,8 +1,8 @@
 test_that(
-  "`validate_codemapper_calls()` raises error for query statements with non-codeminer functions",
+  "`validate_codeminer_calls()` raises error for query statements with non-codeminer functions",
   {
     expect_equal(
-      validate_codemapper_calls(quote(
+      validate_codeminer_calls(quote(
         DESCRIPTION("diab") %AND% DESCRIPTION("type 1") %OR%
           (CHILDREN("E10") %OR% CODES("O240"))
       )),
@@ -10,7 +10,7 @@ test_that(
     )
 
     expect_equal(
-      validate_codemapper_calls(rlang::parse_expr(
+      validate_codeminer_calls(rlang::parse_expr(
         'RESULT = DESCRIPTION("diab") %AND% DESCRIPTION("type 1") %OR%
           (CHILDREN("E10") %OR% CODES("O240"))'
       )),
@@ -18,7 +18,7 @@ test_that(
     )
 
     expect_equal(
-      validate_codemapper_calls(rlang::parse_expr(
+      validate_codeminer_calls(rlang::parse_expr(
         'RESULT <- DESCRIPTION("diab") %AND% DESCRIPTION("type 1") %OR%
           (CHILDREN("E10") %OR% CODES("O240"))'
       )),
@@ -26,17 +26,17 @@ test_that(
     )
 
     expect_error(
-      validate_codemapper_calls(quote(base::mean(1:3))),
+      validate_codeminer_calls(quote(base::mean(1:3))),
       "Invalid function calls found: `mean`, `:`. These functions are not exported by codeminer"
     )
 
     expect_error(
-      validate_codemapper_calls(quote(mean(1:3))),
+      validate_codeminer_calls(quote(mean(1:3))),
       "Invalid function calls found: `mean`, `:`. These functions are not exported by codeminer"
     )
 
     expect_error(
-      validate_codemapper_calls(quote(base:::abs(-1))),
+      validate_codeminer_calls(quote(base:::abs(-1))),
       "Invalid function calls found: `abs`, `-`. These functions are not exported by codeminer"
     )
   }

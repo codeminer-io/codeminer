@@ -11,7 +11,7 @@ get_attributes_sct_old(
   relationship_direction = "child",
   recursive = TRUE,
   active_only = FALSE,
-  col_filters = getOption("codemapper.col_filters"),
+  col_filters = getOption("codeminer.col_filters"),
   all_lkps_maps = NULL
 )
 }

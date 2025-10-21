@@ -13,19 +13,19 @@ knitr::opts_chunk$set(
 )
 ```
 
-# codemapper
+# codeminer
 
 <!-- badges: start -->
 
 [![R-CMD-check](https://github.com/codeminer-io/codeminer/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/codeminer-io/codeminer/actions/workflows/R-CMD-check.yaml)
-[![Codecov test coverage](https://codecov.io/gh/codeminer-io/codeminer/graph/badge.svg)](https://app.codecov.io/gh/codeminer-io/codeminer)
+[![codecov](https://codecov.io/gh/codeminer-io/codeminer/graph/badge.svg?token=AO69EQDLKI)](https://codecov.io/gh/codeminer-io/codeminer)
 [![pkgdown](https://github.com/codeminer-io/codeminer/workflows/pkgdown/badge.svg)](https://github.com/codeminer-io/codeminer/actions)
 [![Launch RStudio Cloud](https://img.shields.io/badge/RStudio-Cloud-blue)](https://rstudio.cloud/project/4007004)
 [![DOI](https://zenodo.org/badge/485945478.svg)](https://zenodo.org/badge/latestdoi/485945478)
 [![Project Status: WIP – Initial development is in progress, but there has not yet been a stable, usable release suitable for the public.](https://www.repostatus.org/badges/latest/wip.svg)](https://www.repostatus.org/#wip)
 <!-- badges: end -->
 
-The goal of codemapper is to facilitate working with clinical codes used in electronic health records.
+The goal of codeminer is to facilitate working with clinical codes used in electronic health records.
 
 This package relies primarily on UK Biobank resource 592 ([Clinical coding classification systems and maps](https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592)) and the UK Biobank [data codings file](https://biobank.ctsu.ox.ac.uk/crystal/exinfo.cgi?src=accessing_data_guide), both of which are publicly available.
 
@@ -34,8 +34,8 @@ This package relies primarily on UK Biobank resource 592 ([Clinical coding class
 You can install the development version from [GitHub](https://github.com/) with:
 
 ```{r eval=FALSE}
-# install.packages("devtools")
-devtools::install_github("rmgpanw/codemapper")
+# install.packages("pak")
+pak::pak("codeminer-io/codeminer")
 ```
 
 ## Basic example
@@ -45,7 +45,7 @@ A data analyst using electronic health records for research into hypertension ma
 First, build a local resource containing lookup and mapping tables for various clinical codings systems. A dummy dataset is used here:
 
 ```{r example}
-library(codemapper)
+library(codeminer)
 
 all_lkps_maps_dummy <- build_all_lkps_maps_dummy()
 ```
@@ -74,7 +74,7 @@ htn_icd10 <- map_codes(
 htn_icd10
 ```
 
-See `vignette('codemapper')` for further details, including how to build a clinical codelist with R Shiny using `RunCodelistBuilder()`.
+See `vignette('codeminer')` for further details, including how to build a clinical codelist with R Shiny using `RunCodelistBuilder()`.
 
 ## UK Biobank
 

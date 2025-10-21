@@ -1,5 +1,6 @@
-Package: codemapper
+Package: codeminer
 Title: Functions for Mapping Between Clinical Coding Systems
+Description: Functions for mapping between clinical coding systems.
 Version: 0.0.0.9004
 Authors@R:
     person(given = "Alasdair",
@@ -7,41 +8,19 @@ Authors@R:
            role = c("aut", "cre"),
            email = "alasdair.warwick06@gmail.com",
            comment = c(ORCID = "0000-0002-0800-2890"))
-Description: Functions for mapping between clinical coding systems.
 License: MIT + file LICENSE
 URL: https://github.com/codeminer-io/codeminer, https://codeminer-io.github.io/codeminer/
 BugReports: https://github.com/codeminer-io/codeminer/issues
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.2
-Suggests:
-    covr,
-    jsonlite,
-    knitr,
-    lobstr,
-    PheWAS,
-    plumber,
-    reactable,
-    rmarkdown,
-    sessioninfo,
-    shinyAce,
-    shinydashboard,
-    shinyFeedback,
-    shinyjs,
-    shinytest,
-    shinyTree,
-    visNetwork,
-    igraph,
-    quarto,
-    downlit,
-    xml2,
-    testthat (>= 3.0.0)
-Config/testthat/edition: 3
-Imports:
+RoxygenNote: 7.3.3
+Depends: 
+    R (>= 4.1.0)
+Imports: 
+    DBI,
     assertthat,
     data.table,
-    DBI,
     dplyr,
     duckdb,
     fs,
@@ -60,7 +39,30 @@ Imports:
     ukbwranglr,
     utils,
     withr
-Remotes:
+Suggests: 
+    PheWAS,
+    covr,
+    downlit,
+    igraph,
+    jsonlite,
+    knitr,
+    lobstr,
+    plumber,
+    quarto,
+    reactable,
+    rmarkdown,
+    sessioninfo,
+    shinyAce,
+    shinyFeedback,
+    shinyTree,
+    shinydashboard,
+    shinyjs,
+    shinytest,
+    testthat (>= 3.0.0),
+    visNetwork,
+    xml2
+Remotes: 
     github::rmgpanw/ukbwranglr,
     github::PheWAS/PheWAS
 VignetteBuilder: knitr
+Config/testthat/edition: 3

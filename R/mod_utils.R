@@ -22,7 +22,7 @@ run_query <- function(query,
                       saved_queries,
                       dag_igraph) {
   # query should only use codeminer exports
-  validate_codemapper_calls(query)
+  validate_codeminer_calls(query)
 
   if (is.null(qb)) {
     qb <- translate_codeminer_query_to_qbr_list(query)
@@ -152,15 +152,15 @@ run_query <- function(query,
   return(x)
 }
 
-validate_codemapper_calls <- function(call_obj) {
-  # Get all exported functions from codemapper
-  codemapper_exports <- getNamespaceExports("codemapper")
+validate_codeminer_calls <- function(call_obj) {
+  # Get all exported functions from codeminer
+  codeminer_exports <- getNamespaceExports("codeminer")
 
   # Get all function calls
   fn_calls <- get_function_calls(call_obj)
 
-  # Check which calls are not in codemapper exports
-  invalid_calls <- setdiff(fn_calls, codemapper_exports)
+  # Check which calls are not in codeminer exports
+  invalid_calls <- setdiff(fn_calls, codeminer_exports)
 
   # "(" is allowed
   invalid_calls <- invalid_calls[!invalid_calls %in% c("(", "=", "<-")]
@@ -346,8 +346,8 @@ update_saved_queries <- function(query,
       )
 
       query_options_for_code_type <- eval(query_options())
-      query_options_for_code_type$codemapper.code_type <- code_type
-      query_options_for_code_type$codemapper.map_to <- code_type
+      query_options_for_code_type$codeminer.code_type <- code_type
+      query_options_for_code_type$codeminer.map_to <- code_type
 
       for (x in upstream_deps) {
         updated_result <-
@@ -723,8 +723,8 @@ recompute_all_queries <- function(saved_queries,
           get(x = params$id, envir = saved_queries()$results_meta)$qb
 
         query_options_for_code_type <- eval(query_options())
-        query_options_for_code_type$codemapper.code_type <- params$group
-        query_options_for_code_type$codemapper.map_to <- params$group
+        query_options_for_code_type$codeminer.code_type <- params$group
+        query_options_for_code_type$codeminer.map_to <- params$group
 
         execute_query <-
           purrr::safely(\(x) withr::with_options(
@@ -740,7 +740,7 @@ recompute_all_queries <- function(saved_queries,
         )
 
         if (is.null(query_result$result)) {
-          stop('Update `col_filters()` feature is not yet fully implemented to handle cases where errors arise when updating saved queries (e.g. no codes returned, or new filters cause `codemapper.unrecognised_codes_lookup = "error")` to raise an error')
+          stop('Update `col_filters()` feature is not yet fully implemented to handle cases where errors arise when updating saved queries (e.g. no codes returned, or new filters cause `codeminer.unrecognised_codes_lookup = "error")` to raise an error')
         }
 
         update_saved_queries(

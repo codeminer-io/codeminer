@@ -2,7 +2,7 @@
 ## `inst/extdata/mapped_caliber_overlapping_disease_categories.csv` dataset goes
 ## here
 
-library(codemapper)
+library(codeminer)
 
 # Reformat and map CALIBER repo (remove col_filters to get all possible
 # overlaps)

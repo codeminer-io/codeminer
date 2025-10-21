@@ -1,5 +1,5 @@
 
-metadata <- codemapper_metadata()
+metadata <- codeminer_metadata()
 
 # `CLINICAL_CODE_MAPPINGS_MAP` --------------------------------------------
 

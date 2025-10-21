@@ -133,7 +133,7 @@ test_that("`get_child_codes()` raises error for unsupported code types e.g. read
       all_lkps_maps = all_lkps_maps,
       codes_only = TRUE,
       standardise_output = FALSE),
-    "Currently codemapper is unable to retrieve child codes for read3"
+    "Currently codeminer is unable to retrieve child codes for read3"
   )
 })
 

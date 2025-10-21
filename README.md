@@ -1,13 +1,12 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# codemapper
+# codeminer
 
 <!-- badges: start -->
 
 [![R-CMD-check](https://github.com/codeminer-io/codeminer/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/codeminer-io/codeminer/actions/workflows/R-CMD-check.yaml)
-[![Codecov test
-coverage](https://codecov.io/gh/codeminer-io/codeminer/graph/badge.svg)](https://app.codecov.io/gh/codeminer-io/codeminer)
+[![codecov](https://codecov.io/gh/codeminer-io/codeminer/graph/badge.svg?token=AO69EQDLKI)](https://codecov.io/gh/codeminer-io/codeminer)
 [![pkgdown](https://github.com/codeminer-io/codeminer/workflows/pkgdown/badge.svg)](https://github.com/codeminer-io/codeminer/actions)
 [![Launch RStudio
 Cloud](https://img.shields.io/badge/RStudio-Cloud-blue)](https://rstudio.cloud/project/4007004)
@@ -17,7 +16,7 @@ has not yet been a stable, usable release suitable for the
 public.](https://www.repostatus.org/badges/latest/wip.svg)](https://www.repostatus.org/#wip)
 <!-- badges: end -->
 
-The goal of codemapper is to facilitate working with clinical codes used
+The goal of codeminer is to facilitate working with clinical codes used
 in electronic health records.
 
 This package relies primarily on UK Biobank resource 592 ([Clinical
@@ -33,8 +32,8 @@ You can install the development version from
 [GitHub](https://github.com/) with:
 
 ``` r
-# install.packages("devtools")
-devtools::install_github("rmgpanw/codemapper")
+# install.packages("pak")
+pak::pak("codeminer-io/codeminer")
 ```
 
 ## Basic example
@@ -47,7 +46,7 @@ First, build a local resource containing lookup and mapping tables for
 various clinical codings systems. A dummy dataset is used here:
 
 ``` r
-library(codemapper)
+library(codeminer)
 
 all_lkps_maps_dummy <- build_all_lkps_maps_dummy()
 ```
@@ -84,7 +83,7 @@ htn_icd10
 #> 1 I10X  Essential (primary) hypertension icd10
 ```
 
-See `vignette('codemapper')` for further details, including how to build
+See `vignette('codeminer')` for further details, including how to build
 a clinical codelist with R Shiny using `RunCodelistBuilder()`.
 
 ## UK Biobank
