@@ -5,7 +5,7 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<title>Functions for Mapping Between Clinical Coding Systems • codemapper</title>
+<title>Functions for Mapping Between Clinical Coding Systems • codeminer</title>
 <script src="deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
 <script src="deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
@@ -20,7 +20,7 @@
 
     <nav class="navbar navbar-expand-lg fixed-top bg-light" data-bs-theme="light" aria-label="Site navigation"><div class="container">
 
-    <a class="navbar-brand me-2" href="index.html">codemapper</a>
+    <a class="navbar-brand me-2" href="index.html">codeminer</a>
 
     <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0.9004</small>
 
@@ -31,7 +31,7 @@
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto">
-<li class="nav-item"><a class="nav-link" href="articles/codemapper.html">Get started</a></li>
+<li class="nav-item"><a class="nav-link" href="articles/codeminer.html">Get started</a></li>
 <li class="nav-item"><a class="nav-link" href="reference/index.html">Reference</a></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
@@ -56,19 +56,19 @@
 </nav><div class="container template-home">
 <div class="row">
   <main id="main" class="col-md-9"><div class="section level1">
-<div class="page-header"><h1 id="codemapper">codemapper<a class="anchor" aria-label="anchor" href="#codemapper"></a>
+<div class="page-header"><h1 id="codeminer">codeminer<a class="anchor" aria-label="anchor" href="#codeminer"></a>
 </h1></div>
 <!-- badges: start -->
 
-<p>The goal of codemapper is to facilitate working with clinical codes used in electronic health records.</p>
+<p>The goal of codeminer is to facilitate working with clinical codes used in electronic health records.</p>
 <p>This package relies primarily on UK Biobank resource 592 (<a href="https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592" class="external-link">Clinical coding classification systems and maps</a>) and the UK Biobank <a href="https://biobank.ctsu.ox.ac.uk/crystal/exinfo.cgi?src=accessing_data_guide" class="external-link">data codings file</a>, both of which are publicly available.</p>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
 <p>You can install the development version from <a href="https://github.com/" class="external-link">GitHub</a> with:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># install.packages("devtools")</span></span>
-<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"rmgpanw/codemapper"</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="co"># install.packages("pak")</span></span>
+<span><span class="fu">pak</span><span class="fu">::</span><span class="fu"><a href="https://pak.r-lib.org/reference/pak.html" class="external-link">pak</a></span><span class="op">(</span><span class="st">"codeminer-io/codeminer"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="basic-example">Basic example<a class="anchor" aria-label="anchor" href="#basic-example"></a>
@@ -76,7 +76,7 @@
 <p>A data analyst using electronic health records for research into hypertension may wish to build a list of clinical codes that capture this condition.</p>
 <p>First, build a local resource containing lookup and mapping tables for various clinical codings systems. A dummy dataset is used here:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/codeminer-io/codeminer" class="external-link">codemapper</a></span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/codeminer-io/codeminer" class="external-link">codeminer</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">all_lkps_maps_dummy</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/build_all_lkps_maps_dummy.html">build_all_lkps_maps_dummy</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p>Look up Read 2 codes for hypertension:</p>
@@ -105,7 +105,7 @@
 <span><span class="co">#&gt;   code  description                      code_type</span></span>
 <span><span class="co">#&gt;   &lt;chr&gt; &lt;chr&gt;                            &lt;chr&gt;    </span></span>
 <span><span class="co">#&gt; 1 I10X  Essential (primary) hypertension icd10</span></span></code></pre></div>
-<p>See <code><a href="articles/codemapper.html">vignette('codemapper')</a></code> for further details, including how to build a clinical codelist with R Shiny using <code><a href="reference/RunCodelistBuilder.html">RunCodelistBuilder()</a></code>.</p>
+<p>See <code><a href="articles/codeminer.html">vignette('codeminer')</a></code> for further details, including how to build a clinical codelist with R Shiny using <code><a href="reference/RunCodelistBuilder.html">RunCodelistBuilder()</a></code>.</p>
 </div>
 <div class="section level2">
 <h2 id="uk-biobank">UK Biobank<a class="anchor" aria-label="anchor" href="#uk-biobank"></a>
@@ -139,7 +139,7 @@
 <div class="citation">
 <h2 data-toc-skip>Citation</h2>
 <ul class="list-unstyled">
-<li><a href="authors.html#citation">Citing codemapper</a></li>
+<li><a href="authors.html#citation">Citing codeminer</a></li>
 </ul>
 </div>
 
@@ -154,7 +154,7 @@
 <h2 data-toc-skip>Dev status</h2>
 <ul class="list-unstyled">
 <li><a href="https://github.com/codeminer-io/codeminer/actions/workflows/R-CMD-check.yaml" class="external-link"><img src="https://github.com/codeminer-io/codeminer/actions/workflows/R-CMD-check.yaml/badge.svg" alt="R-CMD-check"></a></li>
-<li><a href="https://app.codecov.io/gh/codeminer-io/codeminer" class="external-link"><img src="https://codecov.io/gh/codeminer-io/codeminer/graph/badge.svg" alt="Codecov test coverage"></a></li>
+<li><a href="https://codecov.io/gh/codeminer-io/codeminer" class="external-link"><img src="https://codecov.io/gh/codeminer-io/codeminer/graph/badge.svg?token=AO69EQDLKI" alt="codecov"></a></li>
 <li><a href="https://github.com/codeminer-io/codeminer/actions" class="external-link"><img src="https://github.com/codeminer-io/codeminer/workflows/pkgdown/badge.svg" alt="pkgdown"></a></li>
 <li><a href="https://rstudio.cloud/project/4007004" class="external-link"><img src="https://img.shields.io/badge/RStudio-Cloud-blue" alt="Launch RStudio Cloud"></a></li>
 <li><a href="https://zenodo.org/badge/latestdoi/485945478" class="external-link"><img src="https://zenodo.org/badge/485945478.svg" alt="DOI"></a></li>

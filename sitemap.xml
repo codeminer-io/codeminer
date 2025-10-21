@@ -4,7 +4,7 @@
 <url><loc>https://codeminer-io.github.io/codeminer/LICENSE-text.html</loc></url>
 <url><loc>https://codeminer-io.github.io/codeminer/LICENSE.html</loc></url>
 <url><loc>https://codeminer-io.github.io/codeminer/articles/caliber.html</loc></url>
-<url><loc>https://codeminer-io.github.io/codeminer/articles/codemapper.html</loc></url>
+<url><loc>https://codeminer-io.github.io/codeminer/articles/codeminer.html</loc></url>
 <url><loc>https://codeminer-io.github.io/codeminer/articles/icd10_formats.html</loc></url>
 <url><loc>https://codeminer-io.github.io/codeminer/articles/index.html</loc></url>
 <url><loc>https://codeminer-io.github.io/codeminer/articles/map_codes.html</loc></url>
@@ -20,8 +20,8 @@
 <url><loc>https://codeminer-io.github.io/codeminer/reference/build_all_lkps_maps.html</loc></url>
 <url><loc>https://codeminer-io.github.io/codeminer/reference/build_all_lkps_maps_dummy.html</loc></url>
 <url><loc>https://codeminer-io.github.io/codeminer/reference/code_descriptions_like.html</loc></url>
-<url><loc>https://codeminer-io.github.io/codeminer/reference/codemapper-package.html</loc></url>
-<url><loc>https://codeminer-io.github.io/codeminer/reference/codemapper_metadata.html</loc></url>
+<url><loc>https://codeminer-io.github.io/codeminer/reference/codeminer-package.html</loc></url>
+<url><loc>https://codeminer-io.github.io/codeminer/reference/codeminer_metadata.html</loc></url>
 <url><loc>https://codeminer-io.github.io/codeminer/reference/codes_like.html</loc></url>
 <url><loc>https://codeminer-io.github.io/codeminer/reference/default_col_filters.html</loc></url>
 <url><loc>https://codeminer-io.github.io/codeminer/reference/default_overlapping_disease_categories_csv.html</loc></url>

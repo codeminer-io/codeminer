@@ -3,11 +3,11 @@ pkgdown: 2.1.3
 pkgdown_sha: ~
 articles:
   caliber: caliber.html
-  codemapper: codemapper.html
+  codeminer: codeminer.html
   icd10_formats: icd10_formats.html
   map_codes: map_codes.html
   phecodes: phecodes.html
-last_built: 2025-10-20T15:17Z
+last_built: 2025-10-21T11:15Z
 urls:
   reference: https://codeminer-io.github.io/codeminer/reference
   article: https://codeminer-io.github.io/codeminer/articles
