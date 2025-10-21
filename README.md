@@ -6,8 +6,7 @@
 <!-- badges: start -->
 
 [![R-CMD-check](https://github.com/codeminer-io/codeminer/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/codeminer-io/codeminer/actions/workflows/R-CMD-check.yaml)
-[![Codecov test
-coverage](https://codecov.io/gh/codeminer-io/codeminer/graph/badge.svg)](https://app.codecov.io/gh/codeminer-io/codeminer)
+[![codecov](https://codecov.io/gh/codeminer-io/codeminer/graph/badge.svg?token=AO69EQDLKI)](https://codecov.io/gh/codeminer-io/codeminer)
 [![pkgdown](https://github.com/codeminer-io/codeminer/workflows/pkgdown/badge.svg)](https://github.com/codeminer-io/codeminer/actions)
 [![Launch RStudio
 Cloud](https://img.shields.io/badge/RStudio-Cloud-blue)](https://rstudio.cloud/project/4007004)
