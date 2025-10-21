@@ -15,6 +15,7 @@ reference:
 - title: Clinical codes
   desc:  Functions for looking up clinical codes and mapping between different codisng systems.
 - contents:
+  - CODES
   - codes_like
   - get_child_codes
   - get_attributes_sct
