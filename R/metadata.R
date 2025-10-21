@@ -131,7 +131,7 @@ codeminer_metadata <- function() {
 #'
 #' Retrieves metadata for all tables as a single data frame.
 #'
-#' @inheritParams lookup_codes
+#' @inheritParams CODES
 #'
 #' @return A data frame.
 #' @export

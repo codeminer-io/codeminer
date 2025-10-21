@@ -27,10 +27,10 @@ all_lkps_maps_db <- all_lkps_maps_to_db(
 # `all_lkps_maps` -----------------------------------------------------
 
 test_that("`all_lkps_maps` table 'icd10_lkp' has no rows with values in both the 'MODIFER-4' and 'MODIFER-5' columns", {
-  # relevant to `lookup_codes()` when `standardise_output` is `TRUE`. Some
+  # relevant to `CODES()` when `standardise_output` is `TRUE`. Some
   # ICD-10 codes have a description modifier in one of these 2 columns (e.g.
   # `E10` for T1DM (MODIFER-4) and `S27` for traumatic pneumothorax
-  # (MODIFER-5)). `lookup_codes()` creates a description column by pasting
+  # (MODIFER-5)). `CODES()` creates a description column by pasting
   # together the 'DESCRIPTION' column with *only* one of these. Therefore only
   # one of these columns should contain a description.
   expect_true(
@@ -137,11 +137,11 @@ test_that("`get_child_codes()` raises error for unsupported code types e.g. read
   )
 })
 
-# `lookup_codes()` --------------------------------------------------------
+# `CODES()` --------------------------------------------------------
 
-test_that("`lookup_codes()` returns the expected number of results", {
+test_that("`CODES()` returns the expected number of results", {
   expect_equal(nrow(
-    lookup_codes(
+    CODES(
       codes = c("C10E.", "C108."),
       code_type = "read2",
       all_lkps_maps = all_lkps_maps,
@@ -152,7 +152,7 @@ test_that("`lookup_codes()` returns the expected number of results", {
   )
 
   expect_equal(nrow(
-    lookup_codes(
+    CODES(
       codes = c("C10E.", "C108."),
       code_type = "read2",
       all_lkps_maps = all_lkps_maps,
@@ -164,9 +164,9 @@ test_that("`lookup_codes()` returns the expected number of results", {
 })
 
 test_that(
-  "`lookup_codes()` returns the expected columns when `standardise_output` is `TRUE`",
+  "`CODES()` returns the expected columns when `standardise_output` is `TRUE`",
   {
-    result <- lookup_codes(
+    result <- CODES(
       codes = c("E10", "E100"),
       code_type = "icd10",
       all_lkps_maps = all_lkps_maps,
@@ -187,9 +187,9 @@ test_that(
 )
 
 test_that(
-  "`lookup_codes()` returns unrecognised codes only when requested",
+  "`CODES()` returns unrecognised codes only when requested",
   {
-    result <- lookup_codes(
+    result <- CODES(
       codes = c("E10", "E100", "UNRECOGNISED"),
       code_type = "icd10",
       all_lkps_maps = all_lkps_maps,
@@ -661,7 +661,7 @@ test_that("`get_mapping_df()` returns the expected results with/without `col_fil
 
 test_that("`reformat_standardised_codelist()` returns the expected output format", {
   expect_equal(
-    lookup_codes(
+    CODES(
       codes = c("C10E.", "C108."),
       code_type = "read2",
       all_lkps_maps = all_lkps_maps,
