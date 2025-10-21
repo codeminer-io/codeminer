@@ -26,8 +26,9 @@ reference:
   - get_mapping_df
   - reformat_icd10_codes
   - default_col_filters
-  - RunCodelistBuilder
+  - get_col_filters
   - matches("ATTRIBUTE")
+  - filter_sct_relationship
 
 - title: CALIBER
   desc:  Functions for reformatting CALIBER codelists to use with UK Biobank data
