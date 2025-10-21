@@ -1,6 +1,4 @@
 test_that("RunCodelistBuilder sets ALL_LKPS_MAPS_DB environment variable for query execution", {
-  # Regression test for issue #4: https://github.com/UCL-ARC/codemapper/issues/4
-
   # Setup: Create a temporary database
   temp_db_path <- withr::local_tempfile(fileext = ".db")
   dummy_db <- suppressMessages(dummy_all_lkps_maps_db(db_path = temp_db_path))
