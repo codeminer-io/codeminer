@@ -13,9 +13,8 @@ reference:
   - get_all_lkps_maps_db_metadata
 
 - title: Clinical codes
-  desc:  Functions for looking up clinical codes and mapping between different coding systems.
+  desc:  Functions for looking up clinical codes and mapping between different codisng systems.
 - contents:
-  - lookup_codes
   - codes_like
   - get_child_codes
   - get_attributes_sct
