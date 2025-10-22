@@ -152,7 +152,7 @@ package.&lt;/p&gt;'><sup>2</sup></a> objects:</p>
 <span><span class="co"># view first few rows of ICD10 lookup table</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">all_lkps_maps_dummy_db</span><span class="op">$</span><span class="va">icd10_lkp</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># Source:   SQL [?? x 13]</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># Database: DuckDB 1.4.1 [unknown@Linux 6.11.0-1018-azure:R 4.5.1//tmp/RtmpkchYLb/file241562de0390]</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># Database: DuckDB 1.4.1 [unknown@Linux 6.11.0-1018-azure:R 4.5.1//tmp/RtmpEWPaHT/file232a396222bc]</span></span></span>
 <span><span class="co">#&gt;   .rowid ICD10_CODE ALT_CODE USAGE   USAGE_UK DESCRIPTION  MODIFIER_4 MODIFIER_5</span></span>
 <span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     </span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>      1 A00        A00      DEFAULT 3        Cholera      <span style="color: #BB0000;">NA</span>         <span style="color: #BB0000;">NA</span>        </span></span>
@@ -235,7 +235,7 @@ to repeatedly type this in your self.</p>
 <div class="section level3">
 <h3 id="r-shiny-app">R Shiny app<a class="anchor" aria-label="anchor" href="#r-shiny-app"></a>
 </h3>
-<p>Use <code><a href="../reference/RunCodelistBuilder.html">RunCodelistBuilder()</a></code> to launch a R Shiny app for
+<p>Use <code>RunCodelistBuilder()</code> to launch a R Shiny app for
 building a clinical code list.<a class="footnote-ref" tabindex="0" data-bs-toggle="popover" data-bs-content="&lt;p&gt;This is still quite experimental, but should hopefully
 work for the basic workflow described here.&lt;/p&gt;"><sup>3</sup></a> The aim is to develop a broad search
 strategy that captures all clinincal codes that might possibly be

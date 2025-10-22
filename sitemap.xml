@@ -18,7 +18,6 @@
 <url><loc>https://codeminer-io.github.io/codeminer/reference/GET_ATTRIBUTES.html</loc></url>
 <url><loc>https://codeminer-io.github.io/codeminer/reference/HAS_ATTRIBUTES.html</loc></url>
 <url><loc>https://codeminer-io.github.io/codeminer/reference/MAP.html</loc></url>
-<url><loc>https://codeminer-io.github.io/codeminer/reference/RunCodelistBuilder.html</loc></url>
 <url><loc>https://codeminer-io.github.io/codeminer/reference/all_lkps_maps_to_db.html</loc></url>
 <url><loc>https://codeminer-io.github.io/codeminer/reference/build_all_lkps_maps.html</loc></url>
 <url><loc>https://codeminer-io.github.io/codeminer/reference/build_all_lkps_maps_dummy.html</loc></url>
@@ -36,10 +35,12 @@
 <url><loc>https://codeminer-io.github.io/codeminer/reference/dummy_icd10_phecode_map_path.html</loc></url>
 <url><loc>https://codeminer-io.github.io/codeminer/reference/dummy_phecode_lkp_path.html</loc></url>
 <url><loc>https://codeminer-io.github.io/codeminer/reference/dummy_ukb_codings_path.html</loc></url>
+<url><loc>https://codeminer-io.github.io/codeminer/reference/filter_sct_relationship.html</loc></url>
 <url><loc>https://codeminer-io.github.io/codeminer/reference/get_all_lkps_maps_db_metadata.html</loc></url>
 <url><loc>https://codeminer-io.github.io/codeminer/reference/get_bnf_from_open_prescribing.html</loc></url>
 <url><loc>https://codeminer-io.github.io/codeminer/reference/get_caliber_categories_mapping.html</loc></url>
 <url><loc>https://codeminer-io.github.io/codeminer/reference/get_children_sct.html</loc></url>
+<url><loc>https://codeminer-io.github.io/codeminer/reference/get_col_filters.html</loc></url>
 <url><loc>https://codeminer-io.github.io/codeminer/reference/get_mapping_df.html</loc></url>
 <url><loc>https://codeminer-io.github.io/codeminer/reference/get_nhsbsa_snomed_bnf.html</loc></url>
 <url><loc>https://codeminer-io.github.io/codeminer/reference/get_parents_sct.html</loc></url>
