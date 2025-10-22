@@ -41,7 +41,6 @@ reference:
 - title: Phecodes
   desc:  Functions for mapping UK Biobank data to Phecodes
 - contents:
-  - make_phecode_reverse_map
 
 - title: Dummy data
   desc: Dummy data for tests.
