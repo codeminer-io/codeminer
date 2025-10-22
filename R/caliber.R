@@ -655,7 +655,7 @@ reformat_caliber_icd10 <- function(icd10_df,
 
   icd10_lkp_map_3_char <- icd10_lkp_map_3_char %>%
     dplyr::pull("ALT_CODE") %>%
-    lookup_codes(
+    CODES(
       code_type = "icd10",
       all_lkps_maps = all_lkps_maps,
       preferred_description_only = TRUE,
@@ -786,7 +786,7 @@ map_caliber <- function(df,
     dplyr::distinct(dplyr::across(-.data[["description"]]))
 
   # append code descriptions
-  code_descriptions <- lookup_codes(
+  code_descriptions <- CODES(
     codes = result$code,
     code_type = to,
     all_lkps_maps = all_lkps_maps,

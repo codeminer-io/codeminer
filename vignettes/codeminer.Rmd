@@ -91,12 +91,12 @@ Assuming you are using a [RStudio project](https://r4ds.had.co.nz/workflow-proje
 
 Codes may be explored with:
 
--   `lookup_codes()`:
+-   `CODES()`:
 
 <!-- -->
 
 ```{r}
-lookup_codes(
+CODES(
   codes = c("E10", "E11"),
   code_type = "icd10",
   all_lkps_maps = all_lkps_maps_dummy_db

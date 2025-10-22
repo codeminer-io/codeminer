@@ -21,7 +21,7 @@
 #'
 #' @param reg_expr a regular expression to search for
 #' @inheritParams stringr::regex
-#' @inheritParams lookup_codes
+#' @inheritParams CODES
 #' @param ignore_case If `TRUE` (default), ignore case in `reg_expr`.
 #' @param codes_only bool. If \code{TRUE}, return a character vector of
 #'   \emph{unique} codes. If \code{FALSE} (default), return a data frame of all
@@ -126,7 +126,7 @@ code_descriptions_like <- function(reg_expr,
   codes <- subset(codes,
                   !is.na(codes))
 
-  result <- lookup_codes(
+  result <- CODES(
     codes = codes,
     code_type = code_type,
     all_lkps_maps = all_lkps_maps,
@@ -155,7 +155,7 @@ code_descriptions_like <- function(reg_expr,
 #'
 #' @param reg_expr a regular expression to search for
 #' @inheritParams stringr::regex
-#' @inheritParams lookup_codes
+#' @inheritParams CODES
 #' @param codes_only bool. If \code{TRUE}, return a character vector of
 #'   \emph{unique} codes. If \code{FALSE} (default), return a data frame of all
 #'   results including code descriptions (useful for manual validation).
@@ -225,7 +225,7 @@ CODES_LIKE <- function(reg_expr,
 
   codes <- subset(codes, !is.na(codes))
 
-  result <- lookup_codes(
+  result <- CODES(
     codes = codes,
     code_type = code_type,
     all_lkps_maps = all_lkps_maps,
@@ -287,19 +287,19 @@ DESCRIPTION <- code_descriptions_like
 #'
 #' @return data frame
 #' @export
-#' @name lookup_codes
+#' @name CODES
 #' @family Clinical code lookups and mappings
 #' @examples
 #' # build dummy all_lkps_maps
 #' all_lkps_maps_dummy <- build_all_lkps_maps_dummy()
 #'
 #' # look up ICD10 codes
-#' lookup_codes(
+#' CODES(
 #'   codes = c("E10", "E11"),
 #'   code_type = "icd10",
 #'   all_lkps_maps = all_lkps_maps_dummy
 #' )
-lookup_codes <- function(codes,
+CODES <- function(codes,
                          code_type = getOption("codeminer.code_type"),
                          all_lkps_maps = NULL,
                          preferred_description_only = TRUE,
@@ -426,9 +426,6 @@ lookup_codes <- function(codes,
   }
 }
 
-#' @rdname lookup_codes
-#' @export
-CODES <- lookup_codes
 
 #' Get descendents for a code
 #'
@@ -440,7 +437,7 @@ CODES <- lookup_codes
 #' @param codes_only bool. If \code{TRUE}, return a character vector of
 #'   \emph{unique} codes. If \code{FALSE} (default), return a data frame of all
 #'   results including code descriptions (useful for manual validation).
-#' @inheritParams lookup_codes
+#' @inheritParams CODES
 #'
 #' @return A data frame
 #' @name get_child_codes
@@ -460,7 +457,7 @@ get_child_codes <- function(codes,
                             col_filters = getOption("codeminer.col_filters")) {
 
   # check codes exist
-  codes <- lookup_codes(
+  codes <- CODES(
     codes = codes,
     code_type = code_type,
     all_lkps_maps = all_lkps_maps,
@@ -531,7 +528,7 @@ CHILDREN <- get_child_codes
 #' @param include_self If `TRUE` (default) include input codes in the result.
 #' @param include_descendants If `TRUE` (default) return all descendant codes,
 #'   as well as immediate children.
-#' @inheritParams lookup_codes
+#' @inheritParams CODES
 #' @inheritParams get_child_codes
 #'
 #' @return A dataframe
@@ -568,7 +565,7 @@ get_children_sct <- function(codes,
 #' @param include_self If `TRUE` (default) include input codes in the result.
 #' @param include_ancestors If `TRUE` (default) return all ancestor codes,
 #'   as well as immediate parents.
-#' @inheritParams lookup_codes
+#' @inheritParams CODES
 #' @inheritParams get_child_codes
 #'
 #' @return A dataframe
@@ -603,7 +600,7 @@ get_parents_sct <- function(codes,
 #'
 #' @param attribute_codes Character vector of SNOMED codes.
 #' @param relationship_type Character vector of SNOMED codes.
-#' @inheritParams lookup_codes
+#' @inheritParams CODES
 #' @inheritParams get_child_codes
 #'
 #' @return A dataframe
@@ -871,7 +868,7 @@ get_relatives_sct <- function(codes = NULL,
     result <- c(codes, result)
   }
 
-  lookup_codes(
+  CODES(
     codes = result,
     code_type = "sct",
     all_lkps_maps = all_lkps_maps,
@@ -907,7 +904,7 @@ summarise_attributes_sct <- function(codes,
                                           recursive = FALSE,
                                           all_lkps_maps = all_lkps_maps)
 
-  typeID_descriptions <- lookup_codes(
+  typeID_descriptions <- CODES(
     codes = output_codes$typeId,
     code_type = "sct",
     all_lkps_maps = all_lkps_maps,
@@ -920,7 +917,7 @@ summarise_attributes_sct <- function(codes,
 
   output_descriptions <- output_codes %>%
     as.list() %>%
-    purrr::map(\(x) lookup_codes(
+    purrr::map(\(x) CODES(
       codes = x,
       code_type = "sct",
       all_lkps_maps = all_lkps_maps,
@@ -981,7 +978,7 @@ get_attributes_sct <- function(codes,
   ## then expand to include both primary and secondary descriptions
   result <- unique(output_codes$destinationId)
 
-  lookup_codes(
+  CODES(
     codes = result,
     code_type = "sct",
     all_lkps_maps = all_lkps_maps,
@@ -1064,7 +1061,7 @@ get_children_sct_old <- function(codes,
   result <- dplyr::collect(result)
 
   ## then expand to include both primary and secondary descriptions
-  result <- lookup_codes(
+  result <- CODES(
     codes = unique(result[[code_col]]),
     code_type = "sct",
     all_lkps_maps = all_lkps_maps,
@@ -1099,7 +1096,7 @@ get_children_sct_old <- function(codes,
 #'   codes.
 #' @param active_only If `FALSE` (default), return all relationships, even if
 #'   currently inactive.
-#' @inheritParams lookup_codes
+#' @inheritParams CODES
 #' @family Clinical code lookups and mappings
 #' @name get_relatives_sct_old
 #' @noRd
@@ -1154,7 +1151,7 @@ get_relatives_sct_old <- function(codes,
                                active_only = active_only,
                                all_lkps_maps = all_lkps_maps)
 
-  lookup_codes(
+  CODES(
     codes = result$code,
     code_type = "sct",
     all_lkps_maps = all_lkps_maps,
@@ -1180,7 +1177,7 @@ get_relatives_sct_old <- function(codes,
 #'   codes.
 #' @param active_only If `FALSE` (default), return all relationships, even if
 #'   currently inactive.
-#' @inheritParams lookup_codes
+#' @inheritParams CODES
 #' @family Clinical code lookups and mappings
 #' @name get_attributes_sct
 #' @export
@@ -1238,7 +1235,7 @@ get_attributes_sct_old <- function(codes,
   result <- result %>%
     dplyr::filter(!is.na(.data[["typeId"]]))
 
-  lookup_codes(
+  CODES(
     codes = result$typeId,
     code_type = "sct",
     all_lkps_maps = all_lkps_maps,
@@ -1279,7 +1276,7 @@ get_attributes_sct_old <- function(codes,
 #'   returns a data frame with all columns from the relevant mapping table. Note
 #'   that this may or may not include code descriptions.
 #' @inheritParams get_child_codes
-#' @inheritParams lookup_codes
+#' @inheritParams CODES
 #'
 #' @name map_codes
 #' @export
@@ -1400,13 +1397,13 @@ map_codes <- function(codes,
       return(result)
     } else if (standardise_output) {
       # Note, not all mapping sheets in UKB resource 592 contain descriptions
-      # (e.g. 'read_v2_icd9'). Therefore need to use `lookup_codes` if
+      # (e.g. 'read_v2_icd9'). Therefore need to use `CODES` if
       # `standardise_output` is `TRUE`
 
       codes <- unique(result[[to_col]])
 
       return(
-        lookup_codes(
+        CODES(
           codes = codes,
           code_type = to,
           all_lkps_maps = all_lkps_maps,
@@ -1572,7 +1569,7 @@ get_mapping_df <- function(to = getOption("codeminer.map_to"),
 #' @param output_icd10_format character. Must be either "ICD10_CODE" or
 #'   "ALT_CODE".
 #' @inheritParams get_child_codes
-#' @inheritParams lookup_codes
+#' @inheritParams CODES
 #' @param strip_x If `TRUE` and converting to `ALT_CODE` format, 'X' is removed
 #'   from the end of undivided 3 character codes (default is `FALSE`).
 #'
@@ -1807,7 +1804,7 @@ db_tables_to_list <- function(con, md) {
 
 #' Get all available SNOMED CT relationship types
 #'
-#' @inheritParams lookup_codes
+#' @inheritParams CODES
 #'
 #' @return A data frame
 #' @noRd
@@ -1819,7 +1816,7 @@ get_all_sct_relation_types <- function(all_lkps_maps = NULL) {
     dplyr::distinct() %>%
     dplyr::collect() %>%
     dplyr::pull(.data[["typeId"]]) %>%
-    lookup_codes(code_type = "sct",
+    CODES(code_type = "sct",
                  all_lkps_maps = all_lkps_maps,
                  preferred_description_only = TRUE,
                  standardise_output = TRUE,
@@ -2103,7 +2100,7 @@ get_col_filters <- function(defaults_only = TRUE,
 #'
 #' @param escape_dot If `TRUE`, escape any '.' characters in `codes`. Default is
 #'   `FALSE`
-#' @inheritParams lookup_codes
+#' @inheritParams CODES
 #' @inheritParams get_child_codes
 #' @noRd
 #' @family Clinical code lookups and mappings
@@ -2202,12 +2199,12 @@ codes_starting_with <- function(codes,
       return(unique(result[[code_col]]))
     } else if (standardise_output) {
       # Note, not all mapping sheets in UKB resource 592 contain descriptions
-      # (e.g. 'read_v2_icd9'). Therefore need to use `lookup_codes` if
+      # (e.g. 'read_v2_icd9'). Therefore need to use `CODES` if
       # `standardise_output` is `TRUE`
       codes <- unique(result[[code_col]])
 
       return(
-        lookup_codes(
+        CODES(
           codes = codes,
           code_type = code_type,
           all_lkps_maps = all_lkps_maps,
@@ -2273,7 +2270,7 @@ get_value_for_mapping_sheet <- function(mapping_table,
 
 #' Get name of lookup sheet for a clinical code system
 #'
-#' Helper function for \code{\link{lookup_codes}} and \code{\link{codes_starting_with}}
+#' Helper function for \code{\link{CODES}} and \code{\link{codes_starting_with}}
 #'
 #' @param code_type character
 #'
@@ -2294,7 +2291,7 @@ get_lookup_sheet <- function(code_type) {
 
 #' Get name of code, description or preferred synonym column for a lookup sheet
 #'
-#' Helper function for \code{\link{lookup_codes}} and \code{\link{codes_starting_with}}
+#' Helper function for \code{\link{CODES}} and \code{\link{codes_starting_with}}
 #'
 #' @param lookup_sheet character
 #' @param column character
@@ -2324,7 +2321,7 @@ get_col_for_lookup_sheet <- function(lookup_sheet,
 
 #' Get preferred description code for a lookup sheet
 #'
-#' Helper function for \code{\link{lookup_codes}} and \code{\link{codes_starting_with}}
+#' Helper function for \code{\link{CODES}} and \code{\link{codes_starting_with}}
 #'
 #' @param lookup_sheet character
 #'
@@ -2350,7 +2347,7 @@ get_preferred_description_code_for_lookup_sheet <-
 #' \code{\link[ukbwranglr]{extract_phenotypes}}
 #'
 #' A utility function that helps reformat the output from \code{\link{map_codes}}
-#' or \code{\link{lookup_codes}} to work with
+#' or \code{\link{CODES}} to work with
 #' \code{\link[ukbwranglr]{extract_phenotypes}}. See also output
 #' from \code{\link[ukbwranglr]{example_clinical_codes}} for an example of
 #' the format that this function will output.
