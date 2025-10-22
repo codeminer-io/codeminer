@@ -13,6 +13,7 @@
 <url><loc>https://codeminer-io.github.io/codeminer/index.html</loc></url>
 <url><loc>https://codeminer-io.github.io/codeminer/reference/ATTRIBUTE_TYPES_FROM.html</loc></url>
 <url><loc>https://codeminer-io.github.io/codeminer/reference/ATTRIBUTE_TYPES_TO.html</loc></url>
+<url><loc>https://codeminer-io.github.io/codeminer/reference/CODES.html</loc></url>
 <url><loc>https://codeminer-io.github.io/codeminer/reference/GET_ATTRIBUTES.html</loc></url>
 <url><loc>https://codeminer-io.github.io/codeminer/reference/HAS_ATTRIBUTES.html</loc></url>
 <url><loc>https://codeminer-io.github.io/codeminer/reference/RunCodelistBuilder.html</loc></url>
@@ -49,7 +50,6 @@
 <url><loc>https://codeminer-io.github.io/codeminer/reference/get_ukb_self_report_med_to_atc_map.html</loc></url>
 <url><loc>https://codeminer-io.github.io/codeminer/reference/index.html</loc></url>
 <url><loc>https://codeminer-io.github.io/codeminer/reference/infix_setops.html</loc></url>
-<url><loc>https://codeminer-io.github.io/codeminer/reference/lookup_codes.html</loc></url>
 <url><loc>https://codeminer-io.github.io/codeminer/reference/make_phecode_reverse_map.html</loc></url>
 <url><loc>https://codeminer-io.github.io/codeminer/reference/map_clinical_events_to_phecodes.html</loc></url>
 <url><loc>https://codeminer-io.github.io/codeminer/reference/map_codes.html</loc></url>

@@ -152,7 +152,7 @@ package.&lt;/p&gt;'><sup>2</sup></a> objects:</p>
 <span><span class="co"># view first few rows of ICD10 lookup table</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">all_lkps_maps_dummy_db</span><span class="op">$</span><span class="va">icd10_lkp</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># Source:   SQL [?? x 13]</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># Database: DuckDB 1.4.1 [unknown@Linux 6.11.0-1018-azure:R 4.5.1//tmp/RtmpoKnCAh/file258853d037f3]</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># Database: DuckDB 1.4.1 [unknown@Linux 6.11.0-1018-azure:R 4.5.1//tmp/RtmpPzpvJn/file2479154e55b0]</span></span></span>
 <span><span class="co">#&gt;   .rowid ICD10_CODE ALT_CODE USAGE   USAGE_UK DESCRIPTION  MODIFIER_4 MODIFIER_5</span></span>
 <span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     </span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>      1 A00        A00      DEFAULT 3        Cholera      <span style="color: #BB0000;">NA</span>         <span style="color: #BB0000;">NA</span>        </span></span>
@@ -184,10 +184,10 @@ to repeatedly type this in your self.</p>
 <p>Codes may be explored with:</p>
 <ul>
 <li>
-<code><a href="../reference/lookup_codes.html">lookup_codes()</a></code>:</li>
+<code><a href="../reference/CODES.html">CODES()</a></code>:</li>
 </ul>
 <!-- --><div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/lookup_codes.html">lookup_codes</a></span><span class="op">(</span></span>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/CODES.html">CODES</a></span><span class="op">(</span></span>
 <span>  codes <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"E10"</span>, <span class="st">"E11"</span><span class="op">)</span>,</span>
 <span>  code_type <span class="op">=</span> <span class="st">"icd10"</span>,</span>
 <span>  all_lkps_maps <span class="op">=</span> <span class="va">all_lkps_maps_dummy_db</span></span>
