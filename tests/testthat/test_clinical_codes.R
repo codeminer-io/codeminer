@@ -98,11 +98,11 @@ test_that("`codes_starting_with()` returns the expected nuber of results, escapi
 })
 
 
-# `get_child_codes()` -----------------------------------------------------
+# `CHILDREN()` -----------------------------------------------------
 
-test_that("`get_child_codes()` returns error for unrecognised codes", {
+test_that("`CHILDREN()` returns error for unrecognised codes", {
   expect_error(
-    get_child_codes(
+    CHILDREN(
       codes = c("C10"),
       code_type = "read2",
       all_lkps_maps = all_lkps_maps,
@@ -113,9 +113,9 @@ test_that("`get_child_codes()` returns error for unrecognised codes", {
   )
 })
 
-test_that("`get_child_codes()` works as expected for read2", {
+test_that("`CHILDREN()` works as expected for read2", {
   expect_equal(
-    get_child_codes(
+    CHILDREN(
       codes = c("C10.."),
       code_type = "read2",
       all_lkps_maps = all_lkps_maps,
@@ -125,9 +125,9 @@ test_that("`get_child_codes()` works as expected for read2", {
   )
 })
 
-test_that("`get_child_codes()` raises error for unsupported code types e.g. read3", {
+test_that("`CHILDREN()` raises error for unsupported code types e.g. read3", {
   expect_error(
-    get_child_codes(
+    CHILDREN(
       codes = "C10..",
       code_type = "read3",
       all_lkps_maps = all_lkps_maps,
@@ -237,7 +237,7 @@ test_that("`code_descriptions_like()` returns expected results", {
   )
 })
 
-test_that("`code_descriptions_like()` returns ICD10 codes where MODIFIER_4/MODIFIER_5 matches the search string", {
+test_that("`DESCRIPTION()` returns ICD10 codes where MODIFIER_4/MODIFIER_5 matches the search string", {
   expect_equal(
     code_descriptions_like(
       reg_expr = "With ophthalmic complications",
@@ -259,7 +259,7 @@ test_that("`code_descriptions_like()` returns ICD10 codes where MODIFIER_4/MODIF
   )
 })
 
-test_that("`codes_descriptions_like()` returns primary descriptions for codes with a secondary description that matches the search string", {
+test_that("`DESCRIPTION()` returns primary descriptions for codes with a secondary description that matches the search string", {
   # Returns 'Type I diabetes mellitus' when searching for 'IDDM'
   expect_equal(
     code_descriptions_like(
@@ -299,7 +299,7 @@ test_that("`codes_descriptions_like()` returns primary descriptions for codes wi
   )
 })
 
-test_that("`codes_descriptions_like` returns same result for all_lkps_maps_db and all_lkps_maps", {
+test_that("`DESCRIPTION` returns same result for all_lkps_maps_db and all_lkps_maps", {
 
   # expect no result with `ignore_case = FALSE`
   expect_equal(
@@ -354,13 +354,13 @@ test_that("`codes_descriptions_like` returns same result for all_lkps_maps_db an
   )
 })
 
-# `map_codes()` -----------------------------------------------------------
+# `MAP()` -----------------------------------------------------------
 
 test_that(
-  "`map_codes()` raises warning if any of the supplied codes are not present in the coding system being mapped from",
+  "`MAP()` raises warning if any of the supplied codes are not present in the coding system being mapped from",
   {
     expect_warning(
-      map_codes(
+      MAP(
         codes = c("C10E.", "foo", "bar"),
         from = "read2",
         to = "read3",
@@ -374,11 +374,11 @@ test_that(
 )
 
 test_that(
-  "`map_codes()` returns the expected codes",
+  "`MAP()` returns the expected codes",
   {
     # codes only
     expect_equal(
-      map_codes(
+      MAP(
         codes = c("C10E."),
         from = "read2",
         to = "read3",
@@ -392,7 +392,7 @@ test_that(
 
     # codes and ALL descriptions
     expect_equal(
-      nrow(map_codes(
+      nrow(MAP(
         codes = c("C10E."),
         from = "read2",
         to = "read3",
@@ -408,10 +408,10 @@ test_that(
 )
 
 test_that(
-  "`map_codes` returns the expected output when `standardise_output` is `TRUE`",
+  "`MAP` returns the expected output when `standardise_output` is `TRUE`",
   {
     expect_equal(
-      map_codes(
+      MAP(
         codes = c("C10E.", "C108."),
         from = "read2",
         to = "read3",
@@ -433,10 +433,10 @@ test_that(
 # `element_num`/`block_num` means it will also map to ICD10 codes for
 # Tuberculosis.
 test_that(
-  "`map_codes` returns the expected output for Read 3 ('XE0e0') to ICD10 example with default `col_filters`",
+  "`MAP` returns the expected output for Read 3 ('XE0e0') to ICD10 example with default `col_filters`",
   {
     expect_equal(
-      map_codes(
+      MAP(
         codes = "XE0e0",
         from = "read3",
         to = "icd10",
@@ -453,10 +453,10 @@ test_that(
 )
 
 test_that(
-  "`map_codes` returns the expected output for Read 3 ('XE0e0') to ICD10 example with default `col_filters`",
+  "`MAP` returns the expected output for Read 3 ('XE0e0') to ICD10 example with default `col_filters`",
   {
     expect_equal(
-      map_codes(
+      MAP(
         codes = "XE0e0",
         from = "read3",
         to = "icd10",
@@ -483,9 +483,9 @@ test_that(
 )
 
 # icd10 to icd9 mapping
-test_that("`map_codes()` works as expected for mapping icd10 to icd9 codes", {
+test_that("`MAP()` works as expected for mapping icd10 to icd9 codes", {
   expect_equal(
-    suppressWarnings(map_codes(
+    suppressWarnings(MAP(
       codes = "D751",
       from = "icd10",
       to = "icd9",
@@ -500,9 +500,9 @@ test_that("`map_codes()` works as expected for mapping icd10 to icd9 codes", {
   )
 })
 
-test_that("`map_codes()` works when mapping icd9 to icd10", {
+test_that("`MAP()` works when mapping icd9 to icd10", {
   expect_equal(
-    map_codes(
+    MAP(
       codes = "0020",
       from = "icd9",
       to = "icd10",
@@ -516,11 +516,11 @@ test_that("`map_codes()` works when mapping icd9 to icd10", {
   )
 })
 
-# `map_codes()` with all_lkps_maps_db -------------------------------------
+# `MAP()` with all_lkps_maps_db -------------------------------------
 
-test_that("`map_codes()` works when mapping icd9 to icd10", {
+test_that("`MAP()` works when mapping icd9 to icd10", {
   expect_equal(
-    map_codes(
+    MAP(
       codes = "0020",
       from = "icd9",
       to = "icd10",

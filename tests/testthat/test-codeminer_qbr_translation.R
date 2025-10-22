@@ -192,8 +192,8 @@ egs <- list(
   ),
   map_codes_query = list(query = rlang::parse_expr('MAP("E101 << Type 1 diabetes mellitus With ketoacidosis >>", from = "icd10")'), qbr = list(
     list(
-      id = "map_codes",
-      field = "map_codes",
+      id = "MAP",
+      field = "MAP",
       type = "string",
       input = "text",
       operator = "icd10",

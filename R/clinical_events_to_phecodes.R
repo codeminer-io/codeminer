@@ -37,7 +37,7 @@ CLINICAL_EVENTS_SOURCES_MAPPED_TO_PHECODES <- c(
 #' Maps the following UK Biobank clinical events sources to phecodes: `r stringr::str_c(CLINICAL_EVENTS_SOURCES_MAPPED_TO_PHECODES, sep = "", collapse = ", ")`.
 #'
 #' @inheritParams ukbwranglr::extract_phenotypes
-#' @inheritParams  get_child_codes
+#' @inheritParams CHILDREN
 #' @param min_date_only If `TRUE`, result will be filtered for only the earliest
 #'   date per eid-phecode pair (date will be recorded as `NA` for cases where
 #'   there are no dates).

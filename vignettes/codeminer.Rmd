@@ -30,7 +30,7 @@ This vignette demonstrates the above using dummy data included with the package.
 
 [^1]: You will be asked to sign up for a free account if you do not have one already.
 
-Also included are functions for mapping between different clinical coding systems, and using CALIBER code lists[@kuan2019] and Phecodes[@denny2016; @wu2019] with UK Biobank data. See vignettes `vignette('map_codes')` `vignette('caliber')` and `vignette('phecodes')` for further information.
+Also included are functions for mapping between different clinical coding systems, and using CALIBER code lists[@kuan2019] and Phecodes[@denny2016; @wu2019] with UK Biobank data. See vignettes `vignette('MAP')` `vignette('caliber')` and `vignette('phecodes')` for further information.
 
 # Build a local clinical codes lookup and mappings resource
 
@@ -108,7 +108,7 @@ CODES(
 <!-- -->
 
 ```{r}
-get_child_codes(codes = "E10",
+CHILDREN(codes = "E10",
                 code_type = "icd10",
                 all_lkps_maps = all_lkps_maps_dummy_db)
 ```

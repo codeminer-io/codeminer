@@ -445,7 +445,7 @@ get_qbr_saved_queries <- function(x) {
         "saved_query" = x$value,
         "map_saved_query" = x$value,
         "map_children" = NULL,
-        "map_codes" = NULL,
+        "MAP" = NULL,
         "sct_has_attributes" = x$value,
         "sct_get_attributes" = x$value,
         "sct_attribute_types_to" = x$value,
@@ -484,7 +484,7 @@ convert_rules_to_expr <- function(x, nodes) {
                              x$value),
       "codes_like" = rlang::call2(.fn = "CODES_LIKE",
                                  x$value),
-      "map_codes" = rlang::call2(.fn = "MAP",
+      "MAP" = rlang::call2(.fn = "MAP",
                                  x$value,
                                  from = x$operator),
       "map_children" = rlang::call2(
@@ -556,7 +556,7 @@ update_qb_operator_code_type <- function(x, code_type) {
   if (is.list(x) &
       identical(names(x),
                 c("id", "field", "type", "input", "operator", "value"))) {
-    if (x$id %in% c("map_codes", "map_children")) {
+    if (x$id %in% c("MAP", "map_children")) {
       x$operator <- NULL
     } else if (x$id %in% c("sct_has_attributes", "sct_get_attributes")) {
       x$operator <- "sct_relationship"
@@ -835,7 +835,7 @@ map_saved_query_filter <- list(
 )
 
 map_codes_filter <- list(
-  id = "map_codes",
+  id = "MAP",
   label = "Map codes",
   type = "string",
   operators = list(),
