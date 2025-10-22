@@ -1,6 +1,6 @@
 ^renv$
 ^renv\.lock$
-^codemapper\.Rproj$
+^codeminer\.Rproj$
 ^\.Rproj\.user$
 ^LICENSE\.md$
 ^public/\.nojekyll$

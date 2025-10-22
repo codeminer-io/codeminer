@@ -1558,6 +1558,18 @@ get_all_sct_relation_types <- function(all_lkps_maps = NULL) {
                  .return_unrecognised_codes = FALSE)
 }
 
+#' Filter SNOMED CT relationships based on various criteria
+#'
+#' @param codes A vector of SNOMED CT codes to filter relationships by.
+#' @param sourceId_filter A vector of SNOMED CT codes to filter relationships by source.
+#' @param destinationId_filter A vector of SNOMED CT codes to filter relationships by destination.
+#' @param typeId_filter A vector of SNOMED CT codes to filter relationships by type.
+#' @param active_only Logical indicating whether to filter relationships by active status.
+#' @param recursive Logical indicating whether to filter relationships recursively.
+#' @param all_lkps_maps A list of lookup maps.
+#'
+#' @return A data frame of filtered SNOMED CT relationships.
+#' @export
 filter_sct_relationship <- function(codes = NULL,
                                     sourceId_filter = NULL,
                                     destinationId_filter = NULL,
@@ -1780,7 +1792,7 @@ get_relatives_attributes_sct <- function(codes = NULL,
 #' @param selected_table Optional. Name of lookup or mapping table
 #'
 #' @return List
-#' @noRd
+#' @export
 get_col_filters <- function(defaults_only = TRUE,
                             selected_table = NULL) {
 

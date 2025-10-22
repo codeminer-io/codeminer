@@ -15,22 +15,20 @@ Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.3
-Depends: 
+Depends:
     R (>= 4.1.0)
-Imports: 
+Imports:
     DBI,
     assertthat,
     data.table,
     dplyr,
     duckdb,
     fs,
-    jqbr,
     magrittr,
     purrr,
     readr,
     readxl,
     rlang,
-    shiny,
     stats,
     stringr,
     tibble,
@@ -39,29 +37,15 @@ Imports:
     ukbwranglr,
     utils,
     withr
-Suggests: 
+Suggests:
     PheWAS,
     covr,
-    downlit,
-    igraph,
     jsonlite,
     knitr,
-    lobstr,
     plumber,
-    quarto,
-    reactable,
     rmarkdown,
-    sessioninfo,
-    shinyAce,
-    shinyFeedback,
-    shinyTree,
-    shinydashboard,
-    shinyjs,
-    shinytest,
-    testthat (>= 3.0.0),
-    visNetwork,
-    xml2
-Remotes: 
+    testthat (>= 3.0.0)
+Remotes:
     github::rmgpanw/ukbwranglr,
     github::PheWAS/PheWAS
 VignetteBuilder: knitr
