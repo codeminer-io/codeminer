@@ -69,7 +69,7 @@ htn_read2
 Map these to ICD10:
 
 ``` r
-htn_icd10 <- map_codes(
+htn_icd10 <- MAP(
   codes = htn_read2$code,
   from = "read2",
   to = "icd10",
