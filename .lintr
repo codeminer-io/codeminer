@@ -1,0 +1,10 @@
+linters: linters_with_defaults(
+    line_length_linter(120),
+    object_name_linter = NULL,
+    object_length_linter = NULL,
+    return_linter = NULL,
+    commas_linter = NULL  # interferes with air's formatting of tibble::tribble code
+  )
+exclusions: list(
+    "inst"
+  )
