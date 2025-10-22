@@ -38,10 +38,6 @@ reference:
   - default_overlapping_disease_categories_csv
   - get_caliber_categories_mapping
 
-- title: Phecodes
-  desc:  Functions for mapping UK Biobank data to Phecodes
-- contents:
-
 - title: Dummy data
   desc: Dummy data for tests.
 - contents:
