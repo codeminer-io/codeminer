@@ -1,4 +1,3 @@
-
 # CONSTANTS ---------------------------------------------------------------
 
 CLINICAL_EVENTS_SOURCES_MAPPED_TO_PHECODES <- c(
@@ -58,10 +57,12 @@ CLINICAL_EVENTS_SOURCES_MAPPED_TO_PHECODES <- c(
 #'   all_lkps_maps = all_lkps_maps_dummy,
 #'   min_date_only = FALSE
 #' )
-map_clinical_events_to_phecodes <- function(clinical_events,
-                                            all_lkps_maps = NULL,
-                                            min_date_only = FALSE,
-                                            col_filters = default_col_filters()) {
+map_clinical_events_to_phecodes <- function(
+  clinical_events,
+  all_lkps_maps = NULL,
+  min_date_only = FALSE,
+  col_filters = default_col_filters()
+) {
   start_time <- proc.time()
 
   create_db_connection(all_lkps_maps)
@@ -83,14 +84,23 @@ map_clinical_events_to_phecodes <- function(clinical_events,
 
   # list of clinical events sources to actually be mapped (intersect of above)
   clinical_events_sources_to_map <- clinical_events_sources_to_map %>%
-    dplyr::filter(.data[["source"]] %in% !!available_clinical_events_sources$source)
+    dplyr::filter(
+      .data[["source"]] %in% !!available_clinical_events_sources$source
+    )
 
   # combine category and description (for informative messages later)
   clinical_events_sources_to_map$rowid <- 1:nrow(clinical_events_sources_to_map)
 
   clinical_events_sources_to_map <- clinical_events_sources_to_map %>%
     dplyr::mutate(
-      "category_description" = paste0("[", .data[["rowid"]], "] **", .data[["category"]], "** - ", .data[["description"]])
+      "category_description" = paste0(
+        "[",
+        .data[["rowid"]],
+        "] **",
+        .data[["category"]],
+        "** - ",
+        .data[["description"]]
+      )
     ) %>%
     dplyr::select(tidyselect::all_of(c(
       "source",
@@ -105,7 +115,8 @@ map_clinical_events_to_phecodes <- function(clinical_events,
       "Identified the following ",
       length(clinical_events_sources_to_map$category_description),
       " data sources to map to phecodes: ",
-      stringr::str_c(clinical_events_sources_to_map$category_description,
+      stringr::str_c(
+        clinical_events_sources_to_map$category_description,
         sep = "",
         collapse = ", "
       )
@@ -114,7 +125,8 @@ map_clinical_events_to_phecodes <- function(clinical_events,
 
   message("\n***MAPPING clinical_events TO PHECODES***\n")
 
-  map_clinical_events_source_to_phecode_partial <- purrr::partial(map_clinical_events_source_to_phecode,
+  map_clinical_events_source_to_phecode_partial <- purrr::partial(
+    map_clinical_events_source_to_phecode,
     all_lkps_maps = all_lkps_maps,
     clinical_events = clinical_events,
     col_filters = col_filters
@@ -186,8 +198,7 @@ map_clinical_events_to_phecodes <- function(clinical_events,
 #'   clinical_events_phecodes = clinical_events_phecodes_dummy,
 #'   all_lkps_maps = all_lkps_maps_dummy
 #' )
-make_phecode_reverse_map <- function(clinical_events_phecodes,
-                                     all_lkps_maps) {
+make_phecode_reverse_map <- function(clinical_events_phecodes, all_lkps_maps) {
   start_time <- proc.time()
 
   create_db_connection(all_lkps_maps)
@@ -198,17 +209,17 @@ make_phecode_reverse_map <- function(clinical_events_phecodes,
       "source",
       "data_coding"
     ))) %>%
-    dplyr::right_join(clinical_events_phecodes,
-      by = "source"
-    )
+    dplyr::right_join(clinical_events_phecodes, by = "source")
 
   # make `code` = `icd10_code` (currently `code` is `NA` if source uses icd10
   # coding)
   clinical_events_phecodes <- clinical_events_phecodes %>%
-    dplyr::mutate("code" = dplyr::case_when(
-      .data[["data_coding"]] == "icd10" ~ .data[["icd10"]],
-      TRUE ~ .data[["code"]]
-    ))
+    dplyr::mutate(
+      "code" = dplyr::case_when(
+        .data[["data_coding"]] == "icd10" ~ .data[["icd10"]],
+        TRUE ~ .data[["code"]]
+      )
+    )
 
   # select required cols only
   clinical_events_phecodes <- clinical_events_phecodes %>%
@@ -232,10 +243,7 @@ make_phecode_reverse_map <- function(clinical_events_phecodes,
     length(cols_with_missing_values) == 0,
     msg = paste0(
       "The following columns contain `NA` values (there should be none): ",
-      stringr::str_c(names(cols_with_missing_values),
-        sep = "",
-        collapse = ", "
-      )
+      stringr::str_c(names(cols_with_missing_values), sep = "", collapse = ", ")
     )
   )
 
@@ -254,7 +262,9 @@ make_phecode_reverse_map <- function(clinical_events_phecodes,
 
   clinical_events_phecodes <-
     clinical_events_phecodes %>%
-    dplyr::mutate("icd10" = dplyr::recode(.data[["icd10"]], !!!icd10_code_alt_code_x_map))
+    dplyr::mutate(
+      "icd10" = dplyr::recode(.data[["icd10"]], !!!icd10_code_alt_code_x_map)
+    )
 
   # append code descriptions
   clinical_events_phecodes_split <- split(
@@ -266,10 +276,12 @@ make_phecode_reverse_map <- function(clinical_events_phecodes,
   # (e.g. 'I10X' hypertension)
   clinical_events_phecodes_split$icd10 <-
     clinical_events_phecodes_split$icd10 %>%
-    dplyr::mutate("code" = dplyr::recode(
-      .data[["code"]],
-      !!!icd10_code_alt_code_x_map
-    ))
+    dplyr::mutate(
+      "code" = dplyr::recode(
+        .data[["code"]],
+        !!!icd10_code_alt_code_x_map
+      )
+    )
 
   code_descriptions <- clinical_events_phecodes_split %>%
     purrr::imap(
@@ -290,17 +302,19 @@ make_phecode_reverse_map <- function(clinical_events_phecodes,
 
   clinical_events_phecodes_split <- clinical_events_phecodes_split %>%
     # append code descriptions
-    purrr::imap(~ .x %>%
-      dplyr::left_join(code_descriptions[[.y]],
-        by = "code"
-      ))
+    purrr::imap(
+      ~ .x %>%
+        dplyr::left_join(code_descriptions[[.y]], by = "code")
+    )
 
   # strip 'X' from icd10 codes in 'code' col and recombine
   clinical_events_phecodes_split$icd10 <- clinical_events_phecodes_split$icd10 %>%
-    dplyr::mutate("code" = stringr::str_remove(
-      .data[["code"]],
-      "X$"
-    ))
+    dplyr::mutate(
+      "code" = stringr::str_remove(
+        .data[["code"]],
+        "X$"
+      )
+    )
 
   clinical_events_phecodes <- clinical_events_phecodes_split %>%
     dplyr::bind_rows()
@@ -321,9 +335,7 @@ make_phecode_reverse_map <- function(clinical_events_phecodes,
     )
 
   clinical_events_phecodes <- clinical_events_phecodes %>%
-    dplyr::left_join(phecode_descriptions,
-      by = c("phecode")
-    )
+    dplyr::left_join(phecode_descriptions, by = c("phecode"))
 
   # append icd10 equivalent descriptions
   icd10_descriptions <- CODES(
@@ -341,16 +353,16 @@ make_phecode_reverse_map <- function(clinical_events_phecodes,
     )
 
   clinical_events_phecodes <- clinical_events_phecodes %>%
-    dplyr::left_join(icd10_descriptions,
-      by = c("icd10")
-    )
+    dplyr::left_join(icd10_descriptions, by = c("icd10"))
 
   # strip 'X' from icd10 codes in 'icd10' column
   clinical_events_phecodes <- clinical_events_phecodes %>%
-    dplyr::mutate("icd10" = stringr::str_remove(
-      .data[["icd10"]],
-      "X$"
-    ))
+    dplyr::mutate(
+      "icd10" = stringr::str_remove(
+        .data[["icd10"]],
+        "X$"
+      )
+    )
 
   # reorder cols
   clinical_events_phecodes <- clinical_events_phecodes %>%
@@ -394,15 +406,16 @@ make_phecode_reverse_map <- function(clinical_events_phecodes,
 #' @noRd
 #'
 #' @return A data frame.
-map_clinical_events_source_to_phecode <- function(source,
-                                                  data_coding,
-                                                  category_description,
-                                                  all_lkps_maps,
-                                                  clinical_events,
-                                                  col_filters = default_col_filters()) {
+map_clinical_events_source_to_phecode <- function(
+  source,
+  data_coding,
+  category_description,
+  all_lkps_maps,
+  clinical_events,
+  col_filters = default_col_filters()
+) {
   # informative message
   message(category_description)
-
 
   # map icd10 to phecode
   if (data_coding == "icd10") {
@@ -425,10 +438,12 @@ map_clinical_events_source_to_phecode <- function(source,
       )
 
     clinical_events_source <- clinical_events_source %>%
-      dplyr::mutate("icd10" = dplyr::recode(
-        .data[["icd10"]],
-        !!!icd10_code_alt_code_x_map
-      ))
+      dplyr::mutate(
+        "icd10" = dplyr::recode(
+          .data[["icd10"]],
+          !!!icd10_code_alt_code_x_map
+        )
+      )
 
     # map
     result <-
@@ -459,9 +474,7 @@ map_clinical_events_source_to_phecode <- function(source,
   }
 
   # remove 'X' from 'icd10' column
-  result$icd10 <- stringr::str_remove(result$icd10,
-    pattern = "X$"
-  )
+  result$icd10 <- stringr::str_remove(result$icd10, pattern = "X$")
 
   # result - a data frame
   return(result)
@@ -477,9 +490,11 @@ map_clinical_events_source_to_phecode <- function(source,
 #'
 #' @return A clinical events data frame.
 #' @noRd
-map_icd10_to_phecode <- function(clinical_events,
-                                 all_lkps_maps = "all_lkps_maps.db",
-                                 col_filters = default_col_filters()) {
+map_icd10_to_phecode <- function(
+  clinical_events,
+  all_lkps_maps = "all_lkps_maps.db",
+  col_filters = default_col_filters()
+) {
   map_codes_ukb_clinical_events(
     clinical_events = clinical_events,
     from = "icd10",
@@ -516,13 +531,15 @@ map_icd10_to_phecode <- function(clinical_events,
 #' @noRd
 #'
 #' @return A clinical events data frame.
-map_codes_ukb_clinical_events <- function(clinical_events,
-                                          from,
-                                          to,
-                                          from_colname = NULL,
-                                          to_colname = NULL,
-                                          all_lkps_maps = "all_lkps_maps.db",
-                                          col_filters = default_col_filters()) {
+map_codes_ukb_clinical_events <- function(
+  clinical_events,
+  from,
+  to,
+  from_colname = NULL,
+  to_colname = NULL,
+  all_lkps_maps = "all_lkps_maps.db",
+  col_filters = default_col_filters()
+) {
   # validate args
   check_mapping_args(
     from = from,
@@ -561,7 +578,8 @@ map_codes_ukb_clinical_events <- function(clinical_events,
   names(join_by) <- from_colname
 
   result <- clinical_events %>%
-    dplyr::inner_join(mapping_df,
+    dplyr::inner_join(
+      mapping_df,
       by = join_by,
       relationship = "many-to-many"
     ) %>%
@@ -593,17 +611,22 @@ map_codes_ukb_clinical_events <- function(clinical_events,
 #'
 #' @return A data frame
 #' @noRd
-get_clinical_events_source <- function(clinical_events,
-                                       sources,
-                                       allow_missing_sources = FALSE) {
+get_clinical_events_source <- function(
+  clinical_events,
+  sources,
+  allow_missing_sources = FALSE
+) {
   # validate args
-  assertthat::assert_that(all(sources %in% ukbwranglr::clinical_events_sources()$source))
+  assertthat::assert_that(all(
+    sources %in% ukbwranglr::clinical_events_sources()$source
+  ))
   ukbwranglr:::validate_clinical_events_and_check_type(clinical_events)
 
   # check selected sources are present
   check_sources <- clinical_events %>%
     dplyr::filter(.data[["source"]] %in% !!sources) %>%
-    dplyr::distinct(dplyr::across(tidyselect::all_of("source")),
+    dplyr::distinct(
+      dplyr::across(tidyselect::all_of("source")),
       .keep_all = FALSE
     ) %>%
     dplyr::collect()
@@ -619,19 +642,13 @@ get_clinical_events_source <- function(clinical_events,
       warning(paste0(
         "Warning! ",
         missing_sources_msg,
-        stringr::str_c(missing_sources,
-          sep = "",
-          collapse = ", "
-        )
+        stringr::str_c(missing_sources, sep = "", collapse = ", ")
       ))
     } else {
       stop(paste0(
         "Error!",
         missing_sources_msg,
-        stringr::str_c(missing_sources,
-          sep = "",
-          collapse = ", "
-        )
+        stringr::str_c(missing_sources, sep = "", collapse = ", ")
       ))
     }
   }

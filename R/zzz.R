@@ -1,5 +1,4 @@
 .onLoad <- function(libname, pkgname) {
-
   all_pkg_opts <- list(
     codeminer.col_filters = default_col_filters()
   )
@@ -8,7 +7,9 @@
 
   toset <- !(names(all_pkg_opts) %in% names(current_options))
 
-  if(any(toset)) options(all_pkg_opts[toset])
+  if (any(toset)) {
+    options(all_pkg_opts[toset])
+  }
 
   invisible()
 }

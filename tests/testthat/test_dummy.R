@@ -1,4 +1,3 @@
-
 # Dummy data path functions -----------------------------------------------
 
 test_that("Functions that return a path to dummy data work", {

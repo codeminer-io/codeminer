@@ -6,14 +6,15 @@
 #'
 #' @export
 start_api <- function(host = "0.0.0.0", port = 8000) {
+  # Get the path to plumber.R inside the installed package
+  plumber_file <- system.file("plumber/plumber.R", package = "codeminer")
 
-    # Get the path to plumber.R inside the installed package
-    plumber_file <- system.file("plumber/plumber.R", package = "codeminer")
+  if (plumber_file == "") {
+    stop(
+      "Could not find plumber.R. Ensure it is in inst/plumber/ inside the codeminer package."
+    )
+  }
 
-    if (plumber_file == "") {
-      stop("Could not find plumber.R. Ensure it is in inst/plumber/ inside the codeminer package.")
-    }
-
-  pr <- plumber::plumb(plumber_file)  # Load the Plumber API file
+  pr <- plumber::plumb(plumber_file) # Load the Plumber API file
   pr$run(host = host, port = port)
 }

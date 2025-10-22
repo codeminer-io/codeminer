@@ -140,9 +140,11 @@ prodcode_aurum <- function(code) {
 # PRIVATE -----------------------------------------------------------------
 
 with_code_type <- function(code_type, code) {
-  withr::with_options(list(
-    codeminer.code_type = code_type,
-    codeminer.map_to = code_type
-  ),
-  code = code)
+  withr::with_options(
+    list(
+      codeminer.code_type = code_type,
+      codeminer.map_to = code_type
+    ),
+    code = code
+  )
 }
