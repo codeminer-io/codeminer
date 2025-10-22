@@ -237,7 +237,7 @@ test_that("`code_descriptions_like()` returns expected results", {
   )
 })
 
-test_that("`code_descriptions_like()` returns ICD10 codes where MODIFIER_4/MODIFIER_5 matches the search string", {
+test_that("`DESCRIPTION()` returns ICD10 codes where MODIFIER_4/MODIFIER_5 matches the search string", {
   expect_equal(
     code_descriptions_like(
       reg_expr = "With ophthalmic complications",
@@ -259,7 +259,7 @@ test_that("`code_descriptions_like()` returns ICD10 codes where MODIFIER_4/MODIF
   )
 })
 
-test_that("`codes_descriptions_like()` returns primary descriptions for codes with a secondary description that matches the search string", {
+test_that("`DESCRIPTION()` returns primary descriptions for codes with a secondary description that matches the search string", {
   # Returns 'Type I diabetes mellitus' when searching for 'IDDM'
   expect_equal(
     code_descriptions_like(
@@ -299,7 +299,7 @@ test_that("`codes_descriptions_like()` returns primary descriptions for codes wi
   )
 })
 
-test_that("`codes_descriptions_like` returns same result for all_lkps_maps_db and all_lkps_maps", {
+test_that("`DESCRIPTION` returns same result for all_lkps_maps_db and all_lkps_maps", {
 
   # expect no result with `ignore_case = FALSE`
   expect_equal(
