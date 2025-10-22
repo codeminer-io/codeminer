@@ -36,7 +36,7 @@
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
 <li><a class="dropdown-item" href="../articles/caliber.html">CALIBER code lists</a></li>
     <li><a class="dropdown-item" href="../articles/icd10_formats.html">ICD10 code formats</a></li>
-    <li><a class="dropdown-item" href="../articles/map_codes.html">Mapping between clinical coding systems</a></li>
+    <li><a class="dropdown-item" href="../articles/MAP.html">Mapping between clinical coding systems</a></li>
     <li><a class="dropdown-item" href="../articles/phecodes.html">Phecodes</a></li>
   </ul>
 </li>
@@ -92,7 +92,7 @@ do not have one already.&lt;/p&gt;"><sup>1</sup></a> and navigating to this Rmd 
 coding systems, and using CALIBER code lists<span class="citation">(Kuan
 et al. 2019)</span> and Phecodes<span class="citation">(Denny,
 Bastarache, and Roden 2016; Wu et al. 2019)</span> with UK Biobank data.
-See vignettes <code><a href="../articles/map_codes.html">vignette('map_codes')</a></code>
+See vignettes <code><a href="../articles/MAP.html">vignette('MAP')</a></code>
 <code><a href="../articles/caliber.html">vignette('caliber')</a></code> and <code><a href="../articles/phecodes.html">vignette('phecodes')</a></code>
 for further information.</p>
 </div>
@@ -152,7 +152,7 @@ package.&lt;/p&gt;'><sup>2</sup></a> objects:</p>
 <span><span class="co"># view first few rows of ICD10 lookup table</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">all_lkps_maps_dummy_db</span><span class="op">$</span><span class="va">icd10_lkp</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># Source:   SQL [?? x 13]</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># Database: DuckDB 1.4.1 [unknown@Linux 6.11.0-1018-azure:R 4.5.1//tmp/RtmpKKLR2H/file23c073eb6124]</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># Database: DuckDB 1.4.1 [unknown@Linux 6.11.0-1018-azure:R 4.5.1//tmp/RtmpkchYLb/file241562de0390]</span></span></span>
 <span><span class="co">#&gt;   .rowid ICD10_CODE ALT_CODE USAGE   USAGE_UK DESCRIPTION  MODIFIER_4 MODIFIER_5</span></span>
 <span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     </span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>      1 A00        A00      DEFAULT 3        Cholera      <span style="color: #BB0000;">NA</span>         <span style="color: #BB0000;">NA</span>        </span></span>
@@ -202,7 +202,7 @@ to repeatedly type this in your self.</p>
 <code>codes_starting_with()</code>:</li>
 </ul>
 <!-- --><div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/get_child_codes.html">get_child_codes</a></span><span class="op">(</span>codes <span class="op">=</span> <span class="st">"E10"</span>,</span>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/CHILDREN.html">CHILDREN</a></span><span class="op">(</span>codes <span class="op">=</span> <span class="st">"E10"</span>,</span>
 <span>                code_type <span class="op">=</span> <span class="st">"icd10"</span>,</span>
 <span>                all_lkps_maps <span class="op">=</span> <span class="va">all_lkps_maps_dummy_db</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 11 × 3</span></span></span>

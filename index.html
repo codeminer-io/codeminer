@@ -38,7 +38,7 @@
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
 <li><a class="dropdown-item" href="articles/caliber.html">CALIBER code lists</a></li>
     <li><a class="dropdown-item" href="articles/icd10_formats.html">ICD10 code formats</a></li>
-    <li><a class="dropdown-item" href="articles/map_codes.html">Mapping between clinical coding systems</a></li>
+    <li><a class="dropdown-item" href="articles/MAP.html">Mapping between clinical coding systems</a></li>
     <li><a class="dropdown-item" href="articles/phecodes.html">Phecodes</a></li>
   </ul>
 </li>
@@ -93,7 +93,7 @@
 <span><span class="co">#&gt; 1 G20.. Essential hypertension read2</span></span></code></pre></div>
 <p>Map these to ICD10:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">htn_icd10</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/map_codes.html">map_codes</a></span><span class="op">(</span></span>
+<code class="sourceCode R"><span><span class="va">htn_icd10</span> <span class="op">&lt;-</span> <span class="fu">map_codes</span><span class="op">(</span></span>
 <span>  codes <span class="op">=</span> <span class="va">htn_read2</span><span class="op">$</span><span class="va">code</span>,</span>
 <span>  from <span class="op">=</span> <span class="st">"read2"</span>,</span>
 <span>  to <span class="op">=</span> <span class="st">"icd10"</span>,</span>
