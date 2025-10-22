@@ -113,12 +113,12 @@ CHILDREN(codes = "E10",
                 all_lkps_maps = all_lkps_maps_dummy_db)
 ```
 
--   `code_descriptions_like():`
+-   `DESCRIPTION():`
 
 <!-- -->
 
 ```{r}
-code_descriptions_like(reg_expr = "cyst",
+DESCRIPTION(reg_expr = "cyst",
                        code_type = "icd10",
                        all_lkps_maps = all_lkps_maps_dummy_db)
 ```

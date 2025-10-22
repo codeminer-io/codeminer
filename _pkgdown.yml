@@ -20,7 +20,7 @@ reference:
   - CHILDREN
   - get_children_sct
   - get_parents_sct
-  - code_descriptions_like
+  - DESCRIPTION
   - MAP
   - get_mapping_df
   - reformat_icd10_codes

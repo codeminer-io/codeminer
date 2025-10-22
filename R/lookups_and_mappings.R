@@ -672,46 +672,23 @@ get_ukb_all_lkps_maps <- function(dir_path = tempdir()) {
 #' get_bnf_from_open_prescribing()
 #' }
 get_bnf_from_open_prescribing <- function() {
-  # retrieve full BNF terminology
-  result <- 0:9 |>
-    purrr::map(
-      \(x) {
-        stringr::str_glue(
-          'https://openprescribing.net/api/1.0/bnf_code/?q={x}&format=csv'
-        )
-      }
-    ) |>
-    purrr::map(
-      readr::read_csv,
-      col_types = readr::cols(.default = "c"),
-      .progress = TRUE
-    ) |>
-    dplyr::bind_rows() |>
-    dplyr::distinct()
+  urls <- purrr::map(0:9, ~ stringr::str_glue(
+    "https://openprescribing.net/api/1.0/bnf_code/?q={.x}&format=csv"
+  ))
 
-  # bnf codes with '.' - each part of the 'id' (separated by .) should be padded
-  # to two digits, then concatenated
-  result <- result |>
-    dplyr::mutate(id = stringr::str_split(.data[["id"]], "\\.")) |>
-    dplyr::mutate(
-      id = purrr::map_chr(
-        .data[["id"]],
-        \(.x) {
-          paste0(
-            stringr::str_pad(.x, 2, pad = "0"),
-            collapse = ""
-          )
-        },
-        .progress = TRUE
-      )
-    )
+  safe_download <- function(url) {
+    tryCatch({
+      httr::RETRY("GET", url, times = 3, pause_min = 1, quiet = TRUE) |>
+        httr::content(as = "text") |>
+        readr::read_csv(col_types = readr::cols(.default = "c"))
+    }, error = function(e) {
+      message("Skipping failed URL: ", url)
+      return(NULL)
+    })
+  }
 
-  # rename to match UKB resource
-  result |>
-    dplyr::rename(
-      BNF_Code = dplyr::all_of("id"),
-      Description = dplyr::all_of("name")
-    )
+  data <- purrr::map(urls, safe_download)
+  dplyr::bind_rows(data)
 }
 
 #' Download and read a UKB welf-reported medication code to ATC mapping file

@@ -26,27 +26,25 @@
 #' @return data frame by default, or a character vector of codes if
 #'   \code{codes_only} is \code{TRUE}.
 #' @export
-#' @name code_descriptions_like
+#' @name DESCRIPTION
 #' @examples
 #' # build dummy all_lkps_maps
 #' all_lkps_maps_dummy <- build_all_lkps_maps_dummy()
 #'
 #' # lookup ICD10 code descriptions matching 'cyst'
-#' code_descriptions_like(
+#' DESCRIPTION(
 #'   reg_expr = "cyst",
 #'   code_type = "icd10",
 #'   all_lkps_maps = all_lkps_maps_dummy
 #' )
-code_descriptions_like <- function(
-  reg_expr,
-  code_type = getOption("codeminer.code_type"),
-  all_lkps_maps = NULL,
-  ignore_case = TRUE,
-  codes_only = FALSE,
-  preferred_description_only = TRUE,
-  standardise_output = TRUE,
-  col_filters = getOption("codeminer.col_filters")
-) {
+DESCRIPTION <- function(reg_expr,
+                                   code_type = getOption("codeminer.code_type"),
+                                   all_lkps_maps = NULL,
+                                   ignore_case = TRUE,
+                                   codes_only = FALSE,
+                                   preferred_description_only = TRUE,
+                                   standardise_output = TRUE,
+                                   col_filters = getOption("codeminer.col_filters")) {
   # validate args
   assertthat::is.string(reg_expr)
 
@@ -262,9 +260,6 @@ CODES_LIKE <- function(
   }
 }
 
-#' @rdname code_descriptions_like
-#' @export
-DESCRIPTION <- code_descriptions_like
 
 #' Look up descriptions for clinical codes
 #'
