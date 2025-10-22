@@ -440,14 +440,14 @@ CODES <- function(codes,
 #' @inheritParams CODES
 #'
 #' @return A data frame
-#' @name get_child_codes
+#' @name CHILDREN
 #' @export
 #'
 #' @seealso [get_children_sct()]
 #' @family Clinical code lookups and mappings
 #' @examples
 #' # TODO
-get_child_codes <- function(codes,
+CHILDREN <- function(codes,
                             code_type = getOption("codeminer.code_type"),
                             all_lkps_maps = NULL,
                             codes_only = FALSE,
@@ -516,10 +516,6 @@ get_child_codes <- function(codes,
 }
 
 
-#' @rdname get_child_codes
-#' @export
-CHILDREN <- get_child_codes
-
 #' Get children for SNOMED codes
 #'
 #' @param codes Character vector of SNOMED codes.
@@ -529,10 +525,10 @@ CHILDREN <- get_child_codes
 #' @param include_descendants If `TRUE` (default) return all descendant codes,
 #'   as well as immediate children.
 #' @inheritParams CODES
-#' @inheritParams get_child_codes
+#' @inheritParams CHILDREN
 #'
 #' @return A dataframe
-#' @seealso [get_child_codes()], [get_parents_sct()]
+#' @seealso [CHILDREN()], [get_parents_sct()]
 #' @family Clinical code lookups and mappings
 #' @export
 get_children_sct <- function(codes,
@@ -566,10 +562,10 @@ get_children_sct <- function(codes,
 #' @param include_ancestors If `TRUE` (default) return all ancestor codes,
 #'   as well as immediate parents.
 #' @inheritParams CODES
-#' @inheritParams get_child_codes
+#' @inheritParams CHILDREN
 #'
 #' @return A dataframe
-#' @seealso [get_child_codes()], [get_children_sct()]
+#' @seealso [CHILDREN()], [get_children_sct()]
 #' @family Clinical code lookups and mappings
 #' @export
 get_parents_sct <- function(codes,
@@ -601,7 +597,7 @@ get_parents_sct <- function(codes,
 #' @param attribute_codes Character vector of SNOMED codes.
 #' @param relationship_type Character vector of SNOMED codes.
 #' @inheritParams CODES
-#' @inheritParams get_child_codes
+#' @inheritParams CHILDREN
 #'
 #' @return A dataframe
 #' @family Clinical code lookups and mappings
@@ -1015,7 +1011,7 @@ get_attributes_sct <- function(codes,
 #'   frame with columns named 'code', 'description' and 'code_type'. Otherwise
 #'   returns a data frame with all columns from the relevant mapping table. Note
 #'   that this may or may not include code descriptions.
-#' @inheritParams get_child_codes
+#' @inheritParams CHILDREN
 #' @inheritParams CODES
 #'
 #' @name map_codes
@@ -1168,7 +1164,7 @@ MAP <- map_codes
 #'
 #' @param from A clinical coding system to map from.
 #' @param to A clinical coding system to map to.
-#' @inheritParams get_child_codes
+#' @inheritParams CHILDREN
 #' @inheritParams map_codes
 #' @param rename_from_to Optionally supply a named vector to rename the 'from'
 #'   and 'to' columns. For example `c(from = "original_codes", to =
@@ -1308,7 +1304,7 @@ get_mapping_df <- function(to = getOption("codeminer.map_to"),
 #'   "ALT_CODE".
 #' @param output_icd10_format character. Must be either "ICD10_CODE" or
 #'   "ALT_CODE".
-#' @inheritParams get_child_codes
+#' @inheritParams CHILDREN
 #' @inheritParams CODES
 #' @param strip_x If `TRUE` and converting to `ALT_CODE` format, 'X' is removed
 #'   from the end of undivided 3 character codes (default is `FALSE`).
@@ -1841,7 +1837,7 @@ get_col_filters <- function(defaults_only = TRUE,
 #' @param escape_dot If `TRUE`, escape any '.' characters in `codes`. Default is
 #'   `FALSE`
 #' @inheritParams CODES
-#' @inheritParams get_child_codes
+#' @inheritParams CHILDREN
 #' @noRd
 #' @family Clinical code lookups and mappings
 codes_starting_with <- function(codes,

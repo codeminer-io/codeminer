@@ -192,7 +192,7 @@ read_caliber_raw <- function(caliber_dir_path,
 #' ICD9. See `vignette("caliber")` for further details.
 #'
 #' @param caliber A named list of data frames, created by [read_caliber_raw()].
-#' @inheritParams get_child_codes
+#' @inheritParams CHILDREN
 #' @inheritParams read_caliber_raw
 #' @param overlapping_disease_categories_csv File path to a csv containing codes
 #'   that are listed under more than one disease category within a disease. This

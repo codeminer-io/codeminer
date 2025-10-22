@@ -53,14 +53,14 @@ A dataframe
 Get children for SNOMED codes
 }
 \seealso{
-\code{\link[=get_child_codes]{get_child_codes()}}, \code{\link[=get_parents_sct]{get_parents_sct()}}
+\code{\link[=CHILDREN]{CHILDREN()}}, \code{\link[=get_parents_sct]{get_parents_sct()}}
 
 Other Clinical code lookups and mappings: 
+\code{\link{CHILDREN}()},
 \code{\link{CODES}()},
 \code{\link{GET_ATTRIBUTES}()},
 \code{\link{HAS_ATTRIBUTES}()},
 \code{\link{default_col_filters}()},
-\code{\link{get_child_codes}()},
 \code{\link{get_mapping_df}()},
 \code{\link{get_parents_sct}()},
 \code{\link{map_codes}()},

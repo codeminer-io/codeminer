@@ -98,11 +98,11 @@ test_that("`codes_starting_with()` returns the expected nuber of results, escapi
 })
 
 
-# `get_child_codes()` -----------------------------------------------------
+# `CHILDREN()` -----------------------------------------------------
 
-test_that("`get_child_codes()` returns error for unrecognised codes", {
+test_that("`CHILDREN()` returns error for unrecognised codes", {
   expect_error(
-    get_child_codes(
+    CHILDREN(
       codes = c("C10"),
       code_type = "read2",
       all_lkps_maps = all_lkps_maps,
@@ -113,9 +113,9 @@ test_that("`get_child_codes()` returns error for unrecognised codes", {
   )
 })
 
-test_that("`get_child_codes()` works as expected for read2", {
+test_that("`CHILDREN()` works as expected for read2", {
   expect_equal(
-    get_child_codes(
+    CHILDREN(
       codes = c("C10.."),
       code_type = "read2",
       all_lkps_maps = all_lkps_maps,
@@ -125,9 +125,9 @@ test_that("`get_child_codes()` works as expected for read2", {
   )
 })
 
-test_that("`get_child_codes()` raises error for unsupported code types e.g. read3", {
+test_that("`CHILDREN()` raises error for unsupported code types e.g. read3", {
   expect_error(
-    get_child_codes(
+    CHILDREN(
       codes = "C10..",
       code_type = "read3",
       all_lkps_maps = all_lkps_maps,

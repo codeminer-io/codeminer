@@ -71,10 +71,10 @@ HAS_ATTRIBUTES(CHILDREN("106544002", code_type = "sct"), relationship_type = "24
 }
 \seealso{
 Other Clinical code lookups and mappings: 
+\code{\link{CHILDREN}()},
 \code{\link{CODES}()},
 \code{\link{GET_ATTRIBUTES}()},
 \code{\link{default_col_filters}()},
-\code{\link{get_child_codes}()},
 \code{\link{get_children_sct}()},
 \code{\link{get_mapping_df}()},
 \code{\link{get_parents_sct}()},

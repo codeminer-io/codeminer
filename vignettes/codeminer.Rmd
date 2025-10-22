@@ -108,7 +108,7 @@ CODES(
 <!-- -->
 
 ```{r}
-get_child_codes(codes = "E10",
+CHILDREN(codes = "E10",
                 code_type = "icd10",
                 all_lkps_maps = all_lkps_maps_dummy_db)
 ```

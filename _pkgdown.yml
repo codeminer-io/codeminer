@@ -17,7 +17,12 @@ reference:
 - contents:
   - CODES
   - codes_like
+<<<<<<< HEAD
   - get_child_codes
+=======
+  - CHILDREN
+  - get_attributes_sct
+>>>>>>> 01dc353 (switching CHILDREN in favour of get_child_codes; run locally devtools::document(); and devtools::check() > 0 errors ✔ | 2 warnings ✖ | 3 notes ✖  #17)
   - get_children_sct
   - get_parents_sct
   - code_descriptions_like
