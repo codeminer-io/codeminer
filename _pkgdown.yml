@@ -18,7 +18,6 @@ reference:
   - CODES
   - codes_like
   - CHILDREN
-  - get_attributes_sct
   - get_children_sct
   - get_parents_sct
   - code_descriptions_like
