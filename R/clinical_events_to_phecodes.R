@@ -31,32 +31,6 @@ CLINICAL_EVENTS_SOURCES_MAPPED_TO_PHECODES <- c(
 # PRIVATE -----------------------------------------------------------------
 
 
-#' Maps ICD10 codes in `clinical_events` to phecodes
-#'
-#' @param clinical_events Clinical events data frame
-#' @param all_lkps_maps Named list of lookup and mapping tables (can be
-#'   `tbl_dbi` objects) or the path to an Duckdb database containing these
-#' @param col_filters See [default_col_filters()]
-#'
-#' @return A clinical events data frame.
-#' @noRd
-map_icd10_to_phecode <- function(
-  clinical_events,
-  all_lkps_maps = "all_lkps_maps.db",
-  col_filters = default_col_filters()
-) {
-  map_codes_ukb_clinical_events(
-    clinical_events = clinical_events,
-    from = "icd10",
-    to = "phecode",
-    from_colname = "icd10",
-    to_colname = "phecode",
-    all_lkps_maps = all_lkps_maps,
-    col_filters = col_filters
-  )
-}
-
-
 #' Map codes in a UKB clinical events table
 #'
 #' Joins the existing `code` column to a mapping data frame created by
