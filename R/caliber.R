@@ -743,7 +743,7 @@ reformat_caliber_opcs4 <- function(opcs4_df,
 #' @param from Code type to map from
 #' @param to Code type to map to
 #' @param all_lkps_maps Named list
-#' @param col_filters See [map_codes()]
+#' @param col_filters See [MAP()]
 #'
 #' @noRd
 #'

@@ -23,10 +23,10 @@ all_lkps_maps_dummy <- build_all_lkps_maps_dummy()
 
 # Basic usage
 
-Use `map_codes()` to map a vector of codes from one clinical coding system to another:
+Use `MAP()` to map a vector of codes from one clinical coding system to another:
 
 ```{r}
-map_codes(codes = "G20..",
+MAP(codes = "G20..",
           from = "read2",
           to = "icd10",
           all_lkps_maps = all_lkps_maps_dummy)
@@ -63,7 +63,7 @@ all_lkps_maps_dummy$read_ctv3_icd10 %>%
 It is important to decide which mappings to include. For example, if no filters are applied then the Read 3 code for sebaceous cyst 'XaIP9' will map to a number of ICD10 codes, some of which are sex-specific ('N508' and 'N948'):
 
 ```{r}
-map_codes(codes = "XaIP9",
+MAP(codes = "XaIP9",
           from = "read3",
           to = "icd10",
           all_lkps_maps = all_lkps_maps_dummy,
@@ -73,7 +73,7 @@ map_codes(codes = "XaIP9",
 Default filters are applied by `default_col_filters()`:
 
 ```{r}
-map_codes(codes = "XaIP9",
+MAP(codes = "XaIP9",
           from = "read3",
           to = "icd10",
           all_lkps_maps = all_lkps_maps_dummy,

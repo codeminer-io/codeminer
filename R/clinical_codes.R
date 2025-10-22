@@ -1014,7 +1014,7 @@ get_attributes_sct <- function(codes,
 #' @inheritParams CHILDREN
 #' @inheritParams CODES
 #'
-#' @name map_codes
+#' @name MAP
 #' @export
 #' @family Clinical code lookups and mappings
 #' @examples
@@ -1022,13 +1022,13 @@ get_attributes_sct <- function(codes,
 #' all_lkps_maps_dummy <- build_all_lkps_maps_dummy()
 #'
 #' # map codes from Read 2 to ICD10
-#' map_codes(
+#' MAP(
 #'   codes = "G20..",
 #'   from = "read2",
 #'   to = "icd10",
 #'   all_lkps_maps = all_lkps_maps_dummy
 #' )
-map_codes <- function(codes,
+MAP <- function(codes,
                       to = getOption("codeminer.map_to"),
                       from = getOption("codeminer.map_from"),
                       all_lkps_maps = NULL,
@@ -1153,9 +1153,6 @@ map_codes <- function(codes,
   }
 }
 
-#' @rdname map_codes
-#' @export
-MAP <- map_codes
 
 #' Get a 'from-to' mapping data frame
 #'
@@ -1165,7 +1162,7 @@ MAP <- map_codes
 #' @param from A clinical coding system to map from.
 #' @param to A clinical coding system to map to.
 #' @inheritParams CHILDREN
-#' @inheritParams map_codes
+#' @inheritParams MAP
 #' @param rename_from_to Optionally supply a named vector to rename the 'from'
 #'   and 'to' columns. For example `c(from = "original_codes", to =
 #'   "new_codes")`. By default, the columns will be named using the values for
@@ -1954,7 +1951,7 @@ codes_starting_with <- function(codes,
   }
 }
 
-#' Helper function for \code{\link{map_codes}}
+#' Helper function for \code{\link{MAP}}
 #'
 #' Returns name of the appropriate mapping sheet from the UKB code mappings
 #' excel file (resource 592) for mapping from one clinical coding system to
@@ -1971,7 +1968,7 @@ get_from_to_mapping_sheet <- function(from, to) {
     CLINICAL_CODE_MAPPINGS_MAP[["to"]] == to), ][["mapping_table"]]
 }
 
-#' Helper function for \code{\link{map_codes}}
+#' Helper function for \code{\link{MAP}}
 #'
 #' Returns the requested value for a 'mapping_table' in
 #' \code{CLINICAL_CODE_MAPPINGS_MAP}.
@@ -2082,7 +2079,7 @@ get_preferred_description_code_for_lookup_sheet <-
 #' Reformat a dataframe of clinical codes to work with
 #' \code{\link[ukbwranglr]{extract_phenotypes}}
 #'
-#' A utility function that helps reformat the output from \code{\link{map_codes}}
+#' A utility function that helps reformat the output from \code{\link{MAP}}
 #' or \code{\link{CODES}} to work with
 #' \code{\link[ukbwranglr]{extract_phenotypes}}. See also output
 #' from \code{\link[ukbwranglr]{example_clinical_codes}} for an example of

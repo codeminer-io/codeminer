@@ -103,7 +103,7 @@ lookupCodesServer <-
                         )
 
                         if (input$map_to != "(Don't map)") {
-                          recognised <- map_codes(
+                          recognised <- MAP(
                             codes = recognised,
                             to = input$map_to,
                             unrecognised_codes = "warning",

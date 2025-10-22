@@ -348,7 +348,7 @@ transform_query_base <- function(query) {
           } else {
             operator <- query$args$from
             value <- query$args[[1]]
-            id_field <- "map_codes"
+            id_field <- "MAP"
           }
         }
       }

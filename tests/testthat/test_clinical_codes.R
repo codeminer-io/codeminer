@@ -354,13 +354,13 @@ test_that("`DESCRIPTION` returns same result for all_lkps_maps_db and all_lkps_m
   )
 })
 
-# `map_codes()` -----------------------------------------------------------
+# `MAP()` -----------------------------------------------------------
 
 test_that(
-  "`map_codes()` raises warning if any of the supplied codes are not present in the coding system being mapped from",
+  "`MAP()` raises warning if any of the supplied codes are not present in the coding system being mapped from",
   {
     expect_warning(
-      map_codes(
+      MAP(
         codes = c("C10E.", "foo", "bar"),
         from = "read2",
         to = "read3",
@@ -374,11 +374,11 @@ test_that(
 )
 
 test_that(
-  "`map_codes()` returns the expected codes",
+  "`MAP()` returns the expected codes",
   {
     # codes only
     expect_equal(
-      map_codes(
+      MAP(
         codes = c("C10E."),
         from = "read2",
         to = "read3",
@@ -392,7 +392,7 @@ test_that(
 
     # codes and ALL descriptions
     expect_equal(
-      nrow(map_codes(
+      nrow(MAP(
         codes = c("C10E."),
         from = "read2",
         to = "read3",
@@ -408,10 +408,10 @@ test_that(
 )
 
 test_that(
-  "`map_codes` returns the expected output when `standardise_output` is `TRUE`",
+  "`MAP` returns the expected output when `standardise_output` is `TRUE`",
   {
     expect_equal(
-      map_codes(
+      MAP(
         codes = c("C10E.", "C108."),
         from = "read2",
         to = "read3",
@@ -433,10 +433,10 @@ test_that(
 # `element_num`/`block_num` means it will also map to ICD10 codes for
 # Tuberculosis.
 test_that(
-  "`map_codes` returns the expected output for Read 3 ('XE0e0') to ICD10 example with default `col_filters`",
+  "`MAP` returns the expected output for Read 3 ('XE0e0') to ICD10 example with default `col_filters`",
   {
     expect_equal(
-      map_codes(
+      MAP(
         codes = "XE0e0",
         from = "read3",
         to = "icd10",
@@ -453,10 +453,10 @@ test_that(
 )
 
 test_that(
-  "`map_codes` returns the expected output for Read 3 ('XE0e0') to ICD10 example with default `col_filters`",
+  "`MAP` returns the expected output for Read 3 ('XE0e0') to ICD10 example with default `col_filters`",
   {
     expect_equal(
-      map_codes(
+      MAP(
         codes = "XE0e0",
         from = "read3",
         to = "icd10",
@@ -483,9 +483,9 @@ test_that(
 )
 
 # icd10 to icd9 mapping
-test_that("`map_codes()` works as expected for mapping icd10 to icd9 codes", {
+test_that("`MAP()` works as expected for mapping icd10 to icd9 codes", {
   expect_equal(
-    suppressWarnings(map_codes(
+    suppressWarnings(MAP(
       codes = "D751",
       from = "icd10",
       to = "icd9",
@@ -500,9 +500,9 @@ test_that("`map_codes()` works as expected for mapping icd10 to icd9 codes", {
   )
 })
 
-test_that("`map_codes()` works when mapping icd9 to icd10", {
+test_that("`MAP()` works when mapping icd9 to icd10", {
   expect_equal(
-    map_codes(
+    MAP(
       codes = "0020",
       from = "icd9",
       to = "icd10",
@@ -516,11 +516,11 @@ test_that("`map_codes()` works when mapping icd9 to icd10", {
   )
 })
 
-# `map_codes()` with all_lkps_maps_db -------------------------------------
+# `MAP()` with all_lkps_maps_db -------------------------------------
 
-test_that("`map_codes()` works when mapping icd9 to icd10", {
+test_that("`MAP()` works when mapping icd9 to icd10", {
   expect_equal(
-    map_codes(
+    MAP(
       codes = "0020",
       from = "icd9",
       to = "icd10",
