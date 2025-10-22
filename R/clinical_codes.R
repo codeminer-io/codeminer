@@ -21,7 +21,7 @@
 #'
 #' @param reg_expr a regular expression to search for
 #' @inheritParams stringr::regex
-#' @inheritParams lookup_codes
+#' @inheritParams CODES
 #' @param ignore_case If `TRUE` (default), ignore case in `reg_expr`.
 #' @param codes_only bool. If \code{TRUE}, return a character vector of
 #'   \emph{unique} codes. If \code{FALSE} (default), return a data frame of all
@@ -126,7 +126,7 @@ code_descriptions_like <- function(reg_expr,
   codes <- subset(codes,
                   !is.na(codes))
 
-  result <- lookup_codes(
+  result <- CODES(
     codes = codes,
     code_type = code_type,
     all_lkps_maps = all_lkps_maps,
@@ -155,7 +155,7 @@ code_descriptions_like <- function(reg_expr,
 #'
 #' @param reg_expr a regular expression to search for
 #' @inheritParams stringr::regex
-#' @inheritParams lookup_codes
+#' @inheritParams CODES
 #' @param codes_only bool. If \code{TRUE}, return a character vector of
 #'   \emph{unique} codes. If \code{FALSE} (default), return a data frame of all
 #'   results including code descriptions (useful for manual validation).
@@ -225,7 +225,7 @@ CODES_LIKE <- function(reg_expr,
 
   codes <- subset(codes, !is.na(codes))
 
-  result <- lookup_codes(
+  result <- CODES(
     codes = codes,
     code_type = code_type,
     all_lkps_maps = all_lkps_maps,
@@ -287,19 +287,19 @@ DESCRIPTION <- code_descriptions_like
 #'
 #' @return data frame
 #' @export
-#' @name lookup_codes
+#' @name CODES
 #' @family Clinical code lookups and mappings
 #' @examples
 #' # build dummy all_lkps_maps
 #' all_lkps_maps_dummy <- build_all_lkps_maps_dummy()
 #'
 #' # look up ICD10 codes
-#' lookup_codes(
+#' CODES(
 #'   codes = c("E10", "E11"),
 #'   code_type = "icd10",
 #'   all_lkps_maps = all_lkps_maps_dummy
 #' )
-lookup_codes <- function(codes,
+CODES <- function(codes,
                          code_type = getOption("codeminer.code_type"),
                          all_lkps_maps = NULL,
                          preferred_description_only = TRUE,
@@ -426,9 +426,6 @@ lookup_codes <- function(codes,
   }
 }
 
-#' @rdname lookup_codes
-#' @export
-CODES <- lookup_codes
 
 #' Get descendents for a code
 #'
@@ -440,17 +437,17 @@ CODES <- lookup_codes
 #' @param codes_only bool. If \code{TRUE}, return a character vector of
 #'   \emph{unique} codes. If \code{FALSE} (default), return a data frame of all
 #'   results including code descriptions (useful for manual validation).
-#' @inheritParams lookup_codes
+#' @inheritParams CODES
 #'
 #' @return A data frame
-#' @name get_child_codes
+#' @name CHILDREN
 #' @export
 #'
 #' @seealso [get_children_sct()]
 #' @family Clinical code lookups and mappings
 #' @examples
 #' # TODO
-get_child_codes <- function(codes,
+CHILDREN <- function(codes,
                             code_type = getOption("codeminer.code_type"),
                             all_lkps_maps = NULL,
                             codes_only = FALSE,
@@ -460,7 +457,7 @@ get_child_codes <- function(codes,
                             col_filters = getOption("codeminer.col_filters")) {
 
   # check codes exist
-  codes <- lookup_codes(
+  codes <- CODES(
     codes = codes,
     code_type = code_type,
     all_lkps_maps = all_lkps_maps,
@@ -519,10 +516,6 @@ get_child_codes <- function(codes,
 }
 
 
-#' @rdname get_child_codes
-#' @export
-CHILDREN <- get_child_codes
-
 #' Get children for SNOMED codes
 #'
 #' @param codes Character vector of SNOMED codes.
@@ -531,11 +524,11 @@ CHILDREN <- get_child_codes
 #' @param include_self If `TRUE` (default) include input codes in the result.
 #' @param include_descendants If `TRUE` (default) return all descendant codes,
 #'   as well as immediate children.
-#' @inheritParams lookup_codes
-#' @inheritParams get_child_codes
+#' @inheritParams CODES
+#' @inheritParams CHILDREN
 #'
 #' @return A dataframe
-#' @seealso [get_child_codes()], [get_parents_sct()]
+#' @seealso [CHILDREN()], [get_parents_sct()]
 #' @family Clinical code lookups and mappings
 #' @export
 get_children_sct <- function(codes,
@@ -568,11 +561,11 @@ get_children_sct <- function(codes,
 #' @param include_self If `TRUE` (default) include input codes in the result.
 #' @param include_ancestors If `TRUE` (default) return all ancestor codes,
 #'   as well as immediate parents.
-#' @inheritParams lookup_codes
-#' @inheritParams get_child_codes
+#' @inheritParams CODES
+#' @inheritParams CHILDREN
 #'
 #' @return A dataframe
-#' @seealso [get_child_codes()], [get_children_sct()]
+#' @seealso [CHILDREN()], [get_children_sct()]
 #' @family Clinical code lookups and mappings
 #' @export
 get_parents_sct <- function(codes,
@@ -603,8 +596,8 @@ get_parents_sct <- function(codes,
 #'
 #' @param attribute_codes Character vector of SNOMED codes.
 #' @param relationship_type Character vector of SNOMED codes.
-#' @inheritParams lookup_codes
-#' @inheritParams get_child_codes
+#' @inheritParams CODES
+#' @inheritParams CHILDREN
 #'
 #' @return A dataframe
 #' @family Clinical code lookups and mappings
@@ -871,7 +864,7 @@ get_relatives_sct <- function(codes = NULL,
     result <- c(codes, result)
   }
 
-  lookup_codes(
+  CODES(
     codes = result,
     code_type = "sct",
     all_lkps_maps = all_lkps_maps,
@@ -907,7 +900,7 @@ summarise_attributes_sct <- function(codes,
                                           recursive = FALSE,
                                           all_lkps_maps = all_lkps_maps)
 
-  typeID_descriptions <- lookup_codes(
+  typeID_descriptions <- CODES(
     codes = output_codes$typeId,
     code_type = "sct",
     all_lkps_maps = all_lkps_maps,
@@ -920,7 +913,7 @@ summarise_attributes_sct <- function(codes,
 
   output_descriptions <- output_codes %>%
     as.list() %>%
-    purrr::map(\(x) lookup_codes(
+    purrr::map(\(x) CODES(
       codes = x,
       code_type = "sct",
       all_lkps_maps = all_lkps_maps,
@@ -981,7 +974,7 @@ get_attributes_sct <- function(codes,
   ## then expand to include both primary and secondary descriptions
   result <- unique(output_codes$destinationId)
 
-  lookup_codes(
+  CODES(
     codes = result,
     code_type = "sct",
     all_lkps_maps = all_lkps_maps,
@@ -993,266 +986,6 @@ get_attributes_sct <- function(codes,
   )
 }
 
-get_children_sct_old <- function(codes,
-                             standardise_output = TRUE,
-                             active_only = FALSE,
-                             include_self = TRUE,
-                             include_descendants = TRUE,
-                             all_lkps_maps = NULL,
-                             codes_only = FALSE,
-                             preferred_description_only = TRUE,
-                             col_filters = getOption("codeminer.col_filters")) {
-
-  # get child codes
-  out_codes <- get_relatives_sct_old(
-    codes = codes,
-    relationship = "116680003",
-    relationship_direction = "child",
-    active_only = active_only,
-    recursive = include_descendants,
-    all_lkps_maps = all_lkps_maps
-  )
-
-  out_codes <- out_codes$code
-
-  create_db_connection(all_lkps_maps)
-
-  if (!include_self) {
-    out_codes <- subset(out_codes,
-                        !out_codes %in% codes)
-  }
-
-  # determine relevant lookup sheet
-  lkp_table <- get_lookup_sheet(code_type = "sct")
-
-  check_table_exists_in_all_lkps_maps(all_lkps_maps = all_lkps_maps,
-                                      table_name = lkp_table)
-
-  # determine code column for lookup sheet
-  code_col <- get_col_for_lookup_sheet(
-    lookup_sheet = lkp_table,
-    column = "code_col"
-  )
-
-  # determine description column for lookup sheet
-  description_col <-
-    get_col_for_lookup_sheet(
-      lookup_sheet = lkp_table,
-      column = "description_col"
-    )
-
-  # get descriptions
-  result <- all_lkps_maps[[lkp_table]] %>%
-    dplyr::filter(.data[[code_col]] %in% !!out_codes)
-
-  # adapt output according to user input
-  if (active_only) {
-    inactive_codes <- result %>%
-      dplyr::filter(.data[["active"]] == "0") %>%
-      dplyr::pull(.data[[code_col]])
-
-    if (!rlang::is_empty(inactive_codes)) {
-      warning(paste0(length(inactive_codes),
-                     " inactive codes returned from `sct_description` table, despite being marked as active in `sct_relationship` table, including: ",
-                     paste(utils::head(inactive_codes),
-                           sep = "",
-                           collapse = ", ")))
-    }
-  }
-
-  # collect and return result
-  result <- dplyr::collect(result)
-
-  ## then expand to include both primary and secondary descriptions
-  result <- lookup_codes(
-    codes = unique(result[[code_col]]),
-    code_type = "sct",
-    all_lkps_maps = all_lkps_maps,
-    preferred_description_only = preferred_description_only,
-    standardise_output = standardise_output,
-    col_filters = col_filters,
-    unrecognised_codes = "error",
-    .return_unrecognised_codes = FALSE
-  )
-
-  if (codes_only) {
-    if (standardise_output) {
-      return(result$code)
-    } else {
-      return(result[[code_col]])
-    }
-  } else {
-    return(result)
-  }
-}
-
-#' Get related SNOMED codes
-#'
-#' Low level function for querying related SNOMED codes.
-#'
-#' @param codes Character vector of SNOMED codes
-#' @param relationship Character vector of SNOMED codes defining the types of
-#'   relationship. If `NULL` (default), returns all types of relationship.
-#' @param relationship_direction Either 'child' (default) or 'parent'.
-#' @param recursive If `TRUE` (default), will recursively search for related
-#'   codes e.g. find all descendants code instead of just the immediate child
-#'   codes.
-#' @param active_only If `FALSE` (default), return all relationships, even if
-#'   currently inactive.
-#' @inheritParams lookup_codes
-#' @family Clinical code lookups and mappings
-#' @name get_relatives_sct_old
-#' @noRd
-#'
-#' @return A data frame
-#'
-#' @examples
-#' \dontrun{
-#' # get children codes for "269823000" ("Hemoglobin A1C - ...")
-#' get_relatives_sct_old(
-#'   codes = "269823000",
-#'   relationship = "116680003",
-#'   relationship_direction = "child"
-#'   )
-#'
-#' # get parent codes
-#' get_relatives_sct_old(
-#'   codes = "269823000",
-#'   relationship = "116680003",
-#'   relationship_direction = "parent"
-#'   )
-#'
-#' # get all codes for which "386868003" ("Bisoprolol (substance)") is an attribute.
-#' # Note, includes "293967003" ("Allergy to bisoprolol (finding)")
-#' get_relatives_sct_old(
-#'   codes = "386868003",
-#'   relationship = NULL,
-#'   recursive = FALSE,
-#'   relationship_direction = "child"
-#'   )
-#'
-#' # more results (i.e. bisoprolol-containing medications) are returned with `recursive = TRUE`
-#' get_relatives_sct_old(
-#'   codes = "386868003",
-#'   relationship = NULL,
-#'   recursive = TRUE,
-#'   relationship_direction = "child"
-#'   )
-#' }
-get_relatives_sct_old <- function(codes,
-                              relationship = NULL,
-                              relationship_direction = "child",
-                              recursive = TRUE,
-                              active_only = FALSE,
-                              col_filters = getOption("codeminer.col_filters"),
-                              all_lkps_maps = NULL) {
-
-  result <- get_relatives_attributes_sct(codes = codes,
-                               relationship = relationship,
-                               relationship_direction = relationship_direction,
-                               recursive = recursive,
-                               active_only = active_only,
-                               all_lkps_maps = all_lkps_maps)
-
-  lookup_codes(
-    codes = result$code,
-    code_type = "sct",
-    all_lkps_maps = all_lkps_maps,
-    preferred_description_only = TRUE,
-    standardise_output = TRUE,
-    unrecognised_codes = "error",
-    col_filters = col_filters,
-    .return_unrecognised_codes = FALSE
-  )
-}
-
-#' Get attributes for related SNOMED codes
-#'
-#' Low level function for querying related SNOMED codes, returning attributes
-#' types.
-#'
-#' @param codes Character vector of SNOMED codes
-#' @param relationship Character vector of SNOMED codes defining the types of
-#'   relationship. If `NULL` (default), returns all types of relationship.
-#' @param relationship_direction Either 'child' (default) or 'parent'.
-#' @param recursive If `TRUE` (default), will recursively search for related
-#'   codes e.g. find all descendants code instead of just the immediate child
-#'   codes.
-#' @param active_only If `FALSE` (default), return all relationships, even if
-#'   currently inactive.
-#' @inheritParams lookup_codes
-#' @family Clinical code lookups and mappings
-#' @name get_attributes_sct
-#' @export
-#'
-#' @return A data frame
-#'
-#' @examples
-#' \dontrun{
-#' # get children codes for "269823000" ("Hemoglobin A1C - ...")
-#' get_attributes_sct(
-#'   codes = "269823000",
-#'   relationship = "116680003",
-#'   relationship_direction = "child"
-#'   )
-#'
-#' # get parent codes
-#' get_attributes_sct(
-#'   codes = "269823000",
-#'   relationship = "116680003",
-#'   relationship_direction = "parent"
-#'   )
-#'
-#' # get all codes for which "386868003" ("Bisoprolol (substance)") is an attribute.
-#' # Note, includes "293967003" ("Allergy to bisoprolol (finding)")
-#' get_attributes_sct(
-#'   codes = "386868003",
-#'   relationship = NULL,
-#'   recursive = FALSE,
-#'   relationship_direction = "child"
-#'   )
-#'
-#' # more results (i.e. bisoprolol-containing medications) are returned with `recursive = TRUE`
-#' get_attributes_sct(
-#'   codes = "386868003",
-#'   relationship = NULL,
-#'   recursive = TRUE,
-#'   relationship_direction = "child"
-#'   )
-#' }
-get_attributes_sct_old <- function(codes,
-                              relationship = NULL,
-                              relationship_direction = "child",
-                              recursive = TRUE,
-                              active_only = FALSE,
-                              col_filters = getOption("codeminer.col_filters"),
-                              all_lkps_maps = NULL) {
-
-  result <- get_relatives_attributes_sct(codes = codes,
-                                         relationship = relationship,
-                                         relationship_direction = relationship_direction,
-                                         recursive = recursive,
-                                         active_only = active_only,
-                                         all_lkps_maps = all_lkps_maps)
-
-  result <- result %>%
-    dplyr::filter(!is.na(.data[["typeId"]]))
-
-  lookup_codes(
-    codes = result$typeId,
-    code_type = "sct",
-    all_lkps_maps = all_lkps_maps,
-    preferred_description_only = TRUE,
-    standardise_output = TRUE,
-    unrecognised_codes = "error",
-    col_filters = col_filters,
-    .return_unrecognised_codes = FALSE
-  )
-}
-
-# #' @rdname get_relatives_sct
-# #' @export
-# RELATIVES <- get_relatives_sct_old
 
 #' Map clinical codes from one coding system to another
 #'
@@ -1278,10 +1011,10 @@ get_attributes_sct_old <- function(codes,
 #'   frame with columns named 'code', 'description' and 'code_type'. Otherwise
 #'   returns a data frame with all columns from the relevant mapping table. Note
 #'   that this may or may not include code descriptions.
-#' @inheritParams get_child_codes
-#' @inheritParams lookup_codes
+#' @inheritParams CHILDREN
+#' @inheritParams CODES
 #'
-#' @name map_codes
+#' @name MAP
 #' @export
 #' @family Clinical code lookups and mappings
 #' @examples
@@ -1289,13 +1022,13 @@ get_attributes_sct_old <- function(codes,
 #' all_lkps_maps_dummy <- build_all_lkps_maps_dummy()
 #'
 #' # map codes from Read 2 to ICD10
-#' map_codes(
+#' MAP(
 #'   codes = "G20..",
 #'   from = "read2",
 #'   to = "icd10",
 #'   all_lkps_maps = all_lkps_maps_dummy
 #' )
-map_codes <- function(codes,
+MAP <- function(codes,
                       to = getOption("codeminer.map_to"),
                       from = getOption("codeminer.map_from"),
                       all_lkps_maps = NULL,
@@ -1400,13 +1133,13 @@ map_codes <- function(codes,
       return(result)
     } else if (standardise_output) {
       # Note, not all mapping sheets in UKB resource 592 contain descriptions
-      # (e.g. 'read_v2_icd9'). Therefore need to use `lookup_codes` if
+      # (e.g. 'read_v2_icd9'). Therefore need to use `CODES` if
       # `standardise_output` is `TRUE`
 
       codes <- unique(result[[to_col]])
 
       return(
-        lookup_codes(
+        CODES(
           codes = codes,
           code_type = to,
           all_lkps_maps = all_lkps_maps,
@@ -1420,9 +1153,6 @@ map_codes <- function(codes,
   }
 }
 
-#' @rdname map_codes
-#' @export
-MAP <- map_codes
 
 #' Get a 'from-to' mapping data frame
 #'
@@ -1431,8 +1161,8 @@ MAP <- map_codes
 #'
 #' @param from A clinical coding system to map from.
 #' @param to A clinical coding system to map to.
-#' @inheritParams get_child_codes
-#' @inheritParams map_codes
+#' @inheritParams CHILDREN
+#' @inheritParams MAP
 #' @param rename_from_to Optionally supply a named vector to rename the 'from'
 #'   and 'to' columns. For example `c(from = "original_codes", to =
 #'   "new_codes")`. By default, the columns will be named using the values for
@@ -1571,8 +1301,8 @@ get_mapping_df <- function(to = getOption("codeminer.map_to"),
 #'   "ALT_CODE".
 #' @param output_icd10_format character. Must be either "ICD10_CODE" or
 #'   "ALT_CODE".
-#' @inheritParams get_child_codes
-#' @inheritParams lookup_codes
+#' @inheritParams CHILDREN
+#' @inheritParams CODES
 #' @param strip_x If `TRUE` and converting to `ALT_CODE` format, 'X' is removed
 #'   from the end of undivided 3 character codes (default is `FALSE`).
 #'
@@ -1807,7 +1537,7 @@ db_tables_to_list <- function(con, md) {
 
 #' Get all available SNOMED CT relationship types
 #'
-#' @inheritParams lookup_codes
+#' @inheritParams CODES
 #'
 #' @return A data frame
 #' @noRd
@@ -1819,7 +1549,7 @@ get_all_sct_relation_types <- function(all_lkps_maps = NULL) {
     dplyr::distinct() %>%
     dplyr::collect() %>%
     dplyr::pull(.data[["typeId"]]) %>%
-    lookup_codes(code_type = "sct",
+    CODES(code_type = "sct",
                  all_lkps_maps = all_lkps_maps,
                  preferred_description_only = TRUE,
                  standardise_output = TRUE,
@@ -2115,8 +1845,8 @@ get_col_filters <- function(defaults_only = TRUE,
 #'
 #' @param escape_dot If `TRUE`, escape any '.' characters in `codes`. Default is
 #'   `FALSE`
-#' @inheritParams lookup_codes
-#' @inheritParams get_child_codes
+#' @inheritParams CODES
+#' @inheritParams CHILDREN
 #' @noRd
 #' @family Clinical code lookups and mappings
 codes_starting_with <- function(codes,
@@ -2214,12 +1944,12 @@ codes_starting_with <- function(codes,
       return(unique(result[[code_col]]))
     } else if (standardise_output) {
       # Note, not all mapping sheets in UKB resource 592 contain descriptions
-      # (e.g. 'read_v2_icd9'). Therefore need to use `lookup_codes` if
+      # (e.g. 'read_v2_icd9'). Therefore need to use `CODES` if
       # `standardise_output` is `TRUE`
       codes <- unique(result[[code_col]])
 
       return(
-        lookup_codes(
+        CODES(
           codes = codes,
           code_type = code_type,
           all_lkps_maps = all_lkps_maps,
@@ -2233,7 +1963,7 @@ codes_starting_with <- function(codes,
   }
 }
 
-#' Helper function for \code{\link{map_codes}}
+#' Helper function for \code{\link{MAP}}
 #'
 #' Returns name of the appropriate mapping sheet from the UKB code mappings
 #' excel file (resource 592) for mapping from one clinical coding system to
@@ -2250,7 +1980,7 @@ get_from_to_mapping_sheet <- function(from, to) {
     CLINICAL_CODE_MAPPINGS_MAP[["to"]] == to), ][["mapping_table"]]
 }
 
-#' Helper function for \code{\link{map_codes}}
+#' Helper function for \code{\link{MAP}}
 #'
 #' Returns the requested value for a 'mapping_table' in
 #' \code{CLINICAL_CODE_MAPPINGS_MAP}.
@@ -2285,7 +2015,7 @@ get_value_for_mapping_sheet <- function(mapping_table,
 
 #' Get name of lookup sheet for a clinical code system
 #'
-#' Helper function for \code{\link{lookup_codes}} and \code{\link{codes_starting_with}}
+#' Helper function for \code{\link{CODES}} and \code{\link{codes_starting_with}}
 #'
 #' @param code_type character
 #'
@@ -2306,7 +2036,7 @@ get_lookup_sheet <- function(code_type) {
 
 #' Get name of code, description or preferred synonym column for a lookup sheet
 #'
-#' Helper function for \code{\link{lookup_codes}} and \code{\link{codes_starting_with}}
+#' Helper function for \code{\link{CODES}} and \code{\link{codes_starting_with}}
 #'
 #' @param lookup_sheet character
 #' @param column character
@@ -2336,7 +2066,7 @@ get_col_for_lookup_sheet <- function(lookup_sheet,
 
 #' Get preferred description code for a lookup sheet
 #'
-#' Helper function for \code{\link{lookup_codes}} and \code{\link{codes_starting_with}}
+#' Helper function for \code{\link{CODES}} and \code{\link{codes_starting_with}}
 #'
 #' @param lookup_sheet character
 #'
@@ -2361,8 +2091,8 @@ get_preferred_description_code_for_lookup_sheet <-
 #' Reformat a dataframe of clinical codes to work with
 #' \code{\link[ukbwranglr]{extract_phenotypes}}
 #'
-#' A utility function that helps reformat the output from \code{\link{map_codes}}
-#' or \code{\link{lookup_codes}} to work with
+#' A utility function that helps reformat the output from \code{\link{MAP}}
+#' or \code{\link{CODES}} to work with
 #' \code{\link[ukbwranglr]{extract_phenotypes}}. See also output
 #' from \code{\link[ukbwranglr]{example_clinical_codes}} for an example of
 #' the format that this function will output.

@@ -37,7 +37,7 @@ CLINICAL_EVENTS_SOURCES_MAPPED_TO_PHECODES <- c(
 #' Maps the following UK Biobank clinical events sources to phecodes: `r stringr::str_c(CLINICAL_EVENTS_SOURCES_MAPPED_TO_PHECODES, sep = "", collapse = ", ")`.
 #'
 #' @inheritParams ukbwranglr::extract_phenotypes
-#' @inheritParams  get_child_codes
+#' @inheritParams CHILDREN
 #' @param min_date_only If `TRUE`, result will be filtered for only the earliest
 #'   date per eid-phecode pair (date will be recorded as `NA` for cases where
 #'   there are no dates).
@@ -163,7 +163,7 @@ map_clinical_events_to_phecodes <- function(clinical_events,
 #'
 #' @param clinical_events_phecodes A data frame created by
 #'   [map_clinical_events_to_phecodes()].
-#' @inheritParams  lookup_codes
+#' @inheritParams  CODES
 #'
 #' @return A data frame with columns "phecode", "phecode_description",
 #'   "data_coding", "code" "description", "icd10_equivalent" and
@@ -273,7 +273,7 @@ make_phecode_reverse_map <- function(clinical_events_phecodes,
 
   code_descriptions <- clinical_events_phecodes_split %>%
     purrr::imap(
-      ~ lookup_codes(
+      ~ CODES(
         codes = .x$code,
         code_type = .y,
         all_lkps_maps = all_lkps_maps,
@@ -306,7 +306,7 @@ make_phecode_reverse_map <- function(clinical_events_phecodes,
     dplyr::bind_rows()
 
   # append phecode_description
-  phecode_descriptions <- lookup_codes(
+  phecode_descriptions <- CODES(
     codes = clinical_events_phecodes$phecode,
     code_type = "phecode",
     all_lkps_maps = all_lkps_maps,
@@ -326,7 +326,7 @@ make_phecode_reverse_map <- function(clinical_events_phecodes,
     )
 
   # append icd10 equivalent descriptions
-  icd10_descriptions <- lookup_codes(
+  icd10_descriptions <- CODES(
     codes = clinical_events_phecodes$icd10,
     code_type = "icd10",
     all_lkps_maps = all_lkps_maps,

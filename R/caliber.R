@@ -192,7 +192,7 @@ read_caliber_raw <- function(caliber_dir_path,
 #' ICD9. See `vignette("caliber")` for further details.
 #'
 #' @param caliber A named list of data frames, created by [read_caliber_raw()].
-#' @inheritParams get_child_codes
+#' @inheritParams CHILDREN
 #' @inheritParams read_caliber_raw
 #' @param overlapping_disease_categories_csv File path to a csv containing codes
 #'   that are listed under more than one disease category within a disease. This
@@ -655,7 +655,7 @@ reformat_caliber_icd10 <- function(icd10_df,
 
   icd10_lkp_map_3_char <- icd10_lkp_map_3_char %>%
     dplyr::pull("ALT_CODE") %>%
-    lookup_codes(
+    CODES(
       code_type = "icd10",
       all_lkps_maps = all_lkps_maps,
       preferred_description_only = TRUE,
@@ -743,7 +743,7 @@ reformat_caliber_opcs4 <- function(opcs4_df,
 #' @param from Code type to map from
 #' @param to Code type to map to
 #' @param all_lkps_maps Named list
-#' @param col_filters See [map_codes()]
+#' @param col_filters See [MAP()]
 #'
 #' @noRd
 #'
@@ -786,7 +786,7 @@ map_caliber <- function(df,
     dplyr::distinct(dplyr::across(-.data[["description"]]))
 
   # append code descriptions
-  code_descriptions <- lookup_codes(
+  code_descriptions <- CODES(
     codes = result$code,
     code_type = to,
     all_lkps_maps = all_lkps_maps,

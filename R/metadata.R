@@ -78,7 +78,7 @@ CODE_TYPE_TO_LKP_TABLE_MAP <- tibble::tribble(
 
 # CLINICAL_CODE_MAPPINGS_MAP ----------------------------------------------
 
-# used by `map_codes()`
+# used by `MAP()`
 # 'from' and 'to' cols: possible mapping combinations
 # 'mapping_table': the appropriate mapping table to use for a 'from'/'to' combination
 # 'from_col' and 'to_col': the columns to use when mapping
@@ -131,7 +131,7 @@ codeminer_metadata <- function() {
 #'
 #' Retrieves metadata for all tables as a single data frame.
 #'
-#' @inheritParams lookup_codes
+#' @inheritParams CODES
 #'
 #' @return A data frame.
 #' @export

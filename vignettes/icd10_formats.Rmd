@@ -44,13 +44,13 @@ Searching for ICD10 codes in 'ICD10_FORMAT' will yield no results:
 
 ```{r}
 # ICD10_CODE format - no codes found
-lookup_codes(codes = "E10.9",
+CODES(codes = "E10.9",
              code_type = "icd10",
              all_lkps_maps = all_lkps_maps_dummy, 
              unrecognised_codes = "warning")
 
 # ALT_CODE format - now recognised
-lookup_codes(codes = "E109",
+CODES(codes = "E109",
              code_type = "icd10",
              all_lkps_maps = all_lkps_maps_dummy, 
              unrecognised_codes = "warning")
@@ -63,7 +63,7 @@ reformat_icd10_codes(icd10_codes = c("E10.9"),
                      all_lkps_maps = all_lkps_maps_dummy, 
                      input_icd10_format = "ICD10_CODE",
                      output_icd10_format = "ALT_CODE") %>% 
-  lookup_codes(code_type = "icd10",
+  CODES(code_type = "icd10",
                all_lkps_maps = all_lkps_maps_dummy)
 ```
 
@@ -76,7 +76,7 @@ While for many ICD10 codes simply removing the '.' will correctly convert from '
                          all_lkps_maps = all_lkps_maps_dummy, 
                          input_icd10_format = "ICD10_CODE",
                          output_icd10_format = "ALT_CODE") %>% 
-      lookup_codes(code_type = "icd10",
+      CODES(code_type = "icd10",
                    all_lkps_maps = all_lkps_maps_dummy)
     ```
 
@@ -88,7 +88,7 @@ While for many ICD10 codes simply removing the '.' will correctly convert from '
                          all_lkps_maps = all_lkps_maps_dummy, 
                          input_icd10_format = "ICD10_CODE",
                          output_icd10_format = "ALT_CODE") %>% 
-      lookup_codes(code_type = "icd10",
+      CODES(code_type = "icd10",
                    all_lkps_maps = all_lkps_maps_dummy)
 
     m90_alt_code
