@@ -93,7 +93,7 @@
 <span><span class="co">#&gt; 1 G20.. Essential hypertension read2</span></span></code></pre></div>
 <p>Map these to ICD10:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">htn_icd10</span> <span class="op">&lt;-</span> <span class="fu">map_codes</span><span class="op">(</span></span>
+<code class="sourceCode R"><span><span class="va">htn_icd10</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/MAP.html">MAP</a></span><span class="op">(</span></span>
 <span>  codes <span class="op">=</span> <span class="va">htn_read2</span><span class="op">$</span><span class="va">code</span>,</span>
 <span>  from <span class="op">=</span> <span class="st">"read2"</span>,</span>
 <span>  to <span class="op">=</span> <span class="st">"icd10"</span>,</span>
@@ -111,6 +111,33 @@
 <h2 id="uk-biobank">UK Biobank<a class="anchor" aria-label="anchor" href="#uk-biobank"></a>
 </h2>
 <p>Also included are functions for using CALIBER code lists (<code><a href="articles/caliber.html">vignette('caliber')</a></code>) and Phecodes (<code><a href="articles/phecodes.html">vignette('phecodes')</a></code>) with UK Biobank data.</p>
+</div>
+<div class="section level2">
+<h2 id="id_️-development">🏗️ Development<a class="anchor" aria-label="anchor" href="#id_%EF%B8%8F-development"></a>
+</h2>
+<p>Contributions are welcome! Please follow the <a href="https://github.com/codeminer-io/codeminer/blob/main/CONTRIBUTING.md" class="external-link">Contributing Guidelines</a>. To suggest a change, please follow the instructions below.</p>
+<p>Install a <a href="https://www.r-project.org/" class="external-link">recent version of R</a> (<code>&gt;= 4.5.0</code>) and install <a href="https://pak.r-lib.org/" class="external-link"><code>pak</code></a> for package management:</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"pak"</span><span class="op">)</span></span></code></pre></div>
+<p>Though not required, <a href="https://posit.co/download/rstudio-desktop/" class="external-link">RStudio</a> is recommended as an IDE, as it has good support for R package development and Shiny. We also use <a href="https://posit-dev.github.io/air/" class="external-link">air</a> for code formatting. This can be set up as a standalone command line tool or be integrated into your IDE.</p>
+<ol style="list-style-type: decimal">
+<li><p>Clone this repository: <code>git clone https://github.com/codeminer-io/codeminer.git</code></p></li>
+<li>
+<p>Install development dependencies from a fresh R session in your local <code>codeminer</code> directory:</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">pak</span><span class="fu">::</span><span class="fu"><a href="https://pak.r-lib.org/reference/local_install_dev_deps.html" class="external-link">local_install_dev_deps</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+</li>
+<li><p>Create a new branch for your changes, following the naming convention <code>git checkout -b &lt;username&gt;/&lt;my-feature-branch&gt;</code></p></li>
+<li><p>Modify the code as needed</p></li>
+<li><p>Format the code with <code>air</code>, either with your IDE or from the command line: <code>air format &lt;path&gt;</code></p></li>
+<li>
+<p>Run <code>R CMD check</code> locally and fix any errors and warnings, e.g. from an R session:</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">check</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+</li>
+<li><p>Open a <a href="https://github.com/codeminer-io/codeminer/pulls" class="external-link">Pull request</a> against the <code>main</code> branch</p></li>
+</ol>
+<p>For more details about R package development and good practices, see the <a href="https://r-pkgs.org/" class="external-link">R Packages</a> book.</p>
 </div>
 </div>
   </main><aside class="col-md-3"><div class="links">
