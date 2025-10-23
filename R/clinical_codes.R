@@ -37,14 +37,16 @@
 #'   code_type = "icd10",
 #'   all_lkps_maps = all_lkps_maps_dummy
 #' )
-DESCRIPTION <- function(reg_expr,
-                                   code_type = getOption("codeminer.code_type"),
-                                   all_lkps_maps = NULL,
-                                   ignore_case = TRUE,
-                                   codes_only = FALSE,
-                                   preferred_description_only = TRUE,
-                                   standardise_output = TRUE,
-                                   col_filters = getOption("codeminer.col_filters")) {
+DESCRIPTION <- function(
+  reg_expr,
+  code_type = getOption("codeminer.code_type"),
+  all_lkps_maps = NULL,
+  ignore_case = TRUE,
+  codes_only = FALSE,
+  preferred_description_only = TRUE,
+  standardise_output = TRUE,
+  col_filters = getOption("codeminer.col_filters")
+) {
   # validate args
   assertthat::is.string(reg_expr)
 
