@@ -680,16 +680,19 @@ get_bnf_from_open_prescribing <- function() {
   )
 
   safe_download <- function(url) {
-    tryCatch({
-      httr2::request(url) |>
-        httr2::req_retry(max_tries = 3, backoff = 1) |>
-        httr2::req_perform() |>
-        httr2::resp_body_string() |>
-        readr::read_csv(col_types = cols(.default = "c"))
-    }, error = function(e) {
-      cli::cli_alert_warning("Failed to retrieve URL {.url {url}}, skipping.")
-      return(NULL)
-    })
+    tryCatch(
+      {
+        httr2::request(url) |>
+          httr2::req_retry(max_tries = 3, backoff = 1) |>
+          httr2::req_perform() |>
+          httr2::resp_body_string() |>
+          readr::read_csv(col_types = cols(.default = "c"))
+      },
+      error = function(e) {
+        cli::cli_alert_warning("Failed to retrieve URL {.url {url}}, skipping.")
+        return(NULL)
+      }
+    )
   }
 
   data <- purrr::map(urls, safe_download)
