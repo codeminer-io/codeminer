@@ -1,4 +1,3 @@
-
 # SETUP -------------------------------------------------------------------
 
 caliber_raw <- read_caliber_raw(dummy_caliber_dir_path())
@@ -60,11 +59,13 @@ test_that("Mapped CALIBER codes include undivided 3 char ICD10 codes without 'X'
 test_that("ICD10 code E10 (with MODIFIER_4) is expanded", {
   expect_equal(
     caliber_ukb %>%
-      dplyr::filter(stringr::str_detect(
-        code,
-        "^E10"
-      ) &
-        code_type == "icd10") %>%
+      dplyr::filter(
+        stringr::str_detect(
+          code,
+          "^E10"
+        ) &
+          code_type == "icd10"
+      ) %>%
       dplyr::pull(code),
     c(
       "E10",
@@ -85,11 +86,13 @@ test_that("ICD10 code E10 (with MODIFIER_4) is expanded", {
 test_that("ICD10 code M90.0 (with MODIFIER_5) is expanded", {
   expect_equal(
     caliber_ukb %>%
-      dplyr::filter(stringr::str_detect(
-        code,
-        "^M90"
-      ) &
-        code_type == "icd10") %>%
+      dplyr::filter(
+        stringr::str_detect(
+          code,
+          "^M90"
+        ) &
+          code_type == "icd10"
+      ) %>%
       dplyr::pull(code),
     c(
       "M900",
@@ -110,11 +113,13 @@ test_that("ICD10 code M90.0 (with MODIFIER_5) is expanded", {
 test_that("ICD10 code J45 (with no MODIFIER_4/MODIFIER_5) is expanded", {
   expect_equal(
     caliber_ukb %>%
-      dplyr::filter(stringr::str_detect(
-        code,
-        "^J45"
-      ) &
-        code_type == "icd10") %>%
+      dplyr::filter(
+        stringr::str_detect(
+          code,
+          "^J45"
+        ) &
+          code_type == "icd10"
+      ) %>%
       dplyr::pull(code),
     c(
       "J45",
@@ -129,11 +134,13 @@ test_that("ICD10 code J45 (with no MODIFIER_4/MODIFIER_5) is expanded", {
 test_that("Full description appended for expanded 3 character ICD10 codes", {
   expect_equal(
     caliber_ukb %>%
-      dplyr::filter(stringr::str_detect(
-        code,
-        "^J45"
-      ) &
-        code_type == "icd10") %>%
+      dplyr::filter(
+        stringr::str_detect(
+          code,
+          "^J45"
+        ) &
+          code_type == "icd10"
+      ) %>%
       dplyr::pull(description),
     c(
       "Asthma",
@@ -171,8 +178,10 @@ test_that("Error raised if overlapping disease categories in mapped CALIBER code
 test_that("ICD9 has been mapped to", {
   expect_equal(
     caliber_ukb %>%
-      dplyr::filter(category == "Diagnosis of Asthma" &
-        code_type == "icd9") %>%
+      dplyr::filter(
+        category == "Diagnosis of Asthma" &
+          code_type == "icd9"
+      ) %>%
       dplyr::pull(code) %>%
       sort(),
     c(
@@ -188,8 +197,10 @@ test_that("ICD9 has been mapped to", {
 test_that("Read 3 has been mapped to", {
   expect_equal(
     caliber_ukb %>%
-      dplyr::filter(category == "Type I diabetes mellitus (3)" &
-        code_type == "read3") %>%
+      dplyr::filter(
+        category == "Type I diabetes mellitus (3)" &
+          code_type == "read3"
+      ) %>%
       dplyr::pull(code),
     "X40J4"
   )

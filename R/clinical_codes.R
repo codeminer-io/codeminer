@@ -1,6 +1,3 @@
-
-
-
 # OVERVIEW ----------------------------------------------------------------
 
 # Functions to map between different clinical codes e.g. between Read2 and
@@ -12,7 +9,6 @@
 # EXPORTED FUNCTIONS ------------------------------------------------------
 
 # Exploring and mapping clinical codes ------------------------------------
-
 
 #' Search for codes that match a description
 #'
@@ -41,19 +37,22 @@
 #'   code_type = "icd10",
 #'   all_lkps_maps = all_lkps_maps_dummy
 #' )
-code_descriptions_like <- function(reg_expr,
-                                   code_type = getOption("codeminer.code_type"),
-                                   all_lkps_maps = NULL,
-                                   ignore_case = TRUE,
-                                   codes_only = FALSE,
-                                   preferred_description_only = TRUE,
-                                   standardise_output = TRUE,
-                                   col_filters = getOption("codeminer.col_filters")) {
+code_descriptions_like <- function(
+  reg_expr,
+  code_type = getOption("codeminer.code_type"),
+  all_lkps_maps = NULL,
+  ignore_case = TRUE,
+  codes_only = FALSE,
+  preferred_description_only = TRUE,
+  standardise_output = TRUE,
+  col_filters = getOption("codeminer.col_filters")
+) {
   # validate args
   assertthat::is.string(reg_expr)
 
-  assertthat::assert_that(!(codes_only & standardise_output),
-                          msg = "Error! `codes_only` and `standardise_output` cannot both be `TRUE`"
+  assertthat::assert_that(
+    !(codes_only & standardise_output),
+    msg = "Error! `codes_only` and `standardise_output` cannot both be `TRUE`"
   )
 
   match.arg(
@@ -112,19 +111,18 @@ code_descriptions_like <- function(reg_expr,
   } else {
     # if `ignore_case` is `FALSE`, then same code will work for both data
     # frame/tbl_dbi object
-  result <- all_lkps_maps[[lkp_table]] %>%
-    dplyr::filter(stringr::str_detect(
-      string = .data[[description_col]],
-      pattern = reg_expr
-    )) %>%
-    dplyr::collect()
+    result <- all_lkps_maps[[lkp_table]] %>%
+      dplyr::filter(stringr::str_detect(
+        string = .data[[description_col]],
+        pattern = reg_expr
+      )) %>%
+      dplyr::collect()
   }
 
   ## then expand to include both primary and secondary descriptions
   codes <- unique(result[[code_col]])
 
-  codes <- subset(codes,
-                  !is.na(codes))
+  codes <- subset(codes, !is.na(codes))
 
   result <- CODES(
     codes = codes,
@@ -174,17 +172,22 @@ code_descriptions_like <- function(reg_expr,
 #'   code_type = "icd10",
 #'   all_lkps_maps = all_lkps_maps_dummy
 #' )
-CODES_LIKE <- function(reg_expr,
-                       code_type = getOption("codeminer.code_type"),
-                       all_lkps_maps = NULL,
-                       codes_only = FALSE,
-                       preferred_description_only = TRUE,
-                       standardise_output = TRUE,
-                       col_filters = getOption("codeminer.col_filters")) {
+CODES_LIKE <- function(
+  reg_expr,
+  code_type = getOption("codeminer.code_type"),
+  all_lkps_maps = NULL,
+  codes_only = FALSE,
+  preferred_description_only = TRUE,
+  standardise_output = TRUE,
+  col_filters = getOption("codeminer.col_filters")
+) {
   # validate args
   assertthat::is.string(reg_expr)
 
-  assertthat::assert_that(!(codes_only & standardise_output), msg = "Error! `codes_only` and `standardise_output` cannot both be `TRUE`")
+  assertthat::assert_that(
+    !(codes_only & standardise_output),
+    msg = "Error! `codes_only` and `standardise_output` cannot both be `TRUE`"
+  )
 
   match.arg(arg = code_type, choices = CODE_TYPE_TO_LKP_TABLE_MAP$code)
 
@@ -196,15 +199,24 @@ CODES_LIKE <- function(reg_expr,
   lkp_table <- get_lookup_sheet(code_type = code_type)
 
   # determine code and description columns for lookup sheet
-  code_col <- get_col_for_lookup_sheet(lookup_sheet = lkp_table, column = "code_col")
+  code_col <- get_col_for_lookup_sheet(
+    lookup_sheet = lkp_table,
+    column = "code_col"
+  )
 
   description_col <-
-    get_col_for_lookup_sheet(lookup_sheet = lkp_table, column = "description_col")
+    get_col_for_lookup_sheet(
+      lookup_sheet = lkp_table,
+      column = "description_col"
+    )
 
   # determine relevant column indicating whether code description is preferred
   # (for code types with synonymous code descriptions like read 2 and read 3)
   preferred_description_col <-
-    get_col_for_lookup_sheet(lookup_sheet = lkp_table, column = "preferred_synonym_col")
+    get_col_for_lookup_sheet(
+      lookup_sheet = lkp_table,
+      column = "preferred_synonym_col"
+    )
 
   # get preferred code, if appropriate
   if (!is.na(preferred_description_col)) {
@@ -217,7 +229,10 @@ CODES_LIKE <- function(reg_expr,
   ## get all codes matching regex
 
   result <- all_lkps_maps[[lkp_table]] %>%
-    dplyr::filter(stringr::str_detect(string = .data[[code_col]], pattern = reg_expr)) %>%
+    dplyr::filter(stringr::str_detect(
+      string = .data[[code_col]],
+      pattern = reg_expr
+    )) %>%
     dplyr::collect()
 
   ## then expand, optionally including both primary and secondary descriptions
@@ -299,15 +314,16 @@ DESCRIPTION <- code_descriptions_like
 #'   code_type = "icd10",
 #'   all_lkps_maps = all_lkps_maps_dummy
 #' )
-CODES <- function(codes,
-                         code_type = getOption("codeminer.code_type"),
-                         all_lkps_maps = NULL,
-                         preferred_description_only = TRUE,
-                         standardise_output = TRUE,
-                         unrecognised_codes = getOption("codeminer.unrecognised_codes_lookup"),
-                         col_filters = getOption("codeminer.col_filters"),
-                         .return_unrecognised_codes = FALSE) {
-
+CODES <- function(
+  codes,
+  code_type = getOption("codeminer.code_type"),
+  all_lkps_maps = NULL,
+  preferred_description_only = TRUE,
+  standardise_output = TRUE,
+  unrecognised_codes = getOption("codeminer.unrecognised_codes_lookup"),
+  col_filters = getOption("codeminer.col_filters"),
+  .return_unrecognised_codes = FALSE
+) {
   # TODO - create df and string methods; validate codes df
   if (is.data.frame(codes)) {
     code_type <- codes$code_type[1]
@@ -335,8 +351,10 @@ CODES <- function(codes,
   # determine relevant lookup sheet
   lkp_table <- get_lookup_sheet(code_type = code_type)
 
-  check_table_exists_in_all_lkps_maps(all_lkps_maps = all_lkps_maps,
-                                      table_name = lkp_table)
+  check_table_exists_in_all_lkps_maps(
+    all_lkps_maps = all_lkps_maps,
+    table_name = lkp_table
+  )
 
   # determine code column for lookup sheet
   code_col <- get_col_for_lookup_sheet(
@@ -399,10 +417,14 @@ CODES <- function(codes,
   )
 
   # filter for preferred code descriptions only if requested
-  if (preferred_description_only &
-      !is.na(preferred_description_col)) {
+  if (
+    preferred_description_only &
+      !is.na(preferred_description_col)
+  ) {
     result <- result %>%
-      dplyr::filter(.data[[preferred_description_col]] == preferred_description_code)
+      dplyr::filter(
+        .data[[preferred_description_col]] == preferred_description_code
+      )
   }
 
   # standardise output if requested
@@ -447,15 +469,16 @@ CODES <- function(codes,
 #' @family Clinical code lookups and mappings
 #' @examples
 #' # TODO
-CHILDREN <- function(codes,
-                            code_type = getOption("codeminer.code_type"),
-                            all_lkps_maps = NULL,
-                            codes_only = FALSE,
-                            preferred_description_only = TRUE,
-                            standardise_output = TRUE,
-                            unrecognised_codes = "error",
-                            col_filters = getOption("codeminer.col_filters")) {
-
+CHILDREN <- function(
+  codes,
+  code_type = getOption("codeminer.code_type"),
+  all_lkps_maps = NULL,
+  codes_only = FALSE,
+  preferred_description_only = TRUE,
+  standardise_output = TRUE,
+  unrecognised_codes = "error",
+  col_filters = getOption("codeminer.col_filters")
+) {
   # check codes exist
   codes <- CODES(
     codes = codes,
@@ -489,30 +512,34 @@ CHILDREN <- function(codes,
       preferred_description_only = preferred_description_only,
       col_filters = col_filters
     )
-  } else if (code_type %in% c(
-    "bnf",
-    "icd9",
-    "icd10",
-    "read2",
-    "read2_drugs",
-    "opcs4",
-    "phecode"
-  )) {
-    codes_starting_with(codes = codes,
-                        code_type = code_type,
-                        all_lkps_maps = all_lkps_maps,
-                        codes_only = codes_only,
-                        preferred_description_only = preferred_description_only,
-                        standardise_output = standardise_output,
-                        col_filters = col_filters,
-                        escape_dot = FALSE)
+  } else if (
+    code_type %in%
+      c(
+        "bnf",
+        "icd9",
+        "icd10",
+        "read2",
+        "read2_drugs",
+        "opcs4",
+        "phecode"
+      )
+  ) {
+    codes_starting_with(
+      codes = codes,
+      code_type = code_type,
+      all_lkps_maps = all_lkps_maps,
+      codes_only = codes_only,
+      preferred_description_only = preferred_description_only,
+      standardise_output = standardise_output,
+      col_filters = col_filters,
+      escape_dot = FALSE
+    )
   } else {
     stop(paste0(
       "Currently codeminer is unable to retrieve child codes for ",
       code_type
     ))
   }
-
 }
 
 
@@ -531,14 +558,15 @@ CHILDREN <- function(codes,
 #' @seealso [CHILDREN()], [get_parents_sct()]
 #' @family Clinical code lookups and mappings
 #' @export
-get_children_sct <- function(codes,
-                            standardise_output = TRUE,
-                            include_self = TRUE,
-                            include_descendants = TRUE,
-                            all_lkps_maps = NULL,
-                            preferred_description_only = TRUE,
-                            col_filters = getOption("codeminer.col_filters")) {
-
+get_children_sct <- function(
+  codes,
+  standardise_output = TRUE,
+  include_self = TRUE,
+  include_descendants = TRUE,
+  all_lkps_maps = NULL,
+  preferred_description_only = TRUE,
+  col_filters = getOption("codeminer.col_filters")
+) {
   get_relatives_sct(
     codes = codes,
     filter_col = "destinationId",
@@ -568,13 +596,15 @@ get_children_sct <- function(codes,
 #' @seealso [CHILDREN()], [get_children_sct()]
 #' @family Clinical code lookups and mappings
 #' @export
-get_parents_sct <- function(codes,
-                            standardise_output = TRUE,
-                            include_self = TRUE,
-                            include_ancestors = TRUE,
-                            all_lkps_maps = NULL,
-                            preferred_description_only = TRUE,
-                            col_filters = getOption("codeminer.col_filters")) {
+get_parents_sct <- function(
+  codes,
+  standardise_output = TRUE,
+  include_self = TRUE,
+  include_ancestors = TRUE,
+  all_lkps_maps = NULL,
+  preferred_description_only = TRUE,
+  col_filters = getOption("codeminer.col_filters")
+) {
   get_relatives_sct(
     codes = codes,
     filter_col = "sourceId",
@@ -621,12 +651,14 @@ get_parents_sct <- function(codes,
 #' HAS_ATTRIBUTES(CHILDREN("106544002", code_type = "sct"), relationship_type = "246075003") %AND%
 #'   CHILDREN("40733004", code_type = "sct")
 #' }
-HAS_ATTRIBUTES <- function(attribute_codes,
-                          relationship_type = NULL,
-                          standardise_output = TRUE,
-                          all_lkps_maps = NULL,
-                          preferred_description_only = TRUE,
-                          col_filters = getOption("codeminer.col_filters")) {
+HAS_ATTRIBUTES <- function(
+  attribute_codes,
+  relationship_type = NULL,
+  standardise_output = TRUE,
+  all_lkps_maps = NULL,
+  preferred_description_only = TRUE,
+  col_filters = getOption("codeminer.col_filters")
+) {
   get_relatives_sct(
     codes = attribute_codes,
     filter_col = "destinationId",
@@ -664,12 +696,14 @@ HAS_ATTRIBUTES <- function(attribute_codes,
 #' GET_ATTRIBUTES(enterobacteriaceae_infections,
 #'                relationship_type = "363698007 << Finding site (attribute) >>")
 #' }
-GET_ATTRIBUTES <- function(attribute_codes,
-                          relationship_type = NULL,
-                          standardise_output = TRUE,
-                          all_lkps_maps = NULL,
-                          preferred_description_only = TRUE,
-                          col_filters = getOption("codeminer.col_filters")) {
+GET_ATTRIBUTES <- function(
+  attribute_codes,
+  relationship_type = NULL,
+  standardise_output = TRUE,
+  all_lkps_maps = NULL,
+  preferred_description_only = TRUE,
+  col_filters = getOption("codeminer.col_filters")
+) {
   get_relatives_sct(
     codes = attribute_codes,
     filter_col = "sourceId",
@@ -709,11 +743,13 @@ GET_ATTRIBUTES <- function(attribute_codes,
 #' # codes with acute iritis as an attribute, with one of these attribute types specifically
 #' GET_ATTRIBUTES(acute_iritis, attribute_types[1, ])
 #' }
-ATTRIBUTE_TYPES_FROM <- function(codes,
-                                 standardise_output = TRUE,
-                                 all_lkps_maps = NULL,
-                                 preferred_description_only = TRUE,
-                                 col_filters = getOption("codeminer.col_filters")) {
+ATTRIBUTE_TYPES_FROM <- function(
+  codes,
+  standardise_output = TRUE,
+  all_lkps_maps = NULL,
+  preferred_description_only = TRUE,
+  col_filters = getOption("codeminer.col_filters")
+) {
   get_relatives_sct(
     codes = codes,
     filter_col = "sourceId",
@@ -750,11 +786,13 @@ ATTRIBUTE_TYPES_FROM <- function(codes,
 #' # codes with acute iritis as an attribute, with these attributes type(s)
 #' HAS_ATTRIBUTES(acute_iritis, attribute_types)
 #' }
-ATTRIBUTE_TYPES_TO <- function(codes,
-                                 standardise_output = TRUE,
-                                 all_lkps_maps = NULL,
-                                 preferred_description_only = TRUE,
-                                 col_filters = getOption("codeminer.col_filters")) {
+ATTRIBUTE_TYPES_TO <- function(
+  codes,
+  standardise_output = TRUE,
+  all_lkps_maps = NULL,
+  preferred_description_only = TRUE,
+  col_filters = getOption("codeminer.col_filters")
+) {
   get_relatives_sct(
     codes = codes,
     filter_col = "destinationId",
@@ -769,18 +807,18 @@ ATTRIBUTE_TYPES_TO <- function(codes,
   )
 }
 
-get_relatives_sct <- function(codes = NULL,
-                              filter_col = "destinationId",
-                              return_col = "sourceId",
-                              typeId = "116680003",
-                              standardise_output = TRUE,
-                              include_self = TRUE,
-                              recursive = TRUE,
-                              all_lkps_maps = NULL,
-                              preferred_description_only = TRUE,
-                              col_filters = getOption("codeminer.col_filters")) {
-
-
+get_relatives_sct <- function(
+  codes = NULL,
+  filter_col = "destinationId",
+  return_col = "sourceId",
+  typeId = "116680003",
+  standardise_output = TRUE,
+  include_self = TRUE,
+  recursive = TRUE,
+  all_lkps_maps = NULL,
+  preferred_description_only = TRUE,
+  col_filters = getOption("codeminer.col_filters")
+) {
   if (!is.null(codes)) {
     # TODO - create df and string methods; validate codes df
     if (is.data.frame(codes)) {
@@ -811,8 +849,7 @@ get_relatives_sct <- function(codes = NULL,
     }
   }
 
-  match.arg(filter_col,
-            choices = c("sourceId", "destinationId"))
+  match.arg(filter_col, choices = c("sourceId", "destinationId"))
 
   # set up
   sourceId_filter <- destinationId_filter <- NULL
@@ -826,13 +863,15 @@ get_relatives_sct <- function(codes = NULL,
   }
 
   # get codes from relationship table
-  input_codes <- filter_sct_relationship(codes = NULL,
-                                         sourceId_filter = sourceId_filter,
-                                         destinationId_filter = destinationId_filter,
-                                         typeId_filter = typeId,
-                                         active_only = TRUE,
-                                         recursive = FALSE,
-                                         all_lkps_maps = all_lkps_maps)
+  input_codes <- filter_sct_relationship(
+    codes = NULL,
+    sourceId_filter = sourceId_filter,
+    destinationId_filter = destinationId_filter,
+    typeId_filter = typeId,
+    active_only = TRUE,
+    recursive = FALSE,
+    all_lkps_maps = all_lkps_maps
+  )
 
   sourceId_filter <- destinationId_filter <- NULL
 
@@ -846,13 +885,15 @@ get_relatives_sct <- function(codes = NULL,
 
   # perform search recursively
   if (recursive) {
-  output_codes <- filter_sct_relationship(codes = input_codes,
-                                          sourceId_filter = sourceId_filter,
-                                          destinationId_filter = destinationId_filter,
-                                          typeId_filter = typeId,
-                                          active_only = TRUE,
-                                          recursive = recursive,
-                                          all_lkps_maps = all_lkps_maps)
+    output_codes <- filter_sct_relationship(
+      codes = input_codes,
+      sourceId_filter = sourceId_filter,
+      destinationId_filter = destinationId_filter,
+      typeId_filter = typeId,
+      active_only = TRUE,
+      recursive = recursive,
+      all_lkps_maps = all_lkps_maps
+    )
   } else {
     output_codes <- input_codes
   }
@@ -876,9 +917,11 @@ get_relatives_sct <- function(codes = NULL,
   )
 }
 
-summarise_attributes_sct <- function(codes,
-                                     all_lkps_maps = NULL,
-                                     col_filters = getOption("codeminer.col_filters")) {
+summarise_attributes_sct <- function(
+  codes,
+  all_lkps_maps = NULL,
+  col_filters = getOption("codeminer.col_filters")
+) {
   # TODO - create df and string methods; validate codes df
   if (is.data.frame(codes)) {
     code_type <- unique(codes$code_type)
@@ -892,13 +935,15 @@ summarise_attributes_sct <- function(codes,
     codes <- codes_string_to_vector(codes)
   }
 
-  output_codes <- filter_sct_relationship(codes = NULL,
-                                          sourceId_filter = codes,
-                                          destinationId_filter = NULL,
-                                          typeId_filter = NULL,
-                                          active_only = TRUE,
-                                          recursive = FALSE,
-                                          all_lkps_maps = all_lkps_maps)
+  output_codes <- filter_sct_relationship(
+    codes = NULL,
+    sourceId_filter = codes,
+    destinationId_filter = NULL,
+    typeId_filter = NULL,
+    active_only = TRUE,
+    recursive = FALSE,
+    all_lkps_maps = all_lkps_maps
+  )
 
   typeID_descriptions <- CODES(
     codes = output_codes$typeId,
@@ -913,43 +958,50 @@ summarise_attributes_sct <- function(codes,
 
   output_descriptions <- output_codes %>%
     as.list() %>%
-    purrr::map(\(x) CODES(
-      codes = x,
-      code_type = "sct",
-      all_lkps_maps = all_lkps_maps,
-      preferred_description_only = TRUE,
-      standardise_output = TRUE,
-      col_filters = col_filters,
-      unrecognised_codes = "error",
-      .return_unrecognised_codes = FALSE
-    ) %>%
-      dplyr::select(-tidyselect::all_of("code_type"))) %>%
-    purrr::imap(\(x, idx) x %>%
-                  dplyr::rename_with(~ paste0(idx, "_description"),
-                                     tidyselect::all_of("description")) %>%
-                  dplyr::rename_with(~ idx,
-                                     tidyselect::all_of("code")))
+    purrr::map(\(x) {
+      CODES(
+        codes = x,
+        code_type = "sct",
+        all_lkps_maps = all_lkps_maps,
+        preferred_description_only = TRUE,
+        standardise_output = TRUE,
+        col_filters = col_filters,
+        unrecognised_codes = "error",
+        .return_unrecognised_codes = FALSE
+      ) %>%
+        dplyr::select(-tidyselect::all_of("code_type"))
+    }) %>%
+    purrr::imap(\(x, idx) {
+      x %>%
+        dplyr::rename_with(
+          ~ paste0(idx, "_description"),
+          tidyselect::all_of("description")
+        ) %>%
+        dplyr::rename_with(~idx, tidyselect::all_of("code"))
+    })
 
   result <- output_codes
 
   for (x in names(output_descriptions)) {
     result <- result %>%
-      dplyr::full_join(output_descriptions[[x]],
-                       by = x)
+      dplyr::full_join(output_descriptions[[x]], by = x)
   }
 
   result %>%
-    dplyr::select(tidyselect::starts_with("sourceId"),
-                  tidyselect::starts_with("typeId"),
-                  tidyselect::starts_with("destinationId"))
+    dplyr::select(
+      tidyselect::starts_with("sourceId"),
+      tidyselect::starts_with("typeId"),
+      tidyselect::starts_with("destinationId")
+    )
 }
 
-get_attributes_sct <- function(codes,
-                               standardise_output = TRUE,
-                               all_lkps_maps = NULL,
-                               preferred_description_only = TRUE,
-                               col_filters = getOption("codeminer.col_filters")) {
-
+get_attributes_sct <- function(
+  codes,
+  standardise_output = TRUE,
+  all_lkps_maps = NULL,
+  preferred_description_only = TRUE,
+  col_filters = getOption("codeminer.col_filters")
+) {
   # TODO - create df and string methods; validate codes df
   if (is.data.frame(codes)) {
     code_type <- unique(codes$code_type)
@@ -963,13 +1015,15 @@ get_attributes_sct <- function(codes,
     codes <- codes_string_to_vector(codes)
   }
 
-  output_codes <- filter_sct_relationship(codes = NULL,
-                                          sourceId_filter = codes,
-                                          destinationId_filter = NULL,
-                                          typeId_filter = NULL,
-                                          active_only = TRUE,
-                                          recursive = FALSE,
-                                          all_lkps_maps = all_lkps_maps)
+  output_codes <- filter_sct_relationship(
+    codes = NULL,
+    sourceId_filter = codes,
+    destinationId_filter = NULL,
+    typeId_filter = NULL,
+    active_only = TRUE,
+    recursive = FALSE,
+    all_lkps_maps = all_lkps_maps
+  )
 
   ## then expand to include both primary and secondary descriptions
   result <- unique(output_codes$destinationId)
@@ -1028,17 +1082,18 @@ get_attributes_sct <- function(codes,
 #'   to = "icd10",
 #'   all_lkps_maps = all_lkps_maps_dummy
 #' )
-MAP <- function(codes,
-                      to = getOption("codeminer.map_to"),
-                      from = getOption("codeminer.map_from"),
-                      all_lkps_maps = NULL,
-                      codes_only = FALSE,
-                      standardise_output = TRUE,
-                      unrecognised_codes = getOption("codeminer.unrecognised_codes_mapped"),
-                      preferred_description_only = TRUE,
-                      reverse_mapping = getOption("codeminer.reverse_mapping"),
-                      col_filters = getOption("codeminer.col_filters")) {
-
+MAP <- function(
+  codes,
+  to = getOption("codeminer.map_to"),
+  from = getOption("codeminer.map_from"),
+  all_lkps_maps = NULL,
+  codes_only = FALSE,
+  standardise_output = TRUE,
+  unrecognised_codes = getOption("codeminer.unrecognised_codes_mapped"),
+  preferred_description_only = TRUE,
+  reverse_mapping = getOption("codeminer.reverse_mapping"),
+  col_filters = getOption("codeminer.col_filters")
+) {
   # TODO - create df and string methods; validate codes df
   if (is.data.frame(codes)) {
     from <- unique(codes$code_type)
@@ -1056,12 +1111,14 @@ MAP <- function(codes,
 
   validate_all_lkps_maps()
 
-  assertthat::assert_that(is.logical(codes_only),
-                          msg = "`code_only` must be either 'TRUE' or 'FALSE'"
+  assertthat::assert_that(
+    is.logical(codes_only),
+    msg = "`code_only` must be either 'TRUE' or 'FALSE'"
   )
 
-  assertthat::assert_that(!(codes_only & standardise_output),
-                          msg = "Error! `codes_only` and `standardise_output` cannot both be `TRUE`"
+  assertthat::assert_that(
+    !(codes_only & standardise_output),
+    msg = "Error! `codes_only` and `standardise_output` cannot both be `TRUE`"
   )
 
   # check mapping args and get required details - mapping_table, from_col and
@@ -1076,8 +1133,10 @@ MAP <- function(codes,
   to_col <- mapping_params$to_col
   mapping_table <- mapping_params$mapping_table
 
-  check_table_exists_in_all_lkps_maps(all_lkps_maps = all_lkps_maps,
-                                      table_name = mapping_table)
+  check_table_exists_in_all_lkps_maps(
+    all_lkps_maps = all_lkps_maps,
+    table_name = mapping_table
+  )
 
   # determine relevant column indicating whether code description is preferred
   # (for code types with synonymous code descriptions like read 2 and read 3)
@@ -1185,13 +1244,15 @@ MAP <- function(codes,
 #'   to = "icd10",
 #'   all_lkps_maps = all_lkps_maps_dummy
 #' )
-get_mapping_df <- function(to = getOption("codeminer.map_to"),
-                           from = getOption("codeminer.map_from"),
-                           all_lkps_maps = NULL,
-                           rename_from_to = NULL,
-                           na.rm = TRUE,
-                           reverse_mapping = getOption("codeminer.reverse_mapping"),
-                           col_filters = getOption("codeminer.col_filters")) {
+get_mapping_df <- function(
+  to = getOption("codeminer.map_to"),
+  from = getOption("codeminer.map_from"),
+  all_lkps_maps = NULL,
+  rename_from_to = NULL,
+  na.rm = TRUE,
+  reverse_mapping = getOption("codeminer.reverse_mapping"),
+  col_filters = getOption("codeminer.col_filters")
+) {
   # validate args
 
   # get mapping sheet, from and to cols check mapping args and get required
@@ -1211,17 +1272,20 @@ get_mapping_df <- function(to = getOption("codeminer.map_to"),
     "Error! `rename_from_to` should be a named character vector of length 2, with names 'from' and 'to'"
 
   if (!is.null(rename_from_to)) {
-    assertthat::assert_that(is.character(rename_from_to) &&
-                              (length(rename_from_to) == 2) &&
-                              all(c("from", "to") %in% names(rename_from_to)),
-                            msg = rename_from_to_error_msg
+    assertthat::assert_that(
+      is.character(rename_from_to) &&
+        (length(rename_from_to) == 2) &&
+        all(c("from", "to") %in% names(rename_from_to)),
+      msg = rename_from_to_error_msg
     )
   }
 
   create_db_connection(all_lkps_maps)
 
-  check_table_exists_in_all_lkps_maps(all_lkps_maps = all_lkps_maps,
-                                      table_name = mapping_table)
+  check_table_exists_in_all_lkps_maps(
+    all_lkps_maps = all_lkps_maps,
+    table_name = mapping_table
+  )
 
   # get just distinct combinations of from_col and to_col for mapping_table
   from_to_cols <- c(
@@ -1231,7 +1295,6 @@ get_mapping_df <- function(to = getOption("codeminer.map_to"),
 
   result <- all_lkps_maps[[mapping_table]] %>%
     dplyr::collect()
-
 
   # filter on `col_filters` parameters
   if (!is.null(col_filters)) {
@@ -1254,9 +1317,7 @@ get_mapping_df <- function(to = getOption("codeminer.map_to"),
   # distinct rows only (e.g. read 2 'J5310' maps to both primary and secondary
   # descriptions for read 3 'J5311')
   result <- result %>%
-    dplyr::distinct(dplyr::across(tidyselect::everything()),
-                    .keep_all = TRUE
-    )
+    dplyr::distinct(dplyr::across(tidyselect::everything()), .keep_all = TRUE)
 
   # rename
   if (!is.null(rename_from_to)) {
@@ -1329,12 +1390,14 @@ get_mapping_df <- function(to = getOption("codeminer.map_to"),
 #'   input_icd10_format = "ALT_CODE",
 #'   output_icd10_format = "ICD10_CODE"
 #' )
-reformat_icd10_codes <- function(icd10_codes,
-                                 all_lkps_maps = NULL,
-                                 input_icd10_format = "ICD10_CODE",
-                                 output_icd10_format = "ALT_CODE",
-                                 unrecognised_codes = "error",
-                                 strip_x = FALSE) {
+reformat_icd10_codes <- function(
+  icd10_codes,
+  all_lkps_maps = NULL,
+  input_icd10_format = "ICD10_CODE",
+  output_icd10_format = "ALT_CODE",
+  unrecognised_codes = "error",
+  strip_x = FALSE
+) {
   # validate args
   match.arg(
     arg = input_icd10_format,
@@ -1346,8 +1409,8 @@ reformat_icd10_codes <- function(icd10_codes,
     choices = c("ICD10_CODE", "ALT_CODE")
   )
 
-
-  assertthat::assert_that(input_icd10_format != output_icd10_format,
+  assertthat::assert_that(
+    input_icd10_format != output_icd10_format,
     msg = "Error for `reformat_icd10_codes()`! Input and output icd10 formats cannot be the same"
   )
 
@@ -1400,10 +1463,7 @@ reformat_icd10_codes <- function(icd10_codes,
       unique()
 
     more_or_fewer_returned_codes <-
-      ifelse(input_icd10_format == "ICD10_CODE",
-        yes = "*more*",
-        no = "*fewer*"
-      )
+      ifelse(input_icd10_format == "ICD10_CODE", yes = "*more*", no = "*fewer*")
 
     message(
       "The following ",
@@ -1451,8 +1511,7 @@ reformat_icd10_codes <- function(icd10_codes,
 #' @examples
 #' default_col_filters()
 default_col_filters <- function() {
-  get_col_filters(defaults_only = TRUE,
-                  selected_table = NULL)
+  get_col_filters(defaults_only = TRUE, selected_table = NULL)
 }
 
 
@@ -1469,7 +1528,6 @@ default_col_filters <- function() {
 #' @return `NULL`
 #' @noRd
 create_db_connection <- function(all_lkps_maps) {
-
   expr <- NULL
 
   # connect to database file path if `all_lkps_maps` is a string, or `NULL`
@@ -1508,10 +1566,9 @@ create_db_connection <- function(all_lkps_maps) {
 }
 
 db_tables_to_list <- function(con, md) {
-
   # use "db" schema if motherduck connection
   schema <- NULL
-  if(md) {
+  if (md) {
     schema <- "db"
   }
 
@@ -1521,7 +1578,7 @@ db_tables_to_list <- function(con, md) {
   tables_named <- purrr::set_names(tables)
 
   if (md) {
-    result <-  purrr::map(
+    result <- purrr::map(
       tables_named,
       \(.x) dplyr::tbl(con, DBI::Id(schema = schema, table = .x))
     )
@@ -1549,13 +1606,15 @@ get_all_sct_relation_types <- function(all_lkps_maps = NULL) {
     dplyr::distinct() %>%
     dplyr::collect() %>%
     dplyr::pull(.data[["typeId"]]) %>%
-    CODES(code_type = "sct",
-                 all_lkps_maps = all_lkps_maps,
-                 preferred_description_only = TRUE,
-                 standardise_output = TRUE,
-                 unrecognised_codes = "error",
-                 col_filters = NULL,
-                 .return_unrecognised_codes = FALSE)
+    CODES(
+      code_type = "sct",
+      all_lkps_maps = all_lkps_maps,
+      preferred_description_only = TRUE,
+      standardise_output = TRUE,
+      unrecognised_codes = "error",
+      col_filters = NULL,
+      .return_unrecognised_codes = FALSE
+    )
 }
 
 #' Filter SNOMED CT relationships based on various criteria
@@ -1570,16 +1629,21 @@ get_all_sct_relation_types <- function(all_lkps_maps = NULL) {
 #'
 #' @return A data frame of filtered SNOMED CT relationships.
 #' @export
-filter_sct_relationship <- function(codes = NULL,
-                                    sourceId_filter = NULL,
-                                    destinationId_filter = NULL,
-                                    typeId_filter = NULL,
-                                    active_only = TRUE,
-                                    recursive = FALSE,
-                                    all_lkps_maps = NULL) {
-
+filter_sct_relationship <- function(
+  codes = NULL,
+  sourceId_filter = NULL,
+  destinationId_filter = NULL,
+  typeId_filter = NULL,
+  active_only = TRUE,
+  recursive = FALSE,
+  all_lkps_maps = NULL
+) {
   # validate args
-  stopifnot(!is.null(sourceId_filter) | !is.null(destinationId_filter) | !is.null(typeId_filter))
+  stopifnot(
+    !is.null(sourceId_filter) |
+      !is.null(destinationId_filter) |
+      !is.null(typeId_filter)
+  )
 
   # either `sourceId_filter` or `destinationId_filter` should be `NULL` for
   # recursion
@@ -1589,8 +1653,10 @@ filter_sct_relationship <- function(codes = NULL,
 
   create_db_connection(all_lkps_maps)
 
-  check_table_exists_in_all_lkps_maps(all_lkps_maps = all_lkps_maps,
-                                      table_name = "sct_relationship")
+  check_table_exists_in_all_lkps_maps(
+    all_lkps_maps = all_lkps_maps,
+    table_name = "sct_relationship"
+  )
 
   # get related codes, applying supplied filters
   related_codes <- all_lkps_maps$sct_relationship
@@ -1617,16 +1683,18 @@ filter_sct_relationship <- function(codes = NULL,
   }
 
   related_codes <- related_codes %>%
-    dplyr::select(tidyselect::all_of(c("destinationId", "sourceId", "typeId"))) %>%
+    dplyr::select(tidyselect::all_of(c(
+      "destinationId",
+      "sourceId",
+      "typeId"
+    ))) %>%
     dplyr::collect()
 
-  result <- dplyr::bind_rows(codes,
-                             related_codes) %>%
+  result <- dplyr::bind_rows(codes, related_codes) %>%
     dplyr::distinct()
 
   if (recursive) {
     if (nrow(result) > nrow(codes)) {
-
       ## determine relationship direction
       if (!is.null(destinationId_filter)) {
         destinationId_filter <- unique(result[["sourceId"]])
@@ -1653,7 +1721,6 @@ filter_sct_relationship <- function(codes = NULL,
   } else {
     return(result)
   }
-
 }
 
 #' Get data frame of relatives and attributes for a set of SNOMED codes
@@ -1672,29 +1739,33 @@ filter_sct_relationship <- function(codes = NULL,
 #'   relationship = "116680003",
 #'   relationship_direction = "child"
 #'   )
-get_relatives_attributes_sct <- function(codes = NULL,
-                                         relationship = NULL,
-                                         relationship_direction = "child",
-                                         recursive = TRUE,
-                                         active_only = FALSE,
-                                         all_lkps_maps = NULL) {
-
+get_relatives_attributes_sct <- function(
+  codes = NULL,
+  relationship = NULL,
+  relationship_direction = "child",
+  recursive = TRUE,
+  active_only = FALSE,
+  all_lkps_maps = NULL
+) {
   # Note: does not check whether `codes` or `relationship` exist or not
 
   # Note: returns self and relatives
 
   # validate args
-  match.arg(relationship_direction,
-            choices = c("child", "parent"))
+  match.arg(relationship_direction, choices = c("child", "parent"))
 
   ## determine relationship direction
-  filter_col <- switch(relationship_direction,
-                       child = "destinationId",
-                       parent = "sourceId")
+  filter_col <- switch(
+    relationship_direction,
+    child = "destinationId",
+    parent = "sourceId"
+  )
 
-  return_col <- switch(relationship_direction,
-                       child = "sourceId",
-                       parent = "destinationId")
+  return_col <- switch(
+    relationship_direction,
+    child = "sourceId",
+    parent = "destinationId"
+  )
 
   stopifnot(!is.null(codes) | !is.null(relationship))
 
@@ -1707,8 +1778,7 @@ get_relatives_attributes_sct <- function(codes = NULL,
         codes <- codes_string_to_vector(codes)
       }
 
-      codes <- tibble::tibble(code = codes,
-                              typeId = NA_character_)
+      codes <- tibble::tibble(code = codes, typeId = NA_character_)
     }
   }
 
@@ -1730,16 +1800,18 @@ get_relatives_attributes_sct <- function(codes = NULL,
   #                                      relationship,
   #                                      "'"))
 
-  check_table_exists_in_all_lkps_maps(all_lkps_maps = all_lkps_maps,
-                                      table_name = "sct_relationship")
+  check_table_exists_in_all_lkps_maps(
+    all_lkps_maps = all_lkps_maps,
+    table_name = "sct_relationship"
+  )
 
   # get related codes
   related_codes <- all_lkps_maps$sct_relationship
 
   if (!is.null(codes$code)) {
-  related_codes <-
-    all_lkps_maps$sct_relationship %>%
-    dplyr::filter(.data[[filter_col]] %in% !!codes$code)
+    related_codes <-
+      all_lkps_maps$sct_relationship %>%
+      dplyr::filter(.data[[filter_col]] %in% !!codes$code)
   }
 
   if (!is.null(relationship)) {
@@ -1758,8 +1830,7 @@ get_relatives_attributes_sct <- function(codes = NULL,
 
   names(related_codes)[which(names(related_codes) == return_col)] <- "code"
 
-  result <- dplyr::bind_rows(codes,
-                             related_codes) %>%
+  result <- dplyr::bind_rows(codes, related_codes) %>%
     dplyr::distinct()
 
   if (is.null(codes)) {
@@ -1793,43 +1864,45 @@ get_relatives_attributes_sct <- function(codes = NULL,
 #'
 #' @return List
 #' @export
-get_col_filters <- function(defaults_only = TRUE,
-                            selected_table = NULL) {
-
+get_col_filters <- function(defaults_only = TRUE, selected_table = NULL) {
   # validate args
   stopifnot(is.logical(defaults_only))
 
   stopifnot(
-    selected_table %in% CODE_TYPE_TO_LKP_TABLE_MAP$lkp_table |
+    selected_table %in%
+      CODE_TYPE_TO_LKP_TABLE_MAP$lkp_table |
       selected_table %in% CLINICAL_CODE_MAPPINGS_MAP$mapping_table
   )
 
   # get filter_cols
-  result <- list(lookup = CODE_TYPE_TO_LKP_TABLE_MAP %>%
-                   dplyr::rename("table" = "lkp_table"),
-                 map = CLINICAL_CODE_MAPPINGS_MAP %>%
-                   dplyr::rename("table" = "mapping_table")) %>%
+  result <- list(
+    lookup = CODE_TYPE_TO_LKP_TABLE_MAP %>%
+      dplyr::rename("table" = "lkp_table"),
+    map = CLINICAL_CODE_MAPPINGS_MAP %>%
+      dplyr::rename("table" = "mapping_table")
+  ) %>%
     dplyr::bind_rows(.id = "lookup_map") %>%
     dplyr::select(tidyselect::all_of(c("table", "filter_cols"))) %>%
     dplyr::filter(!is.na(.data[["filter_cols"]]))
 
-  result <- rlang::set_names(result$filter_cols,
-                             nm = result$table) %>%
+  result <- rlang::set_names(result$filter_cols, nm = result$table) %>%
     purrr::map(\(x) x[[1]])
 
   # get either all values, or default selections only for filter_cols
   if (defaults_only) {
     result <- result %>%
-      purrr::map(\(x) x %>%
-                   purrr::map(\(x) subset(x,
-                                          stringr::str_detect(x, "\\*"))))
+      purrr::map(\(x) {
+        x %>%
+          purrr::map(\(x) subset(x, stringr::str_detect(x, "\\*")))
+      })
   }
 
   # remove '*' (these are used to indicate default choices)
   result <- result %>%
-    purrr::map(\(x) x %>%
-                 purrr::map(stringr::str_remove_all,
-                            pattern = "\\*"))
+    purrr::map(\(x) {
+      x %>%
+        purrr::map(stringr::str_remove_all, pattern = "\\*")
+    })
 
   # select single table, if requested
   if (!is.null(selected_table)) {
@@ -1849,14 +1922,16 @@ get_col_filters <- function(defaults_only = TRUE,
 #' @inheritParams CHILDREN
 #' @noRd
 #' @family Clinical code lookups and mappings
-codes_starting_with <- function(codes,
-                                code_type = getOption("codeminer.code_type"),
-                                all_lkps_maps = NULL,
-                                codes_only = FALSE,
-                                preferred_description_only = TRUE,
-                                standardise_output = TRUE,
-                                col_filters = getOption("codeminer.col_filters"),
-                                escape_dot = FALSE) {
+codes_starting_with <- function(
+  codes,
+  code_type = getOption("codeminer.code_type"),
+  all_lkps_maps = NULL,
+  codes_only = FALSE,
+  preferred_description_only = TRUE,
+  standardise_output = TRUE,
+  col_filters = getOption("codeminer.col_filters"),
+  escape_dot = FALSE
+) {
   # validate args
   match.arg(
     arg = code_type,
@@ -1867,12 +1942,14 @@ codes_starting_with <- function(codes,
 
   check_codes(codes)
 
-  assertthat::assert_that(is.logical(codes_only),
-                          msg = "`code_only` must be either 'TRUE' or 'FALSE'"
+  assertthat::assert_that(
+    is.logical(codes_only),
+    msg = "`code_only` must be either 'TRUE' or 'FALSE'"
   )
 
-  assertthat::assert_that(!(codes_only & standardise_output),
-                          msg = "Error! `codes_only` and `standardise_output` cannot both be `TRUE`"
+  assertthat::assert_that(
+    !(codes_only & standardise_output),
+    msg = "Error! `codes_only` and `standardise_output` cannot both be `TRUE`"
   )
 
   # TODO check all sheets are present
@@ -1914,8 +1991,7 @@ codes_starting_with <- function(codes,
 
   # get children (filter for codes which match ANY of those in `codes` arg)
   result <- all_lkps_maps[[lkp_table]] %>%
-    dplyr::filter(stringr::str_detect(.data[[code_col]],
-                                      pattern = codes)) %>%
+    dplyr::filter(stringr::str_detect(.data[[code_col]], pattern = codes)) %>%
     dplyr::collect()
 
   # filter on `col_filters` parameters
@@ -1928,10 +2004,14 @@ codes_starting_with <- function(codes,
   }
 
   # filter for preferred code descriptions only if requested
-  if (preferred_description_only &
-      !is.na(preferred_description_col)) {
+  if (
+    preferred_description_only &
+      !is.na(preferred_description_col)
+  ) {
     result <- result %>%
-      dplyr::filter(.data[[preferred_description_col]] == preferred_description_code)
+      dplyr::filter(
+        .data[[preferred_description_col]] == preferred_description_code
+      )
   }
 
   # return result
@@ -1976,8 +2056,10 @@ codes_starting_with <- function(codes,
 #' @noRd
 #' @family Clinical code lookups and mappings
 get_from_to_mapping_sheet <- function(from, to) {
-  CLINICAL_CODE_MAPPINGS_MAP[(CLINICAL_CODE_MAPPINGS_MAP[["from"]] == from &
-    CLINICAL_CODE_MAPPINGS_MAP[["to"]] == to), ][["mapping_table"]]
+  CLINICAL_CODE_MAPPINGS_MAP[
+    (CLINICAL_CODE_MAPPINGS_MAP[["from"]] == from &
+      CLINICAL_CODE_MAPPINGS_MAP[["to"]] == to),
+  ][["mapping_table"]]
 }
 
 #' Helper function for \code{\link{MAP}}
@@ -1993,8 +2075,7 @@ get_from_to_mapping_sheet <- function(from, to) {
 #' @return character (scalar)
 #' @noRd
 #' @family Clinical code lookups and mappings
-get_value_for_mapping_sheet <- function(mapping_table,
-                                        value) {
+get_value_for_mapping_sheet <- function(mapping_table, value) {
   # validate args
   match.arg(
     arg = mapping_table,
@@ -2010,7 +2091,9 @@ get_value_for_mapping_sheet <- function(mapping_table,
   )
 
   # return specified `value`
-  CLINICAL_CODE_MAPPINGS_MAP[CLINICAL_CODE_MAPPINGS_MAP[["mapping_table"]] == mapping_table, ][[value]]
+  CLINICAL_CODE_MAPPINGS_MAP[
+    CLINICAL_CODE_MAPPINGS_MAP[["mapping_table"]] == mapping_table,
+  ][[value]]
 }
 
 #' Get name of lookup sheet for a clinical code system
@@ -2024,9 +2107,7 @@ get_value_for_mapping_sheet <- function(mapping_table,
 #' @family Clinical code lookups and mappings
 get_lookup_sheet <- function(code_type) {
   # validate args
-  rlang::arg_match(code_type,
-    values = CODE_TYPE_TO_LKP_TABLE_MAP$code
-  )
+  rlang::arg_match(code_type, values = CODE_TYPE_TO_LKP_TABLE_MAP$code)
 
   # get lookup sheet
   CODE_TYPE_TO_LKP_TABLE_MAP %>%
@@ -2045,8 +2126,7 @@ get_lookup_sheet <- function(code_type) {
 #'
 #' @family Clinical code lookups and mappings
 #' @noRd
-get_col_for_lookup_sheet <- function(lookup_sheet,
-                                     column) {
+get_col_for_lookup_sheet <- function(lookup_sheet, column) {
   # validate args
   match.arg(
     arg = lookup_sheet,
@@ -2108,13 +2188,16 @@ get_preferred_description_code_for_lookup_sheet <-
 #' @return A data frame with the following column names: 'disease',
 #'   'description', 'category', 'code_type', 'code' and 'author'.
 #' @noRd
-reformat_standardised_codelist <- function(standardised_codelist,
-                                           code_type = getOption("codeminer.code_type"),
-                                           disease,
-                                           disease_category,
-                                           author) {
+reformat_standardised_codelist <- function(
+  standardised_codelist,
+  code_type = getOption("codeminer.code_type"),
+  disease,
+  disease_category,
+  author
+) {
   # validate args
-  assertthat::assert_that(is.data.frame(standardised_codelist),
+  assertthat::assert_that(
+    is.data.frame(standardised_codelist),
     msg = "Error! standardised_codelist must be a data frame (or tibble/data table"
   )
 
@@ -2123,19 +2206,22 @@ reformat_standardised_codelist <- function(standardised_codelist,
   assertthat::is.string(disease_category)
   assertthat::is.string(author)
 
-  match.arg(code_type,
+  match.arg(
+    code_type,
     choices = ukbwranglr:::CLINICAL_EVENTS_SOURCES$data_coding
-  )
-
-  assertthat::assert_that(all(
-    names(standardised_codelist) == c("code", "description", "code_type")
-  ),
-  msg = "Error! `standardised_codelist` must be a data frame with the following headings: 'code', 'description', 'code_type'"
   )
 
   assertthat::assert_that(
     all(
-      standardised_codelist$code_type %in% unique(ukbwranglr:::CLINICAL_EVENTS_SOURCES$data_coding)
+      names(standardised_codelist) == c("code", "description", "code_type")
+    ),
+    msg = "Error! `standardised_codelist` must be a data frame with the following headings: 'code', 'description', 'code_type'"
+  )
+
+  assertthat::assert_that(
+    all(
+      standardised_codelist$code_type %in%
+        unique(ukbwranglr:::CLINICAL_EVENTS_SOURCES$data_coding)
     ),
     msg = paste0(
       "Error! `standardised_codelist$code_type` contains unrecognised code types. Recognised code types: ",
@@ -2170,11 +2256,7 @@ reformat_standardised_codelist <- function(standardised_codelist,
 }
 
 standardise_output_fn <-
-  function(df,
-           lkp_table,
-           code_col,
-           description_col,
-           code_type) {
+  function(df, lkp_table, code_col, description_col, code_type) {
     names(df)[which(names(df) == code_col)] <- "code"
     names(df)[which(names(df) == description_col)] <- "description"
 
@@ -2202,9 +2284,7 @@ standardise_output_fn <-
 #'
 #' @return A dataframe
 #' @noRd
-filter_cols <- function(df,
-                        df_name,
-                        col_filters = NULL) {
+filter_cols <- function(df, df_name, col_filters = NULL) {
   # if `col_filters` is `NULL`, return `df` unchanged (exit early)
   if (is.null(col_filters)) {
     return(df)
@@ -2231,8 +2311,9 @@ filter_cols <- function(df,
   col_filters_item_types <- col_filters %>%
     purrr::map_lgl(\(x) is.vector(x) || is.null(x))
 
-  assertthat::assert_that(sum(!col_filters_item_types) == 0,
-                          msg = "Each item in `col_filters` must be a vector"
+  assertthat::assert_that(
+    sum(!col_filters_item_types) == 0,
+    msg = "Each item in `col_filters` must be a vector"
   )
 
   # check that column names exist in df. Raise error is any are unrecognised.
@@ -2307,33 +2388,24 @@ filter_cols <- function(df,
 #'   "A38X",
 #'   "G01XA"
 #' ))
-rm_or_extract_appended_icd10_dxa <- function(icd10_codes,
-                                             keep_x = TRUE,
-                                             rm_extract = "rm") {
+rm_or_extract_appended_icd10_dxa <- function(
+  icd10_codes,
+  keep_x = TRUE,
+  rm_extract = "rm"
+) {
   # validate args
-  match.arg(rm_extract,
-    choices = c("rm", "extract")
-  )
+  match.arg(rm_extract, choices = c("rm", "extract"))
 
   stopifnot(is.character(icd10_codes))
 
   # either remove or extract appended 'D'/'X'/'A' from `icd10_codes`
-  pattern <- ifelse(keep_x,
-    yes = "[D|A]*$",
-    no = "[D|X|A]*$"
-  )
+  pattern <- ifelse(keep_x, yes = "[D|A]*$", no = "[D|X|A]*$")
 
-  switch(rm_extract,
-    rm = stringr::str_remove(icd10_codes,
-      pattern = pattern
-    ),
-    extract = stringr::str_extract(icd10_codes,
-      pattern = pattern
-    ) %>%
-      ifelse(. == "",
-        yes = NA_character_,
-        no = .
-      )
+  switch(
+    rm_extract,
+    rm = stringr::str_remove(icd10_codes, pattern = pattern),
+    extract = stringr::str_extract(icd10_codes, pattern = pattern) %>%
+      ifelse(. == "", yes = NA_character_, no = .)
   )
 }
 
@@ -2350,38 +2422,41 @@ rm_or_extract_appended_icd10_dxa <- function(icd10_codes,
 #'
 #' @return A data frame or a named list (see argument `as_named_list`).
 #' @noRd
-get_icd10_code_alt_code_x_map <- function(icd10_lkp,
-                                          undivided_3char_only = FALSE,
-                                          as_named_list = NULL) {
-
+get_icd10_code_alt_code_x_map <- function(
+  icd10_lkp,
+  undivided_3char_only = FALSE,
+  as_named_list = NULL
+) {
   # validate args
-  match.arg(as_named_list,
-    choices = c("names_no_x", "names_with_x")
-  )
+  match.arg(as_named_list, choices = c("names_no_x", "names_with_x"))
 
   # make mapping df
   icd10_lkp_alt_x_map <- icd10_lkp %>%
     dplyr::select(tidyselect::all_of("ALT_CODE")) %>%
     dplyr::filter(!is.na(.data[["ALT_CODE"]])) %>%
     dplyr::collect() %>%
-    dplyr::mutate("ALT_CODE_minus_x" = stringr::str_remove(.data[["ALT_CODE"]],
-      pattern = "X$"
-    ))
+    dplyr::mutate(
+      "ALT_CODE_minus_x" = stringr::str_remove(
+        .data[["ALT_CODE"]],
+        pattern = "X$"
+      )
+    )
 
   # check that all codes are unique
   stopifnot(
-    length(icd10_lkp_alt_x_map$ALT_CODE) == dplyr::n_distinct(icd10_lkp_alt_x_map$ALT_CODE)
+    length(icd10_lkp_alt_x_map$ALT_CODE) ==
+      dplyr::n_distinct(icd10_lkp_alt_x_map$ALT_CODE)
   )
   stopifnot(
-    length(icd10_lkp_alt_x_map$ALT_CODE_minus_x) == dplyr::n_distinct(icd10_lkp_alt_x_map$ALT_CODE_minus_x)
+    length(icd10_lkp_alt_x_map$ALT_CODE_minus_x) ==
+      dplyr::n_distinct(icd10_lkp_alt_x_map$ALT_CODE_minus_x)
   )
 
   # check that all codes are the same comparing `ALT_CODE` and
   # `ALT_CODE_minus_x`, after removing the X in `ALT_CODE`
   stopifnot(all(
-    icd10_lkp_alt_x_map$ALT_CODE_minus_x == stringr::str_remove(icd10_lkp_alt_x_map$ALT_CODE,
-      pattern = "X$"
-    )
+    icd10_lkp_alt_x_map$ALT_CODE_minus_x ==
+      stringr::str_remove(icd10_lkp_alt_x_map$ALT_CODE, pattern = "X$")
   ))
 
   if (undivided_3char_only) {
@@ -2391,7 +2466,8 @@ get_icd10_code_alt_code_x_map <- function(icd10_lkp,
 
   # convert to named list
   if (!is.null(as_named_list)) {
-    icd10_lkp_alt_x_map <- switch(as_named_list,
+    icd10_lkp_alt_x_map <- switch(
+      as_named_list,
       names_no_x = icd10_lkp_alt_x_map %>%
         tidyr::pivot_wider(
           names_from = "ALT_CODE_minus_x",
@@ -2424,9 +2500,7 @@ get_icd10_code_alt_code_x_map <- function(icd10_lkp,
 #'
 #' @noRd
 #' @return A character vector of
-get_icd10_code_range <- function(start_icd10_code,
-                                 end_icd10_code,
-                                 icd10_lkp) {
+get_icd10_code_range <- function(start_icd10_code, end_icd10_code, icd10_lkp) {
   # validate args
   stopifnot(is.character(start_icd10_code))
   stopifnot(is.character(end_icd10_code))
@@ -2435,10 +2509,11 @@ get_icd10_code_range <- function(start_icd10_code,
     stringr::str_length(stringr::str_remove(
       start_icd10_code,
       "X$"
-    )) == stringr::str_length(stringr::str_remove(
-      end_icd10_code,
-      "X$"
-    )),
+    )) ==
+      stringr::str_length(stringr::str_remove(
+        end_icd10_code,
+        "X$"
+      )),
     msg = paste0(
       "`start_icd10_code` and `end_icd10_code` must have the same number of characters. Start/end values provided: ",
       start_icd10_code,
@@ -2480,16 +2555,14 @@ get_icd10_code_range <- function(start_icd10_code,
     dplyr::filter(.data[[".rowid"]] %in% icd10_lkp_rowids) %>%
     dplyr::pull(.data[["ALT_CODE"]])
 
-  pattern <- stringr::str_c(paste0("^", result),
-    sep = "",
-    collapse = "|"
-  )
+  pattern <- stringr::str_c(paste0("^", result), sep = "", collapse = "|")
 
   # expand (e.g. for 'A80-A81', at this stage all 'A80' should be present
   # ('A800-A809'), but for 'A81', only 'A81' wil be present - needs expanding
   # to 'A801-A819')
   result <- icd10_lkp %>%
-    dplyr::filter(stringr::str_detect(.data[["ALT_CODE"]],
+    dplyr::filter(stringr::str_detect(
+      .data[["ALT_CODE"]],
       pattern = pattern
     )) %>%
     dplyr::pull(.data[["ALT_CODE"]])
@@ -2509,18 +2582,18 @@ get_icd10_code_range <- function(start_icd10_code,
 #'
 #' @return A data frame
 #' @noRd
-expand_icd10_ranges <- function(read_v2_icd10,
-                                icd10_lkp,
-                                icd10_lkp_alt_x_map) {
+expand_icd10_ranges <- function(read_v2_icd10, icd10_lkp, icd10_lkp_alt_x_map) {
   # validate args
-  assertthat::assert_that(all(
-    c(
-      "read_code",
-      "icd10_code",
-      "icd10_code_def"
-    ) %in% names(read_v2_icd10)
-  ),
-  msg = "Unexpected column names in `read_v2_icd10`"
+  assertthat::assert_that(
+    all(
+      c(
+        "read_code",
+        "icd10_code",
+        "icd10_code_def"
+      ) %in%
+        names(read_v2_icd10)
+    ),
+    msg = "Unexpected column names in `read_v2_icd10`"
   )
 
   # separate by '-'
@@ -2534,10 +2607,13 @@ expand_icd10_ranges <- function(read_v2_icd10,
     )
 
   read_v2_icd10 <- read_v2_icd10 %>%
-    dplyr::mutate("start_icd10_code" = ifelse(is.na(.data[["end_icd10_code"]]),
-      yes = NA_character_,
-      no = .data[["start_icd10_code"]]
-    ))
+    dplyr::mutate(
+      "start_icd10_code" = ifelse(
+        is.na(.data[["end_icd10_code"]]),
+        yes = NA_character_,
+        no = .data[["start_icd10_code"]]
+      )
+    )
 
   # strip any appended 'D/X/A' (last character(s) e.g. 'A89X' and 'A170D' become
   # 'A89' and 'A170'. 'G01XA' would become 'G01', although note that this code
@@ -2571,28 +2647,35 @@ expand_icd10_ranges <- function(read_v2_icd10,
   # expand range
   read_v2_icd10 %>%
     dplyr::rowwise() %>%
-    dplyr::mutate(icd10_range_new = ifelse(
-      is.na(.data[["start_icd10_code"]]),
-      yes = list(NA_character_),
-      no = list(
-        get_icd10_code_range(
-          start_icd10_code = .data[["start_icd10_code"]],
-          end_icd10_code = .data[["end_icd10_code"]],
-          icd10_lkp = icd10_lkp
+    dplyr::mutate(
+      icd10_range_new = ifelse(
+        is.na(.data[["start_icd10_code"]]),
+        yes = list(NA_character_),
+        no = list(
+          get_icd10_code_range(
+            start_icd10_code = .data[["start_icd10_code"]],
+            end_icd10_code = .data[["end_icd10_code"]],
+            icd10_lkp = icd10_lkp
+          )
         )
       )
-    )) %>%
+    ) %>%
     dplyr::ungroup() %>%
     tidyr::unnest(cols = "icd10_range_new") %>%
-    dplyr::mutate("icd10_code" = ifelse(is.na(.data[["icd10_range_new"]]),
-      yes = .data[["icd10_code"]],
-      no = .data[["icd10_range_new"]]
-    )) %>%
-    dplyr::select(-tidyselect::all_of(c(
-      "start_icd10_code",
-      "end_icd10_code",
-      "icd10_range_new"
-    )))
+    dplyr::mutate(
+      "icd10_code" = ifelse(
+        is.na(.data[["icd10_range_new"]]),
+        yes = .data[["icd10_code"]],
+        no = .data[["icd10_range_new"]]
+      )
+    ) %>%
+    dplyr::select(
+      -tidyselect::all_of(c(
+        "start_icd10_code",
+        "end_icd10_code",
+        "icd10_range_new"
+      ))
+    )
 }
 
 codes_string_to_vector <- function(codes) {
@@ -2606,24 +2689,23 @@ codes_string_to_vector <- function(codes) {
 ## Validation helpers ---------------------------
 
 check_codes <- function(codes) {
-  assertthat::assert_that(is.character(codes),
-                          msg = "Error! `codes` must be a character vector")
+  assertthat::assert_that(
+    is.character(codes),
+    msg = "Error! `codes` must be a character vector"
+  )
 
-  assertthat::assert_that(sum(is.na(codes)) == 0,
-                          msg = "Error! `codes` cannot contain `NA` values")
+  assertthat::assert_that(
+    sum(is.na(codes)) == 0,
+    msg = "Error! `codes` cannot contain `NA` values"
+  )
 }
 
-check_mapping_args <- function(from,
-                               to,
-                               reverse_mapping = "error") {
-
+check_mapping_args <- function(from, to, reverse_mapping = "error") {
   if (identical(reverse_mapping, NULL)) {
     reverse_mapping <- "error"
   }
 
-  match.arg(reverse_mapping,
-            choices = c("error", "warning")
-  )
+  match.arg(reverse_mapping, choices = c("error", "warning"))
 
   if (identical(from, NULL)) {
     from <- ""
@@ -2645,8 +2727,9 @@ check_mapping_args <- function(from,
   )
   # choices = CLINICAL_CODE_MAPPINGS_MAP$to)
 
-  assertthat::assert_that(!identical(from, to),
-                          msg = "Error! `from` and `to` args cannot be the same"
+  assertthat::assert_that(
+    !identical(from, to),
+    msg = "Error! `from` and `to` args cannot be the same"
   )
 
   # get appropriate mapping sheet
@@ -2663,12 +2746,13 @@ check_mapping_args <- function(from,
   if (rlang::is_empty(mapping_table)) {
     stop("Error! Invalid (or unavailable) code mapping request")
   } else if (swap_mapping_cols) {
-    switch(reverse_mapping,
-           error = stop("No mapping sheet available for this request"),
-           warning = warning(
-             "No mapping sheet available for this request. Attempting to map anyway using: ",
-             mapping_table
-           )
+    switch(
+      reverse_mapping,
+      error = stop("No mapping sheet available for this request"),
+      warning = warning(
+        "No mapping sheet available for this request. Attempting to map anyway using: ",
+        mapping_table
+      )
     )
   }
 
@@ -2707,7 +2791,6 @@ check_mapping_args <- function(from,
 }
 
 check_all_lkps_maps_path <- function(file_path, md = FALSE) {
-
   # determine whether using motherduck
   if (md) {
     # connect - requires motherduck extension and `motherduck_token`
@@ -2716,8 +2799,10 @@ check_all_lkps_maps_path <- function(file_path, md = FALSE) {
     DBI::dbExecute(con, stringr::str_glue("ATTACH '{file_path}' AS db;"))
   } else {
     # check file exists
-    assertthat::assert_that(file.exists(file_path),
-                            msg = paste0("Error! No file found at ", file_path))
+    assertthat::assert_that(
+      file.exists(file_path),
+      msg = paste0("Error! No file found at ", file_path)
+    )
 
     # check file ends with '.db'
     assertthat::assert_that(stringr::str_detect(
@@ -2732,9 +2817,9 @@ check_all_lkps_maps_path <- function(file_path, md = FALSE) {
   return(con)
 }
 
-check_rowid_col_present <- function(df,
-                                    df_name) {
-  assertthat::assert_that(".rowid" %in% names(df),
+check_rowid_col_present <- function(df, df_name) {
+  assertthat::assert_that(
+    ".rowid" %in% names(df),
     msg = paste0(
       "'.rowid' column not present in `",
       df_name,
@@ -2767,36 +2852,34 @@ check_rowid_col_present <- function(df,
 #' @noRd
 #' @family Clinical code lookups and mappings
 handle_unrecognised_codes <-
-  function(unrecognised_codes,
-           missing_codes,
-           table_name,
-           code_type) {
-
+  function(unrecognised_codes, missing_codes, table_name, code_type) {
     if (is.null(unrecognised_codes)) {
       unrecognised_codes <- "error"
     }
 
-    match.arg(unrecognised_codes,
-              choices = c("error", "warning"))
+    match.arg(unrecognised_codes, choices = c("error", "warning"))
 
     # make sure missing_codes are unique, if not already
     missing_codes <- unique(missing_codes)
 
     # only display first 25 codes
     if (length(missing_codes) > 25) {
-      missing_codes_to_print <- utils::head(missing_codes,
-                                            n = 25)
+      missing_codes_to_print <- utils::head(missing_codes, n = 25)
     } else {
       missing_codes_to_print <- missing_codes
     }
 
-    missing_codes_to_print <- stringr::str_c(missing_codes_to_print,
-                                             sep = "",
-                                             collapse = "', '")
+    missing_codes_to_print <- stringr::str_c(
+      missing_codes_to_print,
+      sep = "",
+      collapse = "', '"
+    )
 
     if (length(missing_codes) > 25) {
-      missing_codes_to_print <- paste0(missing_codes_to_print,
-                                       " (first 25 only shown)")
+      missing_codes_to_print <- paste0(
+        missing_codes_to_print,
+        " (first 25 only shown)"
+      )
     }
 
     if (length(missing_codes) > 0) {
@@ -2816,9 +2899,11 @@ handle_unrecognised_codes <-
         "'"
       )
 
-      switch(unrecognised_codes,
-             error = stop(missing_codes_message),
-             warning = warning(missing_codes_message))
+      switch(
+        unrecognised_codes,
+        error = stop(missing_codes_message),
+        warning = warning(missing_codes_message)
+      )
     }
   }
 
@@ -2838,12 +2923,14 @@ handle_unrecognised_codes <-
 #' @noRd
 #' @return Return vector of unrecognised codes if `return_missing_codes` is
 #'   `TRUE`, otherwise called for side effect (error if any unrecognised codes)
-check_codes_exist <- function(codes,
-                              lkp_codes,
-                              table_name,
-                              code_type = getOption("codeminer.code_type"),
-                              return_unrecognised_codes = FALSE,
-                              unrecognised_codes = "error") {
+check_codes_exist <- function(
+  codes,
+  lkp_codes,
+  table_name,
+  code_type = getOption("codeminer.code_type"),
+  return_unrecognised_codes = FALSE,
+  unrecognised_codes = "error"
+) {
   # check for unrecognised('missing') codes
   missing_codes <- subset(codes, !codes %in% lkp_codes)
 
@@ -2861,12 +2948,9 @@ check_codes_exist <- function(codes,
   )
 }
 
-check_table_exists_in_all_lkps_maps <- function(all_lkps_maps,
-                                                table_name) {
+check_table_exists_in_all_lkps_maps <- function(all_lkps_maps, table_name) {
   assertthat::assert_that(
     table_name %in% names(all_lkps_maps),
-    msg = paste0("Required table ",
-                 table_name,
-                 " not found in `all_lkps_maps`")
+    msg = paste0("Required table ", table_name, " not found in `all_lkps_maps`")
   )
 }

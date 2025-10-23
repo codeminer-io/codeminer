@@ -1,10 +1,6 @@
-
-
 # PUBLIC ------------------------------------------------------------------
 
-
 ## Set ops -----------------------------------------------------------------
-
 
 #' Infix set operations
 #'
@@ -55,11 +51,13 @@ UPDATE_CODE_SELECTION_MATCHING_VARS <- c("disease", "code_type", "code")
 
 # PRIVATE -----------------------------------------------------------------
 
-read_excel_to_named_list <- function(path,
-                                     to_include = NULL,
-                                     to_exclude = NULL,
-                                     col_types = "text",
-                                     ...) {
+read_excel_to_named_list <- function(
+  path,
+  to_include = NULL,
+  to_exclude = NULL,
+  col_types = "text",
+  ...
+) {
   # validate args
   if (!is.null(to_include) & !is.null(to_exclude)) {
     stop("Error! One or both of `to_include` and `to_exclude` must be `NULL`")
@@ -82,11 +80,7 @@ read_excel_to_named_list <- function(path,
   # read sheets into named list
   sheet_names %>%
     purrr::set_names() %>%
-    purrr::map(readxl::read_excel,
-      path = path,
-      col_types = col_types,
-      ...
-    )
+    purrr::map(readxl::read_excel, path = path, col_types = col_types, ...)
 }
 
 #' Remove footer rows from a table in UKB resource 592
@@ -102,25 +96,27 @@ read_excel_to_named_list <- function(path,
 #'
 #' @return A data frame
 #' @noRd
-rm_footer_rows_all_lkps_maps_df <- function(df,
-                                            footer_metadata_col_idx = 1) {
+rm_footer_rows_all_lkps_maps_df <- function(df, footer_metadata_col_idx = 1) {
   # get colname for column containing footer metadata (column 1 by default)
   footer_metadata_col_colname <- names(df)[footer_metadata_col_idx]
 
   # get rowids for rows with `NA` in column containing footer metadata
   df <- df %>%
     tibble::rowid_to_column() %>%
-    dplyr::mutate("rowid" = ifelse(
-      !is.na(.data[[footer_metadata_col_colname]]),
-      yes = NA_character_,
-      no = .data[["rowid"]]
-    ))
+    dplyr::mutate(
+      "rowid" = ifelse(
+        !is.na(.data[[footer_metadata_col_colname]]),
+        yes = NA_character_,
+        no = .data[["rowid"]]
+      )
+    )
 
   # get max rowid (for rows with `NA` in column 1)
   max_rowid <- as.character(max(as.integer(df$rowid), na.rm = TRUE))
 
   # error if more than 3 rows will be removed
-  assertthat::assert_that(as.integer(max_rowid) >= (nrow(df) - 2),
+  assertthat::assert_that(
+    as.integer(max_rowid) >= (nrow(df) - 2),
     msg = paste0(
       "Attempted to remove all rows after row number ",
       max_rowid,
@@ -133,22 +129,24 @@ rm_footer_rows_all_lkps_maps_df <- function(df,
   # convert rowid col to NA, unless rowid equals `max_rowid`. Then, fill
   # downwards, and remove these rows
   df %>%
-    dplyr::mutate("rowid" = ifelse(
-      .data[["rowid"]] == !!max_rowid,
-      yes = .data[["rowid"]],
-      no = NA_character_
-    )) %>%
-    tidyr::fill(tidyselect::all_of("rowid"),
-      .direction = "down"
+    dplyr::mutate(
+      "rowid" = ifelse(
+        .data[["rowid"]] == !!max_rowid,
+        yes = .data[["rowid"]],
+        no = NA_character_
+      )
     ) %>%
+    tidyr::fill(tidyselect::all_of("rowid"), .direction = "down") %>%
     dplyr::filter(is.na(.data[["rowid"]])) %>%
     dplyr::select(-tidyselect::all_of("rowid"))
 }
 
-make_lkp_from_ukb_codings <- function(ukb_codings,
-                                      Coding,
-                                      Value_col_new_name,
-                                      Meaning_col_new_nae = "description") {
+make_lkp_from_ukb_codings <- function(
+  ukb_codings,
+  Coding,
+  Value_col_new_name,
+  Meaning_col_new_nae = "description"
+) {
   result <- ukb_codings[ukb_codings$Coding == Coding, -1]
 
   result <- ukbwranglr:::rename_cols(
@@ -174,8 +172,7 @@ make_lkp_from_ukb_codings <- function(ukb_codings,
 #'
 #' @return A data frame.
 #' @noRd
-update_code_selection <- function(current_selection,
-                                  previous_codelist) {
+update_code_selection <- function(current_selection, previous_codelist) {
   # validate previous_codelist
   ukbwranglr::validate_clinical_codes(previous_codelist)
 
@@ -208,8 +205,7 @@ update_code_selection <- function(current_selection,
 #'
 #' @return File path to downloaded file
 #' @noRd
-download_file <- function(download_url,
-                          path = tempfile()) {
+download_file <- function(download_url, path = tempfile()) {
   if (file.exists(path)) {
     invisible(path)
   } else {
