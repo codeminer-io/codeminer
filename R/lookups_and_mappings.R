@@ -672,9 +672,12 @@ get_ukb_all_lkps_maps <- function(dir_path = tempdir()) {
 #' get_bnf_from_open_prescribing()
 #' }
 get_bnf_from_open_prescribing <- function() {
-  urls <- purrr::map(0:9, ~ stringr::str_glue(
-    "https://openprescribing.net/api/1.0/bnf_code/?q={.x}&format=csv"
-  ))
+  urls <- purrr::map(
+    0:9,
+    ~ stringr::str_glue(
+      "https://openprescribing.net/api/1.0/bnf_code/?q={.x}&format=csv"
+    )
+  )
 
   safe_download <- function(url) {
     tryCatch({
