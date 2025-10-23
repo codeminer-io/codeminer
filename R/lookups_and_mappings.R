@@ -678,11 +678,13 @@ get_bnf_from_open_prescribing <- function() {
 
   safe_download <- function(url) {
     tryCatch({
-      httr::RETRY("GET", url, times = 3, pause_min = 1, quiet = TRUE) |>
-        httr::content(as = "text") |>
-        readr::read_csv(col_types = readr::cols(.default = "c"))
+      httr2::request(url) |>
+        httr2::req_retry(max_tries = 3, backoff = 1) |>
+        httr2::req_perform() |>
+        httr2::resp_body_string() |>
+        readr::read_csv(col_types = cols(.default = "c"))
     }, error = function(e) {
-      message("Skipping failed URL: ", url)
+      cli::cli_alert_warning("Failed to retrieve URL {.url {url}}, skipping.")
       return(NULL)
     })
   }
