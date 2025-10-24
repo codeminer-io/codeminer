@@ -8,4 +8,3 @@ ALL_LKPS_MAPS_DUMMY <- all_lkps_maps_to_db(
 )
 
 clinical_events_dummy <- dummy_clinical_events_tidy()
-
