@@ -22,6 +22,8 @@ Imports:
     assertthat,
     data.table,
     dplyr,
+    httr2,
+    cli,
     duckdb,
     fs,
     magrittr,

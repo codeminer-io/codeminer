@@ -54,7 +54,7 @@ all_lkps_maps_dummy <- build_all_lkps_maps_dummy()
 Look up Read 2 codes for hypertension:
 
 ``` r
-htn_read2 <- code_descriptions_like("Hypertension",
+htn_read2 <- DESCRIPTION("Hypertension",
   code_type = "read2",
   all_lkps_maps = all_lkps_maps_dummy
 )

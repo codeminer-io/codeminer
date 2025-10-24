@@ -197,11 +197,11 @@ test_that("`CODES()` returns unrecognised codes only when requested", {
   )
 })
 
-# `code_descriptions_like()` ----------------------------------------------
+# `DESCRIPTION()` ----------------------------------------------
 
-test_that("`code_descriptions_like()` returns expected results", {
+test_that("`DESCRIPTION()` returns expected results", {
   expect_equal(
-    code_descriptions_like(
+    DESCRIPTION(
       reg_expr = "diabetic retinopathy",
       code_type = "icd10",
       all_lkps_maps = all_lkps_maps,
@@ -213,7 +213,7 @@ test_that("`code_descriptions_like()` returns expected results", {
   )
 
   expect_equal(
-    code_descriptions_like(
+    DESCRIPTION(
       reg_expr = "diabetic retinopathy",
       code_type = "icd10",
       all_lkps_maps = all_lkps_maps,
@@ -231,7 +231,7 @@ test_that("`code_descriptions_like()` returns expected results", {
 
 test_that("`DESCRIPTION()` returns ICD10 codes where MODIFIER_4/MODIFIER_5 matches the search string", {
   expect_equal(
-    code_descriptions_like(
+    DESCRIPTION(
       reg_expr = "With ophthalmic complications",
       code_type = "icd10",
       all_lkps_maps = all_lkps_maps,
@@ -254,7 +254,7 @@ test_that("`DESCRIPTION()` returns ICD10 codes where MODIFIER_4/MODIFIER_5 match
 test_that("`DESCRIPTION()` returns primary descriptions for codes with a secondary description that matches the search string", {
   # Returns 'Type I diabetes mellitus' when searching for 'IDDM'
   expect_equal(
-    code_descriptions_like(
+    DESCRIPTION(
       reg_expr = "IDDM",
       code_type = "read3",
       all_lkps_maps = all_lkps_maps,
@@ -271,7 +271,7 @@ test_that("`DESCRIPTION()` returns primary descriptions for codes with a seconda
   )
 
   expect_equal(
-    code_descriptions_like(
+    DESCRIPTION(
       reg_expr = "IDDM",
       code_type = "read3",
       all_lkps_maps = all_lkps_maps,
@@ -294,7 +294,7 @@ test_that("`DESCRIPTION()` returns primary descriptions for codes with a seconda
 test_that("`DESCRIPTION` returns same result for all_lkps_maps_db and all_lkps_maps", {
   # expect no result with `ignore_case = FALSE`
   expect_equal(
-    code_descriptions_like(
+    DESCRIPTION(
       reg_expr = "diabetic retinopathy",
       code_type = "icd10",
       all_lkps_maps = all_lkps_maps,
@@ -306,7 +306,7 @@ test_that("`DESCRIPTION` returns same result for all_lkps_maps_db and all_lkps_m
   )
 
   expect_equal(
-    code_descriptions_like(
+    DESCRIPTION(
       reg_expr = "diabetic retinopathy",
       code_type = "icd10",
       all_lkps_maps = all_lkps_maps,
@@ -314,7 +314,7 @@ test_that("`DESCRIPTION` returns same result for all_lkps_maps_db and all_lkps_m
       codes_only = TRUE,
       standardise_output = FALSE
     ),
-    code_descriptions_like(
+    DESCRIPTION(
       reg_expr = "diabetic retinopathy",
       code_type = "icd10",
       all_lkps_maps = all_lkps_maps_db,
@@ -326,7 +326,7 @@ test_that("`DESCRIPTION` returns same result for all_lkps_maps_db and all_lkps_m
 
   # expect matching code with `ignore_case = TRUE`
   expect_equal(
-    code_descriptions_like(
+    DESCRIPTION(
       reg_expr = "diabetic retinopathy",
       code_type = "icd10",
       all_lkps_maps = all_lkps_maps,
@@ -334,7 +334,7 @@ test_that("`DESCRIPTION` returns same result for all_lkps_maps_db and all_lkps_m
       codes_only = TRUE,
       standardise_output = FALSE
     ),
-    code_descriptions_like(
+    DESCRIPTION(
       reg_expr = "diabetic retinopathy",
       code_type = "icd10",
       all_lkps_maps = all_lkps_maps_db,
