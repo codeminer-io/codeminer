@@ -699,6 +699,7 @@ get_bnf_from_open_prescribing <- function() {
   dplyr::bind_rows(data)
 }
 
+
 #' Download and read a UKB welf-reported medication code to ATC mapping file
 #'
 #' Mapping table obtained from [Wray et al
