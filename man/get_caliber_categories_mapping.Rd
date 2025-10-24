@@ -11,7 +11,7 @@ A data frame
 }
 \description{
 Includes a category order and colour for plotting. These were manually
-assigned based on those used in the \link[PheWAS:PheWAS]{PheWAS::PheWAS} package (see
+assigned based on those used in the \link[PheWAS:phewas-package]{PheWAS::PheWAS} package (see
 \link[PheWAS:pheinfo]{PheWAS::pheinfo}). The original CALIBER phenotype to categories mapping file
 was obtained from CALIBER's \href{https://github.com/spiros/chronological-map-phenotypes/blob/master/phenotype_categories_mapping.csv}{github repo}.
 }
