@@ -137,7 +137,11 @@ into your IDE.
     devtools::check()
     ```
 
-7.  Open a [Pull
+7.  Install and set up [lintr](https://lintr.r-lib.org/) [for your
+    IDE](https://lintr.r-lib.org/articles/editors.html) and fix as many
+    linting issues as possible
+
+8.  Open a [Pull
     request](https://github.com/codeminer-io/codeminer/pulls) against
     the `main` branch
 
