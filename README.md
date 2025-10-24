@@ -138,8 +138,8 @@ into your IDE.
     ```
 
 7.  Install and set up [lintr](https://lintr.r-lib.org/) [for your
-    IDE](https://lintr.r-lib.org/articles/editors.html) and fix as many
-    linting issues as possible
+    IDE](https://lintr.r-lib.org/articles/editors.html) and fix any
+    issues
 
 8.  Open a [Pull
     request](https://github.com/codeminer-io/codeminer/pulls) against

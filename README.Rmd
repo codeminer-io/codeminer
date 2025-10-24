@@ -113,7 +113,7 @@ command line tool or be integrated into your IDE.
     ```
 
 1. Install and set up [lintr](https://lintr.r-lib.org/) [for your IDE](https://lintr.r-lib.org/articles/editors.html)
-   and fix as many linting issues as possible
+   and fix any issues
 1. Open a [Pull request](https://github.com/codeminer-io/codeminer/pulls) against the `main` branch
 
 
