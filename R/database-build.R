@@ -3,6 +3,8 @@
 #' Set up the codeminer database and create the required lookup and
 #' mapping metadata tables.
 #'
+#' @param overwrite Logical indicating whether to overwrite existing tables
+#'
 #' @return `TRUE` invisibly if successful.
 #'
 #' @export

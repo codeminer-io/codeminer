@@ -4,7 +4,10 @@
 \alias{build_database}
 \title{Build the Codeminer database}
 \usage{
-build_database()
+build_database(overwrite = FALSE)
+}
+\arguments{
+\item{overwrite}{Logical indicating whether to overwrite existing tables}
 }
 \value{
 \code{TRUE} invisibly if successful.
