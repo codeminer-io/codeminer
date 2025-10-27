@@ -1,9 +1,3 @@
-#' @export
-create_dummy_database <- function() {
-  example_tables <- utils::data("example_ontology")
-  #TODO: write to db
-}
-
 #' Build the Codeminer database
 #'
 #' Set up the codeminer database and create the required lookup and
@@ -16,10 +10,17 @@ create_dummy_database <- function() {
 #' \dontrun{
 #' build_database()
 #' }
-build_database <- function() {
+build_database <- function(overwrite = FALSE) {
+  db_exists <- file.exists(db_path())
+  if (db_exists) {
+    cli::cli_alert_info("Existing database found at {.file {db_path()}}")
+  } else {
+    cli::cli_alert_info("Creating new database at {.file {db_path()}}")
+  }
+
   con <- connect_to_db()
-  create_lookup_metadata_table(con)
-  create_mapping_metadata_table(con)
+  create_lookup_metadata_table(con, overwrite = overwrite)
+  create_mapping_metadata_table(con, overwrite = overwrite)
 
   invisible(TRUE)
 }
@@ -36,61 +37,68 @@ get_mapping_metadata_table <- function() {
 
 #' Create lookup metadata table in database
 #'
-#' @param con Database connection
+#' @param con Database connection, as returned by [DBI::dbConnect()]
+#' @param overwrite Logical indicating whether to overwrite existing table
 #'
 #' @return Invisible TRUE on success
 #' @noRd
-create_lookup_metadata_table <- function(con) {
+create_lookup_metadata_table <- function(con, overwrite = FALSE) {
+  tbl_name <- "lookup_metadata"
+  existing_tables <- DBI::dbListTables(con)
+  tbl_exists <- tbl_name %in% existing_tables
+
+  if (tbl_exists && overwrite) {
+    cli::cli_alert_info("Dropping existing lookup metadata table")
+    DBI::dbRemoveTable(con, tbl_name)
+  } else if (tbl_exists) {
+    cli::cli_alert_info("Lookup metadata table already exists")
+    return(invisible(TRUE))
+  }
+
   lookup_cols <- required_lookup_metadata_columns()
-  lookup_col_definitions <- paste(
-    lookup_cols,
-    "VARCHAR",
-    collapse = ",\n      "
-  )
+  lookup_col_types <- rep("VARCHAR", length(lookup_cols))
+  names(lookup_col_types) <- lookup_cols
 
   relationship_cols <- required_relationship_metadata_columns()
-  relationship_col_definitions <- paste(
-    relationship_cols,
-    "VARCHAR",
-    collapse = ",\n      "
-  )
+  relationship_col_types <- rep("VARCHAR", length(relationship_cols))
+  names(relationship_col_types) <- relationship_cols
 
-  sql_statement <- paste0(
-    "
-    CREATE TABLE _metadata_lookup_tables (
-      table_type VARCHAR,
-      lookup_table_name VARCHAR,
-      ",
-    lookup_col_definitions,
-    ",\n      ",
-    relationship_col_definitions,
-    "
+  DBI::dbCreateTable(
+    con,
+    name = tbl_name,
+    fields = c(
+      table_type = "VARCHAR",
+      lookup_table_name = "VARCHAR",
+      lookup_col_types,
+      relationship_col_types
     )
-  "
   )
-
-  DBI::dbExecute(con, sql_statement)
 }
 
 #' Create mapping metadata table in database
 #'
-#' @param con Database connection
+#' @param con Database connection, as returned by [DBI::dbConnect()]
+#' @param overwrite Logical indicating whether to overwrite existing table
 #'
 #' @return Invisible TRUE on success
 #' @noRd
-create_mapping_metadata_table <- function(con) {
-  DBI::dbExecute(
+create_mapping_metadata_table <- function(con, overwrite = FALSE) {
+  tbl_name <- "mapping_metadata"
+  if (overwrite) {
+    cli::cli_alert("Dropping existing mapping metadata table")
+    DBI::dbRemoveTable(con, tbl_name)
+  }
+  DBI::dbCreateTable(
     con,
-    "
-    CREATE TABLE _metadata_mapping_tables (
-      table_name VARCHAR,
-      table_type VARCHAR,
-      from_coding_type VARCHAR,
-      to_coding_type VARCHAR,
-      from_col VARCHAR,
-      to_col VARCHAR
+    name = tbl_name,
+    fields = c(
+      table_name = "VARCHAR",
+      table_type = "VARCHAR",
+      from_coding_type = "VARCHAR",
+      to_coding_type = "VARCHAR",
+      from_col = "VARCHAR",
+      to_col = "VARCHAR"
     )
-  "
   )
 }
 
