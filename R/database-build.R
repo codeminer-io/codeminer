@@ -135,7 +135,7 @@ connect_to_db <- function(.envir = parent.frame()) {
 }
 
 db_path <- function() {
-  env_value <- Sys.getenv("CODEMINER_DB")
+  env_value <- Sys.getenv("CODEMINER_DB_PATH")
   if (env_value != "") {
     return(env_value)
   }
