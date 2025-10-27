@@ -83,9 +83,7 @@ create_mapping_metadata_table <- function(con, overwrite = FALSE) {
 }
 
 create_table <- function(con, tbl_name, fields, overwrite = FALSE) {
-  existing_tables <- DBI::dbListTables(con)
-  tbl_exists <- tbl_name %in% existing_tables
-
+  tbl_exists <- table_exists(con, tbl_name)
   if (tbl_exists && overwrite) {
     cli::cli_alert_info("Dropping existing table {tbl_name}")
     DBI::dbRemoveTable(con, tbl_name)
