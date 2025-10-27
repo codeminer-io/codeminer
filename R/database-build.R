@@ -25,16 +25,6 @@ build_database <- function(overwrite = FALSE) {
   invisible(TRUE)
 }
 
-get_lookup_metadata_table <- function() {
-  con <- connect_to_db()
-  dplyr::tbl(con, "_metadata_lookup_tables")
-}
-
-get_mapping_metadata_table <- function() {
-  con <- connect_to_db()
-  dplyr::tbl(con, "_metadata_mapping_tables")
-}
-
 #' Create lookup metadata table in database
 #'
 #' @param con Database connection, as returned by [DBI::dbConnect()]
