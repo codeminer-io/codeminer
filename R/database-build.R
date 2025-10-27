@@ -1,6 +1,6 @@
 #' @export
 create_dummy_database <- function() {
-  example_tables <- data("example_ontology")
+  example_tables <- utils::data("example_ontology")
   #TODO: write to db
 }
 
