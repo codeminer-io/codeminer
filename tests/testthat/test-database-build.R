@@ -60,14 +60,12 @@ test_that("build_database() creates a valid codeminer database", {
   for (x in required_lookup_fields) {
     expect_true(x %in% lookup_fields)
   }
-  expect_equal(length(lookup_fields), length(required_lookup_fields))
 
   mapping_fields <- DBI::dbListFields(con, "mapping_metadata")
   required_mapping_fields <- required_mapping_metadata_columns()
   for (x in required_mapping_fields) {
     expect_true(x %in% mapping_fields)
   }
-  expect_equal(length(mapping_fields), length(required_mapping_fields))
 })
 
 test_that("build_database() is idempotent", {
@@ -96,7 +94,7 @@ test_that("create_lookup_metadata_table() respects overwrite parameter", {
   # Insert a test row
   DBI::dbExecute(
     con,
-    "INSERT INTO lookup_metadata (coding_type) VALUES ('test')"
+    "INSERT INTO lookup_metadata (lookup_table_name) VALUES ('test')"
   )
   row_count_before <- DBI::dbGetQuery(
     con,

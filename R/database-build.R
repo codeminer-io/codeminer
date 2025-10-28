@@ -55,7 +55,10 @@ create_lookup_metadata_table <- function(con, overwrite = FALSE) {
   create_table(
     con,
     tbl_name = tbl_name,
-    fields = lookup_fields,
+    fields = c(
+      lookup_table_name = "VARCHAR PRIMARY KEY",
+      lookup_fields
+    ),
     overwrite = overwrite
   )
 }
@@ -77,7 +80,10 @@ create_mapping_metadata_table <- function(con, overwrite = FALSE) {
   create_table(
     con,
     tbl_name = tbl_name,
-    fields = mapping_fields,
+    fields = c(
+      mapping_table_name = "VARCHAR PRIMARY KEY",
+      mapping_fields
+    ),
     overwrite = overwrite
   )
 }
@@ -106,7 +112,6 @@ create_table <- function(con, tbl_name, fields, overwrite = FALSE) {
 #' @noRd
 required_lookup_metadata_columns <- function() {
   c(
-    "lookup_table_name",
     "coding_type",
     "lookup_version",
     "hierarchy_type", # "lexical" (e.g. ICD10) or "relational" (e.g. SNOMED CT)
@@ -120,7 +125,6 @@ required_lookup_metadata_columns <- function() {
 
 required_mapping_metadata_columns <- function() {
   c(
-    "mapping_table_name",
     "from_coding_type",
     "to_coding_type",
     "from_col",
