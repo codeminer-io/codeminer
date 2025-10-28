@@ -99,3 +99,25 @@ lookup_metadata <- function(
 }
 
 add_mapping_table <- function(table, metadata) {}
+
+validate_lookup_metadata <- function(
+  metadata,
+  arg = rlang::caller_arg(metadata),
+  call = rlang::caller_env()
+) {
+  required <- required_lookup_metadata_columns()
+  missing <- setdiff(required, names(metadata))
+
+  if (length(missing) > 0) {
+    cli::cli_abort(
+      c(
+        "The metadata in {.arg {arg}} is incomplete.",
+        "x" = "The following entries are missing: {.field {missing}}",
+        "i" = "Use {.fun codeminer::lookup_metadata} to construct valid metadata."
+      ),
+      call = call
+    )
+  }
+
+  return(invisible(metadata))
+}
