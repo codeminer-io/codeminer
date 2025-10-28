@@ -33,6 +33,7 @@ test_that("connect_to_db() creates a valid DuckDB connection", {
   expect_s4_class(con, "duckdb_connection")
 
   # Verify connection works
+  expect_true(DBI::dbIsValid(con))
   result <- DBI::dbListTables(con)
   expect_type(result, "character")
 })
