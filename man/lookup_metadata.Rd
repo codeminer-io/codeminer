@@ -6,7 +6,7 @@
 \usage{
 lookup_metadata(
   coding_type,
-  version = "latest",
+  version = "v0",
   ...,
   hierarchy_type = c("lexical", "relational"),
   lookup_code_col = "code",
@@ -19,7 +19,7 @@ lookup_metadata(
 \arguments{
 \item{coding_type}{The type of coding system (e.g., ICD-10, SNOMED-CT)}
 
-\item{version}{The version of the lookup metadata (default: "latest")}
+\item{version}{The version of the lookup metadata (default: "v0")}
 
 \item{hierarchy_type}{The type of hierarchy (should be one of \code{c("lexical", "relational")})}
 

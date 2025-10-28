@@ -11,7 +11,6 @@
 #'
 #' @param table The lookup table to add, should be coercible to a `data.frame`
 #' @param coding_type The type of coding system (e.g., ICD-10, SNOMED-CT)
-#' @param version The version of the lookup table (default: "latest")
 #' @param metadata The lookup metadata, as specified by [lookup_metadata()].
 #' @param overwrite Boolean, whether to overwrite an existing table (default: `FALSE`)
 #'
@@ -28,7 +27,6 @@
 add_lookup_table <- function(
   table,
   coding_type,
-  version = "latest",
   metadata = lookup_metadata(coding_type),
   overwrite = FALSE
 ) {
@@ -37,9 +35,7 @@ add_lookup_table <- function(
   metadata <- as.data.frame(metadata)
 
   con <- connect_to_db()
-
   update_lookup_metadata(con, metadata)
-
   DBI::dbWriteTable(
     con,
     name = table_name,
@@ -55,7 +51,7 @@ add_lookup_table <- function(
 #' with [add_lookup_table()].
 #'
 #' @param coding_type The type of coding system (e.g., ICD-10, SNOMED-CT)
-#' @param version The version of the lookup metadata (default: "latest")
+#' @param version The version of the lookup metadata (default: "v0")
 #' @param hierarchy_type The type of hierarchy (should be one of `c("lexical", "relational")`)
 #' @param lookup_code_col The column name for the lookup code (default: "code")
 #' @param lookup_description_col The column name for the lookup description (default: "description")
@@ -71,7 +67,7 @@ add_lookup_table <- function(
 #' lookup_metadata("ICD-10", version = "2023")
 lookup_metadata <- function(
   coding_type,
-  version = "latest",
+  version = "v0",
   ...,
   hierarchy_type = c("lexical", "relational"),
   lookup_code_col = "code",

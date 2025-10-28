@@ -7,7 +7,6 @@
 add_lookup_table(
   table,
   coding_type,
-  version = "latest",
   metadata = lookup_metadata(coding_type),
   overwrite = FALSE
 )
@@ -16,8 +15,6 @@ add_lookup_table(
 \item{table}{The lookup table to add, should be coercible to a \code{data.frame}}
 
 \item{coding_type}{The type of coding system (e.g., ICD-10, SNOMED-CT)}
-
-\item{version}{The version of the lookup table (default: "latest")}
 
 \item{metadata}{The lookup metadata, as specified by \code{\link[=lookup_metadata]{lookup_metadata()}}.}
 
