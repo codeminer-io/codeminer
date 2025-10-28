@@ -35,7 +35,7 @@ add_lookup_table <- function(
   metadata <- as.data.frame(metadata)
 
   con <- connect_to_db()
-  update_lookup_metadata(con, metadata)
+  add_lookup_metadata(con, metadata)
   DBI::dbWriteTable(
     con,
     name = table_name,
@@ -98,7 +98,30 @@ lookup_metadata <- function(
   ))
 }
 
-add_mapping_table <- function(table, metadata) {}
+add_mapping_table <- function(table, metadata, overwrite = FALSE) {}
+
+add_lookup_metadata <- function(con, metadata) {
+  validate_lookup_metadata(metadata)
+  tbl_name <- codeminer_metadata_table_names$lookup
+
+  # Check for duplicate lookup_table_name
+  ids <- metadata$lookup_table_name
+  current_metadata <- get_lookup_metadata(con)
+  exists <- ids[ids %in% current_metadata$lookup_table_name]
+
+  if (length(exists) > 0) {
+    cli::cli_abort(
+      c(
+        "Metadata for {.field {exists}} already exists.",
+        "i" = "Use a different {.arg coding_type} or {.arg version}."
+      ),
+      call = rlang::caller_env()
+    )
+  }
+
+  meta_df <- as.data.frame(metadata)
+  DBI::dbAppendTable(con, tbl_name, meta_df)
+}
 
 validate_lookup_metadata <- function(
   metadata,
