@@ -1,3 +1,9 @@
+# Use locked environment to store global variables
+codeminer_metadata_table_names <- new.env(parent = emptyenv())
+codeminer_metadata_table_names$lookup <- "lookup_metadata"
+codeminer_metadata_table_names$mapping <- "mapping_metadata"
+lockEnvironment(codeminer_metadata_table_names)
+
 #' Build the Codeminer database
 #'
 #' Set up the codeminer database and create the required lookup and
@@ -35,7 +41,8 @@ build_database <- function(overwrite = FALSE) {
 #' @return Invisible TRUE on success
 #' @noRd
 create_lookup_metadata_table <- function(con, overwrite = FALSE) {
-  tbl_name <- "lookup_metadata"
+  tbl_name <- codeminer_metadata_table_names$lookup
+
   lookup_cols <- required_lookup_metadata_columns()
   lookup_col_types <- rep("VARCHAR", length(lookup_cols))
   names(lookup_col_types) <- lookup_cols
@@ -65,7 +72,7 @@ create_lookup_metadata_table <- function(con, overwrite = FALSE) {
 #' @return Invisible TRUE on success
 #' @noRd
 create_mapping_metadata_table <- function(con, overwrite = FALSE) {
-  tbl_name <- "mapping_metadata"
+  tbl_name <- codeminer_metadata_table_names$mapping
 
   create_table(
     con,
