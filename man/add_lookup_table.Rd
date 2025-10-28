@@ -4,17 +4,10 @@
 \alias{add_lookup_table}
 \title{Add lookup table to database}
 \usage{
-add_lookup_table(
-  table,
-  coding_type,
-  metadata = lookup_metadata(coding_type),
-  overwrite = FALSE
-)
+add_lookup_table(table, metadata, overwrite = FALSE)
 }
 \arguments{
 \item{table}{The lookup table to add, should be coercible to a \code{data.frame}}
-
-\item{coding_type}{The type of coding system (e.g., ICD-10, SNOMED-CT)}
 
 \item{metadata}{The lookup metadata, as specified by \code{\link[=lookup_metadata]{lookup_metadata()}}.}
 
@@ -31,7 +24,7 @@ Add a lookup table to the database.
 lookup_table <- example_ontology$lookup_tables$capital_letters_v3
 lookup_table
 
-add_lookup_table(lookup_table, "capital_letters", version = "v3")
+add_lookup_table(lookup_table, lookup_metadata("capital_letters", version = "v3"))
 }
 \seealso{
 \code{\link[=lookup_metadata]{lookup_metadata()}}
