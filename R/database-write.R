@@ -5,6 +5,26 @@
 #   build_database()
 # }
 
+#' Add lookup table to database
+#'
+#' Add a lookup table to the database.
+#'
+#' @param table The lookup table to add, should be coercible to a `data.frame`
+#' @param coding_type The type of coding system (e.g., ICD-10, SNOMED-CT)
+#' @param version The version of the lookup table (default: "latest")
+#' @param metadata The lookup metadata, as specified by [lookup_metadata()].
+#' @param overwrite Boolean, whether to overwrite an existing table (default: `FALSE`)
+#'
+#' @return `TRUE` invisibly if successful
+#'
+#' @seealso [lookup_metadata()]
+#' @export
+#' @examples
+#' # Using the example ontology data included in codeminer
+#' lookup_table <- example_ontology$lookup_tables$capital_letters_v3
+#' lookup_table
+#'
+#' add_lookup_table(lookup_table, "capital_letters", version = "v3")
 add_lookup_table <- function(
   table,
   coding_type,
@@ -19,6 +39,7 @@ add_lookup_table <- function(
   con <- connect_to_db()
 
   update_lookup_metadata(con, metadata)
+
   DBI::dbWriteTable(
     con,
     name = table_name,
@@ -27,11 +48,11 @@ add_lookup_table <- function(
   )
 }
 
-# TODO: add this in same Rd as add_lookup_table()
 #' Create lookup metadata
 #'
 #' Generate the required metadata for a lookup table. This is mainly used to
-#' generate the necessary metadata when adding a new lookup table to the database.
+#' generate the necessary metadata when adding a new lookup table to the database
+#' with [add_lookup_table()].
 #'
 #' @param coding_type The type of coding system (e.g., ICD-10, SNOMED-CT)
 #' @param version The version of the lookup metadata (default: "latest")
@@ -44,6 +65,7 @@ add_lookup_table <- function(
 #'
 #' @return A list containing the lookup metadata
 #'
+#' @seealso [add_lookup_table()]
 #' @export
 #' @examples
 #' lookup_metadata("ICD-10", version = "2023")
@@ -63,6 +85,10 @@ lookup_metadata <- function(
   lookup_name <- paste(coding_type, version, sep = "_")
   hierarchy_type <- rlang::arg_match(hierarchy_type)
 
+  if (hierarchy_type == "relational") {
+    cli::cli_abort("Relational hierarchy type is not supported yet.")
+  }
+
   return(list(
     lookup_name = lookup_name,
     coding_type = coding_type,
@@ -75,25 +101,5 @@ lookup_metadata <- function(
     preferred_code = preferred_code
   ))
 }
-
-# TODO: should this just be a separate table in the db?
-# relationship_metadata <- function(
-#   relationship_name,
-#   relationship_version,
-#   relationship_from_col,
-#   relationship_to_col,
-#   relationship_type_col,
-#   child_parent_relationship_code,
-#   relationship_source
-# ) {
-#   all_args <- as.list(match.call())[-1]
-#   missing <- setdiff(required_relationship_metadata_columns(), names(all_args))
-
-#   if (length(missing) > 0) {
-#     cli::cli_abort("Missing required arguments: {missing}")
-#   }
-
-#   return(tibble::as_tibble(all_args))
-# }
 
 add_mapping_table <- function(table, metadata) {}
