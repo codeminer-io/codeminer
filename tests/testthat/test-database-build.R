@@ -55,19 +55,18 @@ test_that("build_database() creates a valid codeminer database", {
 
   # Check table schema
   lookup_fields <- DBI::dbListFields(con, "lookup_metadata")
-  expect_true("table_type" %in% lookup_fields)
-  expect_true("lookup_table_name" %in% lookup_fields)
-  expect_true("lookup_name" %in% lookup_fields)
-  expect_true("coding_type" %in% lookup_fields)
+  required_lookup_fields <- required_lookup_metadata_columns()
+  for (x in required_lookup_fields) {
+    expect_true(x %in% lookup_fields)
+  }
+  expect_equal(length(lookup_fields), length(required_lookup_fields))
 
   mapping_fields <- DBI::dbListFields(con, "mapping_metadata")
-  expect_true("table_name" %in% mapping_fields)
-  expect_true("table_type" %in% mapping_fields)
-  expect_true("from_coding_type" %in% mapping_fields)
-  expect_true("to_coding_type" %in% mapping_fields)
-  expect_true("from_col" %in% mapping_fields)
-  expect_true("to_col" %in% mapping_fields)
-  expect_equal(length(mapping_fields), 6)
+  required_mapping_fields <- required_mapping_metadata_columns()
+  for (x in required_mapping_fields) {
+    expect_true(x %in% mapping_fields)
+  }
+  expect_equal(length(mapping_fields), length(required_mapping_fields))
 })
 
 test_that("build_database() is idempotent", {
@@ -96,7 +95,7 @@ test_that("create_lookup_metadata_table() respects overwrite parameter", {
   # Insert a test row
   DBI::dbExecute(
     con,
-    "INSERT INTO lookup_metadata (table_type) VALUES ('test')"
+    "INSERT INTO lookup_metadata (coding_type) VALUES ('test')"
   )
   row_count_before <- DBI::dbGetQuery(
     con,
@@ -134,7 +133,7 @@ test_that("create_mapping_metadata_table() respects overwrite parameter", {
   create_mapping_metadata_table(con, overwrite = FALSE)
   DBI::dbExecute(
     con,
-    "INSERT INTO mapping_metadata (table_name) VALUES ('test')"
+    "INSERT INTO mapping_metadata (mapping_table_name) VALUES ('test')"
   )
   row_count_before <- DBI::dbGetQuery(
     con,

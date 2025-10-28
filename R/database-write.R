@@ -82,7 +82,7 @@ lookup_metadata <- function(
 ) {
   rlang::check_dots_empty()
 
-  lookup_name <- paste(coding_type, version, sep = "_")
+  lookup_table_name <- paste(coding_type, version, sep = "_")
   hierarchy_type <- rlang::arg_match(hierarchy_type)
 
   if (hierarchy_type == "relational") {
@@ -90,7 +90,7 @@ lookup_metadata <- function(
   }
 
   return(list(
-    lookup_name = lookup_name,
+    lookup_table_name = lookup_table_name,
     coding_type = coding_type,
     lookup_version = version,
     hierarchy_type = hierarchy_type,

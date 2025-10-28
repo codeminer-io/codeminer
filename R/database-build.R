@@ -44,8 +44,8 @@ create_lookup_metadata_table <- function(con, overwrite = FALSE) {
   tbl_name <- codeminer_metadata_table_names$lookup
 
   lookup_cols <- required_lookup_metadata_columns()
-  lookup_col_types <- rep("VARCHAR", length(lookup_cols))
-  names(lookup_col_types) <- lookup_cols
+  lookup_fields <- rep("VARCHAR", length(lookup_cols))
+  names(lookup_fields) <- lookup_cols
 
   # TODO: move this to a separate db table?
   # relationship_cols <- required_relationship_metadata_columns()
@@ -55,11 +55,7 @@ create_lookup_metadata_table <- function(con, overwrite = FALSE) {
   create_table(
     con,
     tbl_name = tbl_name,
-    fields = c(
-      table_type = "VARCHAR",
-      lookup_table_name = "VARCHAR",
-      lookup_col_types
-    ),
+    fields = lookup_fields,
     overwrite = overwrite
   )
 }
@@ -74,17 +70,14 @@ create_lookup_metadata_table <- function(con, overwrite = FALSE) {
 create_mapping_metadata_table <- function(con, overwrite = FALSE) {
   tbl_name <- codeminer_metadata_table_names$mapping
 
+  mapping_cols <- required_mapping_metadata_columns()
+  mapping_fields <- rep("VARCHAR", length(mapping_cols))
+  names(mapping_fields) <- mapping_cols
+
   create_table(
     con,
     tbl_name = tbl_name,
-    fields = c(
-      table_name = "VARCHAR",
-      table_type = "VARCHAR",
-      from_coding_type = "VARCHAR",
-      to_coding_type = "VARCHAR",
-      from_col = "VARCHAR",
-      to_col = "VARCHAR"
-    ),
+    fields = mapping_fields,
     overwrite = overwrite
   )
 }
@@ -113,15 +106,25 @@ create_table <- function(con, tbl_name, fields, overwrite = FALSE) {
 #' @noRd
 required_lookup_metadata_columns <- function() {
   c(
-    "lookup_name",
-    "lookup_version",
+    "lookup_table_name",
     "coding_type",
+    "lookup_version",
     "hierachy_type", # "lexical" (e.g. ICD10) or "relational" (e.g. SNOMED CT)
     "lookup_code_col",
     "lookup_description_col",
     "lookup_source",
     "preferred_synonym_col",
     "preferred_code"
+  )
+}
+
+required_mapping_metadata_columns <- function() {
+  c(
+    "mapping_table_name",
+    "from_coding_type",
+    "to_coding_type",
+    "from_col",
+    "to_col"
   )
 }
 
