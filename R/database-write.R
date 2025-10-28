@@ -1,16 +1,20 @@
-# #' @export
-# create_dummy_database <- function() {
-#   example_tables <- utils::data("example_ontology")
-#   #TODO: write to db
-#   build_database()
-# }
+#' @export
+create_dummy_database <- function() {
+  example_tables <- utils::data("example_ontology")
+
+  lookup_table <- example_tables$lookup_tables$capital_letters_v3
+  lookup_metadata <- example_tables$lookup_metadata |>
+    dplyr::filter(.data$lookup_table_name == "capital_letters_v3")
+
+  build_database()
+  add_lookup_table(lookup_table, lookup_metadata, overwrite = TRUE)
+}
 
 #' Add lookup table to database
 #'
 #' Add a lookup table to the database.
 #'
 #' @param table The lookup table to add, should be coercible to a `data.frame`
-#' @param coding_type The type of coding system (e.g., ICD-10, SNOMED-CT)
 #' @param metadata The lookup metadata, as specified by [lookup_metadata()].
 #' @param overwrite Boolean, whether to overwrite an existing table (default: `FALSE`)
 #'
@@ -23,14 +27,17 @@
 #' lookup_table <- example_ontology$lookup_tables$capital_letters_v3
 #' lookup_table
 #'
-#' add_lookup_table(lookup_table, "capital_letters", version = "v3")
-add_lookup_table <- function(
-  table,
-  coding_type,
-  metadata = lookup_metadata(coding_type),
-  overwrite = FALSE
-) {
-  table_name <- metadata$lookup_name
+#' add_lookup_table(lookup_table, lookup_metadata("capital_letters", version = "v3"))
+add_lookup_table <- function(table, metadata, overwrite = FALSE) {
+  validate_lookup_metadata(metadata, arg = rlang::caller_arg(metadata))
+
+  table_name <- metadata$lookup_table_name
+  if (length(table_name) != 1) {
+    cli::cli_abort(
+      "`metadata$lookup_table_name` must have length 1, not {length(table_name)}."
+    )
+  }
+
   table <- as.data.frame(table)
   metadata <- as.data.frame(metadata)
 
@@ -101,7 +108,6 @@ lookup_metadata <- function(
 add_mapping_table <- function(table, metadata, overwrite = FALSE) {}
 
 add_lookup_metadata <- function(con, metadata) {
-  validate_lookup_metadata(metadata, arg = rlang::caller_arg(metadata))
   tbl_name <- codeminer_metadata_table_names$lookup
 
   # Check for duplicate lookup_table_name
