@@ -101,7 +101,7 @@ lookup_metadata <- function(
 add_mapping_table <- function(table, metadata, overwrite = FALSE) {}
 
 add_lookup_metadata <- function(con, metadata) {
-  validate_lookup_metadata(metadata)
+  validate_lookup_metadata(metadata, arg = rlang::caller_arg(metadata))
   tbl_name <- codeminer_metadata_table_names$lookup
 
   # Check for duplicate lookup_table_name
