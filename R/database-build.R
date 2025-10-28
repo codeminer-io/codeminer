@@ -109,7 +109,7 @@ required_lookup_metadata_columns <- function() {
     "lookup_table_name",
     "coding_type",
     "lookup_version",
-    "hierachy_type", # "lexical" (e.g. ICD10) or "relational" (e.g. SNOMED CT)
+    "hierarchy_type", # "lexical" (e.g. ICD10) or "relational" (e.g. SNOMED CT)
     "lookup_code_col",
     "lookup_description_col",
     "lookup_source",
