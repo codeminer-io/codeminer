@@ -4,9 +4,6 @@ withr::local_options(
 )
 
 test_that("db_path() returns correct path based on environment variable", {
-  original_path <- Sys.getenv("CODEMINER_DB_PATH")
-  on.exit(Sys.setenv(CODEMINER_DB_PATH = original_path), add = TRUE)
-
   custom_path <- "/tmp/test_db.duckdb"
   withr::with_envvar(
     new = c(CODEMINER_DB_PATH = custom_path),
@@ -26,8 +23,7 @@ test_that("db_path() returns correct path based on environment variable", {
 })
 
 test_that("connect_to_db() creates a valid DuckDB connection", {
-  temp_db <- withr::local_tempfile(fileext = ".duckdb")
-  withr::local_envvar(CODEMINER_DB_PATH = temp_db)
+  local_temp_database()
 
   con <- connect_to_db()
   expect_s4_class(con, "duckdb_connection")
@@ -39,8 +35,7 @@ test_that("connect_to_db() creates a valid DuckDB connection", {
 })
 
 test_that("build_database() creates a valid codeminer database", {
-  temp_db <- withr::local_tempfile(fileext = ".duckdb")
-  withr::local_envvar(CODEMINER_DB_PATH = temp_db)
+  temp_db <- local_temp_database()
 
   expect_false(file.exists(temp_db))
   build_database()
@@ -69,8 +64,7 @@ test_that("build_database() creates a valid codeminer database", {
 })
 
 test_that("build_database() is idempotent", {
-  temp_db <- withr::local_tempfile(fileext = ".duckdb")
-  withr::local_envvar(CODEMINER_DB_PATH = temp_db)
+  local_temp_database()
 
   # Create database first time
   build_database(overwrite = FALSE)
@@ -81,12 +75,8 @@ test_that("build_database() is idempotent", {
 })
 
 test_that("create_lookup_metadata_table() respects overwrite parameter", {
-  temp_db <- tempfile(fileext = ".duckdb")
-  withr::local_envvar(CODEMINER_DB_PATH = temp_db)
-  on.exit(unlink(temp_db), add = TRUE)
-
-  con <- DBI::dbConnect(duckdb::duckdb(), temp_db)
-  on.exit(DBI::dbDisconnect(con, shutdown = TRUE), add = TRUE)
+  local_temp_database()
+  con <- connect_to_db()
 
   # Create table first time
   create_lookup_metadata_table(con, overwrite = FALSE)
@@ -121,12 +111,8 @@ test_that("create_lookup_metadata_table() respects overwrite parameter", {
 
 
 test_that("create_mapping_metadata_table() respects overwrite parameter", {
-  temp_db <- tempfile(fileext = ".duckdb")
-  withr::local_envvar(CODEMINER_DB_PATH = temp_db)
-  on.exit(unlink(temp_db), add = TRUE)
-
-  con <- DBI::dbConnect(duckdb::duckdb(), temp_db)
-  on.exit(DBI::dbDisconnect(con, shutdown = TRUE), add = TRUE)
+  local_temp_database()
+  con <- connect_to_db()
 
   # Create table and insert data
   create_mapping_metadata_table(con, overwrite = FALSE)

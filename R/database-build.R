@@ -148,7 +148,7 @@ required_relationship_metadata_columns <- function() {
   )
 }
 
-connect_to_db <- function(.envir = parent.frame()) {
+connect_to_db <- function(..., .envir = parent.frame()) {
   con <- DBI::dbConnect(duckdb::duckdb(), db_path())
   withr::defer(DBI::dbDisconnect(con), envir = .envir)
   return(con)
