@@ -59,7 +59,6 @@ test_that("build_database() creates a valid codeminer database", {
   expect_true("lookup_table_name" %in% lookup_fields)
   expect_true("lookup_name" %in% lookup_fields)
   expect_true("coding_type" %in% lookup_fields)
-  expect_true("relationship_name" %in% lookup_fields)
 
   mapping_fields <- DBI::dbListFields(con, "mapping_metadata")
   expect_true("table_name" %in% mapping_fields)

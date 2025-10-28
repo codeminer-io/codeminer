@@ -47,9 +47,10 @@ create_lookup_metadata_table <- function(con, overwrite = FALSE) {
   lookup_col_types <- rep("VARCHAR", length(lookup_cols))
   names(lookup_col_types) <- lookup_cols
 
-  relationship_cols <- required_relationship_metadata_columns()
-  relationship_col_types <- rep("VARCHAR", length(relationship_cols))
-  names(relationship_col_types) <- relationship_cols
+  # TODO: move this to a separate db table?
+  # relationship_cols <- required_relationship_metadata_columns()
+  # relationship_col_types <- rep("VARCHAR", length(relationship_cols))
+  # names(relationship_col_types) <- relationship_cols
 
   create_table(
     con,
@@ -57,8 +58,7 @@ create_lookup_metadata_table <- function(con, overwrite = FALSE) {
     fields = c(
       table_type = "VARCHAR",
       lookup_table_name = "VARCHAR",
-      lookup_col_types,
-      relationship_col_types
+      lookup_col_types
     ),
     overwrite = overwrite
   )
