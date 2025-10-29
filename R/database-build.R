@@ -15,9 +15,11 @@ lockEnvironment(codeminer_metadata_table_names)
 #'
 #' @export
 #' @examples
-#' \dontrun{
+#' # Build a temporary database
+#' db_path <- tempfile(fileext = ".duckdb")
+#' Sys.setenv(CODEMINER_DB_PATH = db_path)
 #' build_database()
-#' }
+#' file.exists(db_path)
 build_database <- function(overwrite = FALSE) {
   db_exists <- file.exists(db_path())
   if (db_exists) {

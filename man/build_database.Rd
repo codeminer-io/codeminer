@@ -17,7 +17,9 @@ Set up the codeminer database and create the required lookup and
 mapping metadata tables.
 }
 \examples{
-\dontrun{
+# Build a temporary database
+db_path <- tempfile(fileext = ".duckdb")
+Sys.setenv(CODEMINER_DB_PATH = db_path)
 build_database()
-}
+file.exists(db_path)
 }
