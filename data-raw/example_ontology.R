@@ -11,15 +11,6 @@
 #'
 #'   Each category contains versions v1, v2, and v3.
 #'
-#' @examples
-#' # Get all example data
-#' example_data <- create_example_data()
-#'
-#' # Access specific tables
-#' capital_v1 <- example_data$lookup_tables$capital_letters_v1
-#' capital_v1_meta <- example_data$lookup_metadata |>
-#'   dplyr::filter(lookup_table_name == "capital_letters_v1")
-#'
 #' @keywords internal
 create_example_data <- function() {
   # Lookup tables and metadata
