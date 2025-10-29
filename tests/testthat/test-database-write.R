@@ -15,13 +15,26 @@ test_that("add_lookup_table works with example data", {
   )
 })
 
+test_that("add_lookup_table fails without valid database", {
+  # Uninitialised db
+  local_temp_database()
+
+  expect_error(
+    add_lookup_table(
+      data.frame(code = "foo", description = "bar"),
+      lookup_metadata("foo", version = "v0")
+    ),
+    "The database is not initialised"
+  )
+})
+
 test_that("add_lookup_table warns when lookup_table_name already exists", {
   local_build_temp_database()
 
   test_table <- data.frame(code = "foo", description = "bar")
   test_metadata <- lookup_metadata("foo", version = "v0")
 
-  # Adding same metadata twice should fail
+  # Adding same metadata twice should warn
   expect_no_error(add_lookup_table(test_table, test_metadata))
   expect_warning(
     add_lookup_table(test_table, test_metadata),

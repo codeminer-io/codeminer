@@ -34,6 +34,7 @@ lookup_table
 
 # Using a temporary database
 Sys.setenv(CODEMINER_DB_PATH = tempfile())
+build_database()
 add_lookup_table(lookup_table, lookup_metadata("capital_letters", version = "v3"))
 }
 \seealso{

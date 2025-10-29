@@ -17,7 +17,7 @@ create_dummy_database <- function() {
     dplyr::filter(.data$lookup_table_name == "capital_letters_v3")
 
   build_database()
-  add_lookup_table(lookup_table, lookup_metadata, overwrite = TRUE)
+  add_lookup_table(lookup_table, lookup_metadata)
 }
 
 #' Add a lookup table to the database
@@ -47,6 +47,7 @@ create_dummy_database <- function() {
 #'
 #' # Using a temporary database
 #' Sys.setenv(CODEMINER_DB_PATH = tempfile())
+#' build_database()
 #' add_lookup_table(lookup_table, lookup_metadata("capital_letters", version = "v3"))
 add_lookup_table <- function(table, metadata) {
   validate_lookup_metadata(metadata, arg = rlang::caller_arg(metadata))
@@ -62,6 +63,8 @@ add_lookup_table <- function(table, metadata) {
   metadata <- as.data.frame(metadata)
 
   con <- connect_to_db()
+  check_database(con)
+
   meta_added <- add_lookup_metadata(con, metadata)
   if (!meta_added) {
     cli::cli_warn(
@@ -138,7 +141,10 @@ lookup_metadata <- function(
   ))
 }
 
-add_mapping_table <- function(table, metadata) {}
+add_mapping_table <- function(table, metadata) {
+  con <- connect_to_db()
+  check_database(con)
+}
 
 add_lookup_metadata <- function(con, metadata) {
   tbl_name <- codeminer_metadata_table_names$lookup
