@@ -43,12 +43,13 @@ add_lookup_table <- function(table, metadata, overwrite = FALSE) {
 
   con <- connect_to_db()
   add_lookup_metadata(con, metadata)
-  DBI::dbWriteTable(
+  success <- DBI::dbWriteTable(
     con,
     name = table_name,
     value = table,
     overwrite = overwrite
   )
+  return(invisible(success))
 }
 
 #' Create lookup metadata
@@ -126,7 +127,8 @@ add_lookup_metadata <- function(con, metadata) {
   }
 
   meta_df <- as.data.frame(metadata)
-  DBI::dbAppendTable(con, tbl_name, meta_df)
+  success <- DBI::dbAppendTable(con, tbl_name, meta_df)
+  return(invisible(success))
 }
 
 validate_lookup_metadata <- function(

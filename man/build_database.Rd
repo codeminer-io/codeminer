@@ -7,7 +7,7 @@
 build_database(overwrite = FALSE)
 }
 \arguments{
-\item{overwrite}{Logical indicating whether to overwrite existing tables}
+\item{overwrite}{Logical indicating whether to overwrite existing tables (default: \code{FALSE})}
 }
 \value{
 \code{TRUE} invisibly if successful.

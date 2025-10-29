@@ -4,10 +4,10 @@
 #' and their associated metadata across multiple versions.
 #'
 #' @return A list with the following structure:
-#'   - `lookup_tables` - List of lookup data frames (capital_letters, lowercase_letters)
-#'   - `lookup_metadata` - Data frame containing the metadata for the lookup tables
-#'   - `mapping_tables` - List of mapping data frames (capital_to_lowercase)
-#'   - `mapping_metadata` - Data frame containing the metadata for the mapping tables
+#'   - `lookup_tables`: List of lookup data frames (capital_letters, lowercase_letters)
+#'   - `lookup_metadata`: Data frame containing the metadata for the lookup tables
+#'   - `mapping_tables`: List of mapping data frames (capital_to_lowercase)
+#'   - `mapping_metadata`: Data frame containing the metadata for the mapping tables
 #'
 #'   Each category contains versions v1, v2, and v3.
 #'
@@ -17,14 +17,8 @@
 #'
 #' # Access specific tables
 #' capital_v1 <- example_data$lookup_tables$capital_letters_v1
-#' capital_v1_meta <- example_data$lookup_metadata$capital_letters_v1
-#'
-#' # Use with database functions
-#' write_lookup_table_to_db(
-#'   example_data$lookup_tables$capital_letters_v1,
-#'   example_data$lookup_metadata$capital_letters_v1,
-#'   "test.duckdb"
-#' )
+#' capital_v1_meta <- example_data$lookup_metadata |>
+#'   dplyr::filter(lookup_table_name == "capital_letters_v1")
 #'
 #' @keywords internal
 create_example_data <- function() {

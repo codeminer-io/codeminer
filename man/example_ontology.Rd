@@ -10,9 +10,9 @@
 A list with the following structure:
 \itemize{
 \item \code{lookup_tables} - List of lookup data frames (capital_letters, lowercase_letters)
-\item \code{lookup_metadata} - List of lookup metadata data frames
+\item \code{lookup_metadata} - Lookup metadata data frame
 \item \code{mapping_tables} - List of mapping data frames (capital_to_lowercase)
-\item \code{mapping_metadata} - List of mapping metadata data frames
+\item \code{mapping_metadata} - Mapping metadata data frame
 }
 
 Each category contains versions v1, v2, and v3.

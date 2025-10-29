@@ -9,7 +9,7 @@ lockEnvironment(codeminer_metadata_table_names)
 #' Set up the codeminer database and create the required lookup and
 #' mapping metadata tables.
 #'
-#' @param overwrite Logical indicating whether to overwrite existing tables
+#' @param overwrite Logical indicating whether to overwrite existing tables (default: `FALSE`)
 #'
 #' @return `TRUE` invisibly if successful.
 #'
@@ -36,9 +36,9 @@ build_database <- function(overwrite = FALSE) {
 #' Create lookup metadata table in database
 #'
 #' @param con Database connection, as returned by [DBI::dbConnect()]
-#' @param overwrite Logical indicating whether to overwrite existing table
+#' @param overwrite Logical indicating whether to overwrite existing table (default: `FALSE`)
 #'
-#' @return Invisible TRUE on success
+#' @return Invisible `TRUE` on success
 #' @noRd
 create_lookup_metadata_table <- function(con, overwrite = FALSE) {
   tbl_name <- codeminer_metadata_table_names$lookup
@@ -66,9 +66,9 @@ create_lookup_metadata_table <- function(con, overwrite = FALSE) {
 #' Create mapping metadata table in database
 #'
 #' @param con Database connection, as returned by [DBI::dbConnect()]
-#' @param overwrite Logical indicating whether to overwrite existing table
+#' @param overwrite Logical indicating whether to overwrite existing table (default: `FALSE`)
 #'
-#' @return Invisible TRUE on success
+#' @return Invisible `TRUE` on success
 #' @noRd
 create_mapping_metadata_table <- function(con, overwrite = FALSE) {
   tbl_name <- codeminer_metadata_table_names$mapping
@@ -99,11 +99,12 @@ create_table <- function(con, tbl_name, fields, overwrite = FALSE) {
     )
     return(invisible(TRUE))
   }
-  DBI::dbCreateTable(
+  success <- DBI::dbCreateTable(
     con,
     name = tbl_name,
     fields = fields
   )
+  return(invisible(success))
 }
 
 #' Get required lookup metadata column names
@@ -148,12 +149,16 @@ required_relationship_metadata_columns <- function() {
   )
 }
 
+# Helper function to connect to the database
+# .envir = parent.frame() ensures the connection is closed when the caller exits.
 connect_to_db <- function(..., .envir = parent.frame()) {
   con <- DBI::dbConnect(duckdb::duckdb(), db_path())
   withr::defer(DBI::dbDisconnect(con), envir = .envir)
   return(con)
 }
 
+# Helper function to get the path to the database file
+# Either configured through environment variable or default location
 db_path <- function() {
   env_value <- Sys.getenv("CODEMINER_DB_PATH")
   if (env_value != "") {
