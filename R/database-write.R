@@ -10,25 +10,35 @@ create_dummy_database <- function() {
   add_lookup_table(lookup_table, lookup_metadata, overwrite = TRUE)
 }
 
-#' Add lookup table to database
+#' Add a lookup table to the database
 #'
-#' Add a lookup table to the database.
+#' Add a lookup table to the database together with its metadata.
+#' Note that it is not possible to overwrite an existing lookup table.
+#'
+#' Lookup tables are indexed by their `coding_type` and `version`, specified in
+#' [lookup_metadata()]. This index needs to be unique and is used to identify
+#' the lookup table in the database. If a lookup table with the same
+#' `coding_type` and `version` already exists, the function will emit a warning
+#' and return `FALSE` (invisibly) without any effect. Use a different `version`
+#' to add a new version of the lookup table for the given `coding_type`.
 #'
 #' @param table The lookup table to add, should be coercible to a `data.frame`
 #' @param metadata The lookup metadata, as specified by [lookup_metadata()].
-#' @param overwrite Boolean, whether to overwrite an existing table (default: `FALSE`)
 #'
-#' @return `TRUE` invisibly if successful
+#' @return `TRUE` invisibly if successful, `FALSE` invisibly if the lookup table
+#' already exists.
 #'
-#' @seealso [lookup_metadata()]
+#' @seealso [lookup_metadata()] for the specification of the metadata.
 #' @export
 #' @examples
 #' # Using the example ontology data included in codeminer
 #' lookup_table <- example_ontology$lookup_tables$capital_letters_v3
 #' lookup_table
 #'
+#' # Using a temporary database
+#' Sys.setenv(CODEMINER_DB_PATH = tempfile())
 #' add_lookup_table(lookup_table, lookup_metadata("capital_letters", version = "v3"))
-add_lookup_table <- function(table, metadata, overwrite = FALSE) {
+add_lookup_table <- function(table, metadata) {
   validate_lookup_metadata(metadata, arg = rlang::caller_arg(metadata))
 
   table_name <- metadata$lookup_table_name
@@ -42,12 +52,23 @@ add_lookup_table <- function(table, metadata, overwrite = FALSE) {
   metadata <- as.data.frame(metadata)
 
   con <- connect_to_db()
-  add_lookup_metadata(con, metadata)
+  meta_added <- add_lookup_metadata(con, metadata)
+  if (!meta_added) {
+    cli::cli_warn(
+      c(
+        "The lookup table {.field {metadata$lookup_table_name}} already exists.",
+        "i" = "Use a different {.arg coding_type} or {.arg version} in {.arg metadata} to add a new lookup table."
+      ),
+      call = rlang::caller_env()
+    )
+    return(invisible(FALSE))
+  }
+
   success <- DBI::dbWriteTable(
     con,
     name = table_name,
     value = table,
-    overwrite = overwrite
+    overwrite = FALSE
   )
   return(invisible(success))
 }
@@ -106,7 +127,7 @@ lookup_metadata <- function(
   ))
 }
 
-add_mapping_table <- function(table, metadata, overwrite = FALSE) {}
+add_mapping_table <- function(table, metadata) {}
 
 add_lookup_metadata <- function(con, metadata) {
   tbl_name <- codeminer_metadata_table_names$lookup
@@ -116,14 +137,9 @@ add_lookup_metadata <- function(con, metadata) {
   current_metadata <- get_lookup_metadata(con)
   exists <- ids[ids %in% current_metadata$lookup_table_name]
 
+  # Don't allow overwriting existing metadata
   if (length(exists) > 0) {
-    cli::cli_abort(
-      c(
-        "Metadata for {.field {exists}} already exists.",
-        "i" = "Use a different {.arg coding_type} or {.arg version}."
-      ),
-      call = rlang::caller_env()
-    )
+    return(invisible(FALSE))
   }
 
   meta_df <- as.data.frame(metadata)
