@@ -9,4 +9,5 @@ local_temp_database <- function(..., .envir = parent.frame()) {
 local_build_temp_database <- function(..., .envir = parent.frame()) {
   temp_db <- local_temp_database(.envir = .envir)
   build_database(overwrite = TRUE)
+  invisible(temp_db)
 }

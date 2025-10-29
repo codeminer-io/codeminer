@@ -45,7 +45,6 @@ test_that("build_database() creates a valid codeminer database", {
   tables <- DBI::dbListTables(con)
   expect_type(tables, "character")
   expect_length(tables, 2)
-  tables <- DBI::dbListTables(con)
   expect_true("lookup_metadata" %in% tables)
   expect_true("mapping_metadata" %in% tables)
 
