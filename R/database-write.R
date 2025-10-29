@@ -91,6 +91,7 @@ add_lookup_table <- function(table, metadata) {
 #'
 #' @param coding_type The type of coding system (e.g., ICD-10, SNOMED-CT)
 #' @param version The version of the lookup metadata (default: "v0")
+#' @inheritParams rlang::args_dots_empty
 #' @param hierarchy_type The type of hierarchy (should be one of `c("lexical", "relational")`)
 #' @param lookup_code_col The column name for the lookup code (default: "code")
 #' @param lookup_description_col The column name for the lookup description (default: "description")

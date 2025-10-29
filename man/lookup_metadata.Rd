@@ -21,6 +21,8 @@ lookup_metadata(
 
 \item{version}{The version of the lookup metadata (default: "v0")}
 
+\item{...}{These dots are for future extensions and must be empty.}
+
 \item{hierarchy_type}{The type of hierarchy (should be one of \code{c("lexical", "relational")})}
 
 \item{lookup_code_col}{The column name for the lookup code (default: "code")}
