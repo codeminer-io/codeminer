@@ -100,7 +100,6 @@ add_lookup_table <- function(table, metadata) {
 #' @param coding_type The type of coding system (e.g., ICD-10, SNOMED-CT)
 #' @param version The version of the lookup metadata (default: "v0")
 #' @inheritParams rlang::args_dots_empty
-#' @param hierarchy_type The type of hierarchy (should be one of `c("lexical", "relational")`)
 #' @param lookup_code_col The column name for the lookup code (default: "code")
 #' @param lookup_description_col The column name for the lookup description (default: "description")
 #' @param lookup_source The source of the lookup metadata (default: `NA_character_`)
@@ -117,7 +116,6 @@ lookup_metadata <- function(
   coding_type,
   version = "v0",
   ...,
-  hierarchy_type = c("lexical", "relational"),
   lookup_code_col = "code",
   lookup_description_col = "description",
   lookup_source = NA_character_,
@@ -127,17 +125,11 @@ lookup_metadata <- function(
   rlang::check_dots_empty()
 
   lookup_table_name <- paste(coding_type, version, sep = "_")
-  hierarchy_type <- rlang::arg_match(hierarchy_type)
-
-  if (hierarchy_type == "relational") {
-    cli::cli_abort("Relational hierarchy type is not supported yet.")
-  }
 
   return(list(
     lookup_table_name = lookup_table_name,
     coding_type = coding_type,
     lookup_version = version,
-    hierarchy_type = hierarchy_type,
     lookup_code_col = lookup_code_col,
     lookup_description_col = lookup_description_col,
     lookup_source = lookup_source,
