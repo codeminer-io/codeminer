@@ -81,10 +81,10 @@ create_example_data <- function() {
   )
 
   mapping_metadata <- tibble::tribble(
-    ~mapping_table_name       , ~from_coding_type , ~to_coding_type     , ~from_col , ~to_col     ,
-    "capital_to_lowercase_v1" , "capital_letters" , "lowercase_letters" , "capital" , "lowercase" ,
-    "capital_to_lowercase_v2" , "capital_letters" , "lowercase_letters" , "capital" , "lowercase" ,
-    "capital_to_lowercase_v3" , "capital_letters" , "lowercase_letters" , "capital" , "lowercase"
+    ~mapping_table_name       , ~from_coding_type , ~to_coding_type     , ~mapping_version , ~from_col , ~to_col     ,
+    "capital_to_lowercase_v1" , "capital_letters" , "lowercase_letters" , "v1"             , "capital" , "lowercase" ,
+    "capital_to_lowercase_v2" , "capital_letters" , "lowercase_letters" , "v2"             , "capital" , "lowercase" ,
+    "capital_to_lowercase_v3" , "capital_letters" , "lowercase_letters" , "v3"             , "capital" , "lowercase"
   )
 
   return(list(

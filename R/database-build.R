@@ -124,6 +124,7 @@ required_mapping_metadata_columns <- function() {
   c(
     "from_coding_type",
     "to_coding_type",
+    "mapping_version",
     "from_col",
     "to_col"
   )
