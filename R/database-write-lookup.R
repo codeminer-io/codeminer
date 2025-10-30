@@ -83,6 +83,11 @@ add_lookup_table <- function(table, metadata) {
     value = table,
     overwrite = FALSE
   )
+  if (success) {
+    cli::cli_alert_success(
+      "Lookup table {.field {metadata$lookup_table_name}} added successfully."
+    )
+  }
   return(invisible(success))
 }
 
@@ -147,10 +152,10 @@ add_lookup_metadata <- function(con, metadata) {
   # Check for duplicate lookup_table_name
   ids <- metadata$lookup_table_name
   current_metadata <- get_lookup_metadata(con)
-  exists <- ids[ids %in% current_metadata$lookup_table_name]
+  exists <- any(ids %in% current_metadata$lookup_table_name)
 
   # Don't allow overwriting existing metadata
-  if (length(exists) > 0) {
+  if (exists) {
     return(invisible(FALSE))
   }
 
