@@ -1,7 +1,7 @@
 # Use locked environment to store global variables
 codeminer_metadata_table_names <- new.env(parent = emptyenv())
-codeminer_metadata_table_names$lookup <- "lookup_metadata"
-codeminer_metadata_table_names$mapping <- "mapping_metadata"
+codeminer_metadata_table_names$lookup <- "_lookup_metadata"
+codeminer_metadata_table_names$mapping <- "_mapping_metadata"
 lockEnvironment(codeminer_metadata_table_names)
 
 #' Build the Codeminer database
