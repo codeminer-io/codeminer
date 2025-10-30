@@ -3,6 +3,9 @@ withr::local_options(
   cli.default_handler = function(...) {}
 )
 
+lookup_metadata_name <- "_lookup_metadata"
+mapping_metadata_name <- "_mapping_metadata"
+
 test_that("db_path() returns correct path based on environment variable", {
   custom_path <- "/tmp/test_db.duckdb"
   withr::with_envvar(
@@ -45,17 +48,17 @@ test_that("build_database() creates a valid codeminer database", {
   tables <- DBI::dbListTables(con)
   expect_type(tables, "character")
   expect_length(tables, 2)
-  expect_true("lookup_metadata" %in% tables)
-  expect_true("mapping_metadata" %in% tables)
+  expect_true(lookup_metadata_name %in% tables)
+  expect_true(mapping_metadata_name %in% tables)
 
   # Check table schema
-  lookup_fields <- DBI::dbListFields(con, "lookup_metadata")
+  lookup_fields <- DBI::dbListFields(con, lookup_metadata_name)
   required_lookup_fields <- required_lookup_metadata_columns()
   for (x in required_lookup_fields) {
     expect_true(x %in% lookup_fields)
   }
 
-  mapping_fields <- DBI::dbListFields(con, "mapping_metadata")
+  mapping_fields <- DBI::dbListFields(con, mapping_metadata_name)
   required_mapping_fields <- required_mapping_metadata_columns()
   for (x in required_mapping_fields) {
     expect_true(x %in% mapping_fields)
@@ -83,11 +86,11 @@ test_that("create_lookup_metadata_table() respects overwrite parameter", {
   # Insert a test row
   DBI::dbExecute(
     con,
-    "INSERT INTO lookup_metadata (lookup_table_name) VALUES ('test')"
+    "INSERT INTO _lookup_metadata (lookup_table_name) VALUES ('test')"
   )
   row_count_before <- DBI::dbGetQuery(
     con,
-    "SELECT COUNT(*) as n FROM lookup_metadata"
+    "SELECT COUNT(*) as n FROM _lookup_metadata"
   )$n
   expect_equal(row_count_before, 1)
 
@@ -95,7 +98,7 @@ test_that("create_lookup_metadata_table() respects overwrite parameter", {
   create_lookup_metadata_table(con, overwrite = FALSE)
   row_count_after <- DBI::dbGetQuery(
     con,
-    "SELECT COUNT(*) as n FROM lookup_metadata"
+    "SELECT COUNT(*) as n FROM _lookup_metadata"
   )$n
   expect_equal(row_count_after, 1)
 
@@ -103,7 +106,7 @@ test_that("create_lookup_metadata_table() respects overwrite parameter", {
   create_lookup_metadata_table(con, overwrite = TRUE)
   row_count_overwrite <- DBI::dbGetQuery(
     con,
-    "SELECT COUNT(*) as n FROM lookup_metadata"
+    "SELECT COUNT(*) as n FROM _lookup_metadata"
   )$n
   expect_equal(row_count_overwrite, 0)
 })
@@ -117,11 +120,11 @@ test_that("create_mapping_metadata_table() respects overwrite parameter", {
   create_mapping_metadata_table(con, overwrite = FALSE)
   DBI::dbExecute(
     con,
-    "INSERT INTO mapping_metadata (mapping_table_name) VALUES ('test')"
+    "INSERT INTO _mapping_metadata (mapping_table_name) VALUES ('test')"
   )
   row_count_before <- DBI::dbGetQuery(
     con,
-    "SELECT COUNT(*) as n FROM mapping_metadata"
+    "SELECT COUNT(*) as n FROM _mapping_metadata"
   )$n
   expect_equal(row_count_before, 1)
 
@@ -129,7 +132,7 @@ test_that("create_mapping_metadata_table() respects overwrite parameter", {
   create_mapping_metadata_table(con, overwrite = TRUE)
   row_count_after <- DBI::dbGetQuery(
     con,
-    "SELECT COUNT(*) as n FROM mapping_metadata"
+    "SELECT COUNT(*) as n FROM _mapping_metadata"
   )$n
   expect_equal(row_count_after, 0)
 })
