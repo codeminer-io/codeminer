@@ -141,11 +141,6 @@ lookup_metadata <- function(
   ))
 }
 
-add_mapping_table <- function(table, metadata) {
-  con <- connect_to_db()
-  check_database(con)
-}
-
 add_lookup_metadata <- function(con, metadata) {
   tbl_name <- codeminer_metadata_table_names$lookup
 
