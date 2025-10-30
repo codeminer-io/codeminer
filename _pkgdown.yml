@@ -3,14 +3,17 @@ template:
   bootstrap: 5
 
 reference:
-- title: Setting up
-  desc: Build a local resource with lookup and mapping tables for various clinical coding systems.
+- title: Database management
+  desc: Build a local database with lookup and mapping tables for various clinical coding systems.
 - contents:
   - get_ukb_all_lkps_maps
   - read_all_lkps_maps
   - build_all_lkps_maps
   - all_lkps_maps_to_db
   - get_all_lkps_maps_db_metadata
+  - build_database
+  - create_dummy_database
+  - add_lookup_table
 
 - title: Clinical codes
   desc:  Functions for looking up clinical codes and mapping between different codisng systems.
@@ -28,6 +31,7 @@ reference:
   - get_col_filters
   - matches("ATTRIBUTE")
   - filter_sct_relationship
+  - lookup_metadata
 
 - title: CALIBER
   desc:  Functions for reformatting CALIBER codelists to use with UK Biobank data
@@ -43,6 +47,7 @@ reference:
 - contents:
   - ends_with("dummy")
   - starts_with("dummy")
+  - example_ontology
 
 - title:: Utilities
   desc: Miscellaneous utility functions.
