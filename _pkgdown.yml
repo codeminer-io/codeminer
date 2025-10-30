@@ -14,6 +14,7 @@ reference:
   - build_database
   - create_dummy_database
   - add_lookup_table
+  - add_mapping_table
 
 - title: Clinical codes
   desc:  Functions for looking up clinical codes and mapping between different codisng systems.
@@ -32,6 +33,7 @@ reference:
   - matches("ATTRIBUTE")
   - filter_sct_relationship
   - lookup_metadata
+  - mapping_metadata
 
 - title: CALIBER
   desc:  Functions for reformatting CALIBER codelists to use with UK Biobank data
