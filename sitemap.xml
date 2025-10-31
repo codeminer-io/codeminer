@@ -19,12 +19,16 @@
 <url><loc>https://codeminer-io.github.io/codeminer/reference/GET_ATTRIBUTES.html</loc></url>
 <url><loc>https://codeminer-io.github.io/codeminer/reference/HAS_ATTRIBUTES.html</loc></url>
 <url><loc>https://codeminer-io.github.io/codeminer/reference/MAP.html</loc></url>
+<url><loc>https://codeminer-io.github.io/codeminer/reference/add_lookup_table.html</loc></url>
+<url><loc>https://codeminer-io.github.io/codeminer/reference/add_mapping_table.html</loc></url>
 <url><loc>https://codeminer-io.github.io/codeminer/reference/all_lkps_maps_to_db.html</loc></url>
 <url><loc>https://codeminer-io.github.io/codeminer/reference/build_all_lkps_maps.html</loc></url>
 <url><loc>https://codeminer-io.github.io/codeminer/reference/build_all_lkps_maps_dummy.html</loc></url>
+<url><loc>https://codeminer-io.github.io/codeminer/reference/build_database.html</loc></url>
 <url><loc>https://codeminer-io.github.io/codeminer/reference/codeminer-package.html</loc></url>
 <url><loc>https://codeminer-io.github.io/codeminer/reference/codeminer_metadata.html</loc></url>
 <url><loc>https://codeminer-io.github.io/codeminer/reference/codes_like.html</loc></url>
+<url><loc>https://codeminer-io.github.io/codeminer/reference/create_dummy_database.html</loc></url>
 <url><loc>https://codeminer-io.github.io/codeminer/reference/default_col_filters.html</loc></url>
 <url><loc>https://codeminer-io.github.io/codeminer/reference/default_overlapping_disease_categories_csv.html</loc></url>
 <url><loc>https://codeminer-io.github.io/codeminer/reference/download_caliber_repo.html</loc></url>
@@ -35,6 +39,7 @@
 <url><loc>https://codeminer-io.github.io/codeminer/reference/dummy_icd10_phecode_map_path.html</loc></url>
 <url><loc>https://codeminer-io.github.io/codeminer/reference/dummy_phecode_lkp_path.html</loc></url>
 <url><loc>https://codeminer-io.github.io/codeminer/reference/dummy_ukb_codings_path.html</loc></url>
+<url><loc>https://codeminer-io.github.io/codeminer/reference/example_ontology.html</loc></url>
 <url><loc>https://codeminer-io.github.io/codeminer/reference/filter_sct_relationship.html</loc></url>
 <url><loc>https://codeminer-io.github.io/codeminer/reference/get_all_lkps_maps_db_metadata.html</loc></url>
 <url><loc>https://codeminer-io.github.io/codeminer/reference/get_bnf_from_open_prescribing.html</loc></url>
@@ -51,6 +56,8 @@
 <url><loc>https://codeminer-io.github.io/codeminer/reference/get_ukb_self_report_med_to_atc_map.html</loc></url>
 <url><loc>https://codeminer-io.github.io/codeminer/reference/index.html</loc></url>
 <url><loc>https://codeminer-io.github.io/codeminer/reference/infix_setops.html</loc></url>
+<url><loc>https://codeminer-io.github.io/codeminer/reference/lookup_metadata.html</loc></url>
+<url><loc>https://codeminer-io.github.io/codeminer/reference/mapping_metadata.html</loc></url>
 <url><loc>https://codeminer-io.github.io/codeminer/reference/pipe.html</loc></url>
 <url><loc>https://codeminer-io.github.io/codeminer/reference/read_all_lkps_maps.html</loc></url>
 <url><loc>https://codeminer-io.github.io/codeminer/reference/read_all_lkps_maps_dummy.html</loc></url>
