@@ -27,11 +27,23 @@ check_database <- function(con) {
   return(invisible(TRUE))
 }
 
+#' Return the lookup metadata table as a data frame
+#'
+#' @param con A database connection object. Uses the default connection if not provided.
+#' @return A data frame containing the lookup metadata.
+#' @keywords internal
+#' @noRd
 get_lookup_metadata <- function(con = connect_to_db()) {
   tbl_name <- codeminer_metadata_table_names$lookup
   get_table_from_db(con, tbl_name)
 }
 
+#' Return the mapping metadata table as a data frame
+#'
+#' @param con A database connection object. Uses the default connection if not provided.
+#' @return A data frame containing the mapping metadata.
+#' @keywords internal
+#' @noRd
 get_mapping_metadata <- function(con = connect_to_db()) {
   tbl_name <- codeminer_metadata_table_names$mapping
   get_table_from_db(con, tbl_name)

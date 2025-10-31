@@ -116,6 +116,13 @@ lookup_metadata <- function(
   ))
 }
 
+#' Add lookup metadata to the database
+#'
+#' @param con A database connection object.
+#' @param metadata A list containing the lookup metadata.
+#' @return A logical value, invisibly, indicating whether the metadata was successfully added.
+#' @keywords internal
+#' @noRd
 add_lookup_metadata <- function(con, metadata) {
   tbl_name <- codeminer_metadata_table_names$lookup
 
@@ -134,6 +141,14 @@ add_lookup_metadata <- function(con, metadata) {
   return(invisible(success))
 }
 
+#' Validate lookup metadata
+#'
+#' @param metadata A list containing the lookup metadata.
+#' @param arg The argument name. Used to construct error message.
+#' @param call The calling environment. Used to construct error message.
+#' @return A logical value, invisibly, indicating whether the metadata is valid.
+#' @keywords internal
+#' @noRd
 validate_lookup_metadata <- function(
   metadata,
   arg = rlang::caller_arg(metadata),

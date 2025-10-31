@@ -115,6 +115,13 @@ mapping_metadata <- function(
   ))
 }
 
+#' Add mapping metadata to the database.
+#'
+#' @param con A database connection.
+#' @param metadata A list containing the mapping metadata.
+#' @return A logical value, invisibly, indicating whether the metadata was added successfully.
+#' @keywords internal
+#' @noRd
 add_mapping_metadata <- function(con, metadata) {
   tbl_name <- codeminer_metadata_table_names$mapping
 
@@ -133,6 +140,14 @@ add_mapping_metadata <- function(con, metadata) {
   return(invisible(success))
 }
 
+#' Validate mapping metadata.
+#'
+#' @param metadata A list containing the mapping metadata.
+#' @param arg The argument name. Used to construct error message.
+#' @param call The calling environment. Used to construct error message.
+#' @return A logical value, invisibly, indicating whether the metadata is valid.
+#' @keywords internal
+#' @noRd
 validate_mapping_metadata <- function(
   metadata,
   arg = rlang::caller_arg(metadata),
