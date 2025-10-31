@@ -38,7 +38,8 @@ Imports:
     tidyselect,
     ukbwranglr,
     utils,
-    withr
+    withr,
+    rappdirs
 Suggests:
     PheWAS,
     covr,
