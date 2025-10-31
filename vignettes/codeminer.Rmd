@@ -34,7 +34,7 @@ Also included are functions for mapping between different clinical coding system
 
 # Build a local clinical codes lookup and mappings resource
 
-The first step is to create a local database containing lookup and mapping tables for various clinical coding systems using `build_all_lkps_maps()`.
+The first step is to create a local database containing lookup and mapping tables for various clinical coding systems using `build_database()`.
 
 By default this will download the following resources:
 
@@ -46,44 +46,40 @@ By default this will download the following resources:
 
 The tables are imported into R, reformatted, and stored as a named list of data frames:
 
-```{r}
-# build dummy all_lkps_maps resource (supressing warning messages)
-all_lkps_maps_dummy <- build_all_lkps_maps_dummy()
-
-# view first few rows of ICD10 lookup table
-head(all_lkps_maps_dummy$icd10_lkp)
+```{r create_dummy_database}
+# Create a temporary database with dummy data
+(db_path <- create_dummy_database())
+Sys.getenv("CODEMINER_DB_PATH")
 ```
 
-Many of the functions in this package will require this object (supplied to argument `all_lkps_maps`).
+Setting the `CODEMINER_DB_PATH` environment variable ensures that all subsequent `codeminer` calls will use this database.
 
-Instead of re-running `build_all_lkps_maps()` in each new R session, the output can be saved to a Duckdb database file:
+To persist the database across sessions, set the `CODEMINER_DB_PATH` environment variable to a path on your system, e.g. using
+[`usethis::edit_r_environ(scope = "project")`](https://usethis.r-lib.org/reference/edit.html?q=edit_r_environ#ref-usage):
 
-```{r}
-# write to Duckdb database file
-db_path <- suppressMessages(all_lkps_maps_to_db(all_lkps_maps = all_lkps_maps_dummy, 
-                               db_path = tempfile()))
+```
+# ./.Renviron
+CODEMINER_DB_PATH=/path/to/codeminer-database.duckdb
 ```
 
-Connect to this and create a named list of `dbplyr::tbl_dbi`[^2] objects:
+Alternatively, if the environment variable is not set, `codeminer` will store the database in a default location,
+determined by
+[`rappdirs::user_data_dir()`](https://rappdirs.r-lib.org/reference/user_data_dir.html).
 
-[^2]: If you have not used SQL with R before, I recommend reading the [Get started](https://dbplyr.tidyverse.org/articles/dbplyr.html "Using SQL with R") vignette from the dbplyr package.
+The database is a [duckdb](https://r.duckdb.org/index.html) database and can be inspected using the
+[DBI](https://dbi.r-dbi.org/) package.
 
-```{r}
+```{r connect_to_db}
 # connect to Duckdb database
 con <- DBI::dbConnect(duckdb::duckdb(), db_path, read_only = TRUE)
+DBI::dbListTables(con)
 
-# create named list of tbl_db objects
-all_lkps_maps_dummy_db <- ukbwranglr::db_tables_to_list(con)
-
-# view first few rows of ICD10 lookup table
-head(all_lkps_maps_dummy_db$icd10_lkp)
+# Close the connection when you're done
+DBI::dbDisconnect(con)
 ```
 
-Either will work with the functions described in the remainder of this vignette, but the Duckdb database option is recommended. For convenience, record the path to your Duckdb database in a `.Renviron` file:
+Note that manual interaction with the database should not be necessary, `codeminer` will take care of this for you.
 
-    ALL_LKPS_MAPS_DB=/PATH/TO/all_lkps_maps.db
-
-Assuming you are using a [RStudio project](https://r4ds.had.co.nz/workflow-projects.html#rstudio-projects "R for Data Science"), this will set an environmental variable called `ALL_LKPS_MAPS_DB` when you start a new R session. Functions with an `all_lkps_maps` argument will automatically search for this variable and attempt to connect with the database file at that path, meaning you will not need to repeatedly type this in your self.
 
 # Build a clinical code list
 
@@ -91,39 +87,37 @@ Assuming you are using a [RStudio project](https://r4ds.had.co.nz/workflow-proje
 
 Codes may be explored with:
 
--   `CODES()`:
+- `CODES()`: look up descriptions for a set of code in the given code system type
 
-<!-- -->
-
-```{r}
+```{r CODES}
 CODES(
   codes = c("E10", "E11"),
-  code_type = "icd10",
-  all_lkps_maps = all_lkps_maps_dummy_db
+  code_type = "icd10"
 )
 ```
 
--   `codes_starting_with()`:
+- `DESCRIPTION():` search for codes that match a description
 
-<!-- -->
-
-```{r}
-CHILDREN(codes = "E10",
-                code_type = "icd10",
-                all_lkps_maps = all_lkps_maps_dummy_db)
+```{r DESCRIPTION}
+DESCRIPTION(
+  reg_expr = "cyst",
+  code_type = "icd10",
+)
 ```
 
--   `DESCRIPTION():`
+<!-- TODO: add in `CHILDREN()` again, once supported -->
 
-<!-- -->
+<!-- ```{r CHILDREN} -->
+<!-- CHILDREN( -->
+<!--   codes = "E10", -->
+<!--   code_type = "icd10" -->
+<!-- ) -->
+<!-- ``` -->
 
-```{r}
-DESCRIPTION(reg_expr = "cyst",
-                       code_type = "icd10",
-                       all_lkps_maps = all_lkps_maps_dummy_db)
-```
 
 ## R Shiny app
+
+<!-- TODO: to be moved to the `codeminer-app` package vignettes -->
 
 Use `RunCodelistBuilder()` to launch a R Shiny app for building a clinical code list.[^3] The aim is to develop a broad search strategy that captures all clinincal codes that might possibly be included, then download the search results and manually select and sub-categorise the final set of codes:
 
