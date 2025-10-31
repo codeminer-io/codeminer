@@ -41,31 +41,6 @@ create_dummy_database <- function(
   return(invisible(db_path))
 }
 
-get_example_data <- function() {
-  # Workaround for the R CMD check note "no visible binding for global variable 'example_ontology'"
-  # and avoid loading it in the user's global environment
-  example_data <- codeminer::example_ontology
-  capital_lookup <- example_data$lookup_tables$capital_letters_v3
-  capital_lookup_meta <- example_data$lookup_metadata |>
-    dplyr::filter(.data$lookup_table_name == "capital_letters_v3")
-  lowercase_lookup <- example_data$lookup_tables$lowercase_letters_v3
-  lowercase_lookup_meta <- example_data$lookup_metadata |>
-    dplyr::filter(.data$lookup_table_name == "lowercase_letters_v3")
-
-  mapping_table <- example_data$mapping_tables$capital_to_lowercase_v3
-  mapping_metadata <- example_data$mapping_metadata |>
-    dplyr::filter(.data$mapping_table_name == "capital_to_lowercase_v3")
-
-  return(list(
-    capital_lookup_table = capital_lookup,
-    capital_lookup_metadata = capital_lookup_meta,
-    lowercase_lookup_table = lowercase_lookup,
-    lowercase_lookup_metadata = lowercase_lookup_meta,
-    mapping_table = mapping_table,
-    mapping_metadata = mapping_metadata
-  ))
-}
-
 # Helper to generate dummy ICD-10 Lookup data
 dummy_icd10_lookup <- function() {
   raw_path <- system.file(
