@@ -20,32 +20,22 @@
 #'   codes = c("E10", "E11"),
 #'   code_type = "icd10"
 #' )
-CODES <- function(
-  codes,
-  code_type = getOption("codeminer.code_type")
-) {
+CODES <- function(codes, code_type = getOption("codeminer.code_type")) {
   if (is.data.frame(codes)) {
     code_type <- codes$code_type[1]
     codes <- codes$code
   }
 
-  # validate args
   check_codes(codes)
+  check_code_type(code_type)
 
-  if (length(codes) == 1) {
-    codes <- codes_string_to_vector(codes)
+  lookup_metadata <- get_lookup_metadata()
+  if (!(code_type %in% lookup_metadata$code_type)) {
+    cli::cli_abort(c(
+      "Code type '{code_type}' not found in lookup metadata.",
+      "i" = "Did you add the lookup table with {.fun codeminer::add_lookup_table}?"
+    ))
   }
-
-  stopifnot(!is.null(code_type))
-
-  match.arg(
-    arg = code_type,
-    choices = CODE_TYPE_TO_LKP_TABLE_MAP$code
-  )
-
-  create_db_connection(all_lkps_maps)
-
-  validate_all_lkps_maps()
 
   # determine relevant lookup sheet
   lkp_table <- get_lookup_sheet(code_type = code_type)
