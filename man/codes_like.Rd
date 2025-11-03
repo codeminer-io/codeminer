@@ -18,37 +18,13 @@ CODES_LIKE(
 \arguments{
 \item{reg_expr}{a regular expression to search for}
 
-\item{code_type}{character. Type of clinical code system to be searched. One
-of icd10, icd9, read3, read2, sct, opcs4, phecode, read2_drugs, bnf, dmd, data_coding_3, data_coding_4, data_coding_5, data_coding_6, medcode_aurum, or prodcode_aurum.}
-
-\item{all_lkps_maps}{Either a named list of lookup and mapping tables
-(either data frames or \code{tbl_dbi} objects), or the path to a Duckdb database
-containing these tables. If \code{NULL}, will attempt to connect to a Duckdb
-database named 'all_lkps_maps.db' in the current working directory, or to
-a a Duckdb database specified by an environmental variable named
-'ALL_LKPS_MAPS_DB' (see
-\href{https://resources.numbat.space/using-rprofile-and-renviron.html#renviron}{here}
-for how to set environment variables using a \code{.Renviron} file). The latter
-method will be used in preference.}
+\item{code_type}{character. Type of clinical code system to be searched.
+Depends on what is available in the lookup tables. See \code{\link[=add_lookup_table]{add_lookup_table()}}
+on how to add new lookup tables. This can also be configured through the \code{codeminer.code_type} option.}
 
 \item{codes_only}{bool. If \code{TRUE}, return a character vector of
 \emph{unique} codes. If \code{FALSE} (default), return a data frame of all
 results including code descriptions (useful for manual validation).}
-
-\item{preferred_description_only}{If \code{TRUE} (default), return only preferred
-descriptions for clinical codes with synonyms. Will only apply if
-\code{standardise_output} is also \code{TRUE}.}
-
-\item{standardise_output}{bool. If \code{TRUE} (default), outputs a data
-frame with columns named 'code', 'description' and 'code_type'. Otherwise
-returns a data frame with all columns from the relevant look up table.}
-
-\item{col_filters}{A named list where each name in the list refers to the
-name of a lookup or mapping table. Each item is also a named list, where
-the names refer to column names in the corresponding table, and the items
-are vectors of values to filter for. For example, \verb{list(my_lookup_table = list(colA = c("A", "B"))} will result in \code{my_lookup_table} being filtered
-for rows where \code{colA} is either 'A' or 'B'. Uses \code{default_col_filters()} by
-default. Set to \code{NULL} to remove all filters.}
 }
 \value{
 data frame by default, or a character vector of codes if

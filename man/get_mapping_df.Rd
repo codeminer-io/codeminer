@@ -19,16 +19,6 @@ get_mapping_df(
 
 \item{from}{A clinical coding system to map from.}
 
-\item{all_lkps_maps}{Either a named list of lookup and mapping tables
-(either data frames or \code{tbl_dbi} objects), or the path to a Duckdb database
-containing these tables. If \code{NULL}, will attempt to connect to a Duckdb
-database named 'all_lkps_maps.db' in the current working directory, or to
-a a Duckdb database specified by an environmental variable named
-'ALL_LKPS_MAPS_DB' (see
-\href{https://resources.numbat.space/using-rprofile-and-renviron.html#renviron}{here}
-for how to set environment variables using a \code{.Renviron} file). The latter
-method will be used in preference.}
-
 \item{rename_from_to}{Optionally supply a named vector to rename the 'from'
 and 'to' columns. For example \code{c(from = "original_codes", to = "new_codes")}. By default, the columns will be named using the values for
 \code{from} and \code{to} arguments.}
@@ -42,13 +32,6 @@ map between coding systems for which a mapping table does not exist. If
 'warning', will raise a warning and attempt to use an existing mapping
 table in the opposite direction (for example, a mapping from ICD10 to Read
 3 would be attempted using the Read 3-to-ICD10 mapping table).}
-
-\item{col_filters}{A named list where each name in the list refers to the
-name of a lookup or mapping table. Each item is also a named list, where
-the names refer to column names in the corresponding table, and the items
-are vectors of values to filter for. For example, \verb{list(my_lookup_table = list(colA = c("A", "B"))} will result in \code{my_lookup_table} being filtered
-for rows where \code{colA} is either 'A' or 'B'. Uses \code{default_col_filters()} by
-default. Set to \code{NULL} to remove all filters.}
 }
 \value{
 A data frame with column names 'from' and 'to'.

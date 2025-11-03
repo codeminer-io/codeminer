@@ -20,12 +20,12 @@ Add a lookup table to the database together with its metadata.
 Note that it is not possible to overwrite an existing lookup table.
 }
 \details{
-Lookup tables are indexed by their \code{coding_type} and \code{version}, specified in
+Lookup tables are indexed by their \code{code_type} and \code{version}, specified in
 \code{\link[=lookup_metadata]{lookup_metadata()}}. This index needs to be unique and is used to identify
 the lookup table in the database. If a lookup table with the same
-\code{coding_type} and \code{version} already exists, the function will emit a warning
+\code{code_type} and \code{version} already exists, the function will emit a warning
 and return \code{FALSE} (invisibly) without any effect. Use a different \code{version}
-to add a new version of the lookup table for the given \code{coding_type}.
+to add a new version of the lookup table for the given \code{code_type}.
 }
 \examples{
 # Using the example ontology data included in codeminer

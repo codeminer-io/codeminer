@@ -24,16 +24,6 @@ MAP(
 
 \item{from}{Coding system that \code{codes} belong to.}
 
-\item{all_lkps_maps}{Either a named list of lookup and mapping tables
-(either data frames or \code{tbl_dbi} objects), or the path to a Duckdb database
-containing these tables. If \code{NULL}, will attempt to connect to a Duckdb
-database named 'all_lkps_maps.db' in the current working directory, or to
-a a Duckdb database specified by an environmental variable named
-'ALL_LKPS_MAPS_DB' (see
-\href{https://resources.numbat.space/using-rprofile-and-renviron.html#renviron}{here}
-for how to set environment variables using a \code{.Renviron} file). The latter
-method will be used in preference.}
-
 \item{codes_only}{bool. If \code{TRUE}, return a character vector of
 \emph{unique} codes. If \code{FALSE} (default), return a data frame of all
 results including code descriptions (useful for manual validation).}
@@ -47,22 +37,11 @@ that this may or may not include code descriptions.}
 \code{codes} are unrecognised for the coding system being mapped from, then
 either an error or warning will be raised.}
 
-\item{preferred_description_only}{If \code{TRUE} (default), return only preferred
-descriptions for clinical codes with synonyms. Will only apply if
-\code{standardise_output} is also \code{TRUE}.}
-
 \item{reverse_mapping}{If 'error' (default), an error raised if attempting to
 map between coding systems for which a mapping table does not exist. If
 'warning', will raise a warning and attempt to use an existing mapping
 table in the opposite direction (for example, a mapping from ICD10 to Read
 3 would be attempted using the Read 3-to-ICD10 mapping table).}
-
-\item{col_filters}{A named list where each name in the list refers to the
-name of a lookup or mapping table. Each item is also a named list, where
-the names refer to column names in the corresponding table, and the items
-are vectors of values to filter for. For example, \verb{list(my_lookup_table = list(colA = c("A", "B"))} will result in \code{my_lookup_table} being filtered
-for rows where \code{colA} is either 'A' or 'B'. Uses \code{default_col_filters()} by
-default. Set to \code{NULL} to remove all filters.}
 }
 \description{
 Uses the code mapping file provided by UK Biobank

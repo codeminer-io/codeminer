@@ -15,23 +15,6 @@ reformat_caliber_for_ukb(
 \arguments{
 \item{caliber}{A named list of data frames, created by \code{\link[=read_caliber_raw]{read_caliber_raw()}}.}
 
-\item{all_lkps_maps}{Either a named list of lookup and mapping tables
-(either data frames or \code{tbl_dbi} objects), or the path to a Duckdb database
-containing these tables. If \code{NULL}, will attempt to connect to a Duckdb
-database named 'all_lkps_maps.db' in the current working directory, or to
-a a Duckdb database specified by an environmental variable named
-'ALL_LKPS_MAPS_DB' (see
-\href{https://resources.numbat.space/using-rprofile-and-renviron.html#renviron}{here}
-for how to set environment variables using a \code{.Renviron} file). The latter
-method will be used in preference.}
-
-\item{col_filters}{A named list where each name in the list refers to the
-name of a lookup or mapping table. Each item is also a named list, where
-the names refer to column names in the corresponding table, and the items
-are vectors of values to filter for. For example, \verb{list(my_lookup_table = list(colA = c("A", "B"))} will result in \code{my_lookup_table} being filtered
-for rows where \code{colA} is either 'A' or 'B'. Uses \code{default_col_filters()} by
-default. Set to \code{NULL} to remove all filters.}
-
 \item{overlapping_disease_categories}{If 'error' (default), raises an error
 if any overlapping disease categories are present after mapping. Specify
 'warning' to raise a warning instead.}

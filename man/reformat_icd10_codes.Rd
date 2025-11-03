@@ -16,24 +16,11 @@ reformat_icd10_codes(
 \arguments{
 \item{icd10_codes}{character vector of ICD-10 codes}
 
-\item{all_lkps_maps}{Either a named list of lookup and mapping tables
-(either data frames or \code{tbl_dbi} objects), or the path to a Duckdb database
-containing these tables. If \code{NULL}, will attempt to connect to a Duckdb
-database named 'all_lkps_maps.db' in the current working directory, or to
-a a Duckdb database specified by an environmental variable named
-'ALL_LKPS_MAPS_DB' (see
-\href{https://resources.numbat.space/using-rprofile-and-renviron.html#renviron}{here}
-for how to set environment variables using a \code{.Renviron} file). The latter
-method will be used in preference.}
-
 \item{input_icd10_format}{character. Must be either "ICD10_CODE" or
 "ALT_CODE".}
 
 \item{output_icd10_format}{character. Must be either "ICD10_CODE" or
 "ALT_CODE".}
-
-\item{unrecognised_codes}{Either 'error' (default) or 'warning'. If any input
-\code{codes} are unrecognised, then either an error or warning will be raised.}
 
 \item{strip_x}{If \code{TRUE} and converting to \code{ALT_CODE} format, 'X' is removed
 from the end of undivided 3 character codes (default is \code{FALSE}).}

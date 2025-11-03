@@ -5,7 +5,7 @@
 \title{Create lookup metadata}
 \usage{
 lookup_metadata(
-  coding_type,
+  code_type,
   version = "v0",
   ...,
   lookup_code_col = "code",
@@ -16,7 +16,7 @@ lookup_metadata(
 )
 }
 \arguments{
-\item{coding_type}{The type of coding system (e.g., ICD-10, SNOMED-CT)}
+\item{code_type}{The type of coding system (e.g., ICD-10, SNOMED-CT)}
 
 \item{version}{The version of the lookup metadata (default: "v0")}
 
