@@ -126,14 +126,14 @@ CODES <- function(
       )
   }
 
-  # standardise output if requested
-  if (standardise_output) {
-    result <- standardise_output_fn(
-      result,
-      lkp_table = lkp_table,
-      code_col = code_col,
-      description_col = description_col,
-      code_type = code_type
+  result <- standardise_output_fn(
+    result,
+    lkp_table = lkp_table,
+    code_col = code_col,
+    description_col = description_col,
+    code_type = code_type
+  )
+
     )
   }
 
