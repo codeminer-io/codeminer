@@ -3,60 +3,27 @@
 #' Returns a data frame including descriptions for the codes of interest
 #'
 #' @param codes character. Vector of codes to lookup
-#' @param code_type character. Type of clinical code system to be searched. One
-#'   of `r knitr::combine_words(CODE_TYPE_TO_LKP_TABLE_MAP$code, and = "or ")`.
-#' @param standardise_output bool. If \code{TRUE} (default), outputs a data
-#'   frame with columns named 'code', 'description' and 'code_type'. Otherwise
-#'   returns a data frame with all columns from the relevant look up table.
-#' @param unrecognised_codes Either 'error' (default) or 'warning'. If any input
-#'   `codes` are unrecognised, then either an error or warning will be raised.
-#' @param .return_unrecognised_codes If `TRUE`, return a vector of unrecognised
-#'   codes only.
-#' @param col_filters A named list where each name in the list refers to the
-#'   name of a lookup or mapping table. Each item is also a named list, where
-#'   the names refer to column names in the corresponding table, and the items
-#'   are vectors of values to filter for. For example, `list(my_lookup_table =
-#'   list(colA = c("A", "B"))` will result in `my_lookup_table` being filtered
-#'   for rows where `colA` is either 'A' or 'B'. Uses `default_col_filters()` by
-#'   default. Set to `NULL` to remove all filters.
-#' @param preferred_description_only If `TRUE` (default), return only preferred
-#'   descriptions for clinical codes with synonyms. Will only apply if
-#'   \code{standardise_output} is also \code{TRUE}.
-#' @param all_lkps_maps Either a named list of lookup and mapping tables
-#'   (either data frames or `tbl_dbi` objects), or the path to a Duckdb database
-#'   containing these tables. If `NULL`, will attempt to connect to a Duckdb
-#'   database named 'all_lkps_maps.db' in the current working directory, or to
-#'   a a Duckdb database specified by an environmental variable named
-#'   'ALL_LKPS_MAPS_DB' (see
-#'   [here](https://resources.numbat.space/using-rprofile-and-renviron.html#renviron)
-#'   for how to set environment variables using a `.Renviron` file). The latter
-#'   method will be used in preference.
+#' @param code_type character. Type of clinical code system to be searched.
+#'   Depends on what is available in the lookup tables. See [add_lookup_table()]
+#'   on how to add new lookup tables. This can also be configured through the `codeminer.code_type` option.
 #'
-#' @return data frame
+#' @return A `data.frame` containing the codes and their descriptions
 #' @export
-#' @name CODES
 #' @family Clinical code lookups and mappings
 #' @examples
-#' # build dummy all_lkps_maps
-#' all_lkps_maps_dummy <- build_all_lkps_maps_dummy()
+#' # Set up a temporary dummy database
+#' temp_db <- tempfile(fileext = ".duckdb")
+#' create_dummy_database(temp_db)
 #'
 #' # look up ICD10 codes
 #' CODES(
 #'   codes = c("E10", "E11"),
-#'   code_type = "icd10",
-#'   all_lkps_maps = all_lkps_maps_dummy
+#'   code_type = "icd10"
 #' )
 CODES <- function(
   codes,
-  code_type = getOption("codeminer.code_type"),
-  all_lkps_maps = NULL,
-  preferred_description_only = TRUE,
-  standardise_output = TRUE,
-  unrecognised_codes = getOption("codeminer.unrecognised_codes_lookup"),
-  col_filters = getOption("codeminer.col_filters"),
-  .return_unrecognised_codes = FALSE
+  code_type = getOption("codeminer.code_type")
 ) {
-  # TODO - create df and string methods; validate codes df
   if (is.data.frame(codes)) {
     code_type <- codes$code_type[1]
     codes <- codes$code
