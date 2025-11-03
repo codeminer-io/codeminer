@@ -110,7 +110,7 @@ create_table <- function(con, tbl_name, fields, overwrite = FALSE) {
 #' @noRd
 required_lookup_metadata_columns <- function() {
   c(
-    "coding_type",
+    "code_type",
     "lookup_version",
     "lookup_code_col",
     "lookup_description_col",
@@ -122,8 +122,8 @@ required_lookup_metadata_columns <- function() {
 
 required_mapping_metadata_columns <- function() {
   c(
-    "from_coding_type",
-    "to_coding_type",
+    "from_code_type",
+    "to_code_type",
     "mapping_version",
     "from_col",
     "to_col"

@@ -3,8 +3,8 @@
 #' Add a mapping table to the database together with its metadata.
 #' Note that it is not possible to overwrite an existing mapping table.
 #'
-#' Mapping tables are indexed by the combination of `from_coding_type`,
-#' `to_coding_type`, and `version`, specified in [mapping_metadata()]. This
+#' Mapping tables are indexed by the combination of `from_code_type`,
+#' `to_code_type`, and `version`, specified in [mapping_metadata()]. This
 #' index needs to be unique and is used to identify the mapping table in the
 #' database. If a mapping table with the same index already exists, the function
 #' will emit a warning and return `FALSE` (invisibly) without any effect. Use a
@@ -48,7 +48,7 @@ add_mapping_table <- function(table, metadata) {
     cli::cli_warn(
       c(
         "The mapping table {.field {metadata$mapping_table_name}} already exists.",
-        "i" = "Use a different {.arg coding_type} or {.arg version} in {.arg metadata} to add a new mapping table."
+        "i" = "Use a different {.arg code_type} or {.arg version} in {.arg metadata} to add a new mapping table."
       ),
       call = rlang::caller_env()
     )
@@ -75,8 +75,8 @@ add_mapping_table <- function(table, metadata) {
 #' generate the necessary metadata when adding a new mapping table to the database
 #' with [add_mapping_table()].
 #'
-#' @param from_coding_type The type of coding system for the source codes (e.g., ICD-10, SNOMED-CT)
-#' @param to_coding_type The type of coding system for the target codes (e.g., ICD-10, SNOMED-CT)
+#' @param from_code_type The type of coding system for the source codes (e.g., ICD-10, SNOMED-CT)
+#' @param to_code_type The type of coding system for the target codes (e.g., ICD-10, SNOMED-CT)
 #' @param version The version of the mapping metadata (default: "v0")
 #' @inheritParams rlang::args_dots_empty
 #' @param from_col The column name for the source codes (default: "from")
@@ -89,8 +89,8 @@ add_mapping_table <- function(table, metadata) {
 #' @examples
 #' mapping_metadata("ICD-10", "SNOMED-CT", version = "2023")
 mapping_metadata <- function(
-  from_coding_type,
-  to_coding_type,
+  from_code_type,
+  to_code_type,
   version = "v0",
   ...,
   from_col = "from",
@@ -99,16 +99,16 @@ mapping_metadata <- function(
   rlang::check_dots_empty()
 
   mapping_table_name <- paste(
-    from_coding_type,
-    to_coding_type,
+    from_code_type,
+    to_code_type,
     version,
     sep = "_"
   )
 
   return(list(
     mapping_table_name = mapping_table_name,
-    from_coding_type = from_coding_type,
-    to_coding_type = to_coding_type,
+    from_code_type = from_code_type,
+    to_code_type = to_code_type,
     mapping_version = version,
     from_col = from_col,
     to_col = to_col
