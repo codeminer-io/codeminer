@@ -20,109 +20,28 @@
 #'   codes = c("E10", "E11"),
 #'   code_type = "icd10"
 #' )
-CODES <- function(codes, code_type = getOption("codeminer.code_type")) {
-  if (is.data.frame(codes)) {
-    code_type <- codes$code_type[1]
-    codes <- codes$code
-  }
-
+CODES <- function(
+  codes,
+  code_type = getOption("codeminer.code_type"),
+  version = "v0"
+) {
   check_codes(codes)
   check_code_type(code_type)
 
-  lookup_metadata <- get_lookup_metadata()
-  if (!(code_type %in% lookup_metadata$code_type)) {
-    cli::cli_abort(c(
-      "Code type '{code_type}' not found in lookup metadata.",
-      "i" = "Did you add the lookup table with {.fun codeminer::add_lookup_table}?"
-    ))
-  }
+  con <- connect_to_db()
 
-  # determine relevant lookup sheet
-  lkp_table <- get_lookup_sheet(code_type = code_type)
+  lookup_table <- get_lookup_table(con, code_type, version)
 
-  check_table_exists_in_all_lkps_maps(
-    all_lkps_maps = all_lkps_maps,
-    table_name = lkp_table
-  )
-
-  # determine code column for lookup sheet
-  code_col <- get_col_for_lookup_sheet(
-    lookup_sheet = lkp_table,
-    column = "code_col"
-  )
-
-  # determine description column for lookup sheet
-  description_col <-
-    get_col_for_lookup_sheet(
-      lookup_sheet = lkp_table,
-      column = "description_col"
-    )
-
-  # determine relevant column indicating whether code description is preferred
-  # (for code types with synonymous code descriptions like read 2 and read 3)
-  preferred_description_col <-
-    get_col_for_lookup_sheet(
-      lookup_sheet = lkp_table,
-      column = "preferred_synonym_col"
-    )
-
-  # get preferred code, if appropriate
-  if (!is.na(preferred_description_col)) {
-    preferred_description_code <-
-      get_preferred_description_code_for_lookup_sheet(lookup_sheet = lkp_table)
-  }
-
-  # lookup - filter lookup sheet for codes
-  result <- all_lkps_maps[[lkp_table]] %>%
-    dplyr::filter(.data[[code_col]] %in% codes) %>%
+  result <- lookup_table |>
+    dplyr::filter(.data[["code"]] %in% codes) |>
     dplyr::collect()
 
-  # filter on `col_filters` parameters
-  if (!is.null(col_filters)) {
-    result <- filter_cols(
-      df = result,
-      df_name = lkp_table,
-      col_filters = col_filters
+  missing_codes <- setdiff(codes, result[["code"]])
+  if (length(missing_codes) > 0) {
+    cli::cli_warn(
+      "The following codes were not found in the lookup table: {.code {missing_codes}}"
     )
   }
-
-  # check for unrecognised codes
-  missing_codes <- subset(codes, !codes %in% result[[code_col]])
-
-  if (.return_unrecognised_codes) {
-    # optionally return vector of unrecognised codes only
-    message(paste0(
-      "Returning unrecognised codes only. N unrecognised: ",
-      length(missing_codes)
-    ))
-    return(missing_codes)
-  }
-
-  handle_unrecognised_codes(
-    unrecognised_codes = unrecognised_codes,
-    missing_codes = missing_codes,
-    table_name = lkp_table,
-    code_type = code_type
-  )
-
-  # filter for preferred code descriptions only if requested
-  if (
-    preferred_description_only &
-      !is.na(preferred_description_col)
-  ) {
-    result <- result %>%
-      dplyr::filter(
-        .data[[preferred_description_col]] == preferred_description_code
-      )
-  }
-
-  result <- standardise_output_fn(
-    result,
-    lkp_table = lkp_table,
-    code_col = code_col,
-    description_col = description_col,
-    code_type = code_type
-  )
 
   return(result)
 }
@@ -147,4 +66,59 @@ check_code_type <- function(code_type) {
       "{.arg code_type} must have length 1, not {length(code_type)}"
     )
   }
+}
+
+#' Get the lookup table for the given code type in standardised format
+#'
+#' @param con A database connection.
+#' @param code_type The code type for which to retrieve the lookup table.
+#' @param call The calling environment. Passed to [cli::cli_abort].
+#'
+#' @return A data frame containing the lookup table with two columns: `code` and `description`.
+#' @keywords internal
+get_lookup_table <- function(
+  con,
+  code_type,
+  version,
+  call = rlang::caller_env()
+) {
+  this_meta <- get_meta_for_table(con, code_type, version, call)
+
+  tbl_name <- this_meta$lookup_table_name
+  tbl <- get_table_from_db(con, tbl_name)
+
+  tbl <- dplyr::select(
+    tbl,
+    code = this_meta$code_col,
+    description = this_meta$description_col
+  )
+
+  return(tbl)
+}
+
+get_meta_for_table <- function(
+  con,
+  code_type,
+  version,
+  call = rlang::caller_env()
+) {
+  meta <- get_lookup_metadata(con = con)
+  if (!(code_type %in% meta$code_type)) {
+    cli::cli_abort(
+      c(
+        "Code type '{code_type}' not found in lookup metadata.",
+        "i" = "Did you add the lookup table with {.fun codeminer::add_lookup_table}?"
+      ),
+      call = call
+    )
+  }
+
+  this_meta <- dplyr::filter(
+    meta,
+    .data$code_type == code_type,
+    .data$lookup_version == version
+  )
+  stopifnot(nrow(this_meta) == 1) # code_type + version combo should be unique
+
+  return(this_meta)
 }

@@ -1910,25 +1910,6 @@ get_value_for_mapping_sheet <- function(mapping_table, value) {
   ][[value]]
 }
 
-#' Get name of lookup sheet for a clinical code system
-#'
-#' Helper function for \code{\link{CODES}} and \code{\link{codes_starting_with}}
-#'
-#' @param code_type character
-#'
-#' @return character (scalar)
-#' @noRd
-#' @family Clinical code lookups and mappings
-get_lookup_sheet <- function(code_type) {
-  # validate args
-  rlang::arg_match(code_type, values = CODE_TYPE_TO_LKP_TABLE_MAP$code)
-
-  # get lookup sheet
-  CODE_TYPE_TO_LKP_TABLE_MAP %>%
-    dplyr::filter(.data[["code"]] == code_type) %>%
-    .$lkp_table
-}
-
 #' Get name of code, description or preferred synonym column for a lookup sheet
 #'
 #' Helper function for \code{\link{CODES}} and \code{\link{codes_starting_with}}
