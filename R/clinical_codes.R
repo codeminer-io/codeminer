@@ -2502,18 +2502,6 @@ codes_string_to_vector <- function(codes) {
 
 ## Validation helpers ---------------------------
 
-check_codes <- function(codes) {
-  assertthat::assert_that(
-    is.character(codes),
-    msg = "Error! `codes` must be a character vector"
-  )
-
-  assertthat::assert_that(
-    sum(is.na(codes)) == 0,
-    msg = "Error! `codes` cannot contain `NA` values"
-  )
-}
-
 check_mapping_args <- function(from, to, reverse_mapping = "error") {
   if (identical(reverse_mapping, NULL)) {
     reverse_mapping <- "error"

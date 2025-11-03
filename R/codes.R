@@ -134,15 +134,27 @@ CODES <- function(
     code_type = code_type
   )
 
+  return(result)
+}
+
+# Argument validation helpers
+check_codes <- function(codes) {
+  if (!is.character(codes)) {
+    cli::cli_abort(
+      "{.arg codes} must be a character vector, not {typeof(codes)}"
     )
   }
+}
 
-  # return result
-  if (nrow(result) == 0) {
-    message("No matching codes found")
-    return(result)
-  } else {
-    # return either unique codes only, or df including code descriptions
-    return(result)
+check_code_type <- function(code_type) {
+  if (!is.character(code_type)) {
+    cli::cli_abort(
+      "{.arg code_type} must be a character vector, not {typeof(code_type)}"
+    )
+  }
+  if (length(code_type) != 1) {
+    cli::cli_abort(
+      "{.arg code_type} must have length 1, not {length(code_type)}"
+    )
   }
 }
