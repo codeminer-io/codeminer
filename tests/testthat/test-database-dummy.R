@@ -1,8 +1,3 @@
-withr::local_options(
-  # Silence logs generated with cli
-  cli.default_handler = function(...) {}
-)
-
 test_that("create_dummy_database() creates a valid database file", {
   temp_db <- withr::local_tempfile(fileext = ".duckdb")
   result <- create_dummy_database(temp_db)

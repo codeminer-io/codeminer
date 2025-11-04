@@ -1,8 +1,3 @@
-withr::local_options(
-  # Silence logs generated with cli
-  cli.default_handler = function(...) {}
-)
-
 lookup_metadata_name <- "_lookup_metadata"
 mapping_metadata_name <- "_mapping_metadata"
 

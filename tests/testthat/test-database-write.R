@@ -1,9 +1,3 @@
-withr::local_options(
-  # Silence logs generated with cli
-  cli.default_handler = function(...) {}
-)
-
-
 # Lookup tables ---------------------------------------------------------------------------------------------------
 
 test_that("add_lookup_table works with example data", {
