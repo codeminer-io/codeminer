@@ -2,7 +2,7 @@
 #'
 #' Returns a data frame including descriptions for the codes of interest
 #'
-#' @param codes character. Vector of codes to lookup
+#' @param codes character. Vector of codes to lookup. If passing `"all"`, returns all codes.
 #' @param code_type character. Type of clinical code system to be searched.
 #'   Depends on what is available in the lookup tables. See [add_lookup_table()]
 #'   on how to add new lookup tables. This can also be configured through the `codeminer.code_type` option.
@@ -31,6 +31,10 @@ CODES <- function(
   con <- connect_to_db()
 
   lookup_table <- get_lookup_table(con, code_type, version)
+
+  if (length(codes) == 1 && codes == "all") {
+    return(lookup_table)
+  }
 
   result <- lookup_table |>
     dplyr::filter(.data[["code"]] %in% codes) |>

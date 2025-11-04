@@ -7,7 +7,7 @@
 CODES(codes, code_type = getOption("codeminer.code_type"), version = "v0")
 }
 \arguments{
-\item{codes}{character. Vector of codes to lookup}
+\item{codes}{character. Vector of codes to lookup. If passing \code{"all"}, returns all codes.}
 
 \item{code_type}{character. Type of clinical code system to be searched.
 Depends on what is available in the lookup tables. See \code{\link[=add_lookup_table]{add_lookup_table()}}
