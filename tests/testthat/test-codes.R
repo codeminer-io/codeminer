@@ -24,3 +24,60 @@ test_that("CODES works with the codeminer.code_type option", {
   expect_equal(nrow(result), length(test_codes))
   expect_identical(unique(result$code_type), test_type)
 })
+
+test_that("CODES allows querying all codes", {
+  test_type <- "icd10"
+  expected_rows <- 199
+
+  result <- CODES("all", code_type = test_type)
+  expect_s3_class(result, "data.frame")
+  expect_equal(nrow(result), expected_rows)
+})
+
+test_that("CODES respects versions", {
+  test_type <- "icd10"
+  test_version <- "v99"
+
+  # add test table as new version of icd10
+  test_table <- data.frame(
+    code = c("a", "b", "c"),
+    description = c("letter a", "letter b", "letter c")
+  )
+  add_lookup_table(
+    test_table,
+    lookup_metadata(test_type, version = test_version)
+  )
+
+  result <- CODES("all", code_type = test_type, version = test_version)
+  expect_identical(result$code, test_table$code)
+  expect_identical(result$description, test_table$description)
+  expect_identical(unique(result$code_type), test_type)
+})
+
+test_that("CODES warns about missing codes", {
+  test_codes <- c("foo", "bar")
+  expect_warning(
+    CODES(test_codes, "icd10"),
+    "The following codes were not found in the lookup table: `foo` and `bar`",
+    fixed = TRUE
+  )
+})
+
+test_that("CODES fails for wrong argument types", {
+  expect_error(CODES(1:3, "icd10"), "`codes` must be a character vector")
+  expect_error(
+    CODES(c("a", "b"), code_type = TRUE),
+    "`code_type` must be of type character"
+  )
+  expect_error(
+    CODES("all", code_type = c("icd10", "icd11", "icd12")),
+    "`code_type` must have length 1"
+  )
+})
+
+test_that("CODES fails for missing code_type", {
+  expect_error(
+    CODES("all", code_type = "idontexist"),
+    "Code type 'idontexist' not found"
+  )
+})

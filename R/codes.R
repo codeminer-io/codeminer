@@ -62,7 +62,7 @@ check_codes <- function(codes) {
 check_code_type <- function(code_type) {
   if (!is.character(code_type)) {
     cli::cli_abort(
-      "{.arg code_type} must be a character vector, not {typeof(code_type)}"
+      "{.arg code_type} must be of type character, not {typeof(code_type)}"
     )
   }
   if (length(code_type) != 1) {
