@@ -62,7 +62,6 @@ Other Clinical code lookups and mappings:
 \code{\link{HAS_ATTRIBUTES}()},
 \code{\link{default_col_filters}()},
 \code{\link{get_children_sct}()},
-\code{\link{get_mapping_df}()},
 \code{\link{get_parents_sct}()},
 \code{\link{reformat_icd10_codes}()}
 }
