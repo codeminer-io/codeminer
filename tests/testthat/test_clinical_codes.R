@@ -448,7 +448,6 @@ test_that("`MAP()` works when mapping icd9 to icd10", {
   )
 })
 
-all_lkps_maps_db
 
 # `get_mapping_df()` --------------------------
 test_that("`get_mapping_df()` returns the expected output", {
