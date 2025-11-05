@@ -123,7 +123,17 @@ dummy_read3_icd10_mapping <- function() {
     from = "read_code",
     to = "icd10_code"
   )
-  mapping_clean <- dplyr::filter(mapping, !is.na(from), !is.na(to))
+  mapping_clean <- dplyr::filter(mapping, !is.na(.data$from), !is.na(.data$to))
+
+  # Keep only codes for which we have lookup data
+  read3_lookup <- dummy_read3_lookup()
+  icd10_lookup <- dummy_icd10_lookup()
+  mapping_clean <- dplyr::filter(
+    mapping_clean,
+    .data$from %in% read3_lookup$code,
+    .data$to %in% icd10_lookup$code
+  )
+
   return(mapping_clean)
 }
 
