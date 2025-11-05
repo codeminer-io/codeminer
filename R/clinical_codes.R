@@ -1791,105 +1791,6 @@ get_preferred_description_code_for_lookup_sheet <-
       .[["preferred_code"]]
   }
 
-#' Reformat a dataframe of clinical codes to work with
-#' \code{\link[ukbwranglr]{extract_phenotypes}}
-#'
-#' A utility function that helps reformat the output from \code{\link{MAP}}
-#' or \code{\link{CODES}} to work with
-#' \code{\link[ukbwranglr]{extract_phenotypes}}. See also output
-#' from \code{\link[ukbwranglr]{example_clinical_codes}} for an example of
-#' the format that this function will output.
-#'
-#' @param standardised_codelist a data frame with column names "code",
-#'   "description", "code_type".
-#' @param code_type character (scalar). The clinical code type e.g. "read2"
-#' @param disease character (scalar), e.g. "Secondary polycythaemia"
-#' @param disease_category character (scalar). The subcategory of \code{disease}
-#'   that these codes belong to e.g. "Diagnosis of Secondary polycythaemia".
-#' @param author character (scalar), e.g. "caliber".
-#'
-#' @return A data frame with the following column names: 'disease',
-#'   'description', 'category', 'code_type', 'code' and 'author'.
-#' @noRd
-reformat_standardised_codelist <- function(
-  standardised_codelist,
-  code_type = getOption("codeminer.code_type"),
-  disease,
-  disease_category,
-  author
-) {
-  # validate args
-  assertthat::assert_that(
-    is.data.frame(standardised_codelist),
-    msg = "Error! standardised_codelist must be a data frame (or tibble/data table"
-  )
-
-  assertthat::is.string(code_type)
-  assertthat::is.string(disease)
-  assertthat::is.string(disease_category)
-  assertthat::is.string(author)
-
-  match.arg(
-    code_type,
-    choices = ukbwranglr:::CLINICAL_EVENTS_SOURCES$data_coding
-  )
-
-  assertthat::assert_that(
-    all(
-      names(standardised_codelist) == c("code", "description", "code_type")
-    ),
-    msg = "Error! `standardised_codelist` must be a data frame with the following headings: 'code', 'description', 'code_type'"
-  )
-
-  assertthat::assert_that(
-    all(
-      standardised_codelist$code_type %in%
-        unique(ukbwranglr:::CLINICAL_EVENTS_SOURCES$data_coding)
-    ),
-    msg = paste0(
-      "Error! `standardised_codelist$code_type` contains unrecognised code types. Recognised code types: ",
-      stringr::str_c(
-        unique(ukbwranglr:::CLINICAL_EVENTS_SOURCES$data_coding),
-        sep = "",
-        collapse = ", "
-      )
-    )
-  )
-
-  # reformat to work with `extract_phenotypes()`
-  standardised_codelist <- standardised_codelist %>%
-    dplyr::mutate(
-      "code_type" = code_type,
-      "disease" = disease,
-      "category" = disease_category,
-      "author" = author,
-    ) %>%
-    dplyr::select(tidyselect::all_of(
-      c(
-        "disease",
-        "description",
-        "category",
-        "code_type",
-        "code",
-        "author"
-      )
-    ))
-
-  return(standardised_codelist)
-}
-
-standardise_output_fn <-
-  function(df, lkp_table, code_col, description_col, code_type) {
-    names(df)[which(names(df) == code_col)] <- "code"
-    names(df)[which(names(df) == description_col)] <- "description"
-
-    # return code, description and code_type cols only
-    df <- df[c("code", "description")]
-    df[["code_type"]] <- code_type
-
-    return(df)
-  }
-
 #' Filter lookup/mapping table for specified values in columns
 #'
 #' Helper function that enables filtering of lookup/mapping tables for certain
@@ -2299,14 +2200,6 @@ expand_icd10_ranges <- function(read_v2_icd10, icd10_lkp, icd10_lkp_alt_x_map) {
         "icd10_range_new"
       ))
     )
-}
-
-codes_string_to_vector <- function(codes) {
-  codes %>%
-    stringr::str_split_1(pattern = "\\|") %>%
-    stringr::str_remove_all(pattern = "\\n") %>%
-    stringr::str_remove(pattern = "<<.*>>") %>%
-    stringr::str_trim(side = "both")
 }
 
 ## Validation helpers ---------------------------

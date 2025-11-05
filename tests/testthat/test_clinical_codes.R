@@ -570,65 +570,6 @@ test_that("`get_mapping_df()` returns the expected results with/without `col_fil
   )
 })
 
-# `reformat_standardised_codelist()` --------------------------------------
-
-test_that("`reformat_standardised_codelist()` returns the expected output format", {
-  expect_equal(
-    CODES(
-      codes = c("C10E.", "C108."),
-      code_type = "read2",
-      all_lkps_maps = all_lkps_maps,
-      preferred_description_only = TRUE
-    ) %>%
-      reformat_standardised_codelist(
-        code_type = "read2",
-        disease = "T1DM",
-        disease_category = "T1DM GP diagnosis",
-        author = "test"
-      ) %>%
-      names(),
-    c(
-      "disease",
-      "description",
-      "category",
-      "code_type",
-      "code",
-      "author"
-    )
-  )
-})
-
-test_that("`reformat_standardised_codelist()` raises error with invalid args", {
-  expect_error(
-    reformat_standardised_codelist(
-      standardised_codelist = data.frame(
-        code = "C10E.",
-        description = "T1DM",
-        code_type = "invalid_code"
-      ),
-      code_type = "read2",
-      disease = "T1DM",
-      disease_category = "T1DM GP diagnosis",
-      author = "test"
-    ),
-    regexp = "contains unrecognised code types"
-  )
-
-  expect_error(
-    reformat_standardised_codelist(
-      standardised_codelist = data.frame(
-        code = "C10E.",
-        description = "T1DM",
-        A_TYPE_OF_CODE = "read2"
-      ),
-      code_type = "read2",
-      disease = "T1DM",
-      disease_category = "T1DM GP diagnosis",
-      author = "test"
-    ),
-    regexp = "must be a data frame with the following headings: 'code', 'description', 'code_type'"
-  )
-})
 
 # `get_from_to_mapping_sheet()` -------------------------------------------
 
