@@ -35,6 +35,10 @@ create_dummy_database <- function(
 
   add_lookup_table(dummy_icd10_lookup(), dummy_icd10_metadata())
   add_lookup_table(dummy_read3_lookup(), dummy_read3_metadata())
+  add_mapping_table(
+    dummy_read3_icd10_mapping(),
+    dummy_read3_icd10_mapping_metadata()
+  )
 
   cli::cli_alert_success("Dummy database ready to use!")
   return(invisible(db_path))
@@ -105,5 +109,30 @@ dummy_read3_metadata <- function() {
     version = "v0",
     lookup_code_col = "code",
     lookup_description_col = "description"
+  )
+}
+
+dummy_read3_icd10_mapping <- function() {
+  read3_icd10_raw <- readxl::read_excel(
+    dummy_data_path(),
+    sheet = "read_ctv3_icd10"
+  )
+
+  mapping <- dplyr::select(
+    read3_icd10_raw,
+    from = "read_code",
+    to = "icd10_code"
+  )
+  mapping_clean <- dplyr::filter(mapping, !is.na(from), !is.na(to))
+  return(mapping_clean)
+}
+
+dummy_read3_icd10_mapping_metadata <- function() {
+  mapping_metadata(
+    "read3",
+    "icd10",
+    version = "v0",
+    from_col = "from",
+    to_col = "to"
   )
 }
