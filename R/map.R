@@ -52,6 +52,11 @@ MAP <- function(
 
   mapping_table <- get_mapping_table(con, from, to, version)
 
+  if (length(codes) == 1 && codes == "all") {
+    all_mapped_codes <- unique(dplyr::pull(mapping_table, .data$to))
+    return(CODES(all_mapped_codes, code_type = to, version = version))
+  }
+
   mapping <- dplyr::filter(
     mapping_table,
     .data$from %in% codes,
