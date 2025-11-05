@@ -36,7 +36,7 @@ test_that("CODES allows querying all codes", {
 
 test_that("CODES respects versions", {
   test_type <- "icd10"
-  test_version <- "v99"
+  test_version <- "v2"
 
   # add test table as new version of icd10
   test_table <- data.frame(
@@ -80,4 +80,18 @@ test_that("CODES fails for missing code_type", {
     CODES("all", code_type = "idontexist"),
     "Code type 'idontexist' not found"
   )
+})
+
+test_that("CODES fails for wrong version", {
+  expect_error(
+    CODES("all", code_type = "icd10", version = "nope"),
+    "No metadata found for 'icd10' version 'nope'"
+  )
+})
+
+test_that("CODES can return multiple descriptions for the same code", {
+  test_code <- "X40J4"
+  result <- CODES(test_code, code_type = "read3")
+  expect_equal(nrow(result), 5)
+  expect_identical(unique(result$code), test_code)
 })
