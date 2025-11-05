@@ -33,22 +33,20 @@ create_dummy_database <- function(
   )
   build_database(overwrite = TRUE)
 
-  dummy_icd10 <- dummy_icd10_lookup()
-  dummy_icd10_meta <- dummy_icd10_metadata()
-  add_lookup_table(dummy_icd10, dummy_icd10_meta)
+  add_lookup_table(dummy_icd10_lookup(), dummy_icd10_metadata())
+  add_lookup_table(dummy_read3_lookup(), dummy_read3_metadata())
 
   cli::cli_alert_success("Dummy database ready to use!")
   return(invisible(db_path))
 }
 
+dummy_data_path <- function() {
+  system.file("extdata", "dummy_all_lkps_maps_v3.xlsx", package = "codeminer")
+}
+
 # Helper to generate dummy ICD-10 Lookup data
 dummy_icd10_lookup <- function() {
-  raw_path <- system.file(
-    "extdata",
-    "dummy_all_lkps_maps_v3.xlsx",
-    package = "codeminer"
-  )
-  icd10 <- readxl::read_excel(raw_path, sheet = "icd10_lkp")
+  icd10 <- readxl::read_excel(dummy_data_path(), sheet = "icd10_lkp")
 
   # Some ICD-10 descriptions include a modifier e.g. "E10" = "Type 1 diabetes
   # mellitus", whereas "E10.0" = "Type 1 diabetes mellitus with coma". "With
@@ -66,8 +64,11 @@ dummy_icd10_lookup <- function() {
     )
 
   # Keep only relevant columns
-  icd10_lookup_dummy <- icd10_clean |>
-    dplyr::select(code = "ALT_CODE", description = "DESCRIPTION")
+  icd10_lookup_dummy <- dplyr::select(
+    icd10_clean,
+    code = "ALT_CODE",
+    description = "DESCRIPTION"
+  )
 
   return(icd10_lookup_dummy)
 }
@@ -76,6 +77,31 @@ dummy_icd10_lookup <- function() {
 dummy_icd10_metadata <- function() {
   lookup_metadata(
     "icd10",
+    version = "v0",
+    lookup_code_col = "code",
+    lookup_description_col = "description"
+  )
+}
+
+dummy_read3_lookup <- function() {
+  read3 <- readxl::read_excel(dummy_data_path(), sheet = "read_ctv3_lkp")
+  read3_lookup <- dplyr::select(
+    read3,
+    code = "read_code",
+    description = "term_description"
+  )
+  # Remove NA rows
+  read3_lookup <- dplyr::filter(
+    read3_lookup,
+    !is.na(.data$code),
+    !is.na(.data$description)
+  )
+  return(read3_lookup)
+}
+
+dummy_read3_metadata <- function() {
+  lookup_metadata(
+    "read3",
     version = "v0",
     lookup_code_col = "code",
     lookup_description_col = "description"
