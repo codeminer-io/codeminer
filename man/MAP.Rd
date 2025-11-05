@@ -12,47 +12,23 @@ MAP(
 )
 }
 \arguments{
-\item{codes}{A character vector of codes to be mapped.}
+\item{codes}{A character vector of codes to be mapped. If passing \code{"all"}, all mapped codes will be returned.}
 
 \item{from}{Coding system that \code{codes} belong to.}
 
 \item{to}{Coding system to map \code{codes} to.}
 
-\item{unrecognised_codes}{Either 'error' (default) or 'warning'. If any input
-\code{codes} are unrecognised for the coding system being mapped from, then
-either an error or warning will be raised.}
-
-\item{reverse_mapping}{If 'error' (default), an error raised if attempting to
-map between coding systems for which a mapping table does not exist. If
-'warning', will raise a warning and attempt to use an existing mapping
-table in the opposite direction (for example, a mapping from ICD10 to Read
-3 would be attempted using the Read 3-to-ICD10 mapping table).}
-
-\item{standardise_output}{bool. If \code{TRUE} (default), outputs a data
-frame with columns named 'code', 'description' and 'code_type'. Otherwise
-returns a data frame with all columns from the relevant mapping table. Note
-that this may or may not include code descriptions.}
+\item{version}{Version of the mapping table to use.}
 }
 \description{
-Uses the code mapping file provided by UK Biobank
-(\href{https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592}{resource 592}).
-}
-\details{
-The values for arguments \code{from} and \code{to} must be one of
-\code{read2}, \code{read3}, \code{icd9}, \code{icd10}, \code{bnf},
-\code{dmd}, \code{read2_drugs} or \code{opcs4}.
+Map clinical codes from one coding system to another
 }
 \examples{
-# build dummy all_lkps_maps
-all_lkps_maps_dummy <- build_all_lkps_maps_dummy()
+# Set up a temporary dummy database
+temp_db <- tempfile(fileext = ".duckdb")
+create_dummy_database(temp_db)
 
-# map codes from Read 2 to ICD10
-MAP(
-  codes = "G20..",
-  from = "read2",
-  to = "icd10",
-  all_lkps_maps = all_lkps_maps_dummy
-)
+MAP("X40J4", from = "read3", to = "icd10")
 }
 \seealso{
 Other Clinical code lookups and mappings: 
