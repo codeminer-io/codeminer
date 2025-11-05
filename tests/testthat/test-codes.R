@@ -64,11 +64,6 @@ test_that("CODES warns about missing codes", {
 })
 
 test_that("CODES fails for wrong argument types", {
-  expect_error(CODES(1:3, "icd10"), "`codes` must be a character vector")
-  expect_error(
-    CODES(c("a", "b"), code_type = TRUE),
-    "`code_type` must be of type character"
-  )
   expect_error(
     CODES("all", code_type = c("icd10", "icd11", "icd12")),
     "`code_type` must have length 1"

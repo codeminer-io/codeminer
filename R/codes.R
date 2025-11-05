@@ -57,28 +57,11 @@ check_lookup_args <- function(
   version,
   call = rlang::caller_env()
 ) {
-  check_codes(codes, call)
   check_code_type(code_type, call)
   check_version(version, call)
 }
 
-
-check_codes <- function(codes, call = rlang::caller_env()) {
-  if (!is.character(codes)) {
-    cli::cli_abort(
-      "{.arg codes} must be a character vector, not {typeof(codes)}",
-      call = call
-    )
-  }
-}
-
 check_code_type <- function(code_type, call = rlang::caller_env()) {
-  if (!is.character(code_type)) {
-    cli::cli_abort(
-      "{.arg code_type} must be of type character, not {typeof(code_type)}",
-      call = call
-    )
-  }
   if (length(code_type) != 1) {
     cli::cli_abort(
       "{.arg code_type} must have length 1, not {length(code_type)}",

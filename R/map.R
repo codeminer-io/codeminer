@@ -139,22 +139,9 @@ check_mapping_args <- function(
   call = rlang::caller_env()
 ) {
   check_version(version)
-
-  if (!is.character(from)) {
-    cli::cli_abort(
-      "{.arg from} must be of type character, not {typeof(from)}",
-      call = call
-    )
-  }
   if (length(from) != 1) {
     cli::cli_abort(
       "{.arg from} must have length 1, not {length(from)}",
-      call = call
-    )
-  }
-  if (!is.character(to)) {
-    cli::cli_abort(
-      "{.arg to} must be of type character, not {typeof(to)}",
       call = call
     )
   }
