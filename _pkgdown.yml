@@ -26,7 +26,6 @@ reference:
   - get_parents_sct
   - DESCRIPTION
   - MAP
-  - get_mapping_df
   - reformat_icd10_codes
   - default_col_filters
   - get_col_filters

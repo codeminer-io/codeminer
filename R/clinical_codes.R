@@ -639,13 +639,6 @@ get_relatives_sct <- function(
       code_type <- unique(codes$code_type)
       codes <- codes$code
     }
-
-    # validate args
-    check_codes(codes)
-
-    if (length(codes) == 1) {
-      codes <- codes_string_to_vector(codes)
-    }
   }
 
   if (!is.null(typeId)) {
@@ -653,13 +646,6 @@ get_relatives_sct <- function(
     if (is.data.frame(typeId)) {
       code_type <- unique(typeId$code_type)
       typeId <- typeId$code
-    }
-
-    # validate args
-    check_codes(typeId)
-
-    if (length(typeId) == 1) {
-      typeId <- codes_string_to_vector(typeId)
     }
   }
 
@@ -742,13 +728,6 @@ summarise_attributes_sct <- function(
     codes <- codes$code
   }
 
-  # validate args
-  check_codes(codes)
-
-  if (length(codes) == 1) {
-    codes <- codes_string_to_vector(codes)
-  }
-
   output_codes <- filter_sct_relationship(
     codes = NULL,
     sourceId_filter = codes,
@@ -822,13 +801,6 @@ get_attributes_sct <- function(
     codes <- codes$code
   }
 
-  # validate args
-  check_codes(codes)
-
-  if (length(codes) == 1) {
-    codes <- codes_string_to_vector(codes)
-  }
-
   output_codes <- filter_sct_relationship(
     codes = NULL,
     sourceId_filter = codes,
@@ -854,134 +826,6 @@ get_attributes_sct <- function(
   )
 }
 
-
-#' Get a 'from-to' mapping data frame
-#'
-#' Returns a data frame with 'from' and 'to' columns for a specified pair of
-#' coding systems.
-#'
-#' @param from A clinical coding system to map from.
-#' @param to A clinical coding system to map to.
-#' @inheritParams CHILDREN
-#' @inheritParams MAP
-#' @param rename_from_to Optionally supply a named vector to rename the 'from'
-#'   and 'to' columns. For example `c(from = "original_codes", to =
-#'   "new_codes")`. By default, the columns will be named using the values for
-#'   `from` and `to` arguments.
-#' @param na.rm If `TRUE` (default), remove any rows with `NA` from the returned
-#'   mapping data frame. The mapping tables may sometimes include `NA` values to
-#'   explicitly show which 'from' codes have not been mapped.
-#'
-#' @return A data frame with column names 'from' and 'to'.
-#' @export
-#'
-#' @family Clinical code lookups and mappings
-#' @examples
-#' # build dummy all_lkps_maps
-#' all_lkps_maps_dummy <- build_all_lkps_maps_dummy()
-#'
-#' # get mapping data frame for Read 2 to ICD10
-#' get_mapping_df(
-#'   from = "read3",
-#'   to = "icd10",
-#'   all_lkps_maps = all_lkps_maps_dummy
-#' )
-get_mapping_df <- function(
-  to = getOption("codeminer.map_to"),
-  from = getOption("codeminer.map_from"),
-  all_lkps_maps = NULL,
-  rename_from_to = NULL,
-  na.rm = TRUE,
-  reverse_mapping = getOption("codeminer.reverse_mapping"),
-  col_filters = getOption("codeminer.col_filters")
-) {
-  # validate args
-
-  # get mapping sheet, from and to cols check mapping args and get required
-  # details - mapping_table, from_col and to_col
-  mapping_params <- check_mapping_args(
-    from = from,
-    to = to,
-    reverse_mapping = reverse_mapping
-  )
-
-  from_col <- mapping_params$from_col
-  to_col <- mapping_params$to_col
-  mapping_table <- mapping_params$mapping_table
-
-  # rename_from_to
-  rename_from_to_error_msg <-
-    "Error! `rename_from_to` should be a named character vector of length 2, with names 'from' and 'to'"
-
-  if (!is.null(rename_from_to)) {
-    assertthat::assert_that(
-      is.character(rename_from_to) &&
-        (length(rename_from_to) == 2) &&
-        all(c("from", "to") %in% names(rename_from_to)),
-      msg = rename_from_to_error_msg
-    )
-  }
-
-  create_db_connection(all_lkps_maps)
-
-  check_table_exists_in_all_lkps_maps(
-    all_lkps_maps = all_lkps_maps,
-    table_name = mapping_table
-  )
-
-  # get just distinct combinations of from_col and to_col for mapping_table
-  from_to_cols <- c(
-    from_col,
-    to_col
-  )
-
-  result <- all_lkps_maps[[mapping_table]] %>%
-    dplyr::collect()
-
-  # filter on `col_filters` parameters
-  if (!is.null(col_filters)) {
-    result <- filter_cols(
-      df = result,
-      df_name = mapping_table,
-      col_filters = col_filters
-    )
-  }
-
-  # keep required columns only
-  result <- result %>%
-    dplyr::select(tidyselect::all_of(from_to_cols))
-
-  # remove rows with `NA` values
-  if (na.rm) {
-    result <- tidyr::drop_na(result)
-  }
-
-  # distinct rows only (e.g. read 2 'J5310' maps to both primary and secondary
-  # descriptions for read 3 'J5311')
-  result <- result %>%
-    dplyr::distinct(dplyr::across(tidyselect::everything()), .keep_all = TRUE)
-
-  # rename
-  if (!is.null(rename_from_to)) {
-    new_from_to_cols <- c(
-      rename_from_to["from"],
-      rename_from_to["to"]
-    )
-  } else {
-    new_from_to_cols <- c(
-      from,
-      to
-    )
-  }
-
-  result <- result %>%
-    ukbwranglr:::rename_cols(
-      old_colnames = from_to_cols,
-      new_colnames = new_from_to_cols
-    )
-
-  return(result)
-}
 
 # Utilities ---------------------------------------------------------------
 
@@ -1414,21 +1258,7 @@ get_relatives_attributes_sct <- function(
   # codes - can be character vector or data frame
   if (!is.null(codes)) {
     if (is.character(codes)) {
-      check_codes(codes)
-
-      if (length(codes) == 1) {
-        codes <- codes_string_to_vector(codes)
-      }
-
       codes <- tibble::tibble(code = codes, typeId = NA_character_)
-    }
-  }
-
-  if (!is.null(relationship)) {
-    check_codes(relationship)
-
-    if (length(relationship) == 1) {
-      relationship <- codes_string_to_vector(relationship)
     }
   }
 
@@ -1581,8 +1411,6 @@ codes_starting_with <- function(
   )
 
   create_db_connection(all_lkps_maps)
-
-  check_codes(codes)
 
   assertthat::assert_that(
     is.logical(codes_only),
