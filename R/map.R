@@ -168,3 +168,76 @@ MAP <- function(
     }
   }
 }
+
+#' Get the mapping table for the given from and to types in standardised format
+#'
+#' @param con A database connection.
+#' @param from The source code type to map from
+#' @param to The target code type to map to
+#' @param version The version of the mapping table.
+#' @param call The calling environment. Passed to [cli::cli_abort].
+#'
+#' @return A data frame containing the lookup table with two columns: `from` and `to`.
+#' @keywords internal
+get_mapping_table <- function(
+  con,
+  from,
+  to,
+  version,
+  call = rlang::caller_env()
+) {
+  this_meta <- get_meta_for_mapping(con, from, to, version, call = call)
+  tbl_name <- this_meta$mapping_table_name
+  tbl <- get_table_from_db(con, tbl_name)
+
+  tbl <- dplyr::select(tbl, from = this_meta$from_col, to = this_meta$to_col)
+
+  return(tbl)
+}
+
+get_meta_for_mapping <- function(
+  con,
+  from,
+  to,
+  version,
+  call = rlang::caller_env()
+) {
+  all_meta <- get_mapping_metadata(con = con)
+
+  # Check if we need to swap the from and to types
+  if (!(from %in% all_meta$from_code_type) && from %in% all_meta$to_code_type) {
+    old_from <- from
+    from <- to
+    to <- old_from
+  }
+
+  this_meta <- dplyr::filter(
+    all_meta,
+    .data$from_code_type == from,
+    .data$to_code_type == to
+  )
+
+  if (nrow(this_meta) == 0) {
+    cli::cli_abort(
+      c(
+        "No mapping table found for from type '{from}' and to type '{to}'.",
+        "i" = "Did you add the mapping table with {.fun codeminer::add_mapping_table}?"
+      ),
+      call = call
+    )
+  }
+
+  available_versions <- this_meta$lookup_version
+
+  if (!(version %in% available_versions)) {
+    cli::cli_abort(c(
+      "No metadata found for '{code_type}' version '{version}'",
+      "i" = "Available versions for '{code_type}': {available_versions}"
+    ))
+  }
+
+  this_meta <- dplyr::filter(this_meta, .data$mapping_version == version)
+  stopifnot(nrow(this_meta) == 1) # expect a unique mapping table
+
+  return(this_meta)
+}
