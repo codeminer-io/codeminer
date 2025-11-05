@@ -95,7 +95,16 @@ get_mapping_table <- function(
   tbl_name <- this_meta$mapping_table_name
   tbl <- get_table_from_db(con, tbl_name)
 
-  tbl <- dplyr::select(tbl, from = this_meta$from_col, to = this_meta$to_col)
+  # Check if we need to swap
+  from_col <- this_meta$from_col
+  to_col <- this_meta$to_col
+  need_to_swap <- this_meta$from_code_type == to
+  if (need_to_swap) {
+    from_col <- this_meta$to_col
+    to_col <- this_meta$from_col
+  }
+
+  tbl <- dplyr::select(tbl, from = from_col, to = to_col)
 
   return(tbl)
 }
