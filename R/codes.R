@@ -78,7 +78,8 @@ check_code_type <- function(code_type) {
 #' @param code_type The code type for which to retrieve the lookup table.
 #' @param call The calling environment. Passed to [cli::cli_abort].
 #'
-#' @return A data frame containing the lookup table with two columns: `code` and `description`.
+#' @return A data frame containing the lookup table with three columns:
+#'   `code`, `description` and `code_type`.
 #' @keywords internal
 get_lookup_table <- function(
   con,
@@ -130,7 +131,7 @@ get_meta_for_table <- function(
     ))
   }
 
-  this_meta <- dplyr::filter(this_meta, .data[["lookup_version"]] == version)
+  this_meta <- dplyr::filter(this_meta, .data$lookup_version == version)
   stopifnot(nrow(this_meta) == 1) # code_type + version combo should be unique
 
   return(this_meta)
