@@ -25,10 +25,10 @@ CODES <- function(
   code_type = getOption("codeminer.code_type"),
   version = "v0"
 ) {
-  check_codes(codes)
-  check_code_type(code_type)
+  check_lookup_args(codes, code_type, version)
 
   con <- connect_to_db()
+  check_database(con)
 
   lookup_table <- get_lookup_table(con, code_type, version)
 
@@ -51,6 +51,18 @@ CODES <- function(
 }
 
 # Argument validation helpers
+check_lookup_args <- function(
+  codes,
+  code_type,
+  version,
+  call = rlang::caller_env()
+) {
+  check_codes(codes, call)
+  check_code_type(code_type, call)
+  check_version(version, call)
+}
+
+
 check_codes <- function(codes, call = rlang::caller_env()) {
   if (!is.character(codes)) {
     cli::cli_abort(
@@ -70,6 +82,15 @@ check_code_type <- function(code_type, call = rlang::caller_env()) {
   if (length(code_type) != 1) {
     cli::cli_abort(
       "{.arg code_type} must have length 1, not {length(code_type)}",
+      call = call
+    )
+  }
+}
+
+check_version <- function(version, call = rlang::caller_env()) {
+  if (length(version) != 1) {
+    cli::cli_abort(
+      "{.arg version} must have length 1, not {length(version)}",
       call = call
     )
   }
@@ -107,34 +128,30 @@ get_lookup_table <- function(
 
 get_meta_for_table <- function(
   con,
-  code_type,
+  type,
   version,
   call = rlang::caller_env()
 ) {
   meta <- get_lookup_metadata(con = con)
-  if (!(code_type %in% meta$code_type)) {
+  if (!(type %in% meta$code_type)) {
     cli::cli_abort(
       c(
-        "Code type '{code_type}' not found in lookup metadata.",
+        "Code type '{type}' not found in lookup metadata.",
         "i" = "Did you add the lookup table with {.fun codeminer::add_lookup_table}?"
       ),
       call = call
     )
   }
 
-  # Need to use `.env` pronoun here to avoid confusing dplyr::filter
-  # see https://rlang.r-lib.org/reference/dot-data.html
-  this_meta <- dplyr::filter(meta, .data$code_type == .env$code_type)
-  available_versions <- this_meta$lookup_version
+  this_meta <- dplyr::filter(
+    meta,
+    .data$code_type == type,
+    .data$lookup_version == version
+  )
 
-  if (!(version %in% available_versions)) {
-    cli::cli_abort(c(
-      "No metadata found for '{code_type}' version '{version}'",
-      "i" = "Available versions for '{code_type}': {available_versions}"
-    ))
+  if (nrow(this_meta) == 0) {
+    cli::cli_abort("No metadata found for '{type}' version '{version}'")
   }
-
-  this_meta <- dplyr::filter(this_meta, .data$lookup_version == version)
   stopifnot(nrow(this_meta) == 1) # code_type + version combo should be unique
 
   return(this_meta)
