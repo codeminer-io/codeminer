@@ -1687,25 +1687,6 @@ codes_starting_with <- function(
 
 #' Helper function for \code{\link{MAP}}
 #'
-#' Returns name of the appropriate mapping sheet from the UKB code mappings
-#' excel file (resource 592) for mapping from one clinical coding system to
-#' another.
-#'
-#' @param from character
-#' @param to character
-#'
-#' @return character (scalar)
-#' @noRd
-#' @family Clinical code lookups and mappings
-get_from_to_mapping_sheet <- function(from, to) {
-  CLINICAL_CODE_MAPPINGS_MAP[
-    (CLINICAL_CODE_MAPPINGS_MAP[["from"]] == from &
-      CLINICAL_CODE_MAPPINGS_MAP[["to"]] == to),
-  ][["mapping_table"]]
-}
-
-#' Helper function for \code{\link{MAP}}
-#'
 #' Returns the requested value for a 'mapping_table' in
 #' \code{CLINICAL_CODE_MAPPINGS_MAP}.
 #'
@@ -2203,96 +2184,6 @@ expand_icd10_ranges <- function(read_v2_icd10, icd10_lkp, icd10_lkp_alt_x_map) {
 }
 
 ## Validation helpers ---------------------------
-
-check_mapping_args <- function(from, to, reverse_mapping = "error") {
-  if (identical(reverse_mapping, NULL)) {
-    reverse_mapping <- "error"
-  }
-
-  match.arg(reverse_mapping, choices = c("error", "warning"))
-
-  if (identical(from, NULL)) {
-    from <- ""
-  }
-
-  if (identical(to, NULL)) {
-    to <- ""
-  }
-
-  match.arg(
-    arg = from,
-    choices = CODE_TYPE_TO_LKP_TABLE_MAP$code
-  )
-  # choices = CLINICAL_CODE_MAPPINGS_MAP$from)
-
-  match.arg(
-    arg = to,
-    choices = CODE_TYPE_TO_LKP_TABLE_MAP$code
-  )
-  # choices = CLINICAL_CODE_MAPPINGS_MAP$to)
-
-  assertthat::assert_that(
-    !identical(from, to),
-    msg = "Error! `from` and `to` args cannot be the same"
-  )
-
-  # get appropriate mapping sheet
-  swap_mapping_cols <- FALSE
-  mapping_table <- get_from_to_mapping_sheet(from = from, to = to)
-
-  # if above returns `character(0)`, try to map the other way
-  if (rlang::is_empty(mapping_table)) {
-    swap_mapping_cols <- TRUE
-    mapping_table <- get_from_to_mapping_sheet(from = to, to = from)
-  }
-
-  # if still returns `character(0)`, error
-  if (rlang::is_empty(mapping_table)) {
-    stop("Error! Invalid (or unavailable) code mapping request")
-  } else if (swap_mapping_cols) {
-    switch(
-      reverse_mapping,
-      error = stop("No mapping sheet available for this request"),
-      warning = warning(
-        "No mapping sheet available for this request. Attempting to map anyway using: ",
-        mapping_table
-      )
-    )
-  }
-
-  # get from_col and to_col column names for mapping sheet
-  # swap if appropriate
-  if (swap_mapping_cols) {
-    from_col <-
-      get_value_for_mapping_sheet(
-        mapping_table = mapping_table,
-        value = "to_col"
-      )
-    to_col <-
-      get_value_for_mapping_sheet(
-        mapping_table = mapping_table,
-        value = "from_col"
-      )
-  } else {
-    from_col <-
-      get_value_for_mapping_sheet(
-        mapping_table = mapping_table,
-        value = "from_col"
-      )
-    to_col <-
-      get_value_for_mapping_sheet(
-        mapping_table = mapping_table,
-        value = "to_col"
-      )
-  }
-
-  # return result
-  return(list(
-    from_col = from_col,
-    to_col = to_col,
-    mapping_table = mapping_table
-  ))
-}
 
 check_all_lkps_maps_path <- function(file_path, md = FALSE) {
   # determine whether using motherduck
