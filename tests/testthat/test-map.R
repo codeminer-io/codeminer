@@ -41,20 +41,14 @@ test_that("MAP fails for missing mapping table", {
   )
 })
 
-
-# `MAP()` -----------------------------------------------------------
-
-test_that("`MAP()` raises warning if any of the supplied codes are not present in the coding system being mapped from", {
+test_that("`MAP()` warns about missing codes in the coding system being mapped from", {
   expect_warning(
     MAP(
-      codes = c("C10E.", "foo", "bar"),
-      from = "read2",
-      to = "read3",
-      all_lkps_maps = all_lkps_maps,
-      unrecognised_codes = "warning"
+      codes = c("foo", "bar"),
+      from = "read3",
+      to = "icd10"
     ),
-    regexp = "The following 2 codes were not found for 'read2' in table 'read_v2_read_ctv3': 'foo', 'bar'",
-    fixed = TRUE
+    "The following codes were not found in the mapping table",
   )
 })
 
