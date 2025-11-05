@@ -118,11 +118,19 @@ get_meta_for_table <- function(
     )
   }
 
-  this_meta <- dplyr::filter(
-    meta,
-    .data$code_type == code_type,
-    .data$lookup_version == version
-  )
+  # Need to use `.env` pronoun here to avoid confusing dplyr::filter
+  # see https://rlang.r-lib.org/reference/dot-data.html
+  this_meta <- dplyr::filter(meta, .data$code_type == .env$code_type)
+  available_versions <- this_meta$lookup_version
+
+  if (!(version %in% available_versions)) {
+    cli::cli_abort(c(
+      "No metadata found for '{code_type}' version '{version}'",
+      "i" = "Available versions for '{code_type}': {available_versions}"
+    ))
+  }
+
+  this_meta <- dplyr::filter(this_meta, .data[["lookup_version"]] == version)
   stopifnot(nrow(this_meta) == 1) # code_type + version combo should be unique
 
   return(this_meta)
