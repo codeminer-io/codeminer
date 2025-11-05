@@ -14,7 +14,8 @@ get_lookup_table(con, code_type, version, call = rlang::caller_env())
 \item{call}{The calling environment. Passed to \link[cli:cli_abort]{cli::cli_abort}.}
 }
 \value{
-A data frame containing the lookup table with two columns: \code{code} and \code{description}.
+A data frame containing the lookup table with three columns:
+\code{code}, \code{description} and \code{code_type}.
 }
 \description{
 Get the lookup table for the given code type in standardised format
