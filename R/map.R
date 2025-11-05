@@ -41,132 +41,32 @@
 #' )
 MAP <- function(
   codes,
-  to = getOption("codeminer.map_to"),
   from = getOption("codeminer.map_from"),
-  all_lkps_maps = NULL,
-  codes_only = FALSE,
-  standardise_output = TRUE,
-  unrecognised_codes = getOption("codeminer.unrecognised_codes_mapped"),
-  preferred_description_only = TRUE,
-  reverse_mapping = getOption("codeminer.reverse_mapping"),
-  col_filters = getOption("codeminer.col_filters")
+  to = getOption("codeminer.map_to"),
+  version = "v0"
 ) {
-  # TODO - create df and string methods; validate codes df
-  if (is.data.frame(codes)) {
-    from <- unique(codes$code_type)
-    codes <- codes$code
-  }
+  check_mapping_args(from = from, to = to, version = version)
 
-  # validate args
-  check_codes(codes)
+  con <- connect_to_db()
+  check_database(con)
 
-  if (length(codes) == 1) {
-    codes <- codes_string_to_vector(codes)
-  }
+  mapping_table <- get_mapping_table(con, from, to, version)
 
-  create_db_connection(all_lkps_maps)
-
-  validate_all_lkps_maps()
-
-  assertthat::assert_that(
-    is.logical(codes_only),
-    msg = "`code_only` must be either 'TRUE' or 'FALSE'"
-  )
-
-  assertthat::assert_that(
-    !(codes_only & standardise_output),
-    msg = "Error! `codes_only` and `standardise_output` cannot both be `TRUE`"
-  )
-
-  # check mapping args and get required details - mapping_table, from_col and
-  # to_col
-  mapping_params <- check_mapping_args(
-    from = from,
-    to = to,
-    reverse_mapping = reverse_mapping
-  )
-
-  from_col <- mapping_params$from_col
-  to_col <- mapping_params$to_col
-  mapping_table <- mapping_params$mapping_table
-
-  check_table_exists_in_all_lkps_maps(
-    all_lkps_maps = all_lkps_maps,
-    table_name = mapping_table
-  )
-
-  # determine relevant column indicating whether code description is preferred
-  # (for code types with synonymous code descriptions like read 2 and read 3)
-  preferred_description_col <-
-    get_value_for_mapping_sheet(
-      mapping_table = mapping_table,
-      value = "preferred_synonym_col"
-    )
-
-  # get preferred code, if appropriate
-  if (!is.na(preferred_description_col)) {
-    preferred_description_code <-
-      get_value_for_mapping_sheet(
-        mapping_table = mapping_table,
-        value = "preferred_code"
-      )
-  }
-
-  # do mapping
-  result <- all_lkps_maps[[mapping_table]] %>%
-    dplyr::filter(.data[[from_col]] %in% codes) %>%
-    dplyr::filter(!is.na(.data[[to_col]])) %>%
+  mapping <- dplyr::filter(
+    mapping_table,
+    .data$from %in% codes,
+    !is.na(.data$to)
+  ) |>
     dplyr::collect()
 
-  # filter on `col_filters` parameters
-  if (!is.null(col_filters)) {
-    result <- filter_cols(
-      df = result,
-      df_name = mapping_table,
-      col_filters = col_filters
+  missing_codes <- setdiff(codes, mapping$from)
+  if (length(missing_codes) > 0) {
+    cli::cli_warn(
+      "The following codes were not found in the mapping table: {.code {missing_codes}}"
     )
   }
-
-  # check for unrecognised codes
-  missing_codes <- subset(codes, !codes %in% result[[from_col]])
-
-  handle_unrecognised_codes(
-    unrecognised_codes = unrecognised_codes,
-    missing_codes = missing_codes,
-    table_name = mapping_table,
-    code_type = from
-  )
-
-  # return result
-  if (nrow(result) == 0) {
-    message("No codes found after mapping.")
-    return(result)
-  } else {
-    # return either unique codes only, or df including descriptions
-    if (codes_only) {
-      result <- unique(result[[to_col]])
-
-      return(result)
-    } else if (standardise_output) {
-      # Note, not all mapping sheets in UKB resource 592 contain descriptions
-      # (e.g. 'read_v2_icd9'). Therefore need to use `CODES` if
-      # `standardise_output` is `TRUE`
-
-      codes <- unique(result[[to_col]])
-
-      return(
-        CODES(
-          codes = codes,
-          code_type = to,
-          all_lkps_maps = all_lkps_maps,
-          preferred_description_only = preferred_description_only,
-          unrecognised_codes = unrecognised_codes
-        )
-      )
-    } else {
-      return(result)
-    }
-  }
+  mapped_codes <- unique(mapping$to)
+  return(CODES(mapped_codes, code_type = to, version = version))
 }
 
 #' Get the mapping table for the given from and to types in standardised format
@@ -214,30 +114,54 @@ get_meta_for_mapping <- function(
   this_meta <- dplyr::filter(
     all_meta,
     .data$from_code_type == from,
-    .data$to_code_type == to
+    .data$to_code_type == to,
+    .data$mapping_version == version
   )
 
   if (nrow(this_meta) == 0) {
     cli::cli_abort(
       c(
-        "No mapping table found for from type '{from}' and to type '{to}'.",
+        "No mapping table found for from type '{from}' and to type '{to}', version '{version}'.",
         "i" = "Did you add the mapping table with {.fun codeminer::add_mapping_table}?"
       ),
       call = call
     )
   }
 
-  available_versions <- this_meta$lookup_version
-
-  if (!(version %in% available_versions)) {
-    cli::cli_abort(c(
-      "No metadata found for '{code_type}' version '{version}'",
-      "i" = "Available versions for '{code_type}': {available_versions}"
-    ))
-  }
-
-  this_meta <- dplyr::filter(this_meta, .data$mapping_version == version)
   stopifnot(nrow(this_meta) == 1) # expect a unique mapping table
-
   return(this_meta)
+}
+
+check_mapping_args <- function(
+  from,
+  to,
+  version,
+  call = rlang::caller_env()
+) {
+  check_version(version)
+
+  if (!is.character(from)) {
+    cli::cli_abort(
+      "{.arg from} must be of type character, not {typeof(from)}",
+      call = call
+    )
+  }
+  if (length(from) != 1) {
+    cli::cli_abort(
+      "{.arg from} must have length 1, not {length(from)}",
+      call = call
+    )
+  }
+  if (!is.character(to)) {
+    cli::cli_abort(
+      "{.arg to} must be of type character, not {typeof(to)}",
+      call = call
+    )
+  }
+  if (length(to) != 1) {
+    cli::cli_abort(
+      "{.arg to} must have length 1, not {length(to)}",
+      call = call
+    )
+  }
 }
