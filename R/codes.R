@@ -25,7 +25,7 @@ CODES <- function(
   code_type = getOption("codeminer.code_type"),
   version = "v0"
 ) {
-  check_lookup_args(codes, code_type, version)
+  check_lookup_args(code_type, version)
 
   con <- connect_to_db()
   check_database(con)
@@ -52,7 +52,6 @@ CODES <- function(
 
 # Argument validation helpers
 check_lookup_args <- function(
-  codes,
   code_type,
   version,
   call = rlang::caller_env()
