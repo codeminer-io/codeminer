@@ -34,15 +34,6 @@ reference:
   - lookup_metadata
   - mapping_metadata
 
-- title: CALIBER
-  desc:  Functions for reformatting CALIBER codelists to use with UK Biobank data
-- contents:
-  - download_caliber_repo
-  - read_caliber_raw
-  - reformat_caliber_for_ukb
-  - default_overlapping_disease_categories_csv
-  - get_caliber_categories_mapping
-
 - title: Dummy data
   desc: Dummy data for tests.
 - contents:

@@ -86,12 +86,6 @@ htn_icd10
 See `vignette('codeminer')` for further details, including how to build
 a clinical codelist with R Shiny using `RunCodelistBuilder()`.
 
-## UK Biobank
-
-Also included are functions for using CALIBER code lists
-(`vignette('caliber')`) and Phecodes (`vignette('phecodes')`) with UK
-Biobank data.
-
 ## 🏗️ Development
 
 Contributions are welcome! Please follow the [Contributing

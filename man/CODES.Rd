@@ -4,7 +4,7 @@
 \alias{CODES}
 \title{Look up descriptions for clinical codes}
 \usage{
-CODES(codes, code_type = getOption("codeminer.code_type"), version = "v0")
+CODES(codes, code_type = getOption("codeminer.code_type"), version = "latest")
 }
 \arguments{
 \item{codes}{character. Vector of codes to lookup. If passing \code{"all"}, returns all codes.}
