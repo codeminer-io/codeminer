@@ -52,14 +52,17 @@ test_that("`MAP()` warns about missing codes in the coding system being mapped f
   )
 })
 
-test_that("MAP() swaps `to` and `from` if necessary", {
+test_that("MAP() swaps `to` and `from` if necessary and warns", {
   # We only have read3 -> icd10 mapping in the database,
   # icd10 -> read3 is still expected to work, because MAP() swaps the direction if necessary
   test_codes <- c("E129", "E109", "E14", "L721", "I13") # icd10 codes
   test_from <- "icd10"
   test_to <- "read3"
 
-  result <- MAP(test_codes, test_from, test_to)
+  expect_warning(
+    result <- MAP(test_codes, test_from, test_to),
+    "No explicit mapping table found"
+  )
   expect_true(nrow(result) >= length(test_codes))
   expect_identical(unique(result$code_type), test_to)
 })

@@ -69,17 +69,7 @@ get_mapping_table <- function(
   tbl_name <- this_meta$mapping_table_name
   tbl <- get_table_from_db(con, tbl_name)
 
-  # Check if we need to swap
-  from_col <- this_meta$from_col
-  to_col <- this_meta$to_col
-  need_to_swap <- this_meta$from_code_type == to
-  if (need_to_swap) {
-    from_col <- this_meta$to_col
-    to_col <- this_meta$from_col
-  }
-
-  tbl <- dplyr::select(tbl, from = from_col, to = to_col)
-
+  tbl <- dplyr::select(tbl, from = this_meta$from_col, to = this_meta$to_col)
   return(tbl)
 }
 
@@ -93,7 +83,17 @@ get_meta_for_mapping <- function(
   all_meta <- get_mapping_metadata(con = con)
 
   # Check if we need to swap the from and to types
-  if (!(from %in% all_meta$from_code_type) && from %in% all_meta$to_code_type) {
+  swap <- !(from %in% all_meta$from_code_type) &&
+    from %in% all_meta$to_code_type
+  if (swap) {
+    cli::cli_warn(
+      c(
+        "No explicit mapping table found for '{from} -> {to}', but found '{to} -> {from}'.",
+        "Using the reverse of '{to} -> {from}' instead.",
+        "i" = "You can add a new mapping table with {.fun codeminer::add_mapping_table}."
+      ),
+      call = call
+    )
     old_from <- from
     from <- to
     to <- old_from
@@ -114,6 +114,13 @@ get_meta_for_mapping <- function(
       ),
       call = call
     )
+  }
+
+  if (swap) {
+    # Swap the from and to column names if necessary
+    old_from_col <- this_meta$from_col
+    this_meta$from_col <- this_meta$to_col
+    this_meta$to_col <- old_from_col
   }
 
   stopifnot(nrow(this_meta) == 1) # expect a unique mapping table
