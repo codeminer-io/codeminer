@@ -66,3 +66,42 @@ test_that("MAP() swaps `to` and `from` if necessary and warns", {
   expect_true(nrow(result) >= length(test_codes))
   expect_identical(unique(result$code_type), test_to)
 })
+
+test_that("MAP handles versions correctly", {
+  test_from <- "read3"
+  test_to <- "icd10"
+  test_version <- "v2"
+
+  # add test tables as new version of icd10
+  test_lookup_table <- data.frame(
+    code = c("A", "B", "C"),
+    description = c("letter A", "letter B", "letter C")
+  )
+  add_lookup_table(test_lookup_table, lookup_metadata(test_to, test_version))
+  test_mapping_table <- data.frame(
+    from = c("a", "b", "c"),
+    to = c("A", "B", "C")
+  )
+  add_mapping_table(
+    test_mapping_table,
+    mapping_metadata(test_from, test_to, test_version)
+  )
+
+  v2_result <- MAP(
+    "all",
+    from = test_from,
+    to = test_to,
+    version = test_version
+  )
+  expect_identical(v2_result$code, test_lookup_table$code)
+  expect_identical(v2_result$description, test_lookup_table$description)
+  expect_identical(unique(v2_result$code_type), test_to)
+
+  latest_result <- MAP(
+    "all",
+    from = test_from,
+    to = test_to,
+    version = "latest"
+  )
+  expect_identical(latest_result, v2_result)
+})

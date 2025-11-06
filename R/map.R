@@ -17,7 +17,7 @@ MAP <- function(
   codes,
   from = getOption("codeminer.map_from"),
   to = getOption("codeminer.map_to"),
-  version = "v0"
+  version = "latest"
 ) {
   check_mapping_args(from = from, to = to, version = version)
 
@@ -99,12 +99,15 @@ get_meta_for_mapping <- function(
     to <- old_from
   }
 
-  this_meta <- dplyr::filter(
+  all_version_meta <- dplyr::filter(
     all_meta,
     .data$from_code_type == from,
-    .data$to_code_type == to,
-    .data$mapping_version == version
+    .data$to_code_type == to
   )
+  if (version == "latest") {
+    version <- get_latest_version(all_version_meta$mapping_version)
+  }
+  this_meta <- dplyr::filter(all_version_meta, .data$mapping_version == version)
 
   if (nrow(this_meta) == 0) {
     cli::cli_abort(

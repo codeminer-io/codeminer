@@ -34,7 +34,7 @@ test_that("CODES allows querying all codes", {
   expect_equal(nrow(result), expected_rows)
 })
 
-test_that("CODES respects versions", {
+test_that("CODES handles versions correctly", {
   test_type <- "icd10"
   test_version <- "v2"
 
@@ -48,10 +48,13 @@ test_that("CODES respects versions", {
     lookup_metadata(test_type, version = test_version)
   )
 
-  result <- CODES("all", code_type = test_type, version = test_version)
-  expect_identical(result$code, test_table$code)
-  expect_identical(result$description, test_table$description)
-  expect_identical(unique(result$code_type), test_type)
+  v2_result <- CODES("all", code_type = test_type, version = test_version)
+  expect_identical(v2_result$code, test_table$code)
+  expect_identical(v2_result$description, test_table$description)
+  expect_identical(unique(v2_result$code_type), test_type)
+
+  latest_result <- CODES("all", code_type = test_type, version = "latest")
+  expect_identical(latest_result, v2_result)
 })
 
 test_that("CODES warns about missing codes", {
@@ -89,4 +92,14 @@ test_that("CODES can return multiple descriptions for the same code", {
   result <- CODES(test_code, code_type = "read3")
   expect_equal(nrow(result), 5)
   expect_identical(unique(result$code), test_code)
+})
+
+test_that("get_latest_version handles edge cases", {
+  # Non-numeric versions should follow alphabetic ordering
+  test_versions <- c("aaa", "zzz", "ccc")
+  expect_identical(get_latest_version(test_versions), "zzz")
+
+  # But if there's a numeric component, should use that
+  test_versions <- c("v1", "v20", "v5")
+  expect_identical(get_latest_version(test_versions), "v20")
 })

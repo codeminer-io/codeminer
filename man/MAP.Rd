@@ -8,7 +8,7 @@ MAP(
   codes,
   from = getOption("codeminer.map_from"),
   to = getOption("codeminer.map_to"),
-  version = "v0"
+  version = "latest"
 )
 }
 \arguments{

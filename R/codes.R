@@ -23,7 +23,7 @@
 CODES <- function(
   codes,
   code_type = getOption("codeminer.code_type"),
-  version = "v0"
+  version = "latest"
 ) {
   check_lookup_args(code_type, version)
 
@@ -37,7 +37,7 @@ CODES <- function(
   }
 
   result <- lookup_table |>
-    dplyr::filter(.data[["code"]] %in% codes) |>
+    dplyr::filter(.data[["code"]] %in% !!codes) |>
     dplyr::collect()
 
   missing_codes <- setdiff(codes, result[["code"]])
@@ -125,11 +125,12 @@ get_meta_for_table <- function(
     )
   }
 
-  this_meta <- dplyr::filter(
-    meta,
-    .data$code_type == type,
-    .data$lookup_version == version
-  )
+  all_version_meta <- dplyr::filter(meta, .data$code_type == type)
+
+  if (version == "latest") {
+    version <- get_latest_version(all_version_meta$lookup_version)
+  }
+  this_meta <- dplyr::filter(all_version_meta, .data$lookup_version == version)
 
   if (nrow(this_meta) == 0) {
     cli::cli_abort("No metadata found for '{type}' version '{version}'")
@@ -137,4 +138,19 @@ get_meta_for_table <- function(
   stopifnot(nrow(this_meta) == 1) # code_type + version combo should be unique
 
   return(this_meta)
+}
+
+# NOTE: this helper has a strong assumption that the versions have some numeric component (e.g. "v42")
+# that can be extracted and used to sort, in order to get the latest one
+# This is is not something we enforce, so this may not always return the correct result.
+get_latest_version <- function(versions) {
+  versions_numeric <- as.numeric(stringr::str_extract(versions, "\\d+"))
+  if (any(is.na(versions_numeric))) {
+    # resort to alphabetic ordering
+    latest_version <- max(versions)
+  } else {
+    latest_version <- versions[which.max(versions_numeric)]
+  }
+  cli::cli_alert_info("Using '{latest_version}' as latest version")
+  return(latest_version)
 }
