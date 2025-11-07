@@ -4,7 +4,12 @@
 \alias{CODES}
 \title{Look up descriptions for clinical codes}
 \usage{
-CODES(codes, code_type = getOption("codeminer.code_type"), version = "latest")
+CODES(
+  codes,
+  code_type = getOption("codeminer.code_type"),
+  version = "latest",
+  preferred_description_only = FALSE
+)
 }
 \arguments{
 \item{codes}{character. Vector of codes to lookup. If passing \code{"all"}, returns all codes.}
@@ -12,6 +17,9 @@ CODES(codes, code_type = getOption("codeminer.code_type"), version = "latest")
 \item{code_type}{character. Type of clinical code system to be searched.
 Depends on what is available in the lookup tables. See \code{\link[=add_lookup_table]{add_lookup_table()}}
 on how to add new lookup tables. This can also be configured through the \code{codeminer.code_type} option.}
+
+\item{preferred_description_only}{logical. If \code{TRUE}, only returns the preferred description for each code.
+Default: \code{FALSE}.}
 }
 \value{
 A \code{data.frame} containing the codes and their descriptions

@@ -14,6 +14,9 @@ ATTRIBUTE_TYPES_TO(
 }
 \arguments{
 \item{codes}{Codes to get attribute types for}
+
+\item{preferred_description_only}{logical. If \code{TRUE}, only returns the preferred description for each code.
+Default: \code{FALSE}.}
 }
 \value{
 Data frame

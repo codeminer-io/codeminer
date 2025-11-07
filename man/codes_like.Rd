@@ -25,6 +25,9 @@ on how to add new lookup tables. This can also be configured through the \code{c
 \item{codes_only}{bool. If \code{TRUE}, return a character vector of
 \emph{unique} codes. If \code{FALSE} (default), return a data frame of all
 results including code descriptions (useful for manual validation).}
+
+\item{preferred_description_only}{logical. If \code{TRUE}, only returns the preferred description for each code.
+Default: \code{FALSE}.}
 }
 \value{
 data frame by default, or a character vector of codes if

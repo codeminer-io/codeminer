@@ -24,6 +24,9 @@ get_children_sct(
 
 \item{include_descendants}{If \code{TRUE} (default) return all descendant codes,
 as well as immediate children.}
+
+\item{preferred_description_only}{logical. If \code{TRUE}, only returns the preferred description for each code.
+Default: \code{FALSE}.}
 }
 \value{
 A dataframe

@@ -24,6 +24,9 @@ get_parents_sct(
 
 \item{include_ancestors}{If \code{TRUE} (default) return all ancestor codes,
 as well as immediate parents.}
+
+\item{preferred_description_only}{logical. If \code{TRUE}, only returns the preferred description for each code.
+Default: \code{FALSE}.}
 }
 \value{
 A dataframe

@@ -17,6 +17,9 @@ GET_ATTRIBUTES(
 \item{attribute_codes}{Character vector of SNOMED codes.}
 
 \item{relationship_type}{Character vector of SNOMED codes.}
+
+\item{preferred_description_only}{logical. If \code{TRUE}, only returns the preferred description for each code.
+Default: \code{FALSE}.}
 }
 \value{
 A data frame
