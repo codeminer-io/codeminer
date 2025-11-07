@@ -55,7 +55,7 @@ get_snomed_available_items <- function() {
   return(available_items)
 }
 
-#' Download Latest Version of SNOMED CT Item
+#' Download Locally the Latest Version of SNOMED CT Item
 #'
 #' Downloads the most recent release of a SNOMED CT item from TRUD.
 #' By default, downloads the UK Clinical Edition Monolith (item 1799).
@@ -68,10 +68,10 @@ get_snomed_available_items <- function() {
 #' @examples
 #' \dontrun{
 #' # Download default SNOMED CT UK Monolith
-#' file_path <- download_latestversion_of_snomed_item()
+#' file_path <- download_locally_latestversion_of_snomed_item()
 #'
 #' # Download specific item
-#' file_path <- download_latestversion_of_snomed_item(1234)
+#' file_path <- download_locally_latestversion_of_snomed_item(1234)
 #' }
 download_locally_latestversion_of_snomed_item <- function(item_number = 1799) {
   # Input validation
