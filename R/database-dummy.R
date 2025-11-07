@@ -110,7 +110,9 @@ dummy_read3_metadata <- function() {
     "read3",
     version = "v0",
     lookup_code_col = "code",
-    lookup_description_col = "description"
+    lookup_description_col = "description",
+    preferred_description_col = "description_type",
+    preferred_description_indicator = "P"
   )
 }
 

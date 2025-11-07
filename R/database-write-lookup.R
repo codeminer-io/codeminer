@@ -40,6 +40,14 @@ add_lookup_table <- function(table, metadata) {
   table <- as.data.frame(table)
   metadata <- as.data.frame(metadata)
 
+  if (!is.na(metadata$preferred_description_col)) {
+    table <- make_preferred_desc_col_boolean(
+      table,
+      metadata$preferred_description_col,
+      metadata$preferred_description_indicator
+    )
+  }
+
   con <- connect_to_db()
   check_database(con)
 
@@ -81,8 +89,12 @@ add_lookup_table <- function(table, metadata) {
 #' @param lookup_code_col The column name for the lookup code (default: "code")
 #' @param lookup_description_col The column name for the lookup description (default: "description")
 #' @param lookup_source The source of the lookup metadata (default: `NA_character_`)
-#' @param preferred_synonym_col The column name for the preferred synonym (default: `NA_character_`)
-#' @param preferred_code The preferred code (default: `NA_character_`)
+#' @param preferred_description_col The name of the column that indicates the
+#'   preferred description. This is useful for lookup tables that have multiple
+#'   descriptions for the same code (default: `NA_character_`).
+#' @param preferred_description_indicator The value in the
+#'   `preferred_description_col` column that indicates the preferred description
+#'   (default: `NA_character_`)
 #'
 #' @return A list containing the lookup metadata
 #'
@@ -97,12 +109,21 @@ lookup_metadata <- function(
   lookup_code_col = "code",
   lookup_description_col = "description",
   lookup_source = NA_character_,
-  preferred_synonym_col = NA_character_,
-  preferred_code = NA_character_
+  preferred_description_col = NA_character_,
+  preferred_description_indicator = NA_character_
 ) {
   rlang::check_dots_empty()
 
   lookup_table_name <- paste(code_type, version, sep = "_")
+
+  if (
+    !is.na(preferred_description_col) &&
+      is.na(preferred_description_indicator)
+  ) {
+    cli::cli_abort(
+      "{.arg preferred_description_indicator} must be provided if {.arg preferred_description_col} is not `NA`"
+    )
+  }
 
   return(list(
     lookup_table_name = lookup_table_name,
@@ -111,8 +132,8 @@ lookup_metadata <- function(
     lookup_code_col = lookup_code_col,
     lookup_description_col = lookup_description_col,
     lookup_source = lookup_source,
-    preferred_synonym_col = preferred_synonym_col,
-    preferred_code = preferred_code
+    preferred_description_col = preferred_description_col,
+    preferred_description_indicator = preferred_description_indicator
   ))
 }
 
@@ -169,4 +190,10 @@ validate_lookup_metadata <- function(
   }
 
   return(invisible(metadata))
+}
+
+make_preferred_desc_col_boolean <- function(table, col_name, indicator) {
+  is_preferred <- table[[col_name]] == indicator
+  table[[col_name]] <- is_preferred
+  return(table)
 }

@@ -6,6 +6,8 @@
 #' @param code_type character. Type of clinical code system to be searched.
 #'   Depends on what is available in the lookup tables. See [add_lookup_table()]
 #'   on how to add new lookup tables. This can also be configured through the `codeminer.code_type` option.
+#' @param preferred_description_only logical. If `TRUE`, only returns the preferred description for each code.
+#'   Default: `FALSE`.
 #'
 #' @return A `data.frame` containing the codes and their descriptions
 #' @export
@@ -24,7 +26,8 @@
 CODES <- function(
   codes,
   code_type = getOption("codeminer.code_type"),
-  version = "latest"
+  version = "latest",
+  preferred_description_only = FALSE
 ) {
   check_lookup_args(code_type, version)
 
@@ -46,6 +49,10 @@ CODES <- function(
     cli::cli_warn(
       "The following codes were not found in the lookup table: {.code {missing_codes}}"
     )
+  }
+
+  if (preferred_description_only) {
+    result <- dplyr::filter(result, .data$preferred_description)
   }
 
   return(result)
@@ -106,6 +113,13 @@ get_lookup_table <- function(
     dplyr::everything()
   ) |>
     dplyr::mutate(code_type = code_type)
+
+  if (!is.na(this_meta$preferred_description_col)) {
+    tbl <- dplyr::rename(
+      tbl,
+      preferred_description = .env$this_meta$preferred_description_col,
+    )
+  }
 
   return(tbl)
 }

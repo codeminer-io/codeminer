@@ -94,6 +94,17 @@ test_that("CODES can return multiple descriptions for the same code", {
   expect_identical(unique(result$code), test_code)
 })
 
+test_that("CODES can return only the preferred description", {
+  test_code <- "X40J4"
+  result <- CODES(
+    test_code,
+    code_type = "read3",
+    preferred_description_only = TRUE
+  )
+  expect_equal(nrow(result), 1)
+  expect_identical(unique(result$code), test_code)
+})
+
 test_that("get_latest_version handles edge cases", {
   # Non-numeric versions should follow alphabetic ordering
   test_versions <- c("aaa", "zzz", "ccc")

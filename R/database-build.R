@@ -115,8 +115,8 @@ required_lookup_metadata_columns <- function() {
     "lookup_code_col",
     "lookup_description_col",
     "lookup_source",
-    "preferred_synonym_col",
-    "preferred_code"
+    "preferred_description_col",
+    "preferred_description_indicator"
   )
 }
 
