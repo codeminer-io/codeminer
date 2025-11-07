@@ -16,11 +16,11 @@ test_that("MAP() returns the expected data format", {
 
 test_that("MAP fails for wrong argument types", {
   expect_error(
-    MAP("all", from = c("icd10", "icd11", "icd12"), to = "read3"),
+    MAP("foo", from = c("icd10", "icd11", "icd12"), to = "read3"),
     "`from` must have length 1"
   )
   expect_error(
-    MAP("all", from = "read3", to = c("icd10", "icd11", "icd12")),
+    MAP("foo", from = "read3", to = c("icd10", "icd11", "icd12")),
     "`to` must have length 1"
   )
 })
@@ -28,15 +28,15 @@ test_that("MAP fails for wrong argument types", {
 test_that("MAP fails for missing mapping table", {
   expected_msg <- "No mapping table found"
   expect_error(
-    MAP("all", from = "idontexist", to = "icd10"),
+    MAP("foo", from = "idontexist", to = "icd10"),
     expected_msg
   )
   expect_error(
-    MAP("all", from = "read3", to = "idontexist"),
+    MAP("foo", from = "read3", to = "idontexist"),
     expected_msg
   )
   expect_error(
-    MAP("all", from = "read3", to = "icd10", version = "nope"),
+    MAP("foo", from = "read3", to = "icd10", version = "nope"),
     expected_msg
   )
 })
@@ -67,6 +67,11 @@ test_that("MAP() swaps `to` and `from` if necessary and warns", {
   expect_identical(unique(result$code_type), test_to)
 })
 
+test_that("MAP('all') returns the mapping table", {
+  result <- MAP("all", from = "read3", to = "icd10", version = "v0")
+  expect_identical(result, as.data.frame(dummy_read3_icd10_mapping()))
+})
+
 test_that("MAP handles versions correctly", {
   test_from <- "read3"
   test_to <- "icd10"
@@ -93,9 +98,7 @@ test_that("MAP handles versions correctly", {
     to = test_to,
     version = test_version
   )
-  expect_identical(v2_result$code, test_lookup_table$code)
-  expect_identical(v2_result$description, test_lookup_table$description)
-  expect_identical(unique(v2_result$code_type), test_to)
+  expect_identical(v2_result$to, test_lookup_table$code)
 
   latest_result <- MAP(
     "all",

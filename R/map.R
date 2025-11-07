@@ -13,6 +13,9 @@
 #' create_dummy_database(temp_db)
 #'
 #' MAP("X40J4", from = "read3", to = "icd10")
+#'
+#' # Return the mapping table itself
+#' MAP("all", from = "read3", to = "icd10")
 MAP <- function(
   codes,
   from = getOption("codeminer.map_from"),
@@ -27,8 +30,7 @@ MAP <- function(
   mapping_table <- get_mapping_table(con, from, to, version)
 
   if (length(codes) == 1 && codes == "all") {
-    all_mapped_codes <- unique(dplyr::pull(mapping_table, .data$to))
-    return(CODES(all_mapped_codes, code_type = to, version = version))
+    return(mapping_table)
   }
 
   mapping <- dplyr::filter(
