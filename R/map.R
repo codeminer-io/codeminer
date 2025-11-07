@@ -42,7 +42,7 @@ MAP <- function(
   mapping_table <- get_mapping_table(con, from, to, version)
 
   if (length(codes) == 1 && codes == "all") {
-    return(mapping_table)
+    return(dplyr::collect(mapping_table))
   }
 
   mapping <- dplyr::filter(
@@ -81,7 +81,7 @@ get_mapping_table <- function(
 ) {
   this_meta <- get_meta_for_mapping(con, from, to, version, call = call)
   tbl_name <- this_meta$mapping_table_name
-  tbl <- get_table_from_db(con, tbl_name)
+  tbl <- dplyr::tbl(con, tbl_name)
 
   tbl <- dplyr::rename(tbl, from = this_meta$from_col, to = this_meta$to_col)
   return(tbl)

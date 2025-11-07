@@ -34,7 +34,7 @@ CODES <- function(
   lookup_table <- get_lookup_table(con, code_type, version)
 
   if (length(codes) == 1 && codes == "all") {
-    return(lookup_table)
+    return(dplyr::collect(lookup_table))
   }
 
   result <- lookup_table |>
@@ -97,7 +97,7 @@ get_lookup_table <- function(
   this_meta <- get_meta_for_table(con, code_type, version, call)
 
   tbl_name <- this_meta$lookup_table_name
-  tbl <- get_table_from_db(con, tbl_name)
+  tbl <- dplyr::tbl(con, tbl_name)
 
   tbl <- dplyr::select(
     tbl,

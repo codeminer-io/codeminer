@@ -69,7 +69,7 @@ test_that("MAP() swaps `to` and `from` if necessary and warns", {
 
 test_that("MAP('all') returns the mapping table", {
   result <- MAP("all", from = "read3", to = "icd10", version = "v0")
-  expect_identical(result, as.data.frame(dummy_read3_icd10_mapping()))
+  expect_identical(result, dummy_read3_icd10_mapping())
 })
 
 test_that("MAP handles versions correctly", {
