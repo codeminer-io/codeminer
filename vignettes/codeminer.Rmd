@@ -99,10 +99,7 @@ CODES(
 - `DESCRIPTION():` search for codes that match a description
 
 ```{r DESCRIPTION}
-DESCRIPTION(
-  reg_expr = "cyst",
-  code_type = "icd10",
-)
+DESCRIPTION(pattern = "cyst", code_type = "icd10")
 ```
 
 <!-- TODO: add in `CHILDREN()` again, once supported -->
