@@ -31,6 +31,8 @@ CODES(
 )
 }
 \seealso{
+\code{\link[=add_lookup_table]{add_lookup_table()}} for adding new lookup tables to the database.
+
 Other Clinical code lookups and mappings: 
 \code{\link{CHILDREN}()},
 \code{\link{GET_ATTRIBUTES}()},

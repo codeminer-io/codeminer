@@ -20,8 +20,22 @@ MAP(
 
 \item{version}{Version of the mapping table to use.}
 }
+\value{
+A \code{data.frame} of the mapped codes with their descriptions, as returned by \code{\link[=CODES]{CODES()}}.
+
+If using \code{codes = "all"}, returns the mapping table as a \code{data.frame} with columns:
+\itemize{
+\item \code{from}: the codes from the source code system
+\item \code{to}: the mapped codes from the destination system
+}
+}
 \description{
 Map clinical codes from one coding system to another
+}
+\details{
+If no mapping table matching the \code{from -> to} direction is found, but there is a table for \code{to -> from},
+\code{MAP()} will return the reverse mapping with a warning. Note that this is not guaranteed to be correct,
+as most mapping tables only work one way.
 }
 \examples{
 # Set up a temporary dummy database
@@ -29,8 +43,13 @@ temp_db <- tempfile(fileext = ".duckdb")
 create_dummy_database(temp_db)
 
 MAP("X40J4", from = "read3", to = "icd10")
+
+# Return the mapping table itself
+MAP("all", from = "read3", to = "icd10")
 }
 \seealso{
+\code{\link[=add_mapping_table]{add_mapping_table()}} for adding new mapping tables to the codeminer database.
+
 Other Clinical code lookups and mappings: 
 \code{\link{CHILDREN}()},
 \code{\link{CODES}()},

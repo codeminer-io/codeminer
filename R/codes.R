@@ -10,6 +10,7 @@
 #' @return A `data.frame` containing the codes and their descriptions
 #' @export
 #' @family Clinical code lookups and mappings
+#' @seealso [add_lookup_table()] for adding new lookup tables to the database.
 #' @examples
 #' # Set up a temporary dummy database
 #' temp_db <- tempfile(fileext = ".duckdb")

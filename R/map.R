@@ -5,8 +5,20 @@
 #' @param to Coding system to map `codes` to.
 #' @param version Version of the mapping table to use.
 #'
+#' @details
+#' If no mapping table matching the `from -> to` direction is found, but there is a table for `to -> from`,
+#' `MAP()` will return the reverse mapping with a warning. Note that this is not guaranteed to be correct,
+#' as most mapping tables only work one way.
+#'
+#' @return A `data.frame` of the mapped codes with their descriptions, as returned by [CODES()].
+#'
+#'   If using `codes = "all"`, returns the mapping table as a `data.frame` with columns:
+#'   - `from`: the codes from the source code system
+#'   - `to`: the mapped codes from the destination system
+#'
 #' @export
 #' @family Clinical code lookups and mappings
+#' @seealso [add_mapping_table()] for adding new mapping tables to the codeminer database.
 #' @examples
 #' # Set up a temporary dummy database
 #' temp_db <- tempfile(fileext = ".duckdb")
