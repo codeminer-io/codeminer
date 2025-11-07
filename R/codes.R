@@ -101,8 +101,9 @@ get_lookup_table <- function(
 
   tbl <- dplyr::select(
     tbl,
-    code = this_meta$lookup_code_col,
-    description = this_meta$lookup_description_col
+    code = .env$this_meta$lookup_code_col,
+    description = .env$this_meta$lookup_description_col,
+    dplyr::everything()
   ) |>
     dplyr::mutate(code_type = code_type)
 

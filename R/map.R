@@ -83,7 +83,7 @@ get_mapping_table <- function(
   tbl_name <- this_meta$mapping_table_name
   tbl <- get_table_from_db(con, tbl_name)
 
-  tbl <- dplyr::select(tbl, from = this_meta$from_col, to = this_meta$to_col)
+  tbl <- dplyr::rename(tbl, from = this_meta$from_col, to = this_meta$to_col)
   return(tbl)
 }
 

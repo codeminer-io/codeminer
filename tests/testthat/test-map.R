@@ -9,7 +9,7 @@ test_that("MAP() returns the expected data format", {
   result <- MAP(test_codes, from = test_from, to = test_to, version = "v0")
 
   expect_s3_class(result, "data.frame")
-  expect_identical(names(result), c("code", "description", "code_type"))
+  expect_true(all(c("code", "description", "code_type") %in% names(result)))
   expect_true(nrow(result) >= length(test_codes))
   expect_identical(unique(result$code_type), test_to)
 })

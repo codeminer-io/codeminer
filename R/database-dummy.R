@@ -61,17 +61,19 @@ dummy_icd10_lookup <- function() {
   icd10_clean <- icd10 |>
     dplyr::mutate(
       "DESCRIPTION" = dplyr::case_when(
-        !is.na(MODIFIER_4) ~ paste(DESCRIPTION, MODIFIER_4),
-        !is.na(MODIFIER_5) ~ paste(DESCRIPTION, MODIFIER_5),
-        TRUE ~ DESCRIPTION
+        !is.na(.data$MODIFIER_4) ~ paste(.data$DESCRIPTION, .data$MODIFIER_4),
+        !is.na(.data$MODIFIER_5) ~ paste(.data$DESCRIPTION, .data$MODIFIER_5),
+        TRUE ~ .data$DESCRIPTION
       )
-    )
+    ) |>
+    dplyr::select(!dplyr::all_of(c("MODIFIER_4", "MODIFIER_5")))
 
-  # Keep only relevant columns
+  # Rename relevant columns
   icd10_lookup_dummy <- dplyr::select(
     icd10_clean,
     code = "ALT_CODE",
-    description = "DESCRIPTION"
+    description = "DESCRIPTION",
+    dplyr::everything()
   )
 
   return(icd10_lookup_dummy)
@@ -89,7 +91,7 @@ dummy_icd10_metadata <- function() {
 
 dummy_read3_lookup <- function() {
   read3 <- readxl::read_excel(dummy_data_path(), sheet = "read_ctv3_lkp")
-  read3_lookup <- dplyr::select(
+  read3_lookup <- dplyr::rename(
     read3,
     code = "read_code",
     description = "term_description"
@@ -118,7 +120,7 @@ dummy_read3_icd10_mapping <- function() {
     sheet = "read_ctv3_icd10"
   )
 
-  mapping <- dplyr::select(
+  mapping <- dplyr::rename(
     read3_icd10_raw,
     from = "read_code",
     to = "icd10_code"
