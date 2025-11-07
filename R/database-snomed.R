@@ -55,66 +55,107 @@ get_snomed_available_items <- function() {
   return(available_items)
 }
 
-#' Download Locally the Latest Version of SNOMED CT Item
+#' Download the Latest Version of a SNOMED CT Item Locally
 #'
 #' Downloads the most recent release of a SNOMED CT item from TRUD.
 #' By default, downloads the UK Clinical Edition Monolith (item 1799).
 #'
-#' @param item_number TRUD item number (default: 1799 for SNOMED CT UK Monolith)
+#' @param item_number Numeric. TRUD item number (default: 1799 for SNOMED CT UK Monolith)
+#' @param directory_to_extract_files Character. Directory where the files should be extracted (default: ".")
 #'
-#' @return Path to the downloaded file
+#' @return A named list containing:
+#' \describe{
+#'   \item{release_id}{The ID of the latest release downloaded.}
+#'   \item{file_path}{The path to the downloaded ZIP file.}
+#'   \item{extracted_dir}{The directory where the files were extracted.}
+#' }
 #' @export
 #'
 #' @examples
 #' \dontrun{
-#' # Download default SNOMED CT UK Monolith
-#' file_path <- download_locally_latestversion_of_snomed_item()
+#' # Download the default SNOMED CT UK Monolith
+#' result <- download_locally_latestversion_of_snomed_item()
 #'
-#' # Download specific item
-#' file_path <- download_locally_latestversion_of_snomed_item(1234)
+#' # Download a specific item
+#' result <- download_locally_latestversion_of_snomed_item(1234)
 #' }
-download_locally_latestversion_of_snomed_item <- function(item_number = 1799) {
+download_locally_latestversion_of_snomed_item <- function(
+  item_number = 1799,
+  directory_to_extract_files = "."
+) {
   # Input validation
   if (
     !is.numeric(item_number) || length(item_number) != 1 || item_number <= 0
   ) {
-    stop("item_number must be a positive numeric value")
+    stop("`item_number` must be a single positive numeric value.")
+  }
+
+  if (!dir.exists(directory_to_extract_files)) {
+    stop(sprintf(
+      "The directory '%s' does not exist.",
+      directory_to_extract_files
+    ))
   }
 
   # Get metadata for all releases
-  metadata <- trud::get_item_metadata(item_number, release_scope = "all")
-
-  # Check if releases exist
-  if (is.null(metadata$releases) || length(metadata$releases) == 0) {
-    stop(sprintf("No releases found for item number: %s", item_number))
-  }
-
-  # Extract latest release ID
-  latest_release_id <- metadata$releases[[1]]$id
-
-  # Download the item
-  zipfile_and_path <- trud::download_item(
-    item = item_number,
-    directory = tempdir(),
-    release = latest_release_id,
-    overwrite = TRUE
+  message("Retrieving metadata for item ", item_number, " ...")
+  metadata <- tryCatch(
+    trud::get_item_metadata(item_number, release_scope = "all"),
+    error = function(e) stop("Failed to retrieve metadata: ", e$message)
   )
 
-  # Verify download was successful
-  if (!file.exists(zipfile_and_path)) {
-    stop(sprintf("Download failed for item number: %s", item_number))
+  # Validate metadata
+  releases <- metadata$releases
+  if (is.null(releases) || length(releases) == 0) {
+    stop(sprintf("No releases found for item number %s.", item_number))
   }
 
+  # Identify latest release
+  # TRUD metadata is usually sorted with most recent first, but ensure explicitly
+  latest_release <- releases[[1]]
+  latest_release_id <- latest_release$id
+  release_date <- latest_release$releaseDate %||% "unknown"
+
   message(sprintf(
-    "Successfully downloaded item %s (release: %s) to: %s",
-    item_number,
+    "Latest release found: %s (Date: %s)",
     latest_release_id,
-    zipfile_and_path
+    release_date
   ))
 
-  # Return both values as a named list
-  return(list(
+  # Download the release
+  message("Downloading release ...")
+  zipfile_path <- tryCatch(
+    trud::download_item(
+      item = item_number,
+      directory = tempdir(),
+      release = latest_release_id,
+      overwrite = TRUE
+    ),
+    error = function(e) stop("Download failed: ", e$message)
+  )
+
+  if (!file.exists(zipfile_path)) {
+    stop(sprintf("Download failed or file not found at: %s", zipfile_path))
+  }
+  message(sprintf("Download complete: %s", zipfile_path))
+
+  # Extract files
+  message("Extracting contents ...")
+  extracted_dir <- file.path(
+    normalizePath(directory_to_extract_files, mustWork = TRUE),
+    paste0("snomed_item_", item_number, "_", latest_release_id)
+  )
+
+  dir.create(extracted_dir, showWarnings = FALSE, recursive = TRUE)
+
+  utils::unzip(zipfile_path, exdir = extracted_dir)
+
+  message(sprintf("Files extracted to: %s", extracted_dir))
+
+  # Return result
+  invisible(list(
     release_id = latest_release_id,
-    file_path = zipfile_and_path
+    file_path = zipfile_path,
+    extracted_dir = extracted_dir
   ))
 }
