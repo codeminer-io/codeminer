@@ -13,4 +13,5 @@ all_lkps_maps.db
 docs
 *.db
 air.toml
+*_snaps
 *.zip

@@ -2,15 +2,25 @@
 % Please edit documentation in R/database-snomed.R
 \name{download_locally_latestversion_of_snomed_item}
 \alias{download_locally_latestversion_of_snomed_item}
-\title{Download Latest Version of SNOMED CT Item}
+\title{Download the Latest Version of a SNOMED CT Item Locally}
 \usage{
-download_locally_latestversion_of_snomed_item(item_number = 1799)
+download_locally_latestversion_of_snomed_item(
+  item_number = 1799,
+  directory_to_extract_files = "."
+)
 }
 \arguments{
-\item{item_number}{TRUD item number (default: 1799 for SNOMED CT UK Monolith)}
+\item{item_number}{Numeric. TRUD item number (default: 1799 for SNOMED CT UK Monolith)}
+
+\item{directory_to_extract_files}{Character. Directory where the files should be extracted (default: ".")}
 }
 \value{
-Path to the downloaded file
+A named list containing:
+\describe{
+\item{release_id}{The ID of the latest release downloaded.}
+\item{file_path}{The path to the downloaded ZIP file.}
+\item{extracted_dir}{The directory where the files were extracted.}
+}
 }
 \description{
 Downloads the most recent release of a SNOMED CT item from TRUD.
@@ -18,10 +28,10 @@ By default, downloads the UK Clinical Edition Monolith (item 1799).
 }
 \examples{
 \dontrun{
-# Download default SNOMED CT UK Monolith
-file_path <- download_latestversion_of_snomed_item()
+# Download the default SNOMED CT UK Monolith
+result <- download_locally_latestversion_of_snomed_item()
 
-# Download specific item
-file_path <- download_latestversion_of_snomed_item(1234)
+# Download a specific item
+result <- download_locally_latestversion_of_snomed_item(1234)
 }
 }
