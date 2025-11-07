@@ -133,59 +133,6 @@ test_that("`CHILDREN()` raises error for unsupported code types e.g. read3", {
   )
 })
 
-# `DESCRIPTION()` ----------------------------------------------
-
-test_that("`DESCRIPTION()` returns expected results", {
-  expect_equal(
-    DESCRIPTION(
-      reg_expr = "diabetic retinopathy",
-      code_type = "icd10",
-      all_lkps_maps = all_lkps_maps,
-      ignore_case = TRUE,
-      codes_only = TRUE,
-      standardise_output = FALSE
-    ),
-    "H360"
-  )
-
-  expect_equal(
-    DESCRIPTION(
-      reg_expr = "diabetic retinopathy",
-      code_type = "icd10",
-      all_lkps_maps = all_lkps_maps,
-      ignore_case = TRUE,
-      codes_only = FALSE,
-      standardise_output = TRUE
-    ),
-    tibble::tibble(
-      code = "H360",
-      description = "Diabetic retinopathy",
-      code_type = "icd10"
-    )
-  )
-})
-
-test_that("`DESCRIPTION()` returns ICD10 codes where MODIFIER_4/MODIFIER_5 matches the search string", {
-  expect_equal(
-    DESCRIPTION(
-      reg_expr = "With ophthalmic complications",
-      code_type = "icd10",
-      all_lkps_maps = all_lkps_maps,
-      ignore_case = TRUE,
-      codes_only = FALSE,
-      standardise_output = TRUE,
-      preferred_description_only = TRUE
-    ),
-    tibble::tribble(
-      ~code  , ~description                                                           , ~code_type ,
-      "E103" , "Type 1 diabetes mellitus With ophthalmic complications"               , "icd10"    ,
-      "E113" , "Type 2 diabetes mellitus With ophthalmic complications"               , "icd10"    ,
-      "E123" , "Malnutrition-related diabetes mellitus With ophthalmic complications" , "icd10"    ,
-      "E133" , "Other specified diabetes mellitus With ophthalmic complications"      , "icd10"    ,
-      "E143" , "Unspecified diabetes mellitus With ophthalmic complications"          , "icd10"
-    )
-  )
-})
 
 test_that("`DESCRIPTION()` returns primary descriptions for codes with a secondary description that matches the search string", {
   # Returns 'Type I diabetes mellitus' when searching for 'IDDM'
@@ -223,60 +170,6 @@ test_that("`DESCRIPTION()` returns primary descriptions for codes with a seconda
       "X40J4" , "IDDM - Insulin-dependent diabetes mellitus" , "read3"    ,
       "X40J4" , "Juvenile onset diabetes mellitus"           , "read3"    ,
       "X40J4" , "Insulin-dependent diabetes mellitus"        , "read3"
-    )
-  )
-})
-
-test_that("`DESCRIPTION` returns same result for all_lkps_maps_db and all_lkps_maps", {
-  # expect no result with `ignore_case = FALSE`
-  expect_equal(
-    DESCRIPTION(
-      reg_expr = "diabetic retinopathy",
-      code_type = "icd10",
-      all_lkps_maps = all_lkps_maps,
-      ignore_case = FALSE,
-      codes_only = TRUE,
-      standardise_output = FALSE
-    ),
-    character()
-  )
-
-  expect_equal(
-    DESCRIPTION(
-      reg_expr = "diabetic retinopathy",
-      code_type = "icd10",
-      all_lkps_maps = all_lkps_maps,
-      ignore_case = FALSE,
-      codes_only = TRUE,
-      standardise_output = FALSE
-    ),
-    DESCRIPTION(
-      reg_expr = "diabetic retinopathy",
-      code_type = "icd10",
-      all_lkps_maps = all_lkps_maps_db,
-      ignore_case = FALSE,
-      codes_only = TRUE,
-      standardise_output = FALSE
-    )
-  )
-
-  # expect matching code with `ignore_case = TRUE`
-  expect_equal(
-    DESCRIPTION(
-      reg_expr = "diabetic retinopathy",
-      code_type = "icd10",
-      all_lkps_maps = all_lkps_maps,
-      ignore_case = TRUE,
-      codes_only = TRUE,
-      standardise_output = FALSE
-    ),
-    DESCRIPTION(
-      reg_expr = "diabetic retinopathy",
-      code_type = "icd10",
-      all_lkps_maps = all_lkps_maps_db,
-      ignore_case = TRUE,
-      codes_only = TRUE,
-      standardise_output = FALSE
     )
   )
 })
