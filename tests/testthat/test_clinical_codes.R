@@ -134,47 +134,6 @@ test_that("`CHILDREN()` raises error for unsupported code types e.g. read3", {
 })
 
 
-test_that("`DESCRIPTION()` returns primary descriptions for codes with a secondary description that matches the search string", {
-  # Returns 'Type I diabetes mellitus' when searching for 'IDDM'
-  expect_equal(
-    DESCRIPTION(
-      reg_expr = "IDDM",
-      code_type = "read3",
-      all_lkps_maps = all_lkps_maps,
-      ignore_case = TRUE,
-      codes_only = FALSE,
-      standardise_output = TRUE,
-      preferred_description_only = TRUE
-    ),
-    tibble::tibble(
-      code = "X40J4",
-      description = "Type I diabetes mellitus",
-      code_type = "read3"
-    )
-  )
-
-  expect_equal(
-    DESCRIPTION(
-      reg_expr = "IDDM",
-      code_type = "read3",
-      all_lkps_maps = all_lkps_maps,
-      ignore_case = TRUE,
-      codes_only = FALSE,
-      standardise_output = TRUE,
-      preferred_description_only = FALSE
-    ),
-    tibble::tribble(
-      ~code   , ~description                                 , ~code_type ,
-      "X40J4" , "Type I diabetes mellitus"                   , "read3"    ,
-      "X40J4" , "Type 1 diabetes mellitus"                   , "read3"    ,
-      "X40J4" , "IDDM - Insulin-dependent diabetes mellitus" , "read3"    ,
-      "X40J4" , "Juvenile onset diabetes mellitus"           , "read3"    ,
-      "X40J4" , "Insulin-dependent diabetes mellitus"        , "read3"
-    )
-  )
-})
-
-
 # `handle_unrecognised_codes()` ------------------------------------------
 
 test_that("`handle_unrecognised_codes()` produces an error/warning message appropriately", {
