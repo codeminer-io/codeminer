@@ -29,7 +29,7 @@ DESCRIPTION <- function(
 ) {
   if (!rlang::is_string(pattern)) {
     cli::cli_abort(
-      "{.arg description} must be a length 1 string, not {typeof(description)} with length {length(description)}"
+      "{.arg pattern} must be a length 1 string, not {typeof(pattern)} with length {length(pattern)}"
     )
   }
 
