@@ -29,7 +29,7 @@ CODES <- function(
   version = "latest",
   preferred_description_only = TRUE
 ) {
-  check_lookup_args(code_type, version)
+  check_lookup_args(codes, code_type, version)
 
   con <- connect_to_db()
   check_database(con)
@@ -60,12 +60,23 @@ CODES <- function(
 
 # Argument validation helpers
 check_lookup_args <- function(
+  codes,
   code_type,
   version,
   call = rlang::caller_env()
 ) {
+  check_codes(codes)
   check_code_type(code_type, call)
   check_version(version, call)
+}
+
+check_codes <- function(codes) {
+  if (!rlang::is_character(codes)) {
+    cli::cli_abort(
+      "{.arg codes} must be a character vector, not {typeof(codes)}",
+      call = call
+    )
+  }
 }
 
 check_code_type <- function(code_type, call = rlang::caller_env()) {

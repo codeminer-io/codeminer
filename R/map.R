@@ -34,7 +34,7 @@ MAP <- function(
   to = getOption("codeminer.map_to"),
   version = "latest"
 ) {
-  check_mapping_args(from = from, to = to, version = version)
+  check_mapping_args(codes = codes, from = from, to = to, version = version)
 
   con <- connect_to_db()
   check_database(con)
@@ -145,11 +145,13 @@ get_meta_for_mapping <- function(
 }
 
 check_mapping_args <- function(
+  codes,
   from,
   to,
   version,
   call = rlang::caller_env()
 ) {
+  check_codes(codes)
   check_version(version)
   if (length(from) != 1) {
     cli::cli_abort(
