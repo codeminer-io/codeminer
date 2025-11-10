@@ -7,10 +7,7 @@
 GET_ATTRIBUTES(
   attribute_codes,
   relationship_type = NULL,
-  standardise_output = TRUE,
-  all_lkps_maps = NULL,
-  preferred_description_only = TRUE,
-  col_filters = getOption("codeminer.col_filters")
+  preferred_description_only = TRUE
 )
 }
 \arguments{

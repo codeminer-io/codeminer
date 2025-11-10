@@ -30,9 +30,7 @@ get_children_sct <- function(
   standardise_output = TRUE,
   include_self = TRUE,
   include_descendants = TRUE,
-  all_lkps_maps = NULL,
-  preferred_description_only = TRUE,
-  col_filters = getOption("codeminer.col_filters")
+  preferred_description_only = TRUE
 ) {
   get_relatives_sct(
     codes = codes,
@@ -42,9 +40,7 @@ get_children_sct <- function(
     standardise_output = standardise_output,
     include_self = include_self,
     recursive = include_descendants,
-    all_lkps_maps = all_lkps_maps,
-    preferred_description_only = preferred_description_only,
-    col_filters = col_filters
+    preferred_description_only = preferred_description_only
   )
 }
 
@@ -68,9 +64,7 @@ get_parents_sct <- function(
   standardise_output = TRUE,
   include_self = TRUE,
   include_ancestors = TRUE,
-  all_lkps_maps = NULL,
-  preferred_description_only = TRUE,
-  col_filters = getOption("codeminer.col_filters")
+  preferred_description_only = TRUE
 ) {
   get_relatives_sct(
     codes = codes,
@@ -80,9 +74,7 @@ get_parents_sct <- function(
     standardise_output = standardise_output,
     include_self = include_self,
     recursive = include_ancestors,
-    all_lkps_maps = all_lkps_maps,
-    preferred_description_only = preferred_description_only,
-    col_filters = col_filters
+    preferred_description_only = preferred_description_only
   )
 }
 
@@ -121,22 +113,16 @@ get_parents_sct <- function(
 HAS_ATTRIBUTES <- function(
   attribute_codes,
   relationship_type = NULL,
-  standardise_output = TRUE,
-  all_lkps_maps = NULL,
-  preferred_description_only = TRUE,
-  col_filters = getOption("codeminer.col_filters")
+  preferred_description_only = TRUE
 ) {
   get_relatives_sct(
     codes = attribute_codes,
     filter_col = "destinationId",
     return_col = "sourceId",
     typeId = relationship_type,
-    standardise_output = standardise_output,
     include_self = FALSE,
     recursive = FALSE,
-    all_lkps_maps = all_lkps_maps,
-    preferred_description_only = preferred_description_only,
-    col_filters = col_filters
+    preferred_description_only = preferred_description_only
   )
 }
 
@@ -166,22 +152,16 @@ HAS_ATTRIBUTES <- function(
 GET_ATTRIBUTES <- function(
   attribute_codes,
   relationship_type = NULL,
-  standardise_output = TRUE,
-  all_lkps_maps = NULL,
-  preferred_description_only = TRUE,
-  col_filters = getOption("codeminer.col_filters")
+  preferred_description_only = TRUE
 ) {
   get_relatives_sct(
     codes = attribute_codes,
     filter_col = "sourceId",
     return_col = "destinationId",
     typeId = relationship_type,
-    standardise_output = standardise_output,
     include_self = FALSE,
     recursive = FALSE,
-    all_lkps_maps = all_lkps_maps,
-    preferred_description_only = preferred_description_only,
-    col_filters = col_filters
+    preferred_description_only = preferred_description_only
   )
 }
 
@@ -212,22 +192,16 @@ GET_ATTRIBUTES <- function(
 #' }
 ATTRIBUTE_TYPES_FROM <- function(
   codes,
-  standardise_output = TRUE,
-  all_lkps_maps = NULL,
-  preferred_description_only = TRUE,
-  col_filters = getOption("codeminer.col_filters")
+  preferred_description_only = TRUE
 ) {
   get_relatives_sct(
     codes = codes,
     filter_col = "sourceId",
     return_col = "typeId",
     typeId = NULL,
-    standardise_output = standardise_output,
     include_self = FALSE,
     recursive = FALSE,
-    all_lkps_maps = all_lkps_maps,
-    preferred_description_only = preferred_description_only,
-    col_filters = col_filters
+    preferred_description_only = preferred_description_only
   )
 }
 
@@ -255,22 +229,16 @@ ATTRIBUTE_TYPES_FROM <- function(
 #' }
 ATTRIBUTE_TYPES_TO <- function(
   codes,
-  standardise_output = TRUE,
-  all_lkps_maps = NULL,
-  preferred_description_only = TRUE,
-  col_filters = getOption("codeminer.col_filters")
+  preferred_description_only = TRUE
 ) {
   get_relatives_sct(
     codes = codes,
     filter_col = "destinationId",
     return_col = "typeId",
     typeId = NULL,
-    standardise_output = standardise_output,
     include_self = FALSE,
     recursive = FALSE,
-    all_lkps_maps = all_lkps_maps,
-    preferred_description_only = preferred_description_only,
-    col_filters = col_filters
+    preferred_description_only = preferred_description_only
   )
 }
 

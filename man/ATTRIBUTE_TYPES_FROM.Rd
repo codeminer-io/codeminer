@@ -4,13 +4,7 @@
 \alias{ATTRIBUTE_TYPES_FROM}
 \title{Find attribute types that point from a set of codes}
 \usage{
-ATTRIBUTE_TYPES_FROM(
-  codes,
-  standardise_output = TRUE,
-  all_lkps_maps = NULL,
-  preferred_description_only = TRUE,
-  col_filters = getOption("codeminer.col_filters")
-)
+ATTRIBUTE_TYPES_FROM(codes, preferred_description_only = TRUE)
 }
 \arguments{
 \item{codes}{Codes to get attribute types for}

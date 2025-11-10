@@ -9,9 +9,7 @@ get_parents_sct(
   standardise_output = TRUE,
   include_self = TRUE,
   include_ancestors = TRUE,
-  all_lkps_maps = NULL,
-  preferred_description_only = TRUE,
-  col_filters = getOption("codeminer.col_filters")
+  preferred_description_only = TRUE
 )
 }
 \arguments{
