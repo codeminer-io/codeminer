@@ -74,12 +74,12 @@ get_snomed_available_items <- function() {
 #' @examples
 #' \dontrun{
 #' # Download the default SNOMED CT UK Monolith
-#' result <- download_locally_latestversion_of_snomed_item()
+#' result <- download_latestversion_of_snomed_item()
 #'
 #' # Download a specific item
-#' result <- download_locally_latestversion_of_snomed_item(1234)
+#' result <- download_latestversion_of_snomed_item(1234)
 #' }
-download_locally_latestversion_of_snomed_item <- function(
+download_latestversion_of_snomed_item <- function(
   item_number = 1799,
   directory_to_extract_files = "."
 ) {
