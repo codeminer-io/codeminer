@@ -2,12 +2,20 @@
 % Please edit documentation in R/codes.R
 \name{CODES}
 \alias{CODES}
+\alias{CODES_LIKE}
 \title{Look up descriptions for clinical codes}
 \usage{
 CODES(
   codes,
   code_type = getOption("codeminer.code_type"),
   version = getOption("codeminer.lookup_version", default = "latest"),
+  preferred_description_only = TRUE
+)
+
+CODES_LIKE(
+  pattern,
+  code_type = getOption("codeminer.code_type"),
+  version = getOption("codeminer.version", default = "latest"),
   preferred_description_only = TRUE
 )
 }
@@ -20,12 +28,18 @@ on how to add new lookup tables. This can also be configured through the \code{c
 
 \item{preferred_description_only}{logical. If \code{TRUE}, only returns the preferred description for each code.
 Default: \code{FALSE}.}
+
+\item{pattern}{a regular expression to search for}
 }
 \value{
 A \code{data.frame} containing the codes and their descriptions
 }
 \description{
 Returns a data frame including descriptions for the codes of interest
+}
+\details{
+\code{CODES_LIKE} searches for codes that match a given regular expression.
+The matching is case-insensitive.
 }
 \examples{
 # Set up a temporary dummy database
@@ -37,6 +51,7 @@ CODES(
   codes = c("E10", "E11"),
   code_type = "icd10"
 )
+CODES_LIKE("^E1", code_type = "icd10")
 }
 \seealso{
 \code{\link[=add_lookup_table]{add_lookup_table()}} for adding new lookup tables to the database.
