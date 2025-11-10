@@ -75,11 +75,24 @@ download_latestversion_of_snomed_item <- function(
 ) {
   rlang::check_installed("trud")
 
+  if (Sys.getenv("TRUD_API_KEY") == "") {
+    cli::cli_abort(
+      c(
+        "TRUD API key not found.",
+        "i" = "Please set the {.envvar TRUD_API_KEY} environment variable.",
+        "i" = "See documentation for setup instructions."
+      )
+    )
+  }
+
   if (
-    !is.numeric(item_number) || length(item_number) != 1 || item_number <= 0
+    !is.numeric(item_number) ||
+      length(item_number) != 1 ||
+      item_number <= 0 ||
+      item_number != as.integer(item_number)
   ) {
     cli::cli_abort(
-      "{.arg item_number} must be a single positive numeric value."
+      "{.arg item_number} must be a single positive integer value."
     )
   }
 
@@ -174,7 +187,12 @@ download_latestversion_of_snomed_item <- function(
 #' }
 #' @noRd
 read_snomed_ct_uk_monolith <- function(snomed_ct_uk_monolith_dir) {
-  # terminology and refset tables
+  if (!dir.exists(snomed_ct_uk_monolith_dir)) {
+    cli::cli_abort(
+      "Directory does not exist: {.path {snomed_ct_uk_monolith_dir}}"
+    )
+  }
+
   snomed_monolith_terminology <-
     file.path(snomed_ct_uk_monolith_dir, "Snapshot", "Terminology") |>
     list.files(full.names = TRUE) |>
@@ -211,8 +229,8 @@ read_snomed_ct_uk_monolith <- function(snomed_ct_uk_monolith_dir) {
 
   return(
     list(
-      snomed_monolith_terminology = snomed_monolith_terminology,
-      snomed_monolith_refset = snomed_monolith_refset
+      terminology = snomed_monolith_terminology,
+      refset = snomed_monolith_refset
     )
   )
 }

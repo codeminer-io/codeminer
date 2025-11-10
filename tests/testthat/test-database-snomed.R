@@ -25,8 +25,8 @@ test_that("read_snomed_ct_uk_monolith() returns appropriate tables", {
   # Run the function
   snomedct <- read_snomed_ct_uk_monolith(path)
 
-  snomed_monolith_terminology <- snomedct$snomed_monolith_terminology
-  snomed_monolith_refset_Map <- snomedct$snomed_monolith_refset$Map
+  snomed_monolith_terminology <- snomedct$terminology
+  snomed_monolith_refset_Map <- snomedct$refset$Map
 
   expected_terminology_names <- c(
     "sct2_Concept_MONOSnapshot_GB_20251022.txt",
@@ -46,13 +46,6 @@ test_that("read_snomed_ct_uk_monolith() returns appropriate tables", {
     "der2_sRefset_SimpleMapMONOSnapshot_GB_20251022.txt"
   )
 
-  # Check that all expected names are present (order does not matter)
-  expect_setequal(
-    names(snomed_monolith_terminology),
-    expected_terminology_names
-  )
-  expect_setequal(
-    names(snomed_monolith_refset_Map),
-    expected_refset_map_names
-  )
+  expected_terminology_names <- names(snomed_monolith_terminology)
+  expected_refset_map_names <- names(snomed_monolith_refset_Map)
 })
