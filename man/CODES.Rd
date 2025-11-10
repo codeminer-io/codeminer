@@ -15,7 +15,7 @@ CODES(
 CODES_LIKE(
   pattern,
   code_type = getOption("codeminer.code_type"),
-  version = getOption("codeminer.version", default = "latest"),
+  version = getOption("codeminer.lookup_version", default = "latest"),
   preferred_description_only = TRUE
 )
 }
