@@ -193,7 +193,7 @@ validate_lookup_metadata <- function(
 }
 
 make_preferred_desc_col_boolean <- function(table, col_name, indicator) {
-  is_preferred <- table[[col_name]] == indicator
+  is_preferred <- !is.na(table[[col_name]]) & table[[col_name]] == indicator
   table[[col_name]] <- is_preferred
   return(table)
 }
