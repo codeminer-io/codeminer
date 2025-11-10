@@ -3,7 +3,7 @@ withr::local_options(
   cli.default_handler = function(...) {}
 )
 
-test_that("download_latestversion_of_snomed_item() download the latest version of item 1799", {
+test_that("download_latestversion_of_snomed_item() downloads the latest version of item 1799", {
   # Skip if no TRUD_API_KEY is available
   skip_if(Sys.getenv("TRUD_API_KEY") == "", "No TRUD API key available")
 

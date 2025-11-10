@@ -84,12 +84,9 @@ download_latestversion_of_snomed_item <- function(
   }
 
   if (!dir.exists(directory_to_extract_files)) {
-    msg <- sprintf(
-      "The directory '%s' does not exist.",
-      directory_to_extract_files
+    cli::cli_abort(
+      "The directory {.path {directory_to_extract_files}} does not exist."
     )
-    cli::cli_alert_danger(msg)
-    stop(msg)
   }
 
   cli::cli_alert_info("Retrieving metadata for item {.field {item_number}} ...")
@@ -97,16 +94,13 @@ download_latestversion_of_snomed_item <- function(
   metadata <- tryCatch(
     trud::get_item_metadata(item_number, release_scope = "all"),
     error = function(e) {
-      cli::cli_alert_danger("Failed to retrieve metadata: {e$message}")
-      stop(e)
+      cli::cli_abort("Failed to retrieve metadata: {e$message}")
     }
   )
 
   releases <- metadata$releases
   if (is.null(releases) || length(releases) == 0) {
-    msg <- sprintf("No releases found for item number %s.", item_number)
-    cli::cli_alert_danger(msg)
-    stop(msg)
+    cli::cli_abort("No releases found for item number {.field {item_number}}.")
   }
 
   latest_release <- releases[[1]]
@@ -125,8 +119,7 @@ download_latestversion_of_snomed_item <- function(
       overwrite = TRUE
     ),
     error = function(e) {
-      cli::cli_alert_danger("Download failed: {e$message}")
-      stop(e)
+      cli::cli_abort("Download failed: {e$message}")
     }
   )
 
@@ -147,7 +140,7 @@ download_latestversion_of_snomed_item <- function(
   utils::unzip(zipfile_path, exdir = extracted_dir)
 
   cli::cli_alert_success(
-    "Extracted contents to {.path {directory_to_extract_files}} ..."
+    "Extracted contents to {.path {extracted_dir}} ..."
   )
 
   invisible(list(
