@@ -112,7 +112,7 @@ check_version <- function(version, call = rlang::caller_env()) {
 CODES_LIKE <- function(
   pattern,
   code_type = getOption("codeminer.code_type"),
-  version = getOption("codeminer.version", default = "latest"),
+  version = getOption("codeminer.lookup_version", default = "latest"),
   preferred_description_only = TRUE
 ) {
   check_lookup_args(pattern, code_type, version)
