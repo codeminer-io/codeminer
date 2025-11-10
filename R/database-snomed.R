@@ -147,12 +147,13 @@ download_locally_latestversion_of_snomed_item <- function(
   )
 
   if (!file.exists(zipfile_path)) {
-    msg <- sprintf("Download failed or file not found at: %s", zipfile_path)
-    cli::cli_alert_danger(msg)
+    cli::cli_abort(
+      "Download failed or file not found at: {.path {zipfile_path}}"
+    )
     stop(msg)
   }
 
-  cli::cli_alert_success("Download complete: {.file {zipfile_path}}")
+  cli::cli_alert_success("Download complete: {.path {zipfile_path}}")
 
   cli::cli_alert_info("Extracting contents ...")
 
@@ -165,8 +166,8 @@ download_locally_latestversion_of_snomed_item <- function(
 
   utils::unzip(zipfile_path, exdir = extracted_dir)
 
-  cli::cli_alert_info(
-    "Extracting contents to {.file {directory_to_extract_files}} ..."
+  cli::cli_alert_success(
+    "Extracting contents to {.path {directory_to_extract_files}} ..."
   )
 
   # Return result
