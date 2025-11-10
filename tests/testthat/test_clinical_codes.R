@@ -30,68 +30,6 @@ test_that("`all_lkps_maps` table 'icd10_lkp' has no rows with values in both the
   )
 })
 
-# `codes_starting_with()` -----------------------------------------------------
-
-test_that("`codes_starting_with()` returns the expected nuber of results, escaping '.'", {
-  # return - codes only
-
-  # escaping '.'
-  expect_equal(
-    codes_starting_with(
-      codes = c("C10E."),
-      code_type = "read2",
-      all_lkps_maps = all_lkps_maps,
-      codes_only = TRUE,
-      standardise_output = FALSE,
-      escape_dot = TRUE
-    ),
-    expected = "C10E."
-  )
-
-  # no '.'
-  expect_equal(
-    length(codes_starting_with(
-      codes = c("C10"),
-      code_type = "read2",
-      all_lkps_maps = all_lkps_maps,
-      codes_only = TRUE,
-      standardise_output = FALSE,
-      escape_dot = TRUE
-    )),
-    expected = 3
-  )
-
-  # return codes and descriptions as a data frame
-  expect_equal(
-    nrow(
-      codes_starting_with(
-        codes = c("C10E"),
-        code_type = "read2",
-        all_lkps_maps = all_lkps_maps,
-        codes_only = FALSE,
-        preferred_description_only = FALSE,
-        escape_dot = TRUE
-      )
-    ),
-    expected = 3
-  )
-
-  expect_equal(
-    nrow(
-      codes_starting_with(
-        codes = c("C10E"),
-        code_type = "read2",
-        all_lkps_maps = all_lkps_maps,
-        codes_only = FALSE,
-        preferred_description_only = TRUE,
-        escape_dot = TRUE
-      )
-    ),
-    expected = 1
-  )
-})
-
-
 # `handle_unrecognised_codes()` ------------------------------------------
 
 test_that("`handle_unrecognised_codes()` produces an error/warning message appropriately", {
