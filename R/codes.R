@@ -26,7 +26,7 @@
 CODES <- function(
   codes,
   code_type = getOption("codeminer.code_type"),
-  version = "latest",
+  version = getOption("codeminer.lookup_version", default = "latest"),
   preferred_description_only = TRUE
 ) {
   check_lookup_args(codes, code_type, version)

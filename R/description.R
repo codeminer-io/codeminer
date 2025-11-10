@@ -23,7 +23,7 @@
 DESCRIPTION <- function(
   pattern,
   code_type = getOption("codeminer.code_type"),
-  version = "latest",
+  version = getOption("codeminer.lookup_version", default = "latest"),
   ignore_case = TRUE,
   codes_only = FALSE,
   preferred_description_only = TRUE

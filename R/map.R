@@ -32,7 +32,7 @@ MAP <- function(
   codes,
   from = getOption("codeminer.map_from"),
   to = getOption("codeminer.map_to"),
-  version = "latest"
+  version = getOption("codeminer.map_version", default = "latest")
 ) {
   check_mapping_args(codes = codes, from = from, to = to, version = version)
 
