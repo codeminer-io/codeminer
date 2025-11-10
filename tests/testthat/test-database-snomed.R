@@ -19,6 +19,9 @@ test_that("read_snomed_ct_uk_monolith() returns appropriate tables", {
     "SnomedCT_MonolithRF2_PRODUCTION_20251022T120000Z"
   )
 
+  # Skip test for CI as path is for local test
+  skip_if(!dir.exists(path), paste("Test data is for local test:", path))
+
   # Run the function
   snomedct <- read_snomed_ct_uk_monolith(path)
 
