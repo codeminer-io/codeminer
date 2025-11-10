@@ -69,7 +69,7 @@ test_that("CODES warns about missing codes", {
 test_that("CODES fails for wrong argument types", {
   expect_error(
     CODES("all", code_type = c("icd10", "icd11", "icd12")),
-    "`code_type` must have length 1"
+    "`code_type` must be a string"
   )
 })
 

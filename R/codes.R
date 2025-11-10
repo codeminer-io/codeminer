@@ -69,9 +69,9 @@ check_lookup_args <- function(
 }
 
 check_code_type <- function(code_type, call = rlang::caller_env()) {
-  if (length(code_type) != 1) {
+  if (!rlang::is_string(code_type)) {
     cli::cli_abort(
-      "{.arg code_type} must have length 1, not {length(code_type)}",
+      "{.arg code_type} must be a string, not {typeof(code_type)} with length {length(code_type)}",
       call = call
     )
   }
