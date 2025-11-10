@@ -47,7 +47,7 @@ MAP <- function(
 
   mapping <- dplyr::filter(
     mapping_table,
-    .data$from %in% codes,
+    .data$from %in% .env$codes,
     !is.na(.data$to)
   ) |>
     dplyr::collect()
