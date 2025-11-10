@@ -87,7 +87,7 @@ download_locally_latestversion_of_snomed_item <- function(
   if (
     !is.numeric(item_number) || length(item_number) != 1 || item_number <= 0
   ) {
-    stop("`item_number` must be a single positive numeric value.")
+    cli::cli_abort("{.arg item_number} must be a single positive numeric value.")
   }
 
   if (!dir.exists(directory_to_extract_files)) {
