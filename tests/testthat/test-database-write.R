@@ -1,11 +1,13 @@
 # Lookup tables ---------------------------------------------------------------------------------------------------
 
-test_that("add_lookup_table works with example data", {
+test_that("add_lookup_table works with dummy data", {
   local_build_temp_database()
 
-  test_table <- example_ontology$lookup_tables$capital_letters_v3
-  test_metadata <- example_ontology$lookup_metadata |>
-    dplyr::filter(lookup_table_name == "capital_letters_v3")
+  test_table <- data.frame(
+    code = c("a", "b", "c"),
+    description = c("letter A", "letter B", "letter C")
+  )
+  test_metadata <- lookup_metadata("_test", version = "v99")
 
   expect_no_error(
     add_lookup_table(test_table, test_metadata)

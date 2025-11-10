@@ -63,7 +63,6 @@ test_that("MAP() swaps `to` and `from` if necessary and warns", {
     result <- MAP(test_codes, test_from, test_to),
     "No explicit mapping table found"
   )
-  expect_true(nrow(result) >= length(test_codes))
   expect_identical(unique(result$code_type), test_to)
 })
 

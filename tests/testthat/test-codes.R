@@ -89,7 +89,11 @@ test_that("CODES fails for wrong version", {
 
 test_that("CODES can return multiple descriptions for the same code", {
   test_code <- "X40J4"
-  result <- CODES(test_code, code_type = "read3")
+  result <- CODES(
+    test_code,
+    code_type = "read3",
+    preferred_description_only = FALSE
+  )
   expect_equal(nrow(result), 5)
   expect_identical(unique(result$code), test_code)
 })
