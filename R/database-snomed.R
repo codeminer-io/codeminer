@@ -149,3 +149,70 @@ download_latestversion_of_snomed_item <- function(
     extracted_dir = extracted_dir
   ))
 }
+
+
+#' Read the SNOMED CT UK Monolith Edition into R
+#'
+#' @description
+#' Reads the Terminology and Refset tables from a local copy of the
+#' [SNOMED CT UK Monolith Edition]
+#' (https://isd.digital.nhs.uk/trud/users/guest/filters/2/categories/26/items/1799/releases).
+#'
+#' @param snomed_ct_uk_monolith_dir Path to the unzipped SNOMED CT UK Monolith Edition directory.
+#'   This directory should contain the `Snapshot/Terminology` and `Snapshot/Refset` subdirectories.
+#'
+#' @return A named list with two elements:
+#' \describe{
+#'   \item{`terminology`}{A named list of Terminology data.tables.}
+#'   \item{`refset`}{A nested list of Refset data.tables, grouped by subdirectory.}
+#' }
+#' @examples
+#' \dontrun{
+#' snomed <- read_snomed_ct_uk_monolith("~/SNOMEDCT_Release_UK")
+#' names(snomed$terminology)
+#' names(snomed$refset)
+#' }
+#' @noRd
+read_snomed_ct_uk_monolith <- function(snomed_ct_uk_monolith_dir) {
+  # terminology and refset tables
+  snomed_monolith_terminology <-
+    file.path(snomed_ct_uk_monolith_dir, "Snapshot", "Terminology") |>
+    list.files(full.names = TRUE) |>
+    purrr::set_names(nm = fs::path_file) |>
+    purrr::map(
+      ~ data.table::fread(
+        .x,
+        sep = "\t",
+        colClasses = "character",
+        quote = ""
+      )
+    )
+
+  snomed_monolith_refset <- file.path(
+    snomed_ct_uk_monolith_dir,
+    "Snapshot",
+    "Refset"
+  ) |>
+    list.files(full.names = TRUE) |>
+    purrr::set_names(nm = fs::path_file) |>
+    purrr::map(
+      ~ .x |>
+        list.files(full.names = TRUE) |>
+        purrr::set_names(nm = fs::path_file) |>
+        purrr::map(
+          ~ data.table::fread(
+            .x,
+            sep = "\t",
+            colClasses = "character",
+            quote = ""
+          )
+        )
+    )
+
+  return(
+    list(
+      snomed_monolith_terminology = snomed_monolith_terminology,
+      snomed_monolith_refset = snomed_monolith_refset
+    )
+  )
+}
