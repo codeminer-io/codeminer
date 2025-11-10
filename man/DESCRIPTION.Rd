@@ -9,7 +9,8 @@ DESCRIPTION(
   code_type = getOption("codeminer.code_type"),
   version = "latest",
   ignore_case = TRUE,
-  codes_only = FALSE
+  codes_only = FALSE,
+  preferred_description_only = TRUE
 )
 }
 \arguments{

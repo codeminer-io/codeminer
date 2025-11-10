@@ -27,7 +27,7 @@ CODES <- function(
   codes,
   code_type = getOption("codeminer.code_type"),
   version = "latest",
-  preferred_description_only = FALSE
+  preferred_description_only = TRUE
 ) {
   check_lookup_args(code_type, version)
 
@@ -112,13 +112,15 @@ get_lookup_table <- function(
     description = .env$this_meta$lookup_description_col,
     dplyr::everything()
   ) |>
-    dplyr::mutate(code_type = code_type)
+    dplyr::mutate(code_type = .env$code_type)
 
   if (!is.na(this_meta$preferred_description_col)) {
     tbl <- dplyr::rename(
       tbl,
       preferred_description = .env$this_meta$preferred_description_col,
     )
+  } else {
+    tbl <- dplyr::mutate(tbl, preferred_description = TRUE)
   }
 
   return(tbl)

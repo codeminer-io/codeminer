@@ -25,8 +25,8 @@ DESCRIPTION <- function(
   code_type = getOption("codeminer.code_type"),
   version = "latest",
   ignore_case = TRUE,
-  codes_only = FALSE
-  # preferred_description_only = TRUE
+  codes_only = FALSE,
+  preferred_description_only = TRUE
 ) {
   if (!rlang::is_string(pattern)) {
     cli::cli_abort(
@@ -38,20 +38,6 @@ DESCRIPTION <- function(
   lkp_table <- get_lookup_table(con, code_type = code_type, version = version)
   code_col <- "code"
   description_col <- "description"
-
-  # determine relevant column indicating whether code description is preferred
-  # (for code types with synonymous code descriptions like read 2 and read 3)
-  # preferred_description_col <-
-  #   get_col_for_lookup_sheet(
-  #     lookup_sheet = lkp_table,
-  #     column = "preferred_synonym_col"
-  #   )
-
-  # get preferred code, if appropriate
-  # if (!is.na(preferred_description_col)) {
-  #   preferred_description_code <-
-  #     get_preferred_description_code_for_lookup_sheet(lookup_sheet = lkp_table)
-  # }
 
   # Note - it isn't possible to specify `ignore_case` when using dbplyr, so use `tolower()`
   if (ignore_case) {
@@ -80,8 +66,8 @@ DESCRIPTION <- function(
   result <- CODES(
     codes,
     code_type = code_type,
-    version = version
-    # preferred_description_only = preferred_description_only
+    version = version,
+    preferred_description_only = preferred_description_only
   )
 
   if (codes_only) {

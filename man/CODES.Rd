@@ -8,7 +8,7 @@ CODES(
   codes,
   code_type = getOption("codeminer.code_type"),
   version = "latest",
-  preferred_description_only = FALSE
+  preferred_description_only = TRUE
 )
 }
 \arguments{
