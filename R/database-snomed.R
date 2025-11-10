@@ -87,27 +87,38 @@ download_locally_latestversion_of_snomed_item <- function(
   if (
     !is.numeric(item_number) || length(item_number) != 1 || item_number <= 0
   ) {
-    cli::cli_abort("{.arg item_number} must be a single positive numeric value.")
+    cli::cli_abort(
+      "{.arg item_number} must be a single positive numeric value."
+    )
   }
 
   if (!dir.exists(directory_to_extract_files)) {
-    stop(sprintf(
+    msg <- sprintf(
       "The directory '%s' does not exist.",
       directory_to_extract_files
-    ))
+    )
+    cli::cli_alert_danger(msg)
+    stop(msg)
   }
 
   # Get metadata for all releases
-  message("Retrieving metadata for item ", item_number, " ...")
+  cli::cli_alert_info("Retrieving metadata for item {.field {item_number}} ...")
+
   metadata <- tryCatch(
     trud::get_item_metadata(item_number, release_scope = "all"),
-    error = function(e) stop("Failed to retrieve metadata: ", e$message)
+    error = function(e) {
+      cli::cli_alert_danger("Failed to retrieve metadata: {e$message}")
+      stop(e)
+    }
   )
 
-  # Validate metadata
+  cli::cli_alert_info("Validating metadata ...")
+
   releases <- metadata$releases
   if (is.null(releases) || length(releases) == 0) {
-    stop(sprintf("No releases found for item number %s.", item_number))
+    msg <- sprintf("No releases found for item number %s.", item_number)
+    cli::cli_alert_danger(msg)
+    stop(msg)
   }
 
   # Identify latest release
@@ -116,14 +127,12 @@ download_locally_latestversion_of_snomed_item <- function(
   latest_release_id <- latest_release$id
   release_date <- latest_release$releaseDate %||% "unknown"
 
-  message(sprintf(
-    "Latest release found: %s (Date: %s)",
-    latest_release_id,
-    release_date
-  ))
+  cli::cli_alert_info(
+    "Latest release found: {.field {latest_release_id}} (Date: {.val {release_date}})"
+  )
 
-  # Download the release
-  message("Downloading release ...")
+  cli::cli_alert_info("Downloading release ...")
+
   zipfile_path <- tryCatch(
     trud::download_item(
       item = item_number,
@@ -131,16 +140,22 @@ download_locally_latestversion_of_snomed_item <- function(
       release = latest_release_id,
       overwrite = TRUE
     ),
-    error = function(e) stop("Download failed: ", e$message)
+    error = function(e) {
+      cli::cli_alert_danger("Download failed: {e$message}")
+      stop(e)
+    }
   )
 
   if (!file.exists(zipfile_path)) {
-    stop(sprintf("Download failed or file not found at: %s", zipfile_path))
+    msg <- sprintf("Download failed or file not found at: %s", zipfile_path)
+    cli::cli_alert_danger(msg)
+    stop(msg)
   }
-  message(sprintf("Download complete: %s", zipfile_path))
 
-  # Extract files
-  message("Extracting contents ...")
+  cli::cli_alert_success("Download complete: {.file {zipfile_path}}")
+
+  cli::cli_alert_info("Extracting contents ...")
+
   extracted_dir <- file.path(
     normalizePath(directory_to_extract_files, mustWork = TRUE),
     paste0("snomed_item_", item_number, "_", latest_release_id)
@@ -150,7 +165,9 @@ download_locally_latestversion_of_snomed_item <- function(
 
   utils::unzip(zipfile_path, exdir = extracted_dir)
 
-  message(sprintf("Files extracted to: %s", extracted_dir))
+  cli::cli_alert_info(
+    "Extracting contents to {.file {directory_to_extract_files}} ..."
+  )
 
   # Return result
   invisible(list(
