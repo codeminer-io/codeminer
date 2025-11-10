@@ -110,16 +110,3 @@ DESCRIPTION(pattern = "cyst", code_type = "icd10")
 <!--   code_type = "icd10" -->
 <!-- ) -->
 <!-- ``` -->
-
-
-## R Shiny app
-
-<!-- TODO: to be moved to the `codeminer-app` package vignettes -->
-
-Use `RunCodelistBuilder()` to launch a R Shiny app for building a clinical code list.[^3] The aim is to develop a broad search strategy that captures all clinincal codes that might possibly be included, then download the search results and manually select and sub-categorise the final set of codes:
-
-[^3]: This is still quite experimental, but should hopefully work for the basic workflow described here.
-
-![Build a clinical code list in R Shiny](runcodelistbuilder.jpg){width="100%"}
-
-> Microsoft excel auto-formatting can cause problems with certain codes e.g. Read 3 '.7944' (Creation of permanent gastrostomy) may be reformatted to '7944'. Ideally use a different text editor.
