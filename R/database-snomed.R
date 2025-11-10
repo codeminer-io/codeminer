@@ -125,10 +125,9 @@ download_locally_latestversion_of_snomed_item <- function(
   # TRUD metadata is usually sorted with most recent first, but ensure explicitly
   latest_release <- releases[[1]]
   latest_release_id <- latest_release$id
-  release_date <- latest_release$releaseDate %||% "unknown"
 
   cli::cli_alert_info(
-    "Latest release found: {.field {latest_release_id}} (Date: {.val {release_date}})"
+    "Latest release found: {.field {latest_release_id}} (Date: {.val {latest_release$releaseDate %||% 'unknown'}})"
   )
 
   cli::cli_alert_info("Downloading release ...")
