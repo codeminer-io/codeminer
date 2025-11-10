@@ -128,22 +128,22 @@ get_lookup_table <- function(
 
 get_meta_for_table <- function(
   con,
-  type,
+  code_type,
   version,
   call = rlang::caller_env()
 ) {
   meta <- get_lookup_metadata(con = con)
-  if (!(type %in% meta$code_type)) {
+  if (!(code_type %in% meta$code_type)) {
     cli::cli_abort(
       c(
-        "Code type '{type}' not found in lookup metadata.",
+        "Code type '{code_type}' not found in lookup metadata.",
         "i" = "Did you add the lookup table with {.fun codeminer::add_lookup_table}?"
       ),
       call = call
     )
   }
 
-  all_version_meta <- dplyr::filter(meta, .data$code_type == type)
+  all_version_meta <- dplyr::filter(meta, .data$code_type == .env$code_type)
 
   if (version == "latest") {
     version <- get_latest_version(all_version_meta$lookup_version)
@@ -151,7 +151,7 @@ get_meta_for_table <- function(
   this_meta <- dplyr::filter(all_version_meta, .data$lookup_version == version)
 
   if (nrow(this_meta) == 0) {
-    cli::cli_abort("No metadata found for '{type}' version '{version}'")
+    cli::cli_abort("No metadata found for '{code_type}' version '{version}'")
   }
   stopifnot(nrow(this_meta) == 1) # code_type + version combo should be unique
 
