@@ -218,23 +218,6 @@ build_all_lkps_maps <-
         )
       )
 
-    ### icd9_icd10 -------------------
-
-    all_lkps_maps$icd9_icd10 <- reformat_icd9_icd10(all_lkps_maps$icd9_icd10)
-
-    ### read2_icd10 ------------------------
-
-    all_lkps_maps$read_v2_icd10 <- reformat_read_v2_icd10(
-      all_lkps_maps$read_v2_icd10,
-      icd10_lkp = all_lkps_maps$icd10_lkp
-    )
-
-    ### read3_icd10 ------------------------
-
-    all_lkps_maps$read_ctv3_icd10 <- reformat_read_ctv3_icd10(
-      all_lkps_maps$read_ctv3_icd10
-    )
-
     ## extend tables -----------------
     message("Extending tables in UKB resource 592")
     all_lkps_maps$read_v2_drugs_bnf <-
@@ -406,11 +389,6 @@ build_all_lkps_maps <-
         icd10_phecode_1_2,
         progress = FALSE,
         col_types = readr::cols(.default = "c")
-      )
-
-      icd10_phecode <- reformat_icd10_phecode_map_1_2(
-        icd10_phecode,
-        all_lkps_maps = all_lkps_maps
       )
     }
 
