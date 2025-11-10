@@ -2,7 +2,7 @@
 % Please edit documentation in R/database-snomed.R
 \name{download_latestversion_of_snomed_item}
 \alias{download_latestversion_of_snomed_item}
-\title{Download the Latest Version of a SNOMED CT Item Locally}
+\title{Download the Latest SNOMED CT Release from NHS TRUD}
 \usage{
 download_latestversion_of_snomed_item(
   item_number = 1799,
@@ -10,28 +10,82 @@ download_latestversion_of_snomed_item(
 )
 }
 \arguments{
-\item{item_number}{Numeric. TRUD item number (default: 1799 for SNOMED CT UK Monolith)}
+\item{item_number}{Numeric. TRUD item number (default: \code{1799} for SNOMED CT UK Monolith).}
 
-\item{directory_to_extract_files}{Character. Directory where the files should be extracted (default: ".")}
+\item{directory_to_extract_files}{Character. Directory where the files should be extracted (default: \code{"."}).}
 }
 \value{
 A named list containing:
 \describe{
 \item{release_id}{The ID of the latest release downloaded.}
-\item{file_path}{The path to the downloaded ZIP file.}
+\item{file_path}{The full path to the downloaded ZIP file.}
 \item{extracted_dir}{The directory where the files were extracted.}
 }
 }
 \description{
-Downloads the most recent release of a SNOMED CT item from TRUD.
-By default, downloads the UK Clinical Edition Monolith (item 1799).
+This function automates downloading and extracting the most recent release of a SNOMED CT item from the
+NHS TRUD (Technology Reference data Update Distribution) service.
+}
+\details{
+\subsection{Prerequisites}{
+
+Access to SNOMED CT data via the NHS TRUD service is required. Follow the steps below to configure access.
+\subsection{Step 1: Create an NHS TRUD Account}{
+\itemize{
+\item Sign up for a free NHS TRUD account:
+https://isd.digital.nhs.uk/trud/users/guest/filters/0/account/form
+\item Obtain your \strong{API key} from your TRUD profile.
+\item Set your API key in your \code{.Renviron} file. You can open it using:
+
+\if{html}{\out{<div class="sourceCode r">}}\preformatted{usethis::edit_r_environ()
+}\if{html}{\out{</div>}}
+
+Then add a line like this (replace \verb{<key>} with your API key):
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{TRUD_API_KEY=<key>
+}\if{html}{\out{</div>}}
+\item Verify that your key is set correctly:
+
+\if{html}{\out{<div class="sourceCode r">}}\preformatted{Sys.getenv("TRUD_API_KEY")
+}\if{html}{\out{</div>}}
+}
+}
+
+\subsection{Step 2: Subscribe to SNOMED CT Data}{
+\itemize{
+\item After logging into NHS TRUD, subscribe to the SNOMED CT items you need:
+https://isd.digital.nhs.uk/trud/users/authenticated/filters/0/categories/1/items/1799/releases
+}
+
+Ensure that your API key and subscriptions are active before running this function.
+}
+
+}
+
+\subsection{Function Description}{
+
+\code{download_latestversion_of_snomed_item()} downloads and extracts the most recent release
+of a specified SNOMED CT item.
+By default, it retrieves the UK Clinical Edition Monolith (item 1799).
+
+The function uses the \href{https://cran.r-project.org/package=trud}{\code{trud}} package to interact with the NHS TRUD API.
+Ensure you have installed and configured it correctly before use.
+}
 }
 \examples{
 \dontrun{
 # Download the default SNOMED CT UK Monolith
 result <- download_latestversion_of_snomed_item()
 
-# Download a specific item
-result <- download_latestversion_of_snomed_item(1234)
+# Download a specific SNOMED CT item by number
+result <- download_latestversion_of_snomed_item(item_number = 1234)
+
+# Check the extracted directory
+result$extracted_dir
 }
+
+}
+\seealso{
+\href{https://isd.digital.nhs.uk/trud/}{NHS TRUD Documentation},
+\href{https://docs.ropensci.org/trud/}{\code{trud::download_item()}}
 }
