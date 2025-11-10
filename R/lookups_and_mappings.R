@@ -613,8 +613,6 @@ get_ukb_all_lkps_maps <- function(dir_path = tempdir()) {
   # filepaths in tempdir
   primarycare_codings_zip_filepath <-
     file.path(tempdir(), "primarycare_codings.zip")
-  primarycare_codings_excel_filepath <-
-    file.path(tempdir(), primarycare_codings)
 
   # download primary care codings file to tempdir, if not already there
   if (!file.exists(primarycare_codings_zip_filepath)) {
@@ -664,7 +662,7 @@ get_bnf_from_open_prescribing <- function() {
           httr2::req_retry(max_tries = 3, backoff = 1) |>
           httr2::req_perform() |>
           httr2::resp_body_string() |>
-          readr::read_csv(col_types = cols(.default = "c"))
+          readr::read_csv(col_types = readr::cols(.default = "c"))
       },
       error = function(e) {
         cli::cli_alert_warning("Failed to retrieve URL {.url {url}}, skipping.")

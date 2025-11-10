@@ -286,22 +286,6 @@ get_relatives_sct <- function(
   preferred_description_only = TRUE,
   col_filters = getOption("codeminer.col_filters")
 ) {
-  if (!is.null(codes)) {
-    # TODO - create df and string methods; validate codes df
-    if (is.data.frame(codes)) {
-      code_type <- unique(codes$code_type)
-      codes <- codes$code
-    }
-  }
-
-  if (!is.null(typeId)) {
-    # TODO - create df and string methods; validate typeId df
-    if (is.data.frame(typeId)) {
-      code_type <- unique(typeId$code_type)
-      typeId <- typeId$code
-    }
-  }
-
   match.arg(filter_col, choices = c("sourceId", "destinationId"))
 
   # set up
@@ -361,12 +345,7 @@ get_relatives_sct <- function(
   CODES(
     codes = result,
     code_type = "sct",
-    all_lkps_maps = all_lkps_maps,
-    preferred_description_only = preferred_description_only,
-    standardise_output = standardise_output,
-    col_filters = col_filters,
-    unrecognised_codes = "error",
-    .return_unrecognised_codes = FALSE
+    preferred_description_only = preferred_description_only
   )
 }
 
@@ -375,12 +354,6 @@ summarise_attributes_sct <- function(
   all_lkps_maps = NULL,
   col_filters = getOption("codeminer.col_filters")
 ) {
-  # TODO - create df and string methods; validate codes df
-  if (is.data.frame(codes)) {
-    code_type <- unique(codes$code_type)
-    codes <- codes$code
-  }
-
   output_codes <- filter_sct_relationship(
     codes = NULL,
     sourceId_filter = codes,
@@ -391,29 +364,13 @@ summarise_attributes_sct <- function(
     all_lkps_maps = all_lkps_maps
   )
 
-  typeID_descriptions <- CODES(
-    codes = output_codes$typeId,
-    code_type = "sct",
-    all_lkps_maps = all_lkps_maps,
-    preferred_description_only = TRUE,
-    standardise_output = TRUE,
-    col_filters = col_filters,
-    unrecognised_codes = "error",
-    .return_unrecognised_codes = FALSE
-  )
-
   output_descriptions <- output_codes %>%
     as.list() %>%
     purrr::map(\(x) {
       CODES(
         codes = x,
         code_type = "sct",
-        all_lkps_maps = all_lkps_maps,
-        preferred_description_only = TRUE,
-        standardise_output = TRUE,
-        col_filters = col_filters,
-        unrecognised_codes = "error",
-        .return_unrecognised_codes = FALSE
+        preferred_description_only = TRUE
       ) %>%
         dplyr::select(-tidyselect::all_of("code_type"))
     }) %>%
@@ -448,12 +405,6 @@ get_attributes_sct <- function(
   preferred_description_only = TRUE,
   col_filters = getOption("codeminer.col_filters")
 ) {
-  # TODO - create df and string methods; validate codes df
-  if (is.data.frame(codes)) {
-    code_type <- unique(codes$code_type)
-    codes <- codes$code
-  }
-
   output_codes <- filter_sct_relationship(
     codes = NULL,
     sourceId_filter = codes,
@@ -470,12 +421,7 @@ get_attributes_sct <- function(
   CODES(
     codes = result,
     code_type = "sct",
-    all_lkps_maps = all_lkps_maps,
-    preferred_description_only = preferred_description_only,
-    standardise_output = standardise_output,
-    col_filters = col_filters,
-    unrecognised_codes = "error",
-    .return_unrecognised_codes = FALSE
+    preferred_description_only = preferred_description_only
   )
 }
 
@@ -594,12 +540,7 @@ get_all_sct_relation_types <- function(all_lkps_maps = NULL) {
     dplyr::pull(.data[["typeId"]]) %>%
     CODES(
       code_type = "sct",
-      all_lkps_maps = all_lkps_maps,
-      preferred_description_only = TRUE,
-      standardise_output = TRUE,
-      unrecognised_codes = "error",
-      col_filters = NULL,
-      .return_unrecognised_codes = FALSE
+      preferred_description_only = TRUE
     )
 }
 
@@ -918,59 +859,6 @@ get_value_for_mapping_sheet <- function(mapping_table, value) {
   ][[value]]
 }
 
-#' Get name of code, description or preferred synonym column for a lookup sheet
-#'
-#' Helper function for \code{\link{CODES}} and \code{\link{codes_starting_with}}
-#'
-#' @param lookup_sheet character
-#' @param column character
-#'
-#' @return character (scalar)
-#'
-#' @family Clinical code lookups and mappings
-#' @noRd
-get_col_for_lookup_sheet <- function(lookup_sheet, column) {
-  # validate args
-  match.arg(
-    arg = lookup_sheet,
-    choices = CODE_TYPE_TO_LKP_TABLE_MAP$lkp_table
-  )
-
-  match.arg(
-    arg = column,
-    choices = c("code_col", "description_col", "preferred_synonym_col")
-  )
-
-  # get column name for lookup sheet
-  CODE_TYPE_TO_LKP_TABLE_MAP %>%
-    dplyr::filter(.data[["lkp_table"]] == lookup_sheet) %>%
-    .[[column]]
-}
-
-#' Get preferred description code for a lookup sheet
-#'
-#' Helper function for \code{\link{CODES}} and \code{\link{codes_starting_with}}
-#'
-#' @param lookup_sheet character
-#'
-#' @return character (scalar)
-#'
-#' @family Clinical code lookups and mappings
-#' @noRd
-get_preferred_description_code_for_lookup_sheet <-
-  function(lookup_sheet) {
-    # validate args
-    match.arg(
-      arg = lookup_sheet,
-      choices = CODE_TYPE_TO_LKP_TABLE_MAP$lkp_table
-    )
-
-    # get preferred description code for lookup sheet
-    CODE_TYPE_TO_LKP_TABLE_MAP %>%
-      dplyr::filter(.data[["lkp_table"]] == lookup_sheet) %>%
-      .[["preferred_code"]]
-  }
-
 #' Filter lookup/mapping table for specified values in columns
 #'
 #' Helper function that enables filtering of lookup/mapping tables for certain
@@ -1073,44 +961,6 @@ filter_cols <- function(df, df_name, col_filters = NULL) {
 
   # return result
   return(df)
-}
-
-#' Remove or extract appended ICD10 letters
-#'
-#' @param icd10_codes Character vector of ICD10 codes
-#' @param rm_extract Either 'rm' (remove 'D'/'X'/'A' from end of codes) or
-#'   'extract' (return these characters only, or `NA` if the code does not end
-#'   with letter characters).
-#'
-#' @return Character vector
-#' @noRd
-#' @examples
-#' rm_or_extract_appended_icd10_letters(c(
-#'   "A00",
-#'   "A408",
-#'   "A390D",
-#'   "A38X",
-#'   "G01XA"
-#' ))
-rm_or_extract_appended_icd10_dxa <- function(
-  icd10_codes,
-  keep_x = TRUE,
-  rm_extract = "rm"
-) {
-  # validate args
-  match.arg(rm_extract, choices = c("rm", "extract"))
-
-  stopifnot(is.character(icd10_codes))
-
-  # either remove or extract appended 'D'/'X'/'A' from `icd10_codes`
-  pattern <- ifelse(keep_x, yes = "[D|A]*$", no = "[D|X|A]*$")
-
-  switch(
-    rm_extract,
-    rm = stringr::str_remove(icd10_codes, pattern = pattern),
-    extract = stringr::str_extract(icd10_codes, pattern = pattern) %>%
-      ifelse(. == "", yes = NA_character_, no = .)
-  )
 }
 
 #' Get a mapping table for ICD10 codes in ALT_CODE format, with and without 'X'
