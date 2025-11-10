@@ -83,6 +83,8 @@ download_latestversion_of_snomed_item <- function(
   item_number = 1799,
   directory_to_extract_files = "."
 ) {
+  rlang::check_installed("trud")
+
   # Input validation
   if (
     !is.numeric(item_number) || length(item_number) != 1 || item_number <= 0
