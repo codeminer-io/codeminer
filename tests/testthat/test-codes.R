@@ -118,3 +118,14 @@ test_that("get_latest_version handles edge cases", {
   test_versions <- c("v1", "v20", "v5")
   expect_identical(get_latest_version(test_versions), "v20")
 })
+
+test_that("CODES_LIKE can handle regular expressions", {
+  test_pattern <- "^A00"
+  result <- CODES_LIKE(
+    test_pattern,
+    code_type = "icd10",
+    version = "v0"
+  )
+  expect_equal(nrow(result), 4)
+  expect_true(all(stringr::str_detect(result$code, test_pattern)))
+})
