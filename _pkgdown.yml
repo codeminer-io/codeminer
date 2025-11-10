@@ -10,7 +10,6 @@ reference:
   - read_all_lkps_maps
   - build_all_lkps_maps
   - all_lkps_maps_to_db
-  - get_all_lkps_maps_db_metadata
   - build_database
   - create_dummy_database
   - add_lookup_table
