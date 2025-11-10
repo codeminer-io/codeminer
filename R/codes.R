@@ -6,6 +6,8 @@
 #' @param code_type character. Type of clinical code system to be searched.
 #'   Depends on what is available in the lookup tables. See [add_lookup_table()]
 #'   on how to add new lookup tables. This can also be configured through the `codeminer.code_type` option.
+#' @param version character. Version of the lookup table to use. Default:
+#'   `"latest"`. Can be configured through the `codeminer.lookup_version` option.
 #' @param preferred_description_only logical. If `TRUE`, only returns the preferred description for each code.
 #'   Default: `FALSE`.
 #'

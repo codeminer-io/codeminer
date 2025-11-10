@@ -3,12 +3,11 @@
 #' Returns a data frame with clinical codes that match the provided description pattern.
 #'
 #' @param pattern The description to search for. See [stringr::str_detect()] for details.
-#' @param code_type The type of code to search for. Defaults to the value of `getOption("codeminer.code_type")`.
-#' @param version The version of the code system to search in. Defaults to "latest".
 #' @param ignore_case If `TRUE` (default), ignore case in `description`.
 #' @param codes_only `logical`. If `TRUE`, return a character vector of
 #'   \emph{unique} codes. If `FALSE` (default), return a data frame of all
 #'   results including code descriptions (useful for manual validation).
+#' @inheritParams CODES
 #'
 #' @return The result of [CODES()] for codes that match the description, or a character vector of codes if
 #'   `codes_only` is `TRUE`.

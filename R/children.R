@@ -24,6 +24,7 @@ CHILDREN <- function(
   codes,
   code_type = getOption("codeminer.code_type"),
   version = getOption("codeminer.version", default = "latest"),
+  codes_only = FALSE,
   preferred_description_only = TRUE
 ) {
   cli::cli_abort("Not implemented yet.")
