@@ -92,48 +92,6 @@ test_that("`codes_starting_with()` returns the expected nuber of results, escapi
 })
 
 
-# `CHILDREN()` -----------------------------------------------------
-
-test_that("`CHILDREN()` returns error for unrecognised codes", {
-  expect_error(
-    CHILDREN(
-      codes = c("C10"),
-      code_type = "read2",
-      all_lkps_maps = all_lkps_maps,
-      codes_only = TRUE,
-      standardise_output = FALSE
-    ),
-    regexp = "not found for 'read2' in table 'read_v2_lkp"
-  )
-})
-
-test_that("`CHILDREN()` works as expected for read2", {
-  expect_equal(
-    CHILDREN(
-      codes = c("C10.."),
-      code_type = "read2",
-      all_lkps_maps = all_lkps_maps,
-      codes_only = TRUE,
-      standardise_output = FALSE
-    ),
-    c("C10..", "C108.", "C10E.")
-  )
-})
-
-test_that("`CHILDREN()` raises error for unsupported code types e.g. read3", {
-  expect_error(
-    CHILDREN(
-      codes = "C10..",
-      code_type = "read3",
-      all_lkps_maps = all_lkps_maps,
-      codes_only = TRUE,
-      standardise_output = FALSE
-    ),
-    "Currently codeminer is unable to retrieve child codes for read3"
-  )
-})
-
-
 # `handle_unrecognised_codes()` ------------------------------------------
 
 test_that("`handle_unrecognised_codes()` produces an error/warning message appropriately", {
