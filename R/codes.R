@@ -36,7 +36,7 @@ CODES <- function(
 
   lookup_table <- get_lookup_table(con, code_type, version)
 
-  if (length(codes) == 1 && codes == "all") {
+  if (identical(codes, "all")) {
     return(dplyr::collect(lookup_table))
   }
 

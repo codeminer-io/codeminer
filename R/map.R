@@ -41,7 +41,7 @@ MAP <- function(
 
   mapping_table <- get_mapping_table(con, from, to, version)
 
-  if (length(codes) == 1 && codes == "all") {
+  if (identical(codes, "all")) {
     return(dplyr::collect(mapping_table))
   }
 
