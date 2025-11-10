@@ -7,7 +7,7 @@
 CODES(
   codes,
   code_type = getOption("codeminer.code_type"),
-  version = "latest",
+  version = getOption("codeminer.lookup_version", default = "latest"),
   preferred_description_only = TRUE
 )
 }
@@ -48,7 +48,6 @@ Other Clinical code lookups and mappings:
 \code{\link{MAP}()},
 \code{\link{default_col_filters}()},
 \code{\link{get_children_sct}()},
-\code{\link{get_parents_sct}()},
-\code{\link{reformat_icd10_codes}()}
+\code{\link{get_parents_sct}()}
 }
 \concept{Clinical code lookups and mappings}

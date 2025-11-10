@@ -44,7 +44,6 @@ Other Clinical code lookups and mappings:
 \code{\link{HAS_ATTRIBUTES}()},
 \code{\link{MAP}()},
 \code{\link{default_col_filters}()},
-\code{\link{get_children_sct}()},
-\code{\link{reformat_icd10_codes}()}
+\code{\link{get_children_sct}()}
 }
 \concept{Clinical code lookups and mappings}
