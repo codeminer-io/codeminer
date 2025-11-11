@@ -1,13 +1,10 @@
 pandoc: 3.1.11
-pkgdown: 2.1.3
+pkgdown: 2.2.0
 pkgdown_sha: ~
 articles:
-  caliber: caliber.html
   codeminer: codeminer.html
-  icd10_formats: icd10_formats.html
   MAP: MAP.html
-  phecodes: phecodes.html
-last_built: 2025-10-31T10:43Z
+last_built: 2025-11-11T12:31Z
 urls:
   reference: https://codeminer-io.github.io/codeminer/reference
   article: https://codeminer-io.github.io/codeminer/articles

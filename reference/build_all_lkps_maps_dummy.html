@@ -21,10 +21,7 @@ included with this package."></head><body>
 <li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/caliber.html">CALIBER code lists</a></li>
-    <li><a class="dropdown-item" href="../articles/icd10_formats.html">ICD10 code formats</a></li>
-    <li><a class="dropdown-item" href="../articles/MAP.html">Mapping between clinical coding systems</a></li>
-    <li><a class="dropdown-item" href="../articles/phecodes.html">Phecodes</a></li>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/MAP.html">Mapping between clinical coding systems</a></li>
   </ul></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json"></form></li>
@@ -60,17 +57,16 @@ included with this package.</p>
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
     <div class="dont-index"><p><code><a href="build_all_lkps_maps.html">build_all_lkps_maps()</a></code></p>
 <p>Other Dummy data:
-<code><a href="dummy_all_lkps_maps_db.html">dummy_all_lkps_maps_db</a>()</code>,
-<code><a href="dummy_all_lkps_maps_path.html">dummy_all_lkps_maps_path</a>()</code>,
-<code><a href="dummy_caliber_dir_path.html">dummy_caliber_dir_path</a>()</code>,
-<code><a href="dummy_clinical_events_tidy.html">dummy_clinical_events_tidy</a>()</code>,
-<code><a href="dummy_icd10_phecode_map_path.html">dummy_icd10_phecode_map_path</a>()</code>,
-<code><a href="dummy_phecode_lkp_path.html">dummy_phecode_lkp_path</a>()</code>,
-<code><a href="dummy_ukb_codings_path.html">dummy_ukb_codings_path</a>()</code>,
-<code><a href="read_all_lkps_maps_dummy.html">read_all_lkps_maps_dummy</a>()</code>,
-<code><a href="read_icd10_phecode_map_dummy.html">read_icd10_phecode_map_dummy</a>()</code>,
-<code><a href="read_phecode_lkp_dummy.html">read_phecode_lkp_dummy</a>()</code>,
-<code><a href="read_ukb_codings_dummy.html">read_ukb_codings_dummy</a>()</code></p></div>
+<code><a href="dummy_all_lkps_maps_db.html">dummy_all_lkps_maps_db()</a></code>,
+<code><a href="dummy_all_lkps_maps_path.html">dummy_all_lkps_maps_path()</a></code>,
+<code><a href="dummy_clinical_events_tidy.html">dummy_clinical_events_tidy()</a></code>,
+<code><a href="dummy_icd10_phecode_map_path.html">dummy_icd10_phecode_map_path()</a></code>,
+<code><a href="dummy_phecode_lkp_path.html">dummy_phecode_lkp_path()</a></code>,
+<code><a href="dummy_ukb_codings_path.html">dummy_ukb_codings_path()</a></code>,
+<code><a href="read_all_lkps_maps_dummy.html">read_all_lkps_maps_dummy()</a></code>,
+<code><a href="read_icd10_phecode_map_dummy.html">read_icd10_phecode_map_dummy()</a></code>,
+<code><a href="read_phecode_lkp_dummy.html">read_phecode_lkp_dummy()</a></code>,
+<code><a href="read_ukb_codings_dummy.html">read_ukb_codings_dummy()</a></code></p></div>
     </div>
 
     <div class="section level2">
@@ -178,9 +174,9 @@ included with this package.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span>      5 218   UTERINE LEIOMYOMA       D252  Subserosal leiomyoma of uterus    </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span>      6 218   UTERINE LEIOMYOMA       D259  Leiomyoma of uterus, unspecified  </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span>      7 2890  SECONDARY POLYCYTHAEMIA D751  Secondary polycythaemia           </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span>      8 <span style="color: #BB0000;">NA</span>    <span style="color: #BB0000;">NA</span>                      E100  Insulin-dependent diabetes mellit…</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span>      9 <span style="color: #BB0000;">NA</span>    <span style="color: #BB0000;">NA</span>                      E101  Insulin-dependent diabetes mellit…</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span>     10 <span style="color: #BB0000;">NA</span>    <span style="color: #BB0000;">NA</span>                      E102  Insulin-dependent diabetes mellit…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span>      8 UNDEF <span style="color: #BB0000;">NA</span>                      E100  Insulin-dependent diabetes mellit…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span>      9 UNDEF <span style="color: #BB0000;">NA</span>                      E101  Insulin-dependent diabetes mellit…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span>     10 UNDEF <span style="color: #BB0000;">NA</span>                      E102  Insulin-dependent diabetes mellit…</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 37 more rows</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $read_v2_lkp</span>
@@ -237,20 +233,20 @@ included with this package.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 108 more rows</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $read_v2_icd10</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 342 × 5</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    .rowid read_code icd10_code icd10_code_def icd10_dagger_asterisk</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span>      1 A153.     A180       7              D                    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span>      1 A153.     M900       7              A                    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span>      2 A15x.     A180       7              D                    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span>      2 A15x.     M900       7              A                    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span>      3 A34..     J020       3              <span style="color: #BB0000;">NA</span>                   </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span>      3 A34..     A38X       3              <span style="color: #BB0000;">NA</span>                   </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span>      4 A341.     A38X       1              <span style="color: #BB0000;">NA</span>                   </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span>      5 B78..     D259       1              <span style="color: #BB0000;">NA</span>                   </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span>      6 B780.     D250       1              <span style="color: #BB0000;">NA</span>                   </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span>      7 B781.     D251       1              <span style="color: #BB0000;">NA</span>                   </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 332 more rows</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 104 × 4</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    .rowid read_code icd10_code  icd10_code_def</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>         </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span>      1 A153.     A180D M900A 7             </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span>      2 A15x.     A180D M900A 7             </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span>      3 A34..     J020,A38X   3             </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span>      4 A341.     A38X        1             </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span>      5 B78..     D259        1             </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span>      6 B780.     D250        1             </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span>      7 B781.     D251        1             </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span>      8 B782.     D252        1             </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span>      9 B78z.     D259        1             </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span>     10 C10..     E10-E14     2             </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 94 more rows</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $read_v2_opcs4</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 4 × 4</span></span>
@@ -306,7 +302,7 @@ included with this package.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 2 more variables: element_num &lt;chr&gt;, block_num &lt;chr&gt;</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $read_ctv3_icd10</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 36 × 9</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 36 × 8</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    .rowid read_code icd10_code mapping_status refine_flag add_code_flag</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>        </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span>      1 X40J4     E109       D              C           P            </span>
@@ -320,8 +316,7 @@ included with this package.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span>      9 C10..     E139       R              C           C            </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span>     10 C10..     O249       R              C           C            </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 26 more rows</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 3 more variables: element_num &lt;chr&gt;, block_num &lt;chr&gt;,</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   icd10_dagger_asterisk &lt;chr&gt;</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 2 more variables: element_num &lt;chr&gt;, block_num &lt;chr&gt;</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $read_ctv3_opcs4</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 5 × 8</span></span>
@@ -396,26 +391,26 @@ included with this package.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 1 more variable: category &lt;chr&gt;</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $icd10_phecode</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 69 × 5</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    ICD10_CODE ALT_CODE PHECODE `Exl. Phecodes`          `Excl. Phenotypes`      </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                   </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span> E10        E10      250.1   249-250.99               DIABETES                </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span> E10.0      E100     250.1   249-250.99               DIABETES                </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span> E10.1      E101     250.11  249-250.99               DIABETES                </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span> E10.2      E102     250.12  249-250.99               DIABETES                </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span> E10.3      E103     250.23  249-250.99               DIABETES                </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span> E10.3      E103     250.7   250.70-250.79,360-365.99 diabetic retinopathy an…</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span> E10.3      E103     250.13  249-250.99               DIABETES                </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span> E10.4      E104     250.14  249-250.99               DIABETES                </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span> E10.4      E104     250.24  249-250.99               DIABETES                </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span> E10.5      E105     443.7   440-449.99               DISEASES OF ARTERIES, A…</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 59 more rows</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 73 × 4</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    ICD10 PHECODE `Exl. Phecodes`          `Excl. Phenotypes`                    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                                 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span> E10   250.1   249-250.99               DIABETES                              </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span> E10.0 250.1   249-250.99               DIABETES                              </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span> E10.1 250.11  249-250.99               DIABETES                              </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span> E10.2 250.12  249-250.99               DIABETES                              </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span> E10.3 250.23  249-250.99               DIABETES                              </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span> E10.3 250.7   250.70-250.79,360-365.99 diabetic retinopathy and degenerative…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span> E10.3 250.13  249-250.99               DIABETES                              </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span> E10.4 250.14  249-250.99               DIABETES                              </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span> E10.4 250.24  249-250.99               DIABETES                              </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span> E10.5 443.7   440-449.99               DISEASES OF ARTERIES, ARTERIOLES, AND…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 63 more rows</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $metadata_codeminer</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 1 × 1</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   metadata                  </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                     </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> codeminer|0.0.0.9004|4.5.1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> codeminer|0.0.0.9004|4.5.2</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 </code></pre></div>
     </div>
@@ -428,7 +423,7 @@ included with this package.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
     </footer></div>

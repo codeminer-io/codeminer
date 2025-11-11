@@ -21,10 +21,7 @@ snomedizer)."></head><body>
 <li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/caliber.html">CALIBER code lists</a></li>
-    <li><a class="dropdown-item" href="../articles/icd10_formats.html">ICD10 code formats</a></li>
-    <li><a class="dropdown-item" href="../articles/MAP.html">Mapping between clinical coding systems</a></li>
-    <li><a class="dropdown-item" href="../articles/phecodes.html">Phecodes</a></li>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/MAP.html">Mapping between clinical coding systems</a></li>
   </ul></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json"></form></li>
@@ -52,10 +49,7 @@ snomedizer)."></head><body>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">HAS_ATTRIBUTES</span><span class="op">(</span></span>
 <span>  <span class="va">attribute_codes</span>,</span>
 <span>  relationship_type <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  standardise_output <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  all_lkps_maps <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  preferred_description_only <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  col_filters <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"codeminer.col_filters"</span><span class="op">)</span></span>
+<span>  preferred_description_only <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -71,37 +65,9 @@ snomedizer)."></head><body>
 <dd><p>Character vector of SNOMED codes.</p></dd>
 
 
-<dt id="arg-standardise-output">standardise_output<a class="anchor" aria-label="anchor" href="#arg-standardise-output"></a></dt>
-<dd><p>bool. If <code>TRUE</code> (default), outputs a data
-frame with columns named 'code', 'description' and 'code_type'. Otherwise
-returns a data frame with all columns from the relevant look up table.</p></dd>
-
-
-<dt id="arg-all-lkps-maps">all_lkps_maps<a class="anchor" aria-label="anchor" href="#arg-all-lkps-maps"></a></dt>
-<dd><p>Either a named list of lookup and mapping tables
-(either data frames or <code>tbl_dbi</code> objects), or the path to a Duckdb database
-containing these tables. If <code>NULL</code>, will attempt to connect to a Duckdb
-database named 'all_lkps_maps.db' in the current working directory, or to
-a a Duckdb database specified by an environmental variable named
-'ALL_LKPS_MAPS_DB' (see
-<a href="https://resources.numbat.space/using-rprofile-and-renviron.html#renviron" class="external-link">here</a>
-for how to set environment variables using a <code>.Renviron</code> file). The latter
-method will be used in preference.</p></dd>
-
-
 <dt id="arg-preferred-description-only">preferred_description_only<a class="anchor" aria-label="anchor" href="#arg-preferred-description-only"></a></dt>
-<dd><p>If <code>TRUE</code> (default), return only preferred
-descriptions for clinical codes with synonyms. Will only apply if
-<code>standardise_output</code> is also <code>TRUE</code>.</p></dd>
-
-
-<dt id="arg-col-filters">col_filters<a class="anchor" aria-label="anchor" href="#arg-col-filters"></a></dt>
-<dd><p>A named list where each name in the list refers to the
-name of a lookup or mapping table. Each item is also a named list, where
-the names refer to column names in the corresponding table, and the items
-are vectors of values to filter for. For example, <code>list(my_lookup_table = list(colA = c("A", "B"))</code> will result in <code>my_lookup_table</code> being filtered
-for rows where <code>colA</code> is either 'A' or 'B'. Uses <code><a href="default_col_filters.html">default_col_filters()</a></code> by
-default. Set to <code>NULL</code> to remove all filters.</p></dd>
+<dd><p>logical. If <code>TRUE</code>, only returns the preferred description for each code.
+Default: <code>FALSE</code>.</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -111,15 +77,13 @@ default. Set to <code>NULL</code> to remove all filters.</p></dd>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
     <div class="dont-index"><p>Other Clinical code lookups and mappings:
-<code><a href="CHILDREN.html">CHILDREN</a>()</code>,
-<code><a href="CODES.html">CODES</a>()</code>,
-<code><a href="GET_ATTRIBUTES.html">GET_ATTRIBUTES</a>()</code>,
-<code><a href="MAP.html">MAP</a>()</code>,
-<code><a href="default_col_filters.html">default_col_filters</a>()</code>,
-<code><a href="get_children_sct.html">get_children_sct</a>()</code>,
-<code><a href="get_mapping_df.html">get_mapping_df</a>()</code>,
-<code><a href="get_parents_sct.html">get_parents_sct</a>()</code>,
-<code><a href="reformat_icd10_codes.html">reformat_icd10_codes</a>()</code></p></div>
+<code><a href="CHILDREN.html">CHILDREN()</a></code>,
+<code><a href="CODES.html">CODES()</a></code>,
+<code><a href="GET_ATTRIBUTES.html">GET_ATTRIBUTES()</a></code>,
+<code><a href="MAP.html">MAP()</a></code>,
+<code><a href="default_col_filters.html">default_col_filters()</a></code>,
+<code><a href="get_children_sct.html">get_children_sct()</a></code>,
+<code><a href="get_parents_sct.html">get_parents_sct()</a></code></p></div>
     </div>
 
     <div class="section level2">
@@ -152,7 +116,7 @@ default. Set to <code>NULL</code> to remove all filters.</p></dd>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
     </footer></div>

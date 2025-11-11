@@ -19,10 +19,7 @@
 <li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/caliber.html">CALIBER code lists</a></li>
-    <li><a class="dropdown-item" href="../articles/icd10_formats.html">ICD10 code formats</a></li>
-    <li><a class="dropdown-item" href="../articles/MAP.html">Mapping between clinical coding systems</a></li>
-    <li><a class="dropdown-item" href="../articles/phecodes.html">Phecodes</a></li>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/MAP.html">Mapping between clinical coding systems</a></li>
   </ul></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json"></form></li>
@@ -36,7 +33,7 @@
   <main id="main" class="col-md-9"><div class="page-header">
 
       <h1>Look up descriptions for clinical codes</h1>
-      <small class="dont-index">Source: <a href="https://github.com/codeminer-io/codeminer/blob/main/R/clinical_codes.R" class="external-link"><code>R/clinical_codes.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/codeminer-io/codeminer/blob/main/R/codes.R" class="external-link"><code>R/codes.R</code></a></small>
       <div class="d-none name"><code>CODES.Rd</code></div>
     </div>
 
@@ -49,12 +46,15 @@
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">CODES</span><span class="op">(</span></span>
 <span>  <span class="va">codes</span>,</span>
 <span>  code_type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"codeminer.code_type"</span><span class="op">)</span>,</span>
-<span>  all_lkps_maps <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  preferred_description_only <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  standardise_output <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  unrecognised_codes <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"codeminer.unrecognised_codes_lookup"</span><span class="op">)</span>,</span>
-<span>  col_filters <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"codeminer.col_filters"</span><span class="op">)</span>,</span>
-<span>  .return_unrecognised_codes <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span>  version <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"codeminer.lookup_version"</span>, default <span class="op">=</span> <span class="st">"latest"</span><span class="op">)</span>,</span>
+<span>  preferred_description_only <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">CODES_LIKE</span><span class="op">(</span></span>
+<span>  <span class="va">pattern</span>,</span>
+<span>  code_type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"codeminer.code_type"</span><span class="op">)</span>,</span>
+<span>  version <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"codeminer.lookup_version"</span>, default <span class="op">=</span> <span class="st">"latest"</span><span class="op">)</span>,</span>
+<span>  preferred_description_only <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -63,91 +63,72 @@
 
 
 <dl><dt id="arg-codes">codes<a class="anchor" aria-label="anchor" href="#arg-codes"></a></dt>
-<dd><p>character. Vector of codes to lookup</p></dd>
+<dd><p>character. Vector of codes to lookup. If passing <code>"all"</code>, returns all codes.</p></dd>
 
 
 <dt id="arg-code-type">code_type<a class="anchor" aria-label="anchor" href="#arg-code-type"></a></dt>
-<dd><p>character. Type of clinical code system to be searched. One
-of icd10, icd9, read3, read2, sct, opcs4, phecode, read2_drugs, bnf, dmd, data_coding_3, data_coding_4, data_coding_5, data_coding_6, medcode_aurum, or prodcode_aurum.</p></dd>
+<dd><p>character. Type of clinical code system to be searched.
+Depends on what is available in the lookup tables. See <code><a href="add_lookup_table.html">add_lookup_table()</a></code>
+on how to add new lookup tables. This can also be configured through the <code>codeminer.code_type</code> option.</p></dd>
 
 
-<dt id="arg-all-lkps-maps">all_lkps_maps<a class="anchor" aria-label="anchor" href="#arg-all-lkps-maps"></a></dt>
-<dd><p>Either a named list of lookup and mapping tables
-(either data frames or <code>tbl_dbi</code> objects), or the path to a Duckdb database
-containing these tables. If <code>NULL</code>, will attempt to connect to a Duckdb
-database named 'all_lkps_maps.db' in the current working directory, or to
-a a Duckdb database specified by an environmental variable named
-'ALL_LKPS_MAPS_DB' (see
-<a href="https://resources.numbat.space/using-rprofile-and-renviron.html#renviron" class="external-link">here</a>
-for how to set environment variables using a <code>.Renviron</code> file). The latter
-method will be used in preference.</p></dd>
+<dt id="arg-version">version<a class="anchor" aria-label="anchor" href="#arg-version"></a></dt>
+<dd><p>character. Version of the lookup table to use. Default:
+<code>"latest"</code>. Can be configured through the <code>codeminer.lookup_version</code> option.</p></dd>
 
 
 <dt id="arg-preferred-description-only">preferred_description_only<a class="anchor" aria-label="anchor" href="#arg-preferred-description-only"></a></dt>
-<dd><p>If <code>TRUE</code> (default), return only preferred
-descriptions for clinical codes with synonyms. Will only apply if
-<code>standardise_output</code> is also <code>TRUE</code>.</p></dd>
+<dd><p>logical. If <code>TRUE</code>, only returns the preferred description for each code.
+Default: <code>FALSE</code>.</p></dd>
 
 
-<dt id="arg-standardise-output">standardise_output<a class="anchor" aria-label="anchor" href="#arg-standardise-output"></a></dt>
-<dd><p>bool. If <code>TRUE</code> (default), outputs a data
-frame with columns named 'code', 'description' and 'code_type'. Otherwise
-returns a data frame with all columns from the relevant look up table.</p></dd>
-
-
-<dt id="arg-unrecognised-codes">unrecognised_codes<a class="anchor" aria-label="anchor" href="#arg-unrecognised-codes"></a></dt>
-<dd><p>Either 'error' (default) or 'warning'. If any input
-<code>codes</code> are unrecognised, then either an error or warning will be raised.</p></dd>
-
-
-<dt id="arg-col-filters">col_filters<a class="anchor" aria-label="anchor" href="#arg-col-filters"></a></dt>
-<dd><p>A named list where each name in the list refers to the
-name of a lookup or mapping table. Each item is also a named list, where
-the names refer to column names in the corresponding table, and the items
-are vectors of values to filter for. For example, <code>list(my_lookup_table = list(colA = c("A", "B"))</code> will result in <code>my_lookup_table</code> being filtered
-for rows where <code>colA</code> is either 'A' or 'B'. Uses <code><a href="default_col_filters.html">default_col_filters()</a></code> by
-default. Set to <code>NULL</code> to remove all filters.</p></dd>
-
-
-<dt id="arg--return-unrecognised-codes">.return_unrecognised_codes<a class="anchor" aria-label="anchor" href="#arg--return-unrecognised-codes"></a></dt>
-<dd><p>If <code>TRUE</code>, return a vector of unrecognised
-codes only.</p></dd>
+<dt id="arg-pattern">pattern<a class="anchor" aria-label="anchor" href="#arg-pattern"></a></dt>
+<dd><p>a regular expression to search for</p></dd>
 
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>data frame</p>
+    <p>A <code>data.frame</code> containing the codes and their descriptions</p>
+    </div>
+    <div class="section level2">
+    <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
+    <p><code>CODES_LIKE</code> searches for codes that match a given regular expression.
+The matching is case-insensitive.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
-    <div class="dont-index"><p>Other Clinical code lookups and mappings:
-<code><a href="CHILDREN.html">CHILDREN</a>()</code>,
-<code><a href="GET_ATTRIBUTES.html">GET_ATTRIBUTES</a>()</code>,
-<code><a href="HAS_ATTRIBUTES.html">HAS_ATTRIBUTES</a>()</code>,
-<code><a href="MAP.html">MAP</a>()</code>,
-<code><a href="default_col_filters.html">default_col_filters</a>()</code>,
-<code><a href="get_children_sct.html">get_children_sct</a>()</code>,
-<code><a href="get_mapping_df.html">get_mapping_df</a>()</code>,
-<code><a href="get_parents_sct.html">get_parents_sct</a>()</code>,
-<code><a href="reformat_icd10_codes.html">reformat_icd10_codes</a>()</code></p></div>
+    <div class="dont-index"><p><code><a href="add_lookup_table.html">add_lookup_table()</a></code> for adding new lookup tables to the database.</p>
+<p>Other Clinical code lookups and mappings:
+<code><a href="CHILDREN.html">CHILDREN()</a></code>,
+<code><a href="GET_ATTRIBUTES.html">GET_ATTRIBUTES()</a></code>,
+<code><a href="HAS_ATTRIBUTES.html">HAS_ATTRIBUTES()</a></code>,
+<code><a href="MAP.html">MAP()</a></code>,
+<code><a href="default_col_filters.html">default_col_filters()</a></code>,
+<code><a href="get_children_sct.html">get_children_sct()</a></code>,
+<code><a href="get_parents_sct.html">get_parents_sct()</a></code></p></div>
     </div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># build dummy all_lkps_maps</span></span></span>
-<span class="r-in"><span><span class="va">all_lkps_maps_dummy</span> <span class="op">&lt;-</span> <span class="fu"><a href="build_all_lkps_maps_dummy.html">build_all_lkps_maps_dummy</a></span><span class="op">(</span><span class="op">)</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># Set up a temporary dummy database</span></span></span>
+<span class="r-in"><span><span class="va">temp_db</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span>fileext <span class="op">=</span> <span class="st">".duckdb"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="create_dummy_database.html">create_dummy_database</a></span><span class="op">(</span><span class="va">temp_db</span><span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Creating new database at <span style="color: #0000BB;">/tmp/RtmpF9QZHg/file1f4e359243e9.duckdb</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Lookup table <span style="color: #00BB00;">icd10_v0</span> added successfully.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Lookup table <span style="color: #00BB00;">read3_v0</span> added successfully.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Mapping table <span style="color: #00BB00;">read3_icd10_v0</span> added successfully.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Dummy database ready to use!</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># look up ICD10 codes</span></span></span>
 <span class="r-in"><span><span class="fu">CODES</span><span class="op">(</span></span></span>
 <span class="r-in"><span>  codes <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"E10"</span>, <span class="st">"E11"</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>  code_type <span class="op">=</span> <span class="st">"icd10"</span>,</span></span>
-<span class="r-in"><span>  all_lkps_maps <span class="op">=</span> <span class="va">all_lkps_maps_dummy</span></span></span>
+<span class="r-in"><span>  code_type <span class="op">=</span> <span class="st">"icd10"</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 2 × 3</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   code  description              code_type</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> E10   Type 1 diabetes mellitus icd10    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span> E11   Type 2 diabetes mellitus icd10    </span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>cannot open file '/home/runner/.local/share/codeminer/ontology.duckdb': No such file or directory</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in file(con, "w"):</span> cannot open the connection</span>
+<span class="r-in"><span><span class="fu">CODES_LIKE</span><span class="op">(</span><span class="st">"^E1"</span>, code_type <span class="op">=</span> <span class="st">"icd10"</span><span class="op">)</span></span></span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>cannot open file '/home/runner/.local/share/codeminer/ontology.duckdb': No such file or directory</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in file(con, "w"):</span> cannot open the connection</span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
@@ -159,7 +140,7 @@ codes only.</p></dd>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
     </footer></div>

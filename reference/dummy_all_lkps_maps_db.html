@@ -19,10 +19,7 @@
 <li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/caliber.html">CALIBER code lists</a></li>
-    <li><a class="dropdown-item" href="../articles/icd10_formats.html">ICD10 code formats</a></li>
-    <li><a class="dropdown-item" href="../articles/MAP.html">Mapping between clinical coding systems</a></li>
-    <li><a class="dropdown-item" href="../articles/phecodes.html">Phecodes</a></li>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/MAP.html">Mapping between clinical coding systems</a></li>
   </ul></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json"></form></li>
@@ -64,23 +61,22 @@
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
     <div class="dont-index"><p>Other Dummy data:
-<code><a href="build_all_lkps_maps_dummy.html">build_all_lkps_maps_dummy</a>()</code>,
-<code><a href="dummy_all_lkps_maps_path.html">dummy_all_lkps_maps_path</a>()</code>,
-<code><a href="dummy_caliber_dir_path.html">dummy_caliber_dir_path</a>()</code>,
-<code><a href="dummy_clinical_events_tidy.html">dummy_clinical_events_tidy</a>()</code>,
-<code><a href="dummy_icd10_phecode_map_path.html">dummy_icd10_phecode_map_path</a>()</code>,
-<code><a href="dummy_phecode_lkp_path.html">dummy_phecode_lkp_path</a>()</code>,
-<code><a href="dummy_ukb_codings_path.html">dummy_ukb_codings_path</a>()</code>,
-<code><a href="read_all_lkps_maps_dummy.html">read_all_lkps_maps_dummy</a>()</code>,
-<code><a href="read_icd10_phecode_map_dummy.html">read_icd10_phecode_map_dummy</a>()</code>,
-<code><a href="read_phecode_lkp_dummy.html">read_phecode_lkp_dummy</a>()</code>,
-<code><a href="read_ukb_codings_dummy.html">read_ukb_codings_dummy</a>()</code></p></div>
+<code><a href="build_all_lkps_maps_dummy.html">build_all_lkps_maps_dummy()</a></code>,
+<code><a href="dummy_all_lkps_maps_path.html">dummy_all_lkps_maps_path()</a></code>,
+<code><a href="dummy_clinical_events_tidy.html">dummy_clinical_events_tidy()</a></code>,
+<code><a href="dummy_icd10_phecode_map_path.html">dummy_icd10_phecode_map_path()</a></code>,
+<code><a href="dummy_phecode_lkp_path.html">dummy_phecode_lkp_path()</a></code>,
+<code><a href="dummy_ukb_codings_path.html">dummy_ukb_codings_path()</a></code>,
+<code><a href="read_all_lkps_maps_dummy.html">read_all_lkps_maps_dummy()</a></code>,
+<code><a href="read_icd10_phecode_map_dummy.html">read_icd10_phecode_map_dummy()</a></code>,
+<code><a href="read_phecode_lkp_dummy.html">read_phecode_lkp_dummy()</a></code>,
+<code><a href="read_ukb_codings_dummy.html">read_ukb_codings_dummy()</a></code></p></div>
     </div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu">dummy_all_lkps_maps_db</span><span class="op">(</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Writing lookup and mapping tables to Duckdb database at /tmp/RtmpQGXikD/file1e60680729c5.db</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Writing lookup and mapping tables to Duckdb database at /tmp/RtmpF9QZHg/file1f4e2fce0fa1.db</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> metadata_all_lkps_maps</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> bnf_lkp</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> dmd_lkp</span>
@@ -107,7 +103,7 @@
 <span class="r-msg co"><span class="r-pr">#&gt;</span> phecode_lkp</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> icd10_phecode</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> metadata_codeminer</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Success! Connect to database with `con &lt;- DBI::dbConnect(duckdb::duckdb(), '/tmp/RtmpQGXikD/file1e60680729c5.db', read_only = TRUE)`, then access all tables with `all_lkps_maps &lt;- ukbwranglr::db_tables_to_list(con)`</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Success! Connect to database with `con &lt;- DBI::dbConnect(duckdb::duckdb(), '/tmp/RtmpF9QZHg/file1f4e2fce0fa1.db', read_only = TRUE)`, then access all tables with `all_lkps_maps &lt;- ukbwranglr::db_tables_to_list(con)`</span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
@@ -119,7 +115,7 @@
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
     </footer></div>

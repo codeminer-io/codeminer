@@ -19,10 +19,7 @@
 <li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/caliber.html">CALIBER code lists</a></li>
-    <li><a class="dropdown-item" href="../articles/icd10_formats.html">ICD10 code formats</a></li>
-    <li><a class="dropdown-item" href="../articles/MAP.html">Mapping between clinical coding systems</a></li>
-    <li><a class="dropdown-item" href="../articles/phecodes.html">Phecodes</a></li>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/MAP.html">Mapping between clinical coding systems</a></li>
   </ul></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json"></form></li>
@@ -43,8 +40,7 @@
 
       <div class="section-desc"><p>Build a local database with lookup and mapping tables for various clinical coding systems.</p></div>
 
-
-    </div><div class="section level2">
+      <dl></dl></div><div class="section level2">
 
 
 
@@ -55,49 +51,50 @@
 
         </dt>
         <dd>Get UK Biobank resource 592 directly from UKB website</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="read_all_lkps_maps.html">read_all_lkps_maps()</a></code>
 
         </dt>
         <dd>Read UK Biobank resource 592 into a named list</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="build_all_lkps_maps.html">build_all_lkps_maps()</a></code>
 
         </dt>
         <dd>Build named list of clinical code look up and mapping tables</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="all_lkps_maps_to_db.html">all_lkps_maps_to_db()</a></code>
 
         </dt>
         <dd>Build a Duckdb database of clinical code look up and mapping tables</dd>
-      </dl><dl><dt>
 
-          <code><a href="get_all_lkps_maps_db_metadata.html">get_all_lkps_maps_db_metadata()</a></code>
-
-        </dt>
-        <dd>Get metadata from <code>all_lkps_maps</code> database</dd>
-      </dl><dl><dt>
+        <dt>
 
           <code><a href="build_database.html">build_database()</a></code>
 
         </dt>
         <dd>Build the Codeminer database</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="create_dummy_database.html">create_dummy_database()</a></code>
 
         </dt>
         <dd>Create a dummy database</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="add_lookup_table.html">add_lookup_table()</a></code>
 
         </dt>
         <dd>Add a lookup table to the database</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="add_mapping_table.html">add_mapping_table()</a></code>
 
@@ -108,168 +105,121 @@
 
       <div class="section-desc"><p>Functions for looking up clinical codes and mapping between different codisng systems.</p></div>
 
-
-    </div><div class="section level2">
+      <dl></dl></div><div class="section level2">
 
 
 
 
       <dl><dt>
 
-          <code><a href="CODES.html">CODES()</a></code>
+          <code><a href="CODES.html">CODES()</a></code> <code><a href="CODES.html">CODES_LIKE()</a></code>
 
         </dt>
         <dd>Look up descriptions for clinical codes</dd>
-      </dl><dl><dt>
 
-          <code><a href="codes_like.html">CODES_LIKE()</a></code>
-
-        </dt>
-        <dd>Search for codes matching a regular expression</dd>
-      </dl><dl><dt>
+        <dt>
 
           <code><a href="CHILDREN.html">CHILDREN()</a></code>
 
         </dt>
         <dd>Get descendents for a code</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="get_children_sct.html">get_children_sct()</a></code>
 
         </dt>
         <dd>Get children for SNOMED codes</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="get_parents_sct.html">get_parents_sct()</a></code>
 
         </dt>
         <dd>Get parents for SNOMED codes</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="DESCRIPTION.html">DESCRIPTION()</a></code>
 
         </dt>
         <dd>Search for codes that match a description</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="MAP.html">MAP()</a></code>
 
         </dt>
         <dd>Map clinical codes from one coding system to another</dd>
-      </dl><dl><dt>
 
-          <code><a href="get_mapping_df.html">get_mapping_df()</a></code>
-
-        </dt>
-        <dd>Get a 'from-to' mapping data frame</dd>
-      </dl><dl><dt>
-
-          <code><a href="reformat_icd10_codes.html">reformat_icd10_codes()</a></code>
-
-        </dt>
-        <dd>Reformat ICD-10 codes</dd>
-      </dl><dl><dt>
+        <dt>
 
           <code><a href="default_col_filters.html">default_col_filters()</a></code>
 
         </dt>
         <dd>Default filtering parameters for lookup and mapping tables.</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="get_col_filters.html">get_col_filters()</a></code>
 
         </dt>
         <dd>Extract column filters from metadata tables</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="ATTRIBUTE_TYPES_FROM.html">ATTRIBUTE_TYPES_FROM()</a></code>
 
         </dt>
         <dd>Find attribute types that point from a set of codes</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="ATTRIBUTE_TYPES_TO.html">ATTRIBUTE_TYPES_TO()</a></code>
 
         </dt>
         <dd>Find attribute types that point to a set of codes</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="GET_ATTRIBUTES.html">GET_ATTRIBUTES()</a></code>
 
         </dt>
         <dd>Get attributes for a set of SNOMED codes</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="HAS_ATTRIBUTES.html">HAS_ATTRIBUTES()</a></code>
 
         </dt>
         <dd>Get SNOMED codes with a specific set of one or more attributes</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="filter_sct_relationship.html">filter_sct_relationship()</a></code>
 
         </dt>
         <dd>Filter SNOMED CT relationships based on various criteria</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="lookup_metadata.html">lookup_metadata()</a></code>
 
         </dt>
         <dd>Create lookup metadata</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="mapping_metadata.html">mapping_metadata()</a></code>
 
         </dt>
         <dd>Create mapping metadata</dd>
       </dl></div><div class="section level2">
-      <h2 id="caliber">CALIBER<a class="anchor" aria-label="anchor" href="#caliber"></a></h2>
-
-      <div class="section-desc"><p>Functions for reformatting CALIBER codelists to use with UK Biobank data</p></div>
-
-
-    </div><div class="section level2">
-
-
-
-
-      <dl><dt>
-
-          <code><a href="download_caliber_repo.html">download_caliber_repo()</a></code>
-
-        </dt>
-        <dd>Download the caliber github repository</dd>
-      </dl><dl><dt>
-
-          <code><a href="read_caliber_raw.html">read_caliber_raw()</a></code>
-
-        </dt>
-        <dd>Import CALIBER code lists</dd>
-      </dl><dl><dt>
-
-          <code><a href="reformat_caliber_for_ukb.html">reformat_caliber_for_ukb()</a></code>
-
-        </dt>
-        <dd>Reformat and map CALIBER codes for use with UK Biobank data</dd>
-      </dl><dl><dt>
-
-          <code><a href="default_overlapping_disease_categories_csv.html">default_overlapping_disease_categories_csv()</a></code>
-
-        </dt>
-        <dd>CSV file for resolving overlapping disease categories in mapped CALIBER codes</dd>
-      </dl><dl><dt>
-
-          <code><a href="get_caliber_categories_mapping.html">get_caliber_categories_mapping()</a></code>
-
-        </dt>
-        <dd>Get a mapping table of CALIBER phenotypes/categories</dd>
-      </dl></div><div class="section level2">
       <h2 id="dummy-data">Dummy data<a class="anchor" aria-label="anchor" href="#dummy-data"></a></h2>
 
       <div class="section-desc"><p>Dummy data for tests.</p></div>
 
-
-    </div><div class="section level2">
+      <dl></dl></div><div class="section level2">
 
 
 
@@ -280,73 +230,78 @@
 
         </dt>
         <dd>Create a dummy all_lkps_maps</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="read_all_lkps_maps_dummy.html">read_all_lkps_maps_dummy()</a></code>
 
         </dt>
         <dd>Read dummy UK Biobank resource 592 into R</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="read_icd10_phecode_map_dummy.html">read_icd10_phecode_map_dummy()</a></code>
 
         </dt>
         <dd>Read dummy Phecode Map 1.2 with ICD-10 codes (beta) file into R</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="read_phecode_lkp_dummy.html">read_phecode_lkp_dummy()</a></code>
 
         </dt>
         <dd>Read dummy Phecode definitions file into R</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="read_ukb_codings_dummy.html">read_ukb_codings_dummy()</a></code>
 
         </dt>
         <dd>Read dummy UK Biobank codings into R</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="dummy_all_lkps_maps_db.html">dummy_all_lkps_maps_db()</a></code>
 
         </dt>
         <dd>Set up a dummy all_lkps_maps database</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="dummy_all_lkps_maps_path.html">dummy_all_lkps_maps_path()</a></code>
 
         </dt>
         <dd>Dummy UK Biobank resource 592 file path</dd>
-      </dl><dl><dt>
 
-          <code><a href="dummy_caliber_dir_path.html">dummy_caliber_dir_path()</a></code>
-
-        </dt>
-        <dd>Dummy CALIBER repository</dd>
-      </dl><dl><dt>
+        <dt>
 
           <code><a href="dummy_clinical_events_tidy.html">dummy_clinical_events_tidy()</a></code>
 
         </dt>
         <dd>Dummy UK Biobank clinical events, tidied</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="dummy_icd10_phecode_map_path.html">dummy_icd10_phecode_map_path()</a></code>
 
         </dt>
         <dd>Dummy Phecode Map 1.2 with ICD-10 codes (beta) file path</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="dummy_phecode_lkp_path.html">dummy_phecode_lkp_path()</a></code>
 
         </dt>
         <dd>Dummy Phecode definitions file path</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="dummy_ukb_codings_path.html">dummy_ukb_codings_path()</a></code>
 
         </dt>
         <dd>Dummy UK Biobank codings file path</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="example_ontology.html">example_ontology</a></code>
 
@@ -363,55 +318,64 @@
 
         </dt>
         <dd>Infix set operations</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="codeminer_metadata.html">codeminer_metadata()</a></code>
 
         </dt>
         <dd>Metadata</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="get_bnf_from_open_prescribing.html">get_bnf_from_open_prescribing()</a></code>
 
         </dt>
         <dd>Get the BNF terminology from OpenPrescribing</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="get_nhsbsa_snomed_bnf.html">get_nhsbsa_snomed_bnf()</a></code>
 
         </dt>
         <dd>Download and read the NHSBSA BNF_SNOMED mapping file</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="get_ukb_self_report_med_to_atc_map.html">get_ukb_self_report_med_to_atc_map()</a></code>
 
         </dt>
         <dd>Download and read a UKB welf-reported medication code to ATC mapping file</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="get_phecode_definitions.html">get_phecode_definitions()</a></code>
 
         </dt>
         <dd>Download the Phecode 1.2 definitions file</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="get_phecode_icd9_map.html">get_phecode_icd9_map()</a></code>
 
         </dt>
         <dd>Download the Phecode 1.2 to ICD9 mapping file</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="get_phecode_icd10_map.html">get_phecode_icd10_map()</a></code>
 
         </dt>
         <dd>Download the Phecode 1.2 to ICD10 (beta) mapping file</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="with_code_type_helpers.html">icd10()</a></code> <code><a href="with_code_type_helpers.html">icd9()</a></code> <code><a href="with_code_type_helpers.html">read3()</a></code> <code><a href="with_code_type_helpers.html">read2()</a></code> <code><a href="with_code_type_helpers.html">sct()</a></code> <code><a href="with_code_type_helpers.html">opcs4()</a></code> <code><a href="with_code_type_helpers.html">phecode()</a></code> <code><a href="with_code_type_helpers.html">read2_drugs()</a></code> <code><a href="with_code_type_helpers.html">bnf()</a></code> <code><a href="with_code_type_helpers.html">dmd()</a></code> <code><a href="with_code_type_helpers.html">data_coding_3()</a></code> <code><a href="with_code_type_helpers.html">data_coding_4()</a></code> <code><a href="with_code_type_helpers.html">data_coding_5()</a></code> <code><a href="with_code_type_helpers.html">data_coding_6()</a></code> <code><a href="with_code_type_helpers.html">medcode_aurum()</a></code> <code><a href="with_code_type_helpers.html">prodcode_aurum()</a></code>
 
         </dt>
         <dd>With Code Type Functions</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="start_api.html">start_api()</a></code>
 
@@ -427,7 +391,7 @@
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
     </footer></div>
