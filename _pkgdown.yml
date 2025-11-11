@@ -56,3 +56,6 @@ reference:
       - get_phecode_icd10_map
       - with_code_type_helpers
       - start_api
+      - download_latestversion_of_snomed_item
+      - read_snomed_ct_uk_monolith
+      
