@@ -151,8 +151,8 @@ check_mapping_args <- function(
   version,
   call = rlang::caller_env()
 ) {
-  check_codes(codes)
-  check_version(version)
+  check_codes(codes, call = call)
+  check_version(version, call = call)
   if (length(from) != 1) {
     cli::cli_abort(
       "{.arg from} must have length 1, not {length(from)}",
