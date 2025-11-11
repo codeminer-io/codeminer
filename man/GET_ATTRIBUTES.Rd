@@ -7,10 +7,7 @@
 GET_ATTRIBUTES(
   attribute_codes,
   relationship_type = NULL,
-  standardise_output = TRUE,
-  all_lkps_maps = NULL,
-  preferred_description_only = TRUE,
-  col_filters = getOption("codeminer.col_filters")
+  preferred_description_only = TRUE
 )
 }
 \arguments{
@@ -18,30 +15,8 @@ GET_ATTRIBUTES(
 
 \item{relationship_type}{Character vector of SNOMED codes.}
 
-\item{standardise_output}{bool. If \code{TRUE} (default), outputs a data
-frame with columns named 'code', 'description' and 'code_type'. Otherwise
-returns a data frame with all columns from the relevant look up table.}
-
-\item{all_lkps_maps}{Either a named list of lookup and mapping tables
-(either data frames or \code{tbl_dbi} objects), or the path to a Duckdb database
-containing these tables. If \code{NULL}, will attempt to connect to a Duckdb
-database named 'all_lkps_maps.db' in the current working directory, or to
-a a Duckdb database specified by an environmental variable named
-'ALL_LKPS_MAPS_DB' (see
-\href{https://resources.numbat.space/using-rprofile-and-renviron.html#renviron}{here}
-for how to set environment variables using a \code{.Renviron} file). The latter
-method will be used in preference.}
-
-\item{preferred_description_only}{If \code{TRUE} (default), return only preferred
-descriptions for clinical codes with synonyms. Will only apply if
-\code{standardise_output} is also \code{TRUE}.}
-
-\item{col_filters}{A named list where each name in the list refers to the
-name of a lookup or mapping table. Each item is also a named list, where
-the names refer to column names in the corresponding table, and the items
-are vectors of values to filter for. For example, \verb{list(my_lookup_table = list(colA = c("A", "B"))} will result in \code{my_lookup_table} being filtered
-for rows where \code{colA} is either 'A' or 'B'. Uses \code{default_col_filters()} by
-default. Set to \code{NULL} to remove all filters.}
+\item{preferred_description_only}{logical. If \code{TRUE}, only returns the preferred description for each code.
+Default: \code{FALSE}.}
 }
 \value{
 A data frame
@@ -71,8 +46,6 @@ Other Clinical code lookups and mappings:
 \code{\link{MAP}()},
 \code{\link{default_col_filters}()},
 \code{\link{get_children_sct}()},
-\code{\link{get_mapping_df}()},
-\code{\link{get_parents_sct}()},
-\code{\link{reformat_icd10_codes}()}
+\code{\link{get_parents_sct}()}
 }
 \concept{Clinical code lookups and mappings}

@@ -104,22 +104,6 @@ dummy_all_lkps_maps_db <- function(db_path = tempfile(fileext = ".db")) {
   all_lkps_maps_to_db(all_lkps_maps = maps, db_path = db_path)
 }
 
-## CALIBER -----------------------------------------------------------------
-
-#' Dummy CALIBER repository
-#'
-#' Returns the file path to a dummy data
-#' [CALIBER](https://github.com/spiros/chronological-map-phenotypes) repository.
-#'
-#' @return A string.
-#' @export
-#' @family Dummy data
-#' @examples
-#' dummy_caliber_dir_path()
-dummy_caliber_dir_path <- function() {
-  system.file("extdata", "test_caliber_repo", package = "codeminer")
-}
-
 
 ## Phecodes ----------------------------------------------------------------
 

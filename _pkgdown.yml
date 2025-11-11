@@ -3,64 +3,52 @@ template:
   bootstrap: 5
 
 reference:
-- title: Database management
-  desc: Build a local database with lookup and mapping tables for various clinical coding systems.
-- contents:
-  - get_ukb_all_lkps_maps
-  - read_all_lkps_maps
-  - build_all_lkps_maps
-  - all_lkps_maps_to_db
-  - get_all_lkps_maps_db_metadata
-  - build_database
-  - create_dummy_database
-  - add_lookup_table
-  - add_mapping_table
+  - title: Database management
+    desc: Build a local database with lookup and mapping tables for various clinical coding systems.
+  - contents:
+      - get_ukb_all_lkps_maps
+      - read_all_lkps_maps
+      - build_all_lkps_maps
+      - all_lkps_maps_to_db
+      - build_database
+      - create_dummy_database
+      - add_lookup_table
+      - add_mapping_table
 
-- title: Clinical codes
-  desc:  Functions for looking up clinical codes and mapping between different codisng systems.
-- contents:
-  - CODES
-  - codes_like
-  - CHILDREN
-  - get_children_sct
-  - get_parents_sct
-  - DESCRIPTION
-  - MAP
-  - get_mapping_df
-  - reformat_icd10_codes
-  - default_col_filters
-  - get_col_filters
-  - matches("ATTRIBUTE")
-  - filter_sct_relationship
-  - lookup_metadata
-  - mapping_metadata
+  - title: Clinical codes
+    desc: Functions for looking up clinical codes and mapping between different codisng systems.
+  - contents:
+      - CODES
+      - CODES_LIKE
+      - CHILDREN
+      - get_children_sct
+      - get_parents_sct
+      - DESCRIPTION
+      - MAP
+      - default_col_filters
+      - get_col_filters
+      - matches("ATTRIBUTE")
+      - filter_sct_relationship
+      - lookup_metadata
+      - mapping_metadata
 
-- title: CALIBER
-  desc:  Functions for reformatting CALIBER codelists to use with UK Biobank data
-- contents:
-  - download_caliber_repo
-  - read_caliber_raw
-  - reformat_caliber_for_ukb
-  - default_overlapping_disease_categories_csv
-  - get_caliber_categories_mapping
+  - title: Dummy data
+    desc: Dummy data for tests.
+  - contents:
+      - ends_with("dummy")
+      - starts_with("dummy")
+      - example_ontology
 
-- title: Dummy data
-  desc: Dummy data for tests.
-- contents:
-  - ends_with("dummy")
-  - starts_with("dummy")
-  - example_ontology
-
-- title:: Utilities
-  desc: Miscellaneous utility functions.
-- contents:
-  - infix_setops
-  - codeminer_metadata
-  - get_bnf_from_open_prescribing
-  - get_nhsbsa_snomed_bnf
-  - get_ukb_self_report_med_to_atc_map
-  - get_phecode_definitions
-  - get_phecode_icd9_map
-  - get_phecode_icd10_map
-  - with_code_type_helpers
-  - start_api
+  - title:: Utilities
+    desc: Miscellaneous utility functions.
+  - contents:
+      - infix_setops
+      - codeminer_metadata
+      - get_bnf_from_open_prescribing
+      - get_nhsbsa_snomed_bnf
+      - get_ukb_self_report_med_to_atc_map
+      - get_phecode_definitions
+      - get_phecode_icd9_map
+      - get_phecode_icd10_map
+      - with_code_type_helpers
+      - start_api

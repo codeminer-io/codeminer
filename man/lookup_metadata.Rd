@@ -5,18 +5,18 @@
 \title{Create lookup metadata}
 \usage{
 lookup_metadata(
-  coding_type,
+  code_type,
   version = "v0",
   ...,
   lookup_code_col = "code",
   lookup_description_col = "description",
   lookup_source = NA_character_,
-  preferred_synonym_col = NA_character_,
-  preferred_code = NA_character_
+  preferred_description_col = NA_character_,
+  preferred_description_indicator = NA_character_
 )
 }
 \arguments{
-\item{coding_type}{The type of coding system (e.g., ICD-10, SNOMED-CT)}
+\item{code_type}{The type of coding system (e.g., ICD-10, SNOMED-CT)}
 
 \item{version}{The version of the lookup metadata (default: "v0")}
 
@@ -28,9 +28,13 @@ lookup_metadata(
 
 \item{lookup_source}{The source of the lookup metadata (default: \code{NA_character_})}
 
-\item{preferred_synonym_col}{The column name for the preferred synonym (default: \code{NA_character_})}
+\item{preferred_description_col}{The name of the column that indicates the
+preferred description. This is useful for lookup tables that have multiple
+descriptions for the same code (default: \code{NA_character_}).}
 
-\item{preferred_code}{The preferred code (default: \code{NA_character_})}
+\item{preferred_description_indicator}{The value in the
+\code{preferred_description_col} column that indicates the preferred description
+(default: \code{NA_character_})}
 }
 \value{
 A list containing the lookup metadata

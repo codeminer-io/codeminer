@@ -18,66 +18,40 @@ knitr::opts_chunk$set(
 library(codeminer)
 library(dplyr)
 
-all_lkps_maps_dummy <- build_all_lkps_maps_dummy()
+create_dummy_database()
 ```
 
 # Basic usage
 
 Use `MAP()` to map a vector of codes from one clinical coding system to another:
 
-```{r}
-MAP(codes = "G20..",
-          from = "read2",
-          to = "icd10",
-          all_lkps_maps = all_lkps_maps_dummy)
+```{r MAP}
+MAP(codes = "X40J4", from = "read3", to = "icd10", version = "v0")
 ```
 
-Alternatively, use `get_mapping_df()` to return a mapping data frame:
+Use `MAP("all")` to return the entire mapping table:
 
 ```{r}
-get_mapping_df(from = "read3",
-               to = "icd10",
-               all_lkps_maps = all_lkps_maps_dummy)
+MAP("all", from = "read3", to = "icd10")
 ```
 
 # Filters
 
-Mapping between different clinical coding systems is not perfect and should be manually reviewed. Some mapping tables list multiple possible code mappings, with a separate column indicating the type of mapping.[^1] For example, the Read 2 to Read 3 mapping table includes an 'IS_ASSURED' column, where '1' and '0' indicate that a code mapping is or is not assured respectively:
-
-[^1]: Refer to the accompanying documentation for [UKB resource 592](https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592 "Clinical coding classification systems and maps") for further details.
-
-```{r}
-all_lkps_maps_dummy$read_v2_read_ctv3 %>% 
-  dplyr::select(READV2_CODE,
-                READV3_CODE,
-                IS_ASSURED)
-```
-
-Similarly, the Read 3 to ICD10 mapping table includes 'mapping_status' and 'refine_flag' columns:
+Mapping between different clinical coding systems is not perfect and should be manually reviewed. Some mapping tables
+list multiple possible code mappings, with a separate column indicating the type of mapping.[^1] For example, the Read 3
+to ICD10 mapping table includes `mapping_status` and `refine_flag` columns:
 
 ```{r}
-all_lkps_maps_dummy$read_ctv3_icd10 %>% 
-  dplyr::select(read_code:refine_flag)
+MAP("all", from = "read3", to = "icd10") |> 
+  filter(from == "XaIP9")
 ```
+
+[^1]: Refer to the accompanying documentation for [UKB resource 592](https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592)
+for further details.
 
 It is important to decide which mappings to include. For example, if no filters are applied then the Read 3 code for sebaceous cyst 'XaIP9' will map to a number of ICD10 codes, some of which are sex-specific ('N508' and 'N948'):
 
 ```{r}
-MAP(codes = "XaIP9",
-          from = "read3",
-          to = "icd10",
-          all_lkps_maps = all_lkps_maps_dummy,
-          col_filters = NULL)
+MAP("XaIP9", from = "read3", to = "icd10") |> 
+  filter(!is.na(GENDER_MASK))
 ```
-
-Default filters are applied by `default_col_filters()`:
-
-```{r}
-MAP(codes = "XaIP9",
-          from = "read3",
-          to = "icd10",
-          all_lkps_maps = all_lkps_maps_dummy,
-          col_filters = default_col_filters())
-```
-
-See additional notes at <https://rmgpanw.gitlab.io/codemapper_notes/>.

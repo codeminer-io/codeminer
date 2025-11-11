@@ -44,7 +44,7 @@ create_example_data <- function() {
   versions <- c("v1", "v2", "v3")
   capital_metadata <- tibble::tibble(
     lookup_table_name = paste0("capital_letters_", versions),
-    coding_type = "capital_letters",
+    code_type = "capital_letters",
     lookup_version = versions,
     lookup_code_col = "code",
     lookup_description_col = "description",
@@ -54,7 +54,7 @@ create_example_data <- function() {
   )
   lower_metadata <- tibble::tibble(
     lookup_table_name = paste0("lowercase_letters_", versions),
-    coding_type = "lowercase_letters",
+    code_type = "lowercase_letters",
     lookup_version = versions,
     lookup_code_col = "code",
     lookup_description_col = "description",
@@ -81,7 +81,7 @@ create_example_data <- function() {
   )
 
   mapping_metadata <- tibble::tribble(
-    ~mapping_table_name       , ~from_coding_type , ~to_coding_type     , ~mapping_version , ~from_col , ~to_col     ,
+    ~mapping_table_name       , ~from_code_type   , ~to_code_type       , ~mapping_version , ~from_col , ~to_col     ,
     "capital_to_lowercase_v1" , "capital_letters" , "lowercase_letters" , "v1"             , "capital" , "lowercase" ,
     "capital_to_lowercase_v2" , "capital_letters" , "lowercase_letters" , "v2"             , "capital" , "lowercase" ,
     "capital_to_lowercase_v3" , "capital_letters" , "lowercase_letters" , "v3"             , "capital" , "lowercase"

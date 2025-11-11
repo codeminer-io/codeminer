@@ -33,30 +33,120 @@ create_dummy_database <- function(
   )
   build_database(overwrite = TRUE)
 
-  example_data <- get_example_data()
-  add_lookup_table(example_data$lookup_table, example_data$lookup_metadata)
-  add_mapping_table(example_data$mapping_table, example_data$mapping_metadata)
+  add_lookup_table(dummy_icd10_lookup(), dummy_icd10_metadata())
+  add_lookup_table(dummy_read3_lookup(), dummy_read3_metadata())
+  add_mapping_table(
+    dummy_read3_icd10_mapping(),
+    dummy_read3_icd10_mapping_metadata()
+  )
 
   cli::cli_alert_success("Dummy database ready to use!")
   return(invisible(db_path))
 }
 
-get_example_data <- function() {
-  # Workaround for the R CMD check note "no visible binding for global variable 'example_ontology'"
-  # and avoid loading it in the user's global environment
-  example_data <- codeminer::example_ontology
-  lookup_table <- example_data$lookup_tables$capital_letters_v3
-  lookup_metadata <- example_data$lookup_metadata |>
-    dplyr::filter(.data$lookup_table_name == "capital_letters_v3")
+dummy_data_path <- function() {
+  system.file("extdata", "dummy_all_lkps_maps_v3.xlsx", package = "codeminer")
+}
 
-  mapping_table <- example_data$mapping_tables$capital_to_lowercase_v3
-  mapping_metadata <- example_data$mapping_metadata |>
-    dplyr::filter(.data$mapping_table_name == "capital_to_lowercase_v3")
+# Helper to generate dummy ICD-10 Lookup data
+dummy_icd10_lookup <- function() {
+  icd10 <- readxl::read_excel(dummy_data_path(), sheet = "icd10_lkp")
 
-  return(list(
-    lookup_table = lookup_table,
-    lookup_metadata = lookup_metadata,
-    mapping_table = mapping_table,
-    mapping_metadata = mapping_metadata
-  ))
+  # Some ICD-10 descriptions include a modifier e.g. "E10" = "Type 1 diabetes
+  # mellitus", whereas "E10.0" = "Type 1 diabetes mellitus with coma". "With
+  # coma" is contained in the modifier columns "MODIFIER-4". See 'S27' for an
+  # example code where additional description is contained in the "MODIFER-5"
+  # column. There are no codes with a modifier description in
+  # both "MODIFIER_4" and "MODIFIER_5".
+  icd10_clean <- icd10 |>
+    dplyr::mutate(
+      "DESCRIPTION" = dplyr::case_when(
+        !is.na(.data$MODIFIER_4) ~ paste(.data$DESCRIPTION, .data$MODIFIER_4),
+        !is.na(.data$MODIFIER_5) ~ paste(.data$DESCRIPTION, .data$MODIFIER_5),
+        TRUE ~ .data$DESCRIPTION
+      )
+    ) |>
+    dplyr::select(!dplyr::all_of(c("MODIFIER_4", "MODIFIER_5")))
+
+  # Rename relevant columns
+  icd10_lookup_dummy <- dplyr::select(
+    icd10_clean,
+    code = "ALT_CODE",
+    description = "DESCRIPTION",
+    dplyr::everything()
+  )
+
+  return(icd10_lookup_dummy)
+}
+
+# Helper to generate metadata for the dummy ICD10 lookup table
+dummy_icd10_metadata <- function() {
+  lookup_metadata(
+    "icd10",
+    version = "v0",
+    lookup_code_col = "code",
+    lookup_description_col = "description"
+  )
+}
+
+dummy_read3_lookup <- function() {
+  read3 <- readxl::read_excel(dummy_data_path(), sheet = "read_ctv3_lkp")
+  read3_lookup <- dplyr::rename(
+    read3,
+    code = "read_code",
+    description = "term_description"
+  )
+  # Remove NA rows
+  read3_lookup <- dplyr::filter(
+    read3_lookup,
+    !is.na(.data$code),
+    !is.na(.data$description)
+  )
+  return(read3_lookup)
+}
+
+dummy_read3_metadata <- function() {
+  lookup_metadata(
+    "read3",
+    version = "v0",
+    lookup_code_col = "code",
+    lookup_description_col = "description",
+    preferred_description_col = "description_type",
+    preferred_description_indicator = "P"
+  )
+}
+
+dummy_read3_icd10_mapping <- function() {
+  read3_icd10_raw <- readxl::read_excel(
+    dummy_data_path(),
+    sheet = "read_ctv3_icd10"
+  )
+
+  mapping <- dplyr::rename(
+    read3_icd10_raw,
+    from = "read_code",
+    to = "icd10_code"
+  )
+  mapping_clean <- dplyr::filter(mapping, !is.na(.data$from), !is.na(.data$to))
+
+  # Keep only codes for which we have lookup data
+  read3_lookup <- dummy_read3_lookup()
+  icd10_lookup <- dummy_icd10_lookup()
+  mapping_clean <- dplyr::filter(
+    mapping_clean,
+    .data$from %in% read3_lookup$code,
+    .data$to %in% icd10_lookup$code
+  )
+
+  return(mapping_clean)
+}
+
+dummy_read3_icd10_mapping_metadata <- function() {
+  mapping_metadata(
+    "read3",
+    "icd10",
+    version = "v0",
+    from_col = "from",
+    to_col = "to"
+  )
 }

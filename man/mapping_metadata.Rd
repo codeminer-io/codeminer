@@ -5,8 +5,8 @@
 \title{Create mapping metadata}
 \usage{
 mapping_metadata(
-  from_coding_type,
-  to_coding_type,
+  from_code_type,
+  to_code_type,
   version = "v0",
   ...,
   from_col = "from",
@@ -14,9 +14,9 @@ mapping_metadata(
 )
 }
 \arguments{
-\item{from_coding_type}{The type of coding system for the source codes (e.g., ICD-10, SNOMED-CT)}
+\item{from_code_type}{The type of coding system for the source codes (e.g., ICD-10, SNOMED-CT)}
 
-\item{to_coding_type}{The type of coding system for the target codes (e.g., ICD-10, SNOMED-CT)}
+\item{to_code_type}{The type of coding system for the target codes (e.g., ICD-10, SNOMED-CT)}
 
 \item{version}{The version of the mapping metadata (default: "v0")}
 

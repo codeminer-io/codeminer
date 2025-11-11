@@ -2,7 +2,7 @@
 codeminer_metadata_table_names <- new.env(parent = emptyenv())
 codeminer_metadata_table_names$lookup <- "_lookup_metadata"
 codeminer_metadata_table_names$mapping <- "_mapping_metadata"
-lockEnvironment(codeminer_metadata_table_names)
+lockEnvironment(codeminer_metadata_table_names, bindings = TRUE)
 
 #' Build the Codeminer database
 #'
@@ -110,20 +110,20 @@ create_table <- function(con, tbl_name, fields, overwrite = FALSE) {
 #' @noRd
 required_lookup_metadata_columns <- function() {
   c(
-    "coding_type",
+    "code_type",
     "lookup_version",
     "lookup_code_col",
     "lookup_description_col",
     "lookup_source",
-    "preferred_synonym_col",
-    "preferred_code"
+    "preferred_description_col",
+    "preferred_description_indicator"
   )
 }
 
 required_mapping_metadata_columns <- function() {
   c(
-    "from_coding_type",
-    "to_coding_type",
+    "from_code_type",
+    "to_code_type",
     "mapping_version",
     "from_col",
     "to_col"

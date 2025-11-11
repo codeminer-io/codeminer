@@ -20,8 +20,8 @@ Add a mapping table to the database together with its metadata.
 Note that it is not possible to overwrite an existing mapping table.
 }
 \details{
-Mapping tables are indexed by the combination of \code{from_coding_type},
-\code{to_coding_type}, and \code{version}, specified in \code{\link[=mapping_metadata]{mapping_metadata()}}. This
+Mapping tables are indexed by the combination of \code{from_code_type},
+\code{to_code_type}, and \code{version}, specified in \code{\link[=mapping_metadata]{mapping_metadata()}}. This
 index needs to be unique and is used to identify the mapping table in the
 database. If a mapping table with the same index already exists, the function
 will emit a warning and return \code{FALSE} (invisibly) without any effect. Use a

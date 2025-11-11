@@ -19,7 +19,6 @@ dummy_all_lkps_maps_path()
 Other Dummy data: 
 \code{\link{build_all_lkps_maps_dummy}()},
 \code{\link{dummy_all_lkps_maps_db}()},
-\code{\link{dummy_caliber_dir_path}()},
 \code{\link{dummy_clinical_events_tidy}()},
 \code{\link{dummy_icd10_phecode_map_path}()},
 \code{\link{dummy_phecode_lkp_path}()},
