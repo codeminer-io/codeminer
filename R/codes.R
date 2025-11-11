@@ -151,7 +151,7 @@ get_lookup_table <- function(
   version,
   call = rlang::caller_env()
 ) {
-  this_meta <- get_meta_for_table(con, code_type, version, call)
+  this_meta <- get_metadata_for_table(con, code_type, version, call)
 
   tbl_name <- this_meta$lookup_table_name
   tbl <- dplyr::tbl(con, tbl_name)
@@ -176,7 +176,7 @@ get_lookup_table <- function(
   return(tbl)
 }
 
-get_meta_for_table <- function(
+get_metadata_for_table <- function(
   con,
   code_type,
   version,

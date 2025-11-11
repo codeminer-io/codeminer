@@ -79,7 +79,7 @@ get_mapping_table <- function(
   version,
   call = rlang::caller_env()
 ) {
-  this_meta <- get_meta_for_mapping(con, from, to, version, call = call)
+  this_meta <- get_metadata_for_mapping(con, from, to, version, call = call)
   tbl_name <- this_meta$mapping_table_name
   tbl <- dplyr::tbl(con, tbl_name)
 
@@ -87,7 +87,7 @@ get_mapping_table <- function(
   return(tbl)
 }
 
-get_meta_for_mapping <- function(
+get_metadata_for_mapping <- function(
   con,
   from,
   to,
