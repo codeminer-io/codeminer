@@ -168,7 +168,7 @@ download_latestversion_of_snomed_item <- function(
 #'
 #' @description
 #' Reads the Terminology and Refset tables from a local copy of the
-#' [SNOMED CT UK Monolith Edition]
+#' SNOMED CT UK Monolith Edition
 #' (https://isd.digital.nhs.uk/trud/users/guest/filters/2/categories/26/items/1799/releases).
 #'
 #' @param snomed_ct_uk_monolith_dir Path to the unzipped SNOMED CT UK Monolith Edition directory.

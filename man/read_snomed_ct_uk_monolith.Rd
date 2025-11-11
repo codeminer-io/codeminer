@@ -19,7 +19,7 @@ A named list with two elements:
 }
 \description{
 Reads the Terminology and Refset tables from a local copy of the
-\link{SNOMED CT UK Monolith Edition}
+SNOMED CT UK Monolith Edition
 (https://isd.digital.nhs.uk/trud/users/guest/filters/2/categories/26/items/1799/releases).
 }
 \examples{
