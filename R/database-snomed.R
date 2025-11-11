@@ -185,7 +185,7 @@ download_latestversion_of_snomed_item <- function(
 #' names(snomed$terminology)
 #' names(snomed$refset)
 #' }
-#' @noRd
+#' @export
 read_snomed_ct_uk_monolith <- function(snomed_ct_uk_monolith_dir) {
   if (!dir.exists(snomed_ct_uk_monolith_dir)) {
     cli::cli_abort(
