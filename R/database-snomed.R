@@ -120,7 +120,7 @@ download_latestversion_of_snomed_item <- function(
   latest_release_id <- latest_release$id
 
   cli::cli_alert_info(
-    "Latest release found: {.field {latest_release_id}} (Date: {.val {latest_release$releaseDate'}})"
+    "Latest release found: {.field {latest_release_id}} (Date: {.val {latest_release$releaseDate}})"
   )
 
   cli::cli_alert_info("Downloading release ...")
