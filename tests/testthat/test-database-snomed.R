@@ -25,27 +25,57 @@ test_that("read_snomed_ct_uk_monolith() returns appropriate tables", {
   # Run the function
   snomedct <- read_snomed_ct_uk_monolith(path)
 
-  snomed_monolith_terminology <- snomedct$terminology
-  snomed_monolith_refset_Map <- snomedct$refset$Map
-
-  expected_terminology_names <- c(
-    "sct2_Concept_MONOSnapshot_GB_20251022.txt",
-    "sct2_Description_MONOSnapshot-en_GB_20251022.txt",
-    "sct2_Identifier_MONOSnapshot_GB_20251022.txt",
-    "sct2_Relationship_MONOSnapshot_GB_20251022.txt",
-    "sct2_RelationshipConcreteValues_MONOSnapshot_GB_20251022.txt",
-    "sct2_sRefset_OWLExpressionMONOSnapshot_GB_20251022.txt",
-    "sct2_StatedRelationship_MONOSnapshot_GB_20251022.txt",
-    "sct2_TextDefinition_MONOSnapshot-en_GB_20251022.txt"
+  expect_equal(
+    names(snomedct$sct_description),
+    c(
+      "id_description",
+      "effectiveTime_description",
+      "active_description",
+      "moduleId_description",
+      "conceptId",
+      "languageCode_description",
+      "typeId_description",
+      "term_description",
+      "caseSignificanceId_description",
+      "effectiveTime_concept",
+      "active_concept",
+      "moduleId_concept",
+      "definitionStatusId_concept"
+    )
   )
 
-  expected_refset_map_names <- c(
-    "der2_iisssccRefset_ExtendedMapMONOSnapshot_GB_20251022.txt",
-    "der2_iisssciRefset_ExtendedMapMONOSnapshot_GB_20251022.txt",
-    "der2_iissscRefset_ComplexMapMONOSnapshot_GB_20251022.txt",
-    "der2_sRefset_SimpleMapMONOSnapshot_GB_20251022.txt"
+  expect_equal(
+    names(snomedct$sct_relationship),
+    c(
+      "id",
+      "effectiveTime",
+      "active",
+      "moduleId",
+      "sourceId",
+      "destinationId",
+      "relationshipGroup",
+      "typeId",
+      "characteristicTypeId",
+      "modifierId"
+    )
   )
 
-  expected_terminology_names <- names(snomed_monolith_terminology)
-  expected_refset_map_names <- names(snomed_monolith_refset_Map)
+  expect_equal(
+    names(snomedct$sct_icd10),
+    c(
+      "id",
+      "effectiveTime",
+      "active",
+      "moduleId",
+      "refsetId",
+      "referencedComponentId",
+      "mapGroup",
+      "mapPriority",
+      "mapRule",
+      "mapAdvice",
+      "mapTarget",
+      "correlationId",
+      "mapBlock"
+    )
+  )
 })

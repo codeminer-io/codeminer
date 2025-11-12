@@ -227,10 +227,52 @@ read_snomed_ct_uk_monolith <- function(snomed_ct_uk_monolith_dir) {
         )
     )
 
+  names(snomed_monolith_terminology) <-
+    stringr::str_replace(
+      string = names(snomed_monolith_terminology),
+      pattern = "_GB_[0-9]+\\.txt",
+      ".txt"
+    )
+
+  valid_slots <- intersect(
+    c("Content", "Language", "Map", "Metadata"),
+    names(snomed_monolith_refset)
+  )
+  for (slot in valid_slots) {
+    if (!is.null(snomed_monolith_refset[[slot]])) {
+      names(snomed_monolith_refset[[slot]]) <-
+        stringr::str_replace(
+          names(snomed_monolith_refset[[slot]]),
+          "_GB_[0-9]+\\.txt",
+          ".txt"
+        )
+    }
+  }
+
+  sct_description <- snomed_monolith_terminology$`sct2_Description_MONOSnapshot-en.txt` |>
+    dplyr::rename_with(\(x) paste0(x, "_description")) |>
+    dplyr::full_join(
+      snomed_monolith_terminology$sct2_Concept_MONOSnapshot.txt |>
+        dplyr::rename_with(\(x) paste0(x, "_concept")),
+      by = c("conceptId_description" = "id_concept")
+    ) |>
+    dplyr::rename("conceptId" = "conceptId_description")
+
+  sct_relationship <- snomed_monolith_terminology$sct2_Relationship_MONOSnapshot.txt
+
+  sct_icd10 <- snomed_monolith_refset$Map$der2_iisssciRefset_ExtendedMapMONOSnapshot.txt |>
+    dplyr::filter(.data[["refsetId"]] == "999002271000000101") |>
+    dplyr::filter(stringr::str_detect(
+      .data[["mapTarget"]],
+      "#",
+      negate = TRUE
+    ))
+
   return(
     list(
-      terminology = snomed_monolith_terminology,
-      refset = snomed_monolith_refset
+      sct_description = sct_description,
+      sct_relationship = sct_relationship,
+      sct_icd10 = sct_icd10
     )
   )
 }
