@@ -10,10 +10,8 @@ test_that("download_latestversion_of_snomed_item() correctly downloads the lates
   # Skip if no TRUD API key is available
   skip_if(
     Sys.getenv("TRUD_API_KEY") == "",
-    "TRUD_API_KEY environment variable not set, skipping test."
+    "TRUD_API_KEY environment variable not set, skipping CI test."
   )
-
-  skip_if(Sys.getenv("TRUD_API_KEY") == "", "No TRUD API key available")
 
   results <- download_latestversion_of_snomed_item(1799)
 
