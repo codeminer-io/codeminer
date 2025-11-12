@@ -1031,6 +1031,7 @@ extend_read_v2_drugs_bnf <- function(all_lkps_maps) {
   return(result)
 }
 
+# nolint start: commented_code_linter.
 # read_snomed_ct_uk_monolith() has been refactored in database-snomed.R
 # #' Read the SNOMED CT UK Monolith Edition into R
 # #'
@@ -1075,6 +1076,7 @@ extend_read_v2_drugs_bnf <- function(all_lkps_maps) {
 #     )
 #   )
 # }
+# nolint end: commented_code_linter.
 
 #' Read the NHS Data Migration release into R
 #'
