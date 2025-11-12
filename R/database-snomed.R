@@ -167,24 +167,52 @@ download_latestversion_of_snomed_item <- function(
 #' Read the SNOMED CT UK Monolith Edition into R
 #'
 #' @description
-#' Reads the Terminology and Refset tables from a local copy of the
-#' SNOMED CT UK Monolith Edition
-#' (https://isd.digital.nhs.uk/trud/users/guest/filters/2/categories/26/items/1799/releases).
+#' Reads the Terminology and Refset snapshot tables from a local copy of the
+#' **SNOMED CT UK Monolith Edition** release files.
+#' This function imports the key data files as `data.table` objects, performs basic
+#' normalization and constructs joined tables for concept descriptions and ICD-10 mappings.
 #'
-#' @param snomed_ct_uk_monolith_dir Path to the unzipped SNOMED CT UK Monolith Edition directory.
-#'   This directory should contain the `Snapshot/Terminology` and `Snapshot/Refset` subdirectories.
+#' For more information on the SNOMED CT UK Monolith Edition, see:
+#' <https://isd.digital.nhs.uk/trud/users/guest/filters/2/categories/26/items/1799/releases>.
 #'
-#' @return A named list with two elements:
+#' @param snomed_ct_uk_monolith_dir A character string giving the path to the unzipped
+#'   SNOMED CT UK Monolith Edition directory.
+#'   This directory must contain the subdirectories:
+#'   - `Snapshot/Terminology`
+#'   - `Snapshot/Refset`
+#'
+#' @details
+#' The function reads all `.txt` files within the Terminology and Refset snapshot folders
+#' using `data.table::fread()`, with all columns imported as character type to preserve data fidelity.
+#' It constructs:
+#' - A joined table of SNOMED CT concept and description data.
+#' - The relationship table of concept relationships.
+#' - The ICD-10 map subset from the Extended Map refset.
+#'
+#' The function automatically normalizes file names by removing suffixes like `_GB_<date>.txt`.
+#'
+#' @return
+#' A named list with three elements:
 #' \describe{
-#'   \item{`terminology`}{A named list of Terminology data.tables.}
-#'   \item{`refset`}{A nested list of Refset data.tables, grouped by subdirectory.}
+#'   \item{`sct_description`}{A `data.table` combining SNOMED CT concepts and descriptions.}
+#'   \item{`sct_relationship`}{A `data.table` containing concept relationships.}
+#'   \item{`sct_icd10`}{A `data.table` containing SNOMED CT–to–ICD-10 map entries.}
 #' }
+#'
 #' @examples
 #' \dontrun{
+#' # Read a local SNOMED CT UK Monolith Edition
 #' snomed <- read_snomed_ct_uk_monolith("~/SNOMEDCT_Release_UK")
-#' names(snomed$terminology)
-#' names(snomed$refset)
+#'
+#' # View available datasets
+#' names(snomed)
+#'
+#' # Inspect a few rows of each
+#' head(snomed$sct_description)
+#' head(snomed$sct_relationship)
+#' head(snomed$sct_icd10)
 #' }
+#'
 #' @export
 read_snomed_ct_uk_monolith <- function(snomed_ct_uk_monolith_dir) {
   if (!dir.exists(snomed_ct_uk_monolith_dir)) {
