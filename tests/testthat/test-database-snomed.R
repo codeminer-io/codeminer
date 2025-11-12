@@ -3,12 +3,14 @@ withr::local_options(
   cli.default_handler = function(...) {}
 )
 
+# Skip the whole file/test if TRUD_API_KEY is not set
+if (is.na(Sys.getenv("TRUD_API_KEY", unset = NA))) {
+  skip("Skipping NHS TRUD tests because TRUD_API_KEY is not set")
+}
+
 test_that("download_latestversion_of_snomed_item() correctly downloads the latest version of SNOMED item 1799", {
   # Unit tests are intended for local execution.
   # See the function's documentation for prerequisites.
-  #
-  # Skip if no TRUD_API_KEY is available
-  skip_if(Sys.getenv("TRUD_API_KEY") == "", "No TRUD API key available")
 
   results <- download_latestversion_of_snomed_item(1799)
 
