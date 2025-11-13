@@ -12,11 +12,11 @@
 #'
 #' - Obtain your **API key** from your TRUD profile.
 #'
-#' - Set your API key in your .Renviron file. You can open it using:
+#' - Set your API key in your `.Renviron` file. You can open it using:
 #'   ```r
 #'   usethis::edit_r_environ()
 #'   ```
-#'   Then add a line like this (replace <key> with your API key):
+#'   Then add a line like this (replace `<key>` with your API key):
 #'   ```
 #'   TRUD_API_KEY=<key>
 #'   ```
@@ -34,20 +34,20 @@
 #'
 #' ## Function Description
 #'
-#' download_latestversion_of_snomed_item() downloads and extracts the most recent release
+#' `download_latestversion_of_snomed_item()` downloads and extracts the most recent release
 #' of a specified SNOMED CT item.
 #' By default, it retrieves the UK Clinical Edition Monolith (item 1799).
 #'
 #' @param item_number Numeric. The TRUD item number identifying the SNOMED CT UK data package.
-#'   Defaults to 1799, which corresponds to the SNOMED CT UK Clinical Edition (Monolith).
+#'   Defaults to `1799`, which corresponds to the SNOMED CT UK Clinical Edition (Monolith).
 #'
 #' @param release_index Numeric. The index position of the TRUD metadata release to download.
-#'   Use 1 for the most recent release (e.g., "uk_sct2mo_41.1.0_20251022000001Z.zip").
-#'   Valid indices typically range from 1 (latest) to 48 (oldest, e.g., "Release 32.11.0").
+#'   Use `1` for the most recent release (e.g., `"uk_sct2mo_41.1.0_20251022000001Z.zip"`).
+#'   Valid indices typically range from `1` (latest) to `48` (oldest, e.g., `"Release 32.11.0"`).
 #'   **Note:** These index ranges are subject to change as new releases become available on TRUD.
 #'
 #' @param path_destination Character. Path to the directory where downloaded files
-#'   should be extracted. Defaults to the current working directory (".").
+#'   should be extracted. Defaults to the current working directory (`"."`).
 #'
 #' @return A named list containing:
 #' \describe{
@@ -57,12 +57,12 @@
 #' }
 #'
 #' @details
-#' The function uses the [trud](https://cran.r-project.org/package=trud) package to interact with the NHS TRUD API.
+#' The function uses the [`trud`](https://cran.r-project.org/package=trud) package to interact with the NHS TRUD API.
 #' Ensure you have installed and configured it correctly before use.
 #'
 #' @seealso
 #' [NHS TRUD Documentation](https://isd.digital.nhs.uk/trud/),
-#' [trud::download_item()](https://docs.ropensci.org/trud/)
+#' [`trud::download_item()`](https://docs.ropensci.org/trud/)
 #'
 #' @examples
 #' \dontrun{
@@ -191,7 +191,7 @@ download_latestversion_of_snomed_item <- function(
 #' @description
 #' Reads the Terminology and Refset snapshot tables from a local copy of the
 #' **SNOMED CT UK Monolith Edition** release files.
-#' This function imports the key data files as data.table objects, performs basic
+#' This function imports the key data files as `data.table` objects, performs basic
 #' normalization and constructs joined tables for concept descriptions and ICD-10 mappings.
 #'
 #' For more information on the SNOMED CT UK Monolith Edition, see:
@@ -200,25 +200,25 @@ download_latestversion_of_snomed_item <- function(
 #' @param path_destination A character string giving the path to the unzipped
 #'   SNOMED CT UK Monolith Edition directory.
 #'   This directory must contain the subdirectories:
-#'   - Snapshot/Terminology
-#'   - Snapshot/Refset
+#'   - `Snapshot/Terminology`
+#'   - `Snapshot/Refset`
 #'
 #' @details
-#' The function reads all .txt files within the Terminology and Refset snapshot folders
-#' using data.table::fread(), with all columns imported as character type to preserve data fidelity.
+#' The function reads all `.txt` files within the Terminology and Refset snapshot folders
+#' using `data.table::fread()`, with all columns imported as character type to preserve data fidelity.
 #' It constructs:
 #' - A joined table of SNOMED CT concept and description data.
 #' - The relationship table of concept relationships.
 #' - The ICD-10 map subset from the Extended Map refset.
 #'
-#' The function automatically normalizes file names by removing suffixes like _GB_<date>.txt.
+#' The function automatically normalizes file names by removing suffixes like `_GB_<date>.txt`.
 #'
 #' @return
 #' A named list with three elements:
 #' \describe{
-#'   \item{sct_description}{A data.table combining SNOMED CT concepts and descriptions.}
-#'   \item{sct_relationship}{A data.table containing concept relationships.}
-#'   \item{sct_icd10}{A data.table containing SNOMED CT-to-ICD-10 map entries.}
+#'   \item{`sct_description`}{A `data.table` combining SNOMED CT concepts and descriptions.}
+#'   \item{`sct_relationship`}{A `data.table` containing concept relationships.}
+#'   \item{`sct_icd10`}{A `data.table` containing SNOMED CT–to–ICD-10 map entries.}
 #' }
 #'
 #' @examples
