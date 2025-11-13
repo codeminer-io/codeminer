@@ -4,7 +4,7 @@ withr::local_options(
 )
 
 # Skip the whole file/test if TRUD_API_KEY is not set
-if (is.na(Sys.getenv("TRUD_API_KEY", unset = NA))) {
+if (Sys.getenv("TRUD_API_KEY") == "") {
   skip("Skipping NHS TRUD tests because TRUD_API_KEY is not set")
 }
 

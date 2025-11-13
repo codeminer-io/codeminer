@@ -125,15 +125,25 @@ download_latestversion_of_snomed_item <- function(
   )
 
   releases <- metadata$releases
-  if (is.null(releases) || length(releases) == 0) {
-    cli::cli_abort("No releases found for item number {.field {item_number}}.")
+  if (
+    !is.numeric(index_of_trud_metadata_releases) ||
+      length(index_of_trud_metadata_releases) != 1 ||
+      index_of_trud_metadata_releases <= 0 ||
+      index_of_trud_metadata_releases !=
+        as.integer(index_of_trud_metadata_releases) ||
+      index_of_trud_metadata_releases > length(releases)
+  ) {
+    cli::cli_abort(
+      "{.arg index_of_trud_metadata_releases} must be a positive integer between 1 and {length(releases)}."
+    )
   }
 
   latest_release <- releases[[index_of_trud_metadata_releases]]
   latest_release_id <- latest_release$id
 
   cli::cli_alert_info(
-    "Latest release found: {.field {latest_release_id}} (Date: {.val {latest_release$releaseDate}})"
+    "Release {index_of_trud_metadata_releases} found: 
+    {.field {latest_release_id}} (Date: {.val {latest_release$releaseDate}})"
   )
 
   cli::cli_alert_info("Downloading release ...")
