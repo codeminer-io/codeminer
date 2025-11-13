@@ -336,11 +336,12 @@ build_all_lkps_maps <-
     }
 
     ## SNOMED CT UK Monolith Edition ---------
+    # nolint start: commented_code_linter.
     if (!is.null(snomed_ct_uk_monolith)) {
       snomed_ct_uk_monolith_full <-
         read_snomed_ct_uk_monolith(
           snomed_ct_uk_monolith_dir = snomed_ct_uk_monolith
-        ) # nolint
+        )
 
       # TODO - tidy when more familiar with this dataset
       snomed_monolith_terminology <- snomed_ct_uk_monolith_full$snomed_monolith_terminology
@@ -361,6 +362,7 @@ build_all_lkps_maps <-
           ".txt"
         )
     }
+    # nolint end: commented_code_linter.
 
     ## SNOMED CT NHS Data Migration ------
 
