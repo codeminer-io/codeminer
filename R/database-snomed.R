@@ -237,9 +237,35 @@ download_latestversion_of_snomed_item <- function(
 #'
 #' @export
 read_snomed_ct_uk_monolith <- function(path_destination) {
+  # Define expected structure
+  expected_dirs <- file.path(
+    path_destination,
+    "Snapshot",
+    c(
+      "Refset/Content",
+      "Refset/Language",
+      "Refset/Map",
+      "Refset/Metadata",
+      "Terminology"
+    )
+  )
+
+  # Check the main directory first
   if (!dir.exists(path_destination)) {
-    cli::cli_abort(
-      "Directory does not exist: {.path {path_destination}}"
+    cli::cli_abort("Directory does not exist: {.path {path_destination}}")
+  }
+
+  # Identify which expected subdirectories are missing
+  missing_dirs <- expected_dirs[!dir.exists(expected_dirs)]
+
+  if (length(missing_dirs) > 0) {
+    cli::cli_abort(c(
+      "!" = "The following required directories are missing under {.path {path_destination}}:",
+      "•" = paste(missing_dirs, collapse = "\n• ")
+    ))
+  } else {
+    cli::cli_inform(
+      "All required subdirectories exist under {.path {path_destination}}"
     )
   }
 
