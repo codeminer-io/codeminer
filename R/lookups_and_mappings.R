@@ -338,7 +338,7 @@ build_all_lkps_maps <-
     ## SNOMED CT UK Monolith Edition ---------
     # nolint start: commented_code_linter.
     if (!is.null(snomed_ct_uk_monolith)) {
-      snomed_ct_uk_monolith_full <-
+      snomed_ct_uk_monolith_full <- # nolint
         read_snomed_ct_uk_monolith(
           snomed_ct_uk_monolith_dir = snomed_ct_uk_monolith
         )
