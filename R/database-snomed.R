@@ -12,11 +12,11 @@
 #'
 #' - Obtain your **API key** from your TRUD profile.
 #'
-#' - Set your API key in your `.Renviron` file. You can open it using:
+#' - Set your API key in your .Renviron file. You can open it using:
 #'   ```r
 #'   usethis::edit_r_environ()
 #'   ```
-#'   Then add a line like this (replace `<key>` with your API key):
+#'   Then add a line like this (replace <key> with your API key):
 #'   ```
 #'   TRUD_API_KEY=<key>
 #'   ```
@@ -211,13 +211,13 @@ download_latestversion_of_snomed_item <- function(
 #' - The relationship table of concept relationships.
 #' - The ICD-10 map subset from the Extended Map refset.
 #'
-#' The function automatically normalizes file names by removing suffixes like `_GB_<date>.txt`.
+#' The function automatically normalizes file names by removing suffixes like _GB_<date>.txt.
 #'
 #' @return
 #' A named list with three elements:
 #' \describe{
 #'   \item{sct_description}{A data.table combining SNOMED CT concepts and descriptions.}
-#'   \item{sct_relationship`}{A data.table containing concept relationships.}
+#'   \item{sct_relationship}{A data.table containing concept relationships.}
 #'   \item{sct_icd10}{A data.table containing SNOMED CT-to-ICD-10 map entries.}
 #' }
 #'
