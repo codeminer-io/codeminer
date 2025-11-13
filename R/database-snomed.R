@@ -218,7 +218,7 @@ download_latestversion_of_snomed_item <- function(
 #' \describe{
 #'   \item{sct_description}{A data.table combining SNOMED CT concepts and descriptions.}
 #'   \item{sct_relationship`}{A data.table containing concept relationships.}
-#'   \item{sct_icd10}{A data.table containing SNOMED CT–to–ICD-10 map entries.}
+#'   \item{sct_icd10}{A data.table containing SNOMED CT-to-ICD-10 map entries.}
 #' }
 #'
 #' @examples
