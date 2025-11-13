@@ -92,6 +92,17 @@ get_mapping_metadata <- function(con = connect_to_db()) {
   read_table_from_db(con, tbl_name)
 }
 
+#' Return the relationship metadata table as a data frame
+#'
+#' @param con A database connection object. Uses the default connection if not provided.
+#' @return A data frame containing the relationship metadata.
+#' @keywords internal
+#' @noRd
+get_relationship_metadata <- function(con = connect_to_db()) {
+  tbl_name <- codeminer_metadata_table_names$relationship
+  read_table_from_db(con, tbl_name)
+}
+
 # Helper to read a table from the database as a data.frame
 read_table_from_db <- function(con, tbl_name) {
   DBI::dbReadTable(con, tbl_name)
