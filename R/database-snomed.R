@@ -325,18 +325,24 @@ read_snomed_ct_uk_monolith <- function(path_destination) {
     }
   }
 
-  sct_description <- snomed_monolith_terminology$`sct2_Description_MONOSnapshot-en.txt` |>
+  sct_description <- snomed_monolith_terminology[[
+    "sct2_Description_MONOSnapshot-en.txt"
+  ]] |>
     dplyr::rename_with(\(x) paste0(x, "_description")) |>
     dplyr::full_join(
-      snomed_monolith_terminology$sct2_Concept_MONOSnapshot.txt |>
+      snomed_monolith_terminology[["sct2_Concept_MONOSnapshot.txt"]] |>
         dplyr::rename_with(\(x) paste0(x, "_concept")),
       by = c("conceptId_description" = "id_concept")
     ) |>
     dplyr::rename("conceptId" = "conceptId_description")
 
-  sct_relationship <- snomed_monolith_terminology$sct2_Relationship_MONOSnapshot.txt
+  sct_relationship <- snomed_monolith_terminology[[
+    "sct2_Relationship_MONOSnapshot.txt"
+  ]]
 
-  sct_icd10 <- snomed_monolith_refset$Map$der2_iisssciRefset_ExtendedMapMONOSnapshot.txt |>
+  sct_icd10 <- snomed_monolith_refset$Map[[
+    "der2_iisssciRefset_ExtendedMapMONOSnapshot.txt"
+  ]] |>
     dplyr::filter(.data[["refsetId"]] == "999002271000000101") |>
     dplyr::filter(stringr::str_detect(
       .data[["mapTarget"]],
