@@ -41,12 +41,12 @@
 #' @param item_number Numeric. The TRUD item number identifying the SNOMED CT UK data package.
 #'   Defaults to `1799`, which corresponds to the SNOMED CT UK Clinical Edition (Monolith).
 #'
-#' @param index_of_trud_metadata_releases Numeric. The index position of the TRUD metadata release to download.
+#' @param release_index Numeric. The index position of the TRUD metadata release to download.
 #'   Use `1` for the most recent release (e.g., `"uk_sct2mo_41.1.0_20251022000001Z.zip"`).
 #'   Valid indices typically range from `1` (latest) to `48` (oldest, e.g., `"Release 32.11.0"`).
 #'   **Note:** These index ranges are subject to change as new releases become available on TRUD.
 #'
-#' @param directory_to_extract_files Character. Path to the directory where downloaded files
+#' @param path_destination Character. Path to the directory where downloaded files
 #'   should be extracted. Defaults to the current working directory (`"."`).
 #'
 #' @return A named list containing:
@@ -72,8 +72,8 @@
 #' # Download a specific earlier release and extract to a custom folder
 #' download_latestversion_of_snomed_item(
 #'   item_number = 1799,
-#'   index_of_trud_metadata_releases = 5,
-#'   directory_to_extract_files = "data/snomed_releases"
+#'   release_index = 5,
+#'   path_destination = "data/snomed_releases"
 #' )
 #'
 #' # Check the extracted directory
@@ -83,8 +83,8 @@
 #' @export
 download_latestversion_of_snomed_item <- function(
   item_number = 1799,
-  index_of_trud_metadata_releases = 1,
-  directory_to_extract_files = "."
+  release_index = 1,
+  path_destination = "."
 ) {
   rlang::check_installed("trud")
 
@@ -109,9 +109,9 @@ download_latestversion_of_snomed_item <- function(
     )
   }
 
-  if (!dir.exists(directory_to_extract_files)) {
+  if (!dir.exists(path_destination)) {
     cli::cli_abort(
-      "The directory {.path {directory_to_extract_files}} does not exist."
+      "The directory {.path {path_destination}} does not exist."
     )
   }
 
@@ -126,23 +126,22 @@ download_latestversion_of_snomed_item <- function(
 
   releases <- metadata$releases
   if (
-    !is.numeric(index_of_trud_metadata_releases) ||
-      length(index_of_trud_metadata_releases) != 1 ||
-      index_of_trud_metadata_releases <= 0 ||
-      index_of_trud_metadata_releases !=
-        as.integer(index_of_trud_metadata_releases) ||
-      index_of_trud_metadata_releases > length(releases)
+    !is.numeric(release_index) ||
+      length(release_index) != 1 ||
+      release_index <= 0 ||
+      release_index != as.integer(release_index) ||
+      release_index > length(releases)
   ) {
     cli::cli_abort(
-      "{.arg index_of_trud_metadata_releases} must be a positive integer between 1 and {length(releases)}."
+      "{.arg release_index} must be a positive integer between 1 and {length(releases)}."
     )
   }
 
-  latest_release <- releases[[index_of_trud_metadata_releases]]
+  latest_release <- releases[[release_index]]
   latest_release_id <- latest_release$id
 
   cli::cli_alert_info(
-    "Release {index_of_trud_metadata_releases} found: 
+    "Release {release_index} found: 
     {.field {latest_release_id}} (Date: {.val {latest_release$releaseDate}})"
   )
 
@@ -168,7 +167,7 @@ download_latestversion_of_snomed_item <- function(
   cli::cli_alert_success("Download complete: {.path {zipfile_path}}")
 
   extracted_dir <- file.path(
-    normalizePath(directory_to_extract_files, mustWork = TRUE),
+    normalizePath(path_destination, mustWork = TRUE),
     paste0("snomed_item_", item_number, "_", latest_release_id)
   )
 
@@ -198,7 +197,7 @@ download_latestversion_of_snomed_item <- function(
 #' For more information on the SNOMED CT UK Monolith Edition, see:
 #' <https://isd.digital.nhs.uk/trud/users/guest/filters/2/categories/26/items/1799/releases>.
 #'
-#' @param snomed_ct_uk_monolith_dir A character string giving the path to the unzipped
+#' @param path_destination A character string giving the path to the unzipped
 #'   SNOMED CT UK Monolith Edition directory.
 #'   This directory must contain the subdirectories:
 #'   - `Snapshot/Terminology`
@@ -237,15 +236,15 @@ download_latestversion_of_snomed_item <- function(
 #' }
 #'
 #' @export
-read_snomed_ct_uk_monolith <- function(snomed_ct_uk_monolith_dir) {
-  if (!dir.exists(snomed_ct_uk_monolith_dir)) {
+read_snomed_ct_uk_monolith <- function(path_destination) {
+  if (!dir.exists(path_destination)) {
     cli::cli_abort(
-      "Directory does not exist: {.path {snomed_ct_uk_monolith_dir}}"
+      "Directory does not exist: {.path {path_destination}}"
     )
   }
 
   snomed_monolith_terminology <-
-    file.path(snomed_ct_uk_monolith_dir, "Snapshot", "Terminology") |>
+    file.path(path_destination, "Snapshot", "Terminology") |>
     list.files(full.names = TRUE) |>
     purrr::set_names(nm = fs::path_file) |>
     purrr::map(
@@ -258,7 +257,7 @@ read_snomed_ct_uk_monolith <- function(snomed_ct_uk_monolith_dir) {
     )
 
   snomed_monolith_refset <- file.path(
-    snomed_ct_uk_monolith_dir,
+    path_destination,
     "Snapshot",
     "Refset"
   ) |>

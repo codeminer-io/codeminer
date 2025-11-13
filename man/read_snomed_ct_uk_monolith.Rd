@@ -4,10 +4,10 @@
 \alias{read_snomed_ct_uk_monolith}
 \title{Read the SNOMED CT UK Monolith Edition into R}
 \usage{
-read_snomed_ct_uk_monolith(snomed_ct_uk_monolith_dir)
+read_snomed_ct_uk_monolith(path_destination)
 }
 \arguments{
-\item{snomed_ct_uk_monolith_dir}{A character string giving the path to the unzipped
+\item{path_destination}{A character string giving the path to the unzipped
 SNOMED CT UK Monolith Edition directory.
 This directory must contain the subdirectories:
 \itemize{

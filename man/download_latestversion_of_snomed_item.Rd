@@ -6,20 +6,20 @@
 \usage{
 download_latestversion_of_snomed_item(
   item_number = 1799,
-  index_of_trud_metadata_releases = 1,
-  directory_to_extract_files = "."
+  release_index = 1,
+  path_destination = "."
 )
 }
 \arguments{
 \item{item_number}{Numeric. The TRUD item number identifying the SNOMED CT UK data package.
 Defaults to \code{1799}, which corresponds to the SNOMED CT UK Clinical Edition (Monolith).}
 
-\item{index_of_trud_metadata_releases}{Numeric. The index position of the TRUD metadata release to download.
+\item{release_index}{Numeric. The index position of the TRUD metadata release to download.
 Use \code{1} for the most recent release (e.g., \code{"uk_sct2mo_41.1.0_20251022000001Z.zip"}).
 Valid indices typically range from \code{1} (latest) to \code{48} (oldest, e.g., \code{"Release 32.11.0"}).
 \strong{Note:} These index ranges are subject to change as new releases become available on TRUD.}
 
-\item{directory_to_extract_files}{Character. Path to the directory where downloaded files
+\item{path_destination}{Character. Path to the directory where downloaded files
 should be extracted. Defaults to the current working directory (\code{"."}).}
 }
 \value{
@@ -88,8 +88,8 @@ result <- download_latestversion_of_snomed_item()
 # Download a specific earlier release and extract to a custom folder
 download_latestversion_of_snomed_item(
   item_number = 1799,
-  index_of_trud_metadata_releases = 5,
-  directory_to_extract_files = "data/snomed_releases"
+  release_index = 5,
+  path_destination = "data/snomed_releases"
 )
 
 # Check the extracted directory

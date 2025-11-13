@@ -14,17 +14,17 @@ test_that("download_latestversion_of_snomed_item() correctly downloads the lates
 
   # Set the index for the TRUD metadata release
   # Use 1 for the latest version; increasing values retrieve older releases
-  index_of_trud_metadata_releases <- 1
+  release_index <- 1
 
   # Download and extract the specified SNOMED CT UK TRUD release
   results <- download_latestversion_of_snomed_item(
     1799,
-    index_of_trud_metadata_releases
+    release_index
   )
 
   trud_metadata <- trud::get_item_metadata(1799, release_scope = "all")
   latest_release_id <- trud_metadata$releases[[
-    index_of_trud_metadata_releases
+    release_index
   ]]$id
 
   # Compare the downloaded release ID to the latest one in metadata
@@ -42,11 +42,11 @@ test_that("read_snomed_ct_uk_monolith() returns appropriate tables", {
 
   # Set the index for the TRUD metadata release
   # Use 1 for the latest version; increasing values retrieve older releases
-  index_of_trud_metadata_releases <- 1
+  release_index <- 1
 
   trud_metadata <- trud::get_item_metadata(1799, release_scope = "all")
   expected_zip_name <- trud_metadata$releases[[
-    index_of_trud_metadata_releases
+    release_index
   ]]$archiveFileName
   expected_base_name <- tools::file_path_sans_ext(expected_zip_name)
 
