@@ -342,7 +342,7 @@ build_all_lkps_maps <-
       snomed_ct_uk_monolith_full <- # nolint
         read_snomed_ct_uk_monolith(
           # nolint
-          snomed_ct_uk_monolith_dir = snomed_ct_uk_monolith # nolint
+          snomed_ct_uk_monolith # nolint
         ) # nolint
 
       # TODO - tidy when more familiar with this dataset
