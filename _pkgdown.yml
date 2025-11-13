@@ -14,6 +14,8 @@ reference:
       - create_dummy_database
       - add_lookup_table
       - add_mapping_table
+      - get_lookup_metadata
+      - get_mapping_metadata
 
   - title: Clinical codes
     desc: Functions for looking up clinical codes and mapping between different codisng systems.
