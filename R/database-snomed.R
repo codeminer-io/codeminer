@@ -38,8 +38,16 @@
 #' of a specified SNOMED CT item.
 #' By default, it retrieves the UK Clinical Edition Monolith (item 1799).
 #'
-#' @param item_number Numeric. TRUD item number (default: `1799` for SNOMED CT UK Monolith).
-#' @param directory_to_extract_files Character. Directory where the files should be extracted (default: `"."`).
+#' @param item_number Numeric. The TRUD item number identifying the SNOMED CT UK data package.
+#'   Defaults to `1799`, which corresponds to the SNOMED CT UK Clinical Edition (Monolith).
+#'
+#' @param index_of_trud_metadata_releases Numeric. The index position of the TRUD metadata release to download.
+#'   Use `1` for the most recent release (e.g., `"uk_sct2mo_41.1.0_20251022000001Z.zip"`).
+#'   Valid indices typically range from `1` (latest) to `48` (oldest, e.g., `"Release 32.11.0"`).
+#'   **Note:** These index ranges are subject to change as new releases become available on TRUD.
+#'
+#' @param directory_to_extract_files Character. Path to the directory where downloaded files
+#'   should be extracted. Defaults to the current working directory (`"."`).
 #'
 #' @return A named list containing:
 #' \describe{
@@ -61,8 +69,12 @@
 #' # Download the default SNOMED CT UK Monolith
 #' result <- download_latestversion_of_snomed_item()
 #'
-#' # Download a specific SNOMED CT item by number
-#' result <- download_latestversion_of_snomed_item(item_number = 1234)
+#' # Download a specific earlier release and extract to a custom folder
+#' download_latestversion_of_snomed_item(
+#'   item_number = 1799,
+#'   index_of_trud_metadata_releases = 5,
+#'   directory_to_extract_files = "data/snomed_releases"
+#' )
 #'
 #' # Check the extracted directory
 #' result$extracted_dir
@@ -71,6 +83,7 @@
 #' @export
 download_latestversion_of_snomed_item <- function(
   item_number = 1799,
+  index_of_trud_metadata_releases = 1,
   directory_to_extract_files = "."
 ) {
   rlang::check_installed("trud")
@@ -116,7 +129,7 @@ download_latestversion_of_snomed_item <- function(
     cli::cli_abort("No releases found for item number {.field {item_number}}.")
   }
 
-  latest_release <- releases[[1]]
+  latest_release <- releases[[index_of_trud_metadata_releases]]
   latest_release_id <- latest_release$id
 
   cli::cli_alert_info(

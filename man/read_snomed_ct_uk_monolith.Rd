@@ -7,25 +7,55 @@
 read_snomed_ct_uk_monolith(snomed_ct_uk_monolith_dir)
 }
 \arguments{
-\item{snomed_ct_uk_monolith_dir}{Path to the unzipped SNOMED CT UK Monolith Edition directory.
-This directory should contain the \code{Snapshot/Terminology} and \code{Snapshot/Refset} subdirectories.}
+\item{snomed_ct_uk_monolith_dir}{A character string giving the path to the unzipped
+SNOMED CT UK Monolith Edition directory.
+This directory must contain the subdirectories:
+\itemize{
+\item \code{Snapshot/Terminology}
+\item \code{Snapshot/Refset}
+}}
 }
 \value{
-A named list with two elements:
+A named list with three elements:
 \describe{
-\item{\code{terminology}}{A named list of Terminology data.tables.}
-\item{\code{refset}}{A nested list of Refset data.tables, grouped by subdirectory.}
+\item{\code{sct_description}}{A \code{data.table} combining SNOMED CT concepts and descriptions.}
+\item{\code{sct_relationship}}{A \code{data.table} containing concept relationships.}
+\item{\code{sct_icd10}}{A \code{data.table} containing SNOMED CT–to–ICD-10 map entries.}
 }
 }
 \description{
-Reads the Terminology and Refset tables from a local copy of the
-SNOMED CT UK Monolith Edition
-(https://isd.digital.nhs.uk/trud/users/guest/filters/2/categories/26/items/1799/releases).
+Reads the Terminology and Refset snapshot tables from a local copy of the
+\strong{SNOMED CT UK Monolith Edition} release files.
+This function imports the key data files as \code{data.table} objects, performs basic
+normalization and constructs joined tables for concept descriptions and ICD-10 mappings.
+
+For more information on the SNOMED CT UK Monolith Edition, see:
+\url{https://isd.digital.nhs.uk/trud/users/guest/filters/2/categories/26/items/1799/releases}.
+}
+\details{
+The function reads all \code{.txt} files within the Terminology and Refset snapshot folders
+using \code{data.table::fread()}, with all columns imported as character type to preserve data fidelity.
+It constructs:
+\itemize{
+\item A joined table of SNOMED CT concept and description data.
+\item The relationship table of concept relationships.
+\item The ICD-10 map subset from the Extended Map refset.
+}
+
+The function automatically normalizes file names by removing suffixes like \verb{_GB_<date>.txt}.
 }
 \examples{
 \dontrun{
+# Read a local SNOMED CT UK Monolith Edition
 snomed <- read_snomed_ct_uk_monolith("~/SNOMEDCT_Release_UK")
-names(snomed$terminology)
-names(snomed$refset)
+
+# View available datasets
+names(snomed)
+
+# Inspect a few rows of each
+head(snomed$sct_description)
+head(snomed$sct_relationship)
+head(snomed$sct_icd10)
 }
+
 }

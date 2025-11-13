@@ -6,13 +6,21 @@
 \usage{
 download_latestversion_of_snomed_item(
   item_number = 1799,
+  index_of_trud_metadata_releases = 1,
   directory_to_extract_files = "."
 )
 }
 \arguments{
-\item{item_number}{Numeric. TRUD item number (default: \code{1799} for SNOMED CT UK Monolith).}
+\item{item_number}{Numeric. The TRUD item number identifying the SNOMED CT UK data package.
+Defaults to \code{1799}, which corresponds to the SNOMED CT UK Clinical Edition (Monolith).}
 
-\item{directory_to_extract_files}{Character. Directory where the files should be extracted (default: \code{"."}).}
+\item{index_of_trud_metadata_releases}{Numeric. The index position of the TRUD metadata release to download.
+Use \code{1} for the most recent release (e.g., \code{"uk_sct2mo_41.1.0_20251022000001Z.zip"}).
+Valid indices typically range from \code{1} (latest) to \code{48} (oldest, e.g., \code{"Release 32.11.0"}).
+\strong{Note:} These index ranges are subject to change as new releases become available on TRUD.}
+
+\item{directory_to_extract_files}{Character. Path to the directory where downloaded files
+should be extracted. Defaults to the current working directory (\code{"."}).}
 }
 \value{
 A named list containing:
@@ -77,8 +85,12 @@ Ensure you have installed and configured it correctly before use.
 # Download the default SNOMED CT UK Monolith
 result <- download_latestversion_of_snomed_item()
 
-# Download a specific SNOMED CT item by number
-result <- download_latestversion_of_snomed_item(item_number = 1234)
+# Download a specific earlier release and extract to a custom folder
+download_latestversion_of_snomed_item(
+  item_number = 1799,
+  index_of_trud_metadata_releases = 5,
+  directory_to_extract_files = "data/snomed_releases"
+)
 
 # Check the extracted directory
 result$extracted_dir

@@ -12,10 +12,20 @@ test_that("download_latestversion_of_snomed_item() correctly downloads the lates
   # Unit tests are intended for local execution.
   # See the function's documentation for prerequisites.
 
-  results <- download_latestversion_of_snomed_item(1799)
+  # Set the index for the TRUD metadata release
+  # Use 1 for the latest version; increasing values retrieve older releases
+  index_of_trud_metadata_releases <- 1
+
+  # Download and extract the specified SNOMED CT UK TRUD release
+  results <- download_latestversion_of_snomed_item(
+    1799,
+    index_of_trud_metadata_releases
+  )
 
   trud_metadata <- trud::get_item_metadata(1799, release_scope = "all")
-  latest_release_id <- trud_metadata$releases[[1]]$id
+  latest_release_id <- trud_metadata$releases[[
+    index_of_trud_metadata_releases
+  ]]$id
 
   # Compare the downloaded release ID to the latest one in metadata
   expect_equal(
@@ -30,8 +40,14 @@ test_that("read_snomed_ct_uk_monolith() returns appropriate tables", {
   # Unit tests are intended for local execution.
   # See the function's documentation for prerequisites.
 
+  # Set the index for the TRUD metadata release
+  # Use 1 for the latest version; increasing values retrieve older releases
+  index_of_trud_metadata_releases <- 1
+
   trud_metadata <- trud::get_item_metadata(1799, release_scope = "all")
-  expected_zip_name <- trud_metadata$releases[[1]]$archiveFileName
+  expected_zip_name <- trud_metadata$releases[[
+    index_of_trud_metadata_releases
+  ]]$archiveFileName
   expected_base_name <- tools::file_path_sans_ext(expected_zip_name)
 
   # Construct dynamic path with trud_metadata
