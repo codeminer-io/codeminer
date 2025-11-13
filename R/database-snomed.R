@@ -261,7 +261,7 @@ read_snomed_ct_uk_monolith <- function(path_destination) {
   if (length(missing_dirs) > 0) {
     cli::cli_abort(c(
       "!" = "The following required directories are missing under {.path {path_destination}}:",
-      "•" = paste(missing_dirs, collapse = "\n• ")
+      "*" = paste(missing_dirs, collapse = "\n ")
     ))
   } else {
     cli::cli_inform(
