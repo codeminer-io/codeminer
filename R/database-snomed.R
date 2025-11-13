@@ -325,6 +325,39 @@ read_snomed_ct_uk_monolith <- function(path_destination) {
     }
   }
 
+  # Define required file names
+  required_files <- c(
+    "sct2_Description_MONOSnapshot-en.txt",
+    "sct2_Concept_MONOSnapshot.txt",
+    "sct2_Relationship_MONOSnapshot.txt"
+  )
+
+  required_refset <- "der2_iisssciRefset_ExtendedMapMONOSnapshot.txt"
+
+  # --- Check terminology files exist ---
+  missing_terminology <- setdiff(
+    required_files,
+    names(snomed_monolith_terminology)
+  )
+  if (length(missing_terminology) > 0) {
+    stop(
+      sprintf(
+        "Error: Missing SNOMED terminology file(s): %s",
+        paste(missing_terminology, collapse = ", ")
+      )
+    )
+  }
+
+  # --- Check refset file exists ---
+  if (!required_refset %in% names(snomed_monolith_refset$Map)) {
+    stop(
+      sprintf(
+        "Error: Missing SNOMED refset file: %s",
+        required_refset
+      )
+    )
+  }
+
   sct_description <- snomed_monolith_terminology[[
     "sct2_Description_MONOSnapshot-en.txt"
   ]] |>
