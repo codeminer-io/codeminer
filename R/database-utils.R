@@ -27,6 +27,49 @@ check_database <- function(con) {
   return(invisible(TRUE))
 }
 
+#' Add metadata to the database
+#'
+#' @param con A database connection object.
+#' @param metadata A data frame containing the metadata to be added.
+#' @param type The type of metadata to be added. Can be one of "lookup", "mapping", or "relationship".
+#' @return A logical value indicating whether the metadata was successfully added.
+#' @noRd
+#' @keywords internal
+add_metadata_table <- function(
+  con,
+  metadata,
+  type = c("lookup", "mapping", "relationship")
+) {
+  type <- match.arg(type)
+  tbl_name <- codeminer_metadata_table_names[[type]]
+  stopifnot(!is.null(tbl_name)) # sanity check, not expected to ever fail
+
+  id_col <- switch(
+    type,
+    lookup = "lookup_table_name",
+    mapping = "mapping_table_name",
+    relationship = "relationship_table_name",
+    cli::cli_abort("Invalid metadata type: {type}.")
+  )
+  ids <- metadata[[id_col]]
+  if (is.null(ids)) {
+    cli::cli_abort("Missing field {id_col} in metadata.")
+  }
+
+  current_metadata <- read_table_from_db(con, tbl_name)
+  exists <- any(ids %in% current_metadata[[id_col]])
+
+  # Don't allow overwriting existing metadata
+  if (exists) {
+    return(invisible(FALSE))
+  }
+
+  meta_df <- as.data.frame(metadata)
+  success <- DBI::dbAppendTable(con, tbl_name, meta_df)
+  return(invisible(success))
+}
+
+
 #' Return the lookup metadata table as a data frame
 #'
 #' @param con A database connection object. Uses the default connection if not provided.

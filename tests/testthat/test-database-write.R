@@ -12,6 +12,10 @@ test_that("add_lookup_table works with dummy data", {
   expect_no_error(
     add_lookup_table(test_table, test_metadata)
   )
+  expect_true(table_exists(
+    con = connect_to_db(),
+    test_metadata$lookup_table_name
+  ))
 })
 
 test_that("add_lookup_table fails without valid database", {
@@ -76,6 +80,10 @@ test_that("add_mapping_table works with example data", {
   expect_no_error(
     add_mapping_table(test_table, test_metadata)
   )
+  expect_true(table_exists(
+    con = connect_to_db(),
+    test_metadata$mapping_table_name
+  ))
 })
 
 test_that("add_mapping_table fails without valid database", {
