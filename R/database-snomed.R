@@ -339,23 +339,18 @@ read_snomed_ct_uk_monolith <- function(path_destination) {
     required_files,
     names(snomed_monolith_terminology)
   )
+
   if (length(missing_terminology) > 0) {
-    stop(
-      sprintf(
-        "Error: Missing SNOMED terminology file(s): %s",
-        paste(missing_terminology, collapse = ", ")
-      )
-    )
+    cli::cli_alert_danger("Missing SNOMED terminology file(s):")
+    cli::cli_ul(missing_terminology)
+    cli::cli_abort("Cannot proceed without required terminology files.")
   }
 
   # --- Check refset file exists ---
   if (!required_refset %in% names(snomed_monolith_refset$Map)) {
-    stop(
-      sprintf(
-        "Error: Missing SNOMED refset file: %s",
-        required_refset
-      )
-    )
+    cli::cli_alert_danger("Missing SNOMED refset file:")
+    cli::cli_ul(required_refset)
+    cli::cli_abort("Cannot proceed without required refset file.")
   }
 
   sct_description <- snomed_monolith_terminology[[
