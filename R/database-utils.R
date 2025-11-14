@@ -11,6 +11,10 @@ check_database <- function(con) {
   )
   has_lookup_meta <- table_exists(con, codeminer_metadata_table_names$lookup)
   has_mapping_meta <- table_exists(con, codeminer_metadata_table_names$mapping)
+  has_relationship_meta <- table_exists(
+    con,
+    codeminer_metadata_table_names$relationship
+  )
 
   if (!has_lookup_meta) {
     cli::cli_abort(c(
@@ -22,6 +26,12 @@ check_database <- function(con) {
     cli::cli_abort(c(
       error_msg,
       "x" = "The mapping metadata table does not exist in the database."
+    ))
+  }
+  if (!has_relationship_meta) {
+    cli::cli_abort(c(
+      error_msg,
+      "x" = "The relationship metadata table does not exist in the database."
     ))
   }
   return(invisible(TRUE))

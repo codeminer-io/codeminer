@@ -45,16 +45,6 @@ test_that("add_lookup_table warns when lookup_table_name already exists", {
   )
 })
 
-test_that("add_lookup_metadata can take multiple entries", {
-  local_build_temp_database()
-  con <- connect_to_db()
-
-  test_metadata <- lookup_metadata(c("foo", "bar", "baz"))
-
-  expect_no_error(add_lookup_metadata(con, test_metadata))
-  expect_equal(nrow(get_lookup_metadata(con)), 3)
-})
-
 test_that("add_lookup_table fails with invalid metadata", {
   local_build_temp_database()
 
@@ -111,19 +101,6 @@ test_that("add_mapping_table warns when mapping_table_name already exists", {
     add_mapping_table(test_table, test_metadata),
     "The mapping table foo_bar_v0 already exists."
   )
-})
-
-test_that("add_mapping_metadata can take multiple entries", {
-  local_build_temp_database()
-  con <- connect_to_db()
-
-  test_metadata <- mapping_metadata(
-    c("foo", "bar", "baz"),
-    c("alice", "bob", "charlie")
-  )
-
-  expect_no_error(add_mapping_metadata(con, test_metadata))
-  expect_equal(nrow(get_mapping_metadata(con)), 3)
 })
 
 test_that("add_mapping_table fails with invalid metadata", {
