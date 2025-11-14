@@ -20,7 +20,11 @@
 #' @seealso [relationship_metadata()] for the specification of the metadata.
 #' @export
 #' @examples
-#' relationship_table <- data.frame(source = c("A", "B", "C"), target = c("B", "C", "D"), type = "child")
+#' relationship_table <- data.frame(
+#'   source = c("A", "B", "C"),
+#'   target = c("B", "C", "D"),
+#'   type = "child"
+#' )
 #' relationship_table
 #'
 #' # Using a temporary database
@@ -28,7 +32,12 @@
 #' build_database()
 #' add_relationship_table(
 #'   relationship_table,
-#'   relationship_metadata("test", version = "v1", from_col = "source", to_col = "target", type_col = "type")
+#'   relationship_metadata(
+#'     "test", version = "v1",
+#'     from_col = "source",
+#'     to_col = "target",
+#'     type_col = "type"
+#'   )
 #' )
 add_relationship_table <- function(table, metadata) {
   validate_relationship_metadata(metadata, arg = rlang::caller_arg(metadata))
