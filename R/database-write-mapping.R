@@ -49,8 +49,7 @@ add_mapping_table <- function(table, metadata) {
       c(
         "The mapping table {.field {metadata$mapping_table_name}} already exists.",
         "i" = "Use a different {.arg code_type} or {.arg version} in {.arg metadata} to add a new mapping table."
-      ),
-      call = rlang::caller_env()
+      )
     )
     return(invisible(FALSE))
   }

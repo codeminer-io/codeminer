@@ -57,8 +57,7 @@ add_lookup_table <- function(table, metadata) {
       c(
         "The lookup table {.field {metadata$lookup_table_name}} already exists.",
         "i" = "Use a different {.arg code_type} or {.arg version} in {.arg metadata} to add a new lookup table."
-      ),
-      call = rlang::caller_env()
+      )
     )
     return(invisible(FALSE))
   }
