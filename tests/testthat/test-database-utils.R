@@ -33,7 +33,7 @@ test_that("check_database() fails when metadata tables are missing", {
     "The mapping metadata table does not exist in the database"
   )
 
-  # Create only lookup metadata table
+  # Create only mapping metadata table
   create_mapping_metadata_table(con_empty)
   expect_error(
     check_database(con_empty),
