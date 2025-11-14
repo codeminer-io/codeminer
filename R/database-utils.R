@@ -40,7 +40,7 @@ add_metadata_table <- function(
   metadata,
   type = c("lookup", "mapping", "relationship")
 ) {
-  type <- match.arg(type)
+  type <- rlang::arg_match(type)
   tbl_name <- codeminer_metadata_table_names[[type]]
   stopifnot(!is.null(tbl_name)) # sanity check, not expected to ever fail
 
