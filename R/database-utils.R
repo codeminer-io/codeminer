@@ -42,7 +42,8 @@ check_database <- function(con) {
 #' @param con A database connection object.
 #' @param metadata A data frame containing the metadata to be added.
 #' @param type The type of metadata to be added. Can be one of "lookup", "mapping", or "relationship".
-#' @return A logical value indicating whether the metadata was successfully added.
+#' @return If successful, returns the number of rows added to the metadata
+#'   table, invisibly. If not, returns `FALSE` invisibly.
 #' @noRd
 #' @keywords internal
 add_metadata_table <- function(
@@ -75,8 +76,8 @@ add_metadata_table <- function(
   }
 
   meta_df <- as.data.frame(metadata)
-  success <- DBI::dbAppendTable(con, tbl_name, meta_df)
-  return(invisible(success))
+  rows_added <- DBI::dbAppendTable(con, tbl_name, meta_df)
+  return(invisible(rows_added))
 }
 
 
