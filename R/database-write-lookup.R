@@ -51,14 +51,13 @@ add_lookup_table <- function(table, metadata) {
   con <- connect_to_db()
   check_database(con)
 
-  meta_added <- add_lookup_metadata(con, metadata)
+  meta_added <- add_metadata_table(con, metadata, type = "lookup")
   if (!meta_added) {
     cli::cli_warn(
       c(
         "The lookup table {.field {metadata$lookup_table_name}} already exists.",
         "i" = "Use a different {.arg code_type} or {.arg version} in {.arg metadata} to add a new lookup table."
-      ),
-      call = rlang::caller_env()
+      )
     )
     return(invisible(FALSE))
   }
@@ -135,31 +134,6 @@ lookup_metadata <- function(
     preferred_description_col = preferred_description_col,
     preferred_description_indicator = preferred_description_indicator
   ))
-}
-
-#' Add lookup metadata to the database
-#'
-#' @param con A database connection object.
-#' @param metadata A list containing the lookup metadata.
-#' @return A logical value, invisibly, indicating whether the metadata was successfully added.
-#' @keywords internal
-#' @noRd
-add_lookup_metadata <- function(con, metadata) {
-  tbl_name <- codeminer_metadata_table_names$lookup
-
-  # Check for duplicate lookup_table_name
-  ids <- metadata$lookup_table_name
-  current_metadata <- get_lookup_metadata(con)
-  exists <- any(ids %in% current_metadata$lookup_table_name)
-
-  # Don't allow overwriting existing metadata
-  if (exists) {
-    return(invisible(FALSE))
-  }
-
-  meta_df <- as.data.frame(metadata)
-  success <- DBI::dbAppendTable(con, tbl_name, meta_df)
-  return(invisible(success))
 }
 
 #' Validate lookup metadata

@@ -43,14 +43,13 @@ add_mapping_table <- function(table, metadata) {
   con <- connect_to_db()
   check_database(con)
 
-  meta_added <- add_mapping_metadata(con, metadata)
+  meta_added <- add_metadata_table(con, metadata, type = "mapping")
   if (!meta_added) {
     cli::cli_warn(
       c(
         "The mapping table {.field {metadata$mapping_table_name}} already exists.",
         "i" = "Use a different {.arg code_type} or {.arg version} in {.arg metadata} to add a new mapping table."
-      ),
-      call = rlang::caller_env()
+      )
     )
     return(invisible(FALSE))
   }
@@ -113,31 +112,6 @@ mapping_metadata <- function(
     from_col = from_col,
     to_col = to_col
   ))
-}
-
-#' Add mapping metadata to the database.
-#'
-#' @param con A database connection.
-#' @param metadata A list containing the mapping metadata.
-#' @return A logical value, invisibly, indicating whether the metadata was added successfully.
-#' @keywords internal
-#' @noRd
-add_mapping_metadata <- function(con, metadata) {
-  tbl_name <- codeminer_metadata_table_names$mapping
-
-  # Check for duplicate mapping_table_name
-  ids <- metadata$mapping_table_name
-  current_metadata <- get_mapping_metadata(con)
-  exists <- any(ids %in% current_metadata$mapping_table_name)
-
-  # Don't allow overwriting existing metadata
-  if (exists) {
-    return(invisible(FALSE))
-  }
-
-  meta_df <- as.data.frame(metadata)
-  success <- DBI::dbAppendTable(con, tbl_name, meta_df)
-  return(invisible(success))
 }
 
 #' Validate mapping metadata.

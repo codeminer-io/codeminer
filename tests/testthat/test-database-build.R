@@ -1,5 +1,6 @@
 lookup_metadata_name <- "_lookup_metadata"
 mapping_metadata_name <- "_mapping_metadata"
+relationship_metadata_name <- "_relationship_metadata"
 
 test_that("db_path() returns correct path based on environment variable", {
   custom_path <- "/tmp/test_db.duckdb"
@@ -42,9 +43,10 @@ test_that("build_database() creates a valid codeminer database", {
   con <- connect_to_db()
   tables <- DBI::dbListTables(con)
   expect_type(tables, "character")
-  expect_length(tables, 2)
+  expect_length(tables, 3)
   expect_true(lookup_metadata_name %in% tables)
   expect_true(mapping_metadata_name %in% tables)
+  expect_true(relationship_metadata_name %in% tables)
 
   # Check table schema
   lookup_fields <- DBI::dbListFields(con, lookup_metadata_name)

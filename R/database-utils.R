@@ -11,6 +11,10 @@ check_database <- function(con) {
   )
   has_lookup_meta <- table_exists(con, codeminer_metadata_table_names$lookup)
   has_mapping_meta <- table_exists(con, codeminer_metadata_table_names$mapping)
+  has_relationship_meta <- table_exists(
+    con,
+    codeminer_metadata_table_names$relationship
+  )
 
   if (!has_lookup_meta) {
     cli::cli_abort(c(
@@ -24,8 +28,58 @@ check_database <- function(con) {
       "x" = "The mapping metadata table does not exist in the database."
     ))
   }
+  if (!has_relationship_meta) {
+    cli::cli_abort(c(
+      error_msg,
+      "x" = "The relationship metadata table does not exist in the database."
+    ))
+  }
   return(invisible(TRUE))
 }
+
+#' Add metadata to the database
+#'
+#' @param con A database connection object.
+#' @param metadata A data frame containing the metadata to be added.
+#' @param type The type of metadata to be added. Can be one of "lookup", "mapping", or "relationship".
+#' @return If successful, returns the number of rows added to the metadata
+#'   table, invisibly. If not, returns `FALSE` invisibly.
+#' @noRd
+#' @keywords internal
+add_metadata_table <- function(
+  con,
+  metadata,
+  type = c("lookup", "mapping", "relationship")
+) {
+  type <- rlang::arg_match(type)
+  tbl_name <- codeminer_metadata_table_names[[type]]
+  stopifnot(!is.null(tbl_name)) # sanity check, not expected to ever fail
+
+  id_col <- switch(
+    type,
+    lookup = "lookup_table_name",
+    mapping = "mapping_table_name",
+    relationship = "relationship_table_name",
+    cli::cli_abort("Invalid metadata type: {type}.")
+  )
+  ids <- metadata[[id_col]]
+  if (is.null(ids)) {
+    cli::cli_abort("Missing field {id_col} in metadata.")
+  }
+
+  current_metadata <- read_table_from_db(con, tbl_name)
+  exists <- any(ids %in% current_metadata[[id_col]])
+
+  # Don't allow overwriting existing metadata
+  if (exists) {
+    return(invisible(FALSE))
+  }
+
+  meta_df <- as.data.frame(metadata)
+  rows_added <- DBI::dbAppendTable(con, tbl_name, meta_df)
+  return(invisible(rows_added))
+}
+
 
 #' Return the lookup metadata table as a data frame
 #'
@@ -46,6 +100,17 @@ get_lookup_metadata <- function(con = connect_to_db()) {
 #' @noRd
 get_mapping_metadata <- function(con = connect_to_db()) {
   tbl_name <- codeminer_metadata_table_names$mapping
+  read_table_from_db(con, tbl_name)
+}
+
+#' Return the relationship metadata table as a data frame
+#'
+#' @param con A database connection object. Uses the default connection if not provided.
+#' @return A data frame containing the relationship metadata.
+#' @keywords internal
+#' @noRd
+get_relationship_metadata <- function(con = connect_to_db()) {
+  tbl_name <- codeminer_metadata_table_names$relationship
   read_table_from_db(con, tbl_name)
 }
 
