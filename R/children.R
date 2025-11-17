@@ -54,27 +54,17 @@ CHILDREN <- function(
     )
   }
 
-  validated_codes <- CODES(
-    codes = codes,
-    code_type = code_type,
-    version = version,
-    preferred_description_only = TRUE
-  )
-
-  if (nrow(validated_codes) == 0) {
-    cli::cli_warn("No valid codes found.")
-    return(if (codes_only) character(0) else data.frame())
-  }
-
-  input_codes <- unique(validated_codes$code)
-
-  # Get child codes using generic relationship traversal
   child_codes <- get_children(
     con = con,
-    codes = input_codes,
+    codes = codes,
     code_type = code_type,
     version = version
   )
+
+  if (length(child_codes) == 0) {
+    cli::cli_warn("No valid child codes found.")
+    return(if (codes_only) character(0) else data.frame())
+  }
 
   result <- CODES(
     codes = child_codes,
