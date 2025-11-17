@@ -2,7 +2,7 @@
 % Please edit documentation in R/children.R
 \name{CHILDREN}
 \alias{CHILDREN}
-\title{Get descendents for a code}
+\title{Get child codes}
 \usage{
 CHILDREN(
   codes,
@@ -34,9 +34,8 @@ A data frame with columns \code{code}, \code{description}, and \code{code_type}
 \code{codes_only = TRUE}).
 }
 \description{
-Retrieves children codes for a given set of codes (including the codes
-themselves). This function works with any relationship table added via
-\code{\link[=add_relationship_table]{add_relationship_table()}}.
+Retrieves children codes for a given set of codes. This function works with
+any relationship table added via \code{\link[=add_relationship_table]{add_relationship_table()}}.
 }
 \examples{
 create_dummy_database()

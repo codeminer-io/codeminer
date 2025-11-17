@@ -1,8 +1,7 @@
-#' Get descendants for a code
+#' Get child codes
 #'
-#' Retrieves children codes for a given set of codes (including the codes
-#' themselves). This function works with any relationship table added via
-#' [add_relationship_table()].
+#' Retrieves children codes for a given set of codes. This function works with
+#' any relationship table added via [add_relationship_table()].
 #'
 #' @param codes character. A vector of code strings to retrieve child codes for.
 #' @param code_type character. Type of clinical code system to be searched.
