@@ -27,7 +27,7 @@ test_that("CODES works with the codeminer.code_type option", {
 
 test_that("CODES allows querying all codes", {
   test_type <- "icd10"
-  expected_rows <- 199
+  expected_rows <- nrow(dummy_icd10_lookup())
 
   result <- CODES("all", code_type = test_type)
   expect_s3_class(result, "data.frame")

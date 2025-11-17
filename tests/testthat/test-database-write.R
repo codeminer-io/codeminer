@@ -185,7 +185,7 @@ test_that("add_relationship_table warns when relationship_table_name already exi
   expect_no_error(add_relationship_table(test_table, test_metadata))
   expect_warning(
     add_relationship_table(test_table, test_metadata),
-    "The relationship table foo_v0 already exists."
+    "The relationship table foo_relationship_v0 already exists."
   )
 })
 

@@ -1,5 +1,3 @@
-# TODO: as part of https://github.com/codeminer-io/codeminer/issues/44
-testthat::skip("CHILDREN not implemented yet")
 test_that("`CHILDREN()` returns error for unrecognised codes", {
   expect_error(
     CHILDREN(
@@ -13,7 +11,6 @@ test_that("`CHILDREN()` returns error for unrecognised codes", {
   )
 })
 
-testthat::skip("CHILDREN not implemented yet")
 test_that("`CHILDREN()` works as expected for read2", {
   expect_equal(
     CHILDREN(
@@ -27,7 +24,6 @@ test_that("`CHILDREN()` works as expected for read2", {
   )
 })
 
-testthat::skip("CHILDREN not implemented yet")
 test_that("`CHILDREN()` raises error for unsupported code types e.g. read3", {
   expect_error(
     CHILDREN(

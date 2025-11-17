@@ -69,14 +69,14 @@ test_that("add_metadata_table() works with mapping type", {
 })
 
 test_that("add_metadata_table() works with relationship type", {
-  test_metadata <- relationship_metadata("test_code", version = "v1")
+  test_metadata <- relationship_metadata("test", version = "v1")
 
   result <- add_metadata_table(con, test_metadata, type = "relationship")
   expect_type(result, "integer")
   expect_true(result > 0)
 
   rel_meta <- get_relationship_metadata(con)
-  expect_true("test_code_v1" %in% rel_meta$relationship_table_name)
+  expect_true("test_relationship_v1" %in% rel_meta$relationship_table_name)
 })
 
 test_that("add_metadata_table() prevents duplicate entries", {
@@ -189,8 +189,8 @@ test_that("get_relationship_metadata() returns all added entries", {
   add_metadata_table(con, test_metadata2, type = "relationship")
 
   result <- get_relationship_metadata(con)
-  expect_true("rel_type1_v1" %in% result$relationship_table_name)
-  expect_true("rel_type2_v2" %in% result$relationship_table_name)
+  expect_true("rel_type1_relationship_v1" %in% result$relationship_table_name)
+  expect_true("rel_type2_relationship_v2" %in% result$relationship_table_name)
 })
 
 test_that("get_relationship_metadata() works without explicit connection", {
