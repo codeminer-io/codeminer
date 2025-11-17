@@ -218,7 +218,6 @@ download_latestversion_of_snomed_item <- function(
 #' \describe{
 #'   \item{`sct_description`}{A `data.table` combining SNOMED CT concepts and descriptions.}
 #'   \item{`sct_relationship`}{A `data.table` containing concept relationships.}
-#'   \item{`sct_icd10`}{A `data.table` containing SNOMED CT–to–ICD-10 map entries.}
 #' }
 #'
 #' @examples
@@ -232,7 +231,6 @@ download_latestversion_of_snomed_item <- function(
 #' # Inspect a few rows of each
 #' head(snomed$sct_description)
 #' head(snomed$sct_relationship)
-#' head(snomed$sct_icd10)
 #' }
 #'
 #' @export
@@ -368,21 +366,10 @@ read_snomed_ct_uk_monolith <- function(path_destination) {
     "sct2_Relationship_MONOSnapshot.txt"
   ]]
 
-  sct_icd10 <- snomed_monolith_refset$Map[[
-    "der2_iisssciRefset_ExtendedMapMONOSnapshot.txt"
-  ]] |>
-    dplyr::filter(.data[["refsetId"]] == "999002271000000101") |>
-    dplyr::filter(stringr::str_detect(
-      .data[["mapTarget"]],
-      "#",
-      negate = TRUE
-    ))
-
   return(
     list(
       sct_description = sct_description,
-      sct_relationship = sct_relationship,
-      sct_icd10 = sct_icd10
+      sct_relationship = sct_relationship
     )
   )
 }

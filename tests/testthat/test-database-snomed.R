@@ -108,23 +108,4 @@ test_that("read_snomed_ct_uk_monolith() returns appropriate tables", {
       "modifierId"
     )
   )
-
-  expect_equal(
-    names(snomedct$sct_icd10),
-    c(
-      "id",
-      "effectiveTime",
-      "active",
-      "moduleId",
-      "refsetId",
-      "referencedComponentId",
-      "mapGroup",
-      "mapPriority",
-      "mapRule",
-      "mapAdvice",
-      "mapTarget",
-      "correlationId",
-      "mapBlock"
-    )
-  )
 })

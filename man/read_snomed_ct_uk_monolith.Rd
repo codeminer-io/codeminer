@@ -20,7 +20,6 @@ A named list with three elements:
 \describe{
 \item{\code{sct_description}}{A \code{data.table} combining SNOMED CT concepts and descriptions.}
 \item{\code{sct_relationship}}{A \code{data.table} containing concept relationships.}
-\item{\code{sct_icd10}}{A \code{data.table} containing SNOMED CT–to–ICD-10 map entries.}
 }
 }
 \description{
@@ -55,7 +54,6 @@ names(snomed)
 # Inspect a few rows of each
 head(snomed$sct_description)
 head(snomed$sct_relationship)
-head(snomed$sct_icd10)
 }
 
 }
