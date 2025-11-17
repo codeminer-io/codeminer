@@ -114,7 +114,7 @@ dummy_icd10_relationship <- function() {
     rlang::set_names(icd10_codes)
   # Remove empty entries
   children[lengths(children) == 0] <- NULL
-  tbl <- stack(children)
+  tbl <- utils::stack(children)
   names(tbl) <- c("from", "to")
   tbl$type <- "is a"
   return(tbl)
