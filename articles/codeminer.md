@@ -51,14 +51,14 @@ of data frames:
 ``` r
 # Create a temporary database with dummy data
 (db_path <- create_dummy_database())
-#> ℹ Creating new database at /tmp/RtmpjIv7Ug/file234c7f0ea8f8.duckdb
+#> ℹ Creating new database at /tmp/RtmpeOGpsO/file1d3c254f0459.duckdb
 #> ✔ Lookup table icd10_v0 added successfully.
 #> ✔ Lookup table read3_v0 added successfully.
 #> ✔ Mapping table read3_icd10_v0 added successfully.
 #> ✔ Dummy database ready to use!
-#> [1] "/tmp/RtmpjIv7Ug/file234c7f0ea8f8.duckdb"
+#> [1] "/tmp/RtmpeOGpsO/file1d3c254f0459.duckdb"
 Sys.getenv("CODEMINER_DB_PATH")
-#> [1] "/tmp/RtmpjIv7Ug/file234c7f0ea8f8.duckdb"
+#> [1] "/tmp/RtmpeOGpsO/file1d3c254f0459.duckdb"
 ```
 
 Setting the `CODEMINER_DB_PATH` environment variable ensures that all
@@ -82,8 +82,8 @@ can be inspected using the [DBI](https://dbi.r-dbi.org/) package.
 # connect to Duckdb database
 con <- DBI::dbConnect(duckdb::duckdb(), db_path, read_only = TRUE)
 DBI::dbListTables(con)
-#> [1] "_lookup_metadata"  "_mapping_metadata" "icd10_v0"         
-#> [4] "read3_icd10_v0"    "read3_v0"
+#> [1] "_lookup_metadata"       "_mapping_metadata"      "_relationship_metadata"
+#> [4] "icd10_v0"               "read3_icd10_v0"         "read3_v0"
 
 # Close the connection when you're done
 DBI::dbDisconnect(con)

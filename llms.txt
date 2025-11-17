@@ -149,13 +149,21 @@ clinical coding systems.
   : Create a dummy database
 - [`add_lookup_table()`](https://codeminer-io.github.io/codeminer/reference/add_lookup_table.md)
   : Add a lookup table to the database
+- [`lookup_metadata()`](https://codeminer-io.github.io/codeminer/reference/lookup_metadata.md)
+  : Create lookup metadata
 - [`add_mapping_table()`](https://codeminer-io.github.io/codeminer/reference/add_mapping_table.md)
   : Add a mapping table to the database
+- [`mapping_metadata()`](https://codeminer-io.github.io/codeminer/reference/mapping_metadata.md)
+  : Create mapping metadata
+- [`add_relationship_table()`](https://codeminer-io.github.io/codeminer/reference/add_relationship_table.md)
+  : Add a relationship table to the database
+- [`relationship_metadata()`](https://codeminer-io.github.io/codeminer/reference/relationship_metadata.md)
+  : Create relationship metadata
 
 ## Clinical codes
 
 Functions for looking up clinical codes and mapping between different
-codisng systems.
+coding systems.
 
 - [`CODES()`](https://codeminer-io.github.io/codeminer/reference/CODES.md)
   [`CODES_LIKE()`](https://codeminer-io.github.io/codeminer/reference/CODES.md)
@@ -184,10 +192,6 @@ codisng systems.
   : Get SNOMED codes with a specific set of one or more attributes
 - [`filter_sct_relationship()`](https://codeminer-io.github.io/codeminer/reference/filter_sct_relationship.md)
   : Filter SNOMED CT relationships based on various criteria
-- [`lookup_metadata()`](https://codeminer-io.github.io/codeminer/reference/lookup_metadata.md)
-  : Create lookup metadata
-- [`mapping_metadata()`](https://codeminer-io.github.io/codeminer/reference/mapping_metadata.md)
-  : Create mapping metadata
 
 ## Dummy data
 
@@ -217,6 +221,10 @@ Dummy data for tests.
   : Dummy UK Biobank codings file path
 - [`example_ontology`](https://codeminer-io.github.io/codeminer/reference/example_ontology.md)
   : Example ontology data
+
+## Utilities
+
+Miscellaneous utility functions.
 
 - [`` `%AND%` ``](https://codeminer-io.github.io/codeminer/reference/infix_setops.md)
   [`` `%OR%` ``](https://codeminer-io.github.io/codeminer/reference/infix_setops.md)

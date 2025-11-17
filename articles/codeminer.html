@@ -112,14 +112,14 @@ list of data frames:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Create a temporary database with dummy data</span></span>
 <span><span class="op">(</span><span class="va">db_path</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/create_dummy_database.html">create_dummy_database</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Creating new database at <span style="color: #0000BB;">/tmp/RtmpjIv7Ug/file234c7f0ea8f8.duckdb</span></span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Creating new database at <span style="color: #0000BB;">/tmp/RtmpeOGpsO/file1d3c254f0459.duckdb</span></span></span>
 <span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Lookup table <span style="color: #00BB00;">icd10_v0</span> added successfully.</span></span>
 <span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Lookup table <span style="color: #00BB00;">read3_v0</span> added successfully.</span></span>
 <span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Mapping table <span style="color: #00BB00;">read3_icd10_v0</span> added successfully.</span></span>
 <span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Dummy database ready to use!</span></span>
-<span><span class="co">#&gt; [1] "/tmp/RtmpjIv7Ug/file234c7f0ea8f8.duckdb"</span></span>
+<span><span class="co">#&gt; [1] "/tmp/RtmpeOGpsO/file1d3c254f0459.duckdb"</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/Sys.getenv.html" class="external-link">Sys.getenv</a></span><span class="op">(</span><span class="st">"CODEMINER_DB_PATH"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] "/tmp/RtmpjIv7Ug/file234c7f0ea8f8.duckdb"</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] "/tmp/RtmpeOGpsO/file1d3c254f0459.duckdb"</span></span></code></pre></div>
 <p>Setting the <code>CODEMINER_DB_PATH</code> environment variable
 ensures that all subsequent <code>codeminer</code> calls will use this
 database.</p>
@@ -138,8 +138,8 @@ package.</p>
 <code class="sourceCode R"><span><span class="co"># connect to Duckdb database</span></span>
 <span><span class="va">con</span> <span class="op">&lt;-</span> <span class="fu">DBI</span><span class="fu">::</span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbConnect.html" class="external-link">dbConnect</a></span><span class="op">(</span><span class="fu">duckdb</span><span class="fu">::</span><span class="fu"><a href="https://r.duckdb.org/reference/duckdb.html" class="external-link">duckdb</a></span><span class="op">(</span><span class="op">)</span>, <span class="va">db_path</span>, read_only <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="fu">DBI</span><span class="fu">::</span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbListTables.html" class="external-link">dbListTables</a></span><span class="op">(</span><span class="va">con</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] "_lookup_metadata"  "_mapping_metadata" "icd10_v0"         </span></span>
-<span><span class="co">#&gt; [4] "read3_icd10_v0"    "read3_v0"</span></span>
+<span><span class="co">#&gt; [1] "_lookup_metadata"       "_mapping_metadata"      "_relationship_metadata"</span></span>
+<span><span class="co">#&gt; [4] "icd10_v0"               "read3_icd10_v0"         "read3_v0"</span></span>
 <span></span>
 <span><span class="co"># Close the connection when you're done</span></span>
 <span><span class="fu">DBI</span><span class="fu">::</span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbDisconnect.html" class="external-link">dbDisconnect</a></span><span class="op">(</span><span class="va">con</span><span class="op">)</span></span></code></pre></div>

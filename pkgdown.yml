@@ -4,7 +4,7 @@ pkgdown_sha: ~
 articles:
   codeminer: codeminer.html
   MAP: MAP.html
-last_built: 2025-11-11T12:31Z
+last_built: 2025-11-17T12:38Z
 urls:
   reference: https://codeminer-io.github.io/codeminer/reference
   article: https://codeminer-io.github.io/codeminer/articles

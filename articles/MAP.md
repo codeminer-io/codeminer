@@ -13,7 +13,7 @@ library(dplyr)
 #>     intersect, setdiff, setequal, union
 
 create_dummy_database()
-#> ℹ Creating new database at /tmp/Rtmpmh7KXx/file23b273247cda.duckdb
+#> ℹ Creating new database at /tmp/RtmpbSL4iZ/file1da260a5f77d.duckdb
 #> ✔ Lookup table icd10_v0 added successfully.
 #> ✔ Lookup table read3_v0 added successfully.
 #> ✔ Mapping table read3_icd10_v0 added successfully.
