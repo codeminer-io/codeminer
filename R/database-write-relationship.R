@@ -115,7 +115,12 @@ relationship_metadata <- function(
 ) {
   rlang::check_dots_empty()
 
-  relationship_table_name <- paste(code_type, version, sep = "_")
+  relationship_table_name <- paste(
+    code_type,
+    "relationship",
+    version,
+    sep = "_"
+  )
   return(list(
     relationship_table_name = relationship_table_name,
     code_type = code_type,
