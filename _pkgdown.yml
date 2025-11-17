@@ -18,6 +18,8 @@ reference:
       - mapping_metadata
       - add_relationship_table
       - relationship_metadata
+      - get_lookup_metadata
+      - get_mapping_metadata
 
   - title: Clinical codes
     desc: Functions for looking up clinical codes and mapping between different coding systems.
