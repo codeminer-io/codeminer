@@ -27,8 +27,6 @@ reference:
       - CODES
       - CODES_LIKE
       - CHILDREN
-      - get_children_sct
-      - get_parents_sct
       - DESCRIPTION
       - MAP
       - default_col_filters
