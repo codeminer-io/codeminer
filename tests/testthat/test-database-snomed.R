@@ -109,3 +109,15 @@ test_that("read_snomed_ct_uk_monolith() returns appropriate tables", {
     )
   )
 })
+
+test_that("mapping_snomed_database() maps snomed database with codeminer ", {
+  # Unit tests are intended for local execution.
+  # See the function's documentation for prerequisites.
+
+  db_path <- mapping_snomed_database(
+    getwd(),
+    release_index = 1
+  )
+
+  expect_true(file.exists(db_path))
+})

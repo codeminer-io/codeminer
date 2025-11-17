@@ -373,3 +373,69 @@ read_snomed_ct_uk_monolith <- function(path_destination) {
     )
   )
 }
+
+#' Mapping SNOMED CT UK database with codeminer tables
+#' #TODO add docstring
+#'
+mapping_snomed_database <- function(
+  path_destination = ".",
+  release_index = 1
+) {
+  rlang::check_installed("trud")
+
+  if (!dir.exists(path_destination)) {
+    cli::cli_abort("Directory does not exist: {path_destination}")
+  }
+
+  #TODO remove > duplicated lines 390-414 with test-database-snomed.R 45-66
+  # Set the index for the TRUD metadata release
+  # Use 1 for the latest version; increasing values retrieve older releases
+  release_index <- 1
+
+  trud_metadata <- trud::get_item_metadata(1799, release_scope = "all")
+  expected_zip_name <- trud_metadata$releases[[
+    release_index
+  ]]$archiveFileName
+  expected_base_name <- tools::file_path_sans_ext(expected_zip_name)
+
+  # Construct dynamic path with trud_metadata
+  expected_path <- file.path(
+    path_destination,
+    paste0("snomed_item_1799_", expected_zip_name),
+    paste0(
+      "SnomedCT_MonolithRF2_PRODUCTION_",
+      substr(
+        expected_base_name,
+        nchar(expected_base_name) - 14,
+        nchar(expected_base_name) - 7
+      ),
+      "T120000Z"
+    )
+  )
+
+  snomedct <- read_snomed_ct_uk_monolith(expected_path)
+
+  # Print mapping table names
+  cli::cli_inform(c(
+    "i" = "Names in snomedct:",
+    ">" = paste(names(snomedct), collapse = ", ")
+  ))
+
+  # Print first rows of sct_description as a formatted preview
+  cli::cli_inform(c(
+    "i" = "Preview of snomedct$sct_description:"
+  ))
+  cli::cli_inform(c(
+    ">" = utils::capture.output(print(head(snomedct$sct_description)))
+  ))
+
+  # Build a temporary database
+  db_path <- tempfile(fileext = ".duckdb")
+  Sys.setenv(CODEMINER_DB_PATH = db_path)
+  cli::cli_inform(c(
+    "i" = paste0("Using CODEMINER_DB_PATH: ", Sys.getenv("CODEMINER_DB_PATH"))
+  ))
+  codeminer::build_database()
+
+  return(db_path)
+}
