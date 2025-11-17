@@ -9,8 +9,7 @@ CHILDREN(
   code_type = getOption("codeminer.code_type"),
   version = getOption("codeminer.relationship_version", default = "latest"),
   codes_only = FALSE,
-  preferred_description_only = TRUE,
-  include_self = TRUE
+  preferred_description_only = TRUE
 )
 }
 \arguments{
@@ -28,8 +27,6 @@ results including code descriptions (useful for manual validation).}
 
 \item{preferred_description_only}{logical. If \code{TRUE} (default), only returns
 the preferred description for each code.}
-
-\item{include_self}{logical. If \code{TRUE} (default) include input codes in the result.}
 }
 \value{
 A data frame with columns \code{code}, \code{description}, and \code{code_type}
