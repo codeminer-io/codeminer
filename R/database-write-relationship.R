@@ -36,7 +36,8 @@
 #'     "test", version = "v1",
 #'     from_col = "source",
 #'     to_col = "target",
-#'     type_col = "type"
+#'     type_col = "type",
+#'     child_parent_relationship_code = "child"
 #'   )
 #' )
 add_relationship_table <- function(table, metadata) {

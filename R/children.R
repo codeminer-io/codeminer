@@ -96,12 +96,11 @@ CHILDREN <- function(
 #' Get related codes from relationship table
 #'
 #' Generic function to traverse relationship tables and retrieve related codes.
-#' This is an internal function used by [CHILDREN()] and [PARENTS()].
+#' This is an internal function used by [CHILDREN()].
 #'
 #' @param codes Character vector of codes to start from.
 #' @param code_type The type of coding system.
 #' @param version The version of the relationship table.
-#' @param direction Either "children" or "parents" to specify traversal direction.
 #' @param include_self Whether to include the input codes in the result.
 #'
 #' @return A character vector of related codes.

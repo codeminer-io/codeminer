@@ -7,49 +7,57 @@
 CHILDREN(
   codes,
   code_type = getOption("codeminer.code_type"),
-  version = getOption("codeminer.version", default = "latest"),
+  version = getOption("codeminer.relationship_version", default = "latest"),
   codes_only = FALSE,
-  preferred_description_only = TRUE
+  preferred_description_only = TRUE,
+  include_self = TRUE
 )
 }
 \arguments{
 \item{codes}{character. A vector of code strings to retrieve child codes for.}
 
 \item{code_type}{character. Type of clinical code system to be searched.
-Depends on what is available in the lookup tables. See \code{\link[=add_lookup_table]{add_lookup_table()}}
-on how to add new lookup tables. This can also be configured through the \code{codeminer.code_type} option.}
+This can also be configured through the \code{codeminer.code_type} option.}
 
-\item{version}{character. Version of the lookup table to use. Default:
-\code{"latest"}. Can be configured through the \code{codeminer.lookup_version} option.}
+\item{version}{character. Version of the relationship table to use. Default:
+\code{"latest"}. Can be configured through the \code{codeminer.relationship_version} option.}
 
-\item{codes_only}{bool. If \code{TRUE}, return a character vector of
+\item{codes_only}{logical. If \code{TRUE}, return a character vector of
 \emph{unique} codes. If \code{FALSE} (default), return a data frame of all
 results including code descriptions (useful for manual validation).}
 
-\item{preferred_description_only}{logical. If \code{TRUE}, only returns the preferred description for each code.
-Default: \code{FALSE}.}
+\item{preferred_description_only}{logical. If \code{TRUE} (default), only returns
+the preferred description for each code.}
+
+\item{include_self}{logical. If \code{TRUE} (default) include input codes in the result.}
 }
 \value{
-A data frame
+A data frame with columns \code{code}, \code{description}, and \code{code_type}
+(when \code{codes_only = FALSE}), or a character vector of codes (when
+\code{codes_only = TRUE}).
 }
 \description{
 Retrieves children codes for a given set of codes (including the codes
-themselves). Note that currently it is not possible to retrieve children
-codes for certain clinical coding systems, such as Read 3.
+themselves). This function works with any relationship table added via
+\code{\link[=add_relationship_table]{add_relationship_table()}}.
 }
 \examples{
-# TODO
+create_dummy_database()
+
+# Get children for ICD-10 codes (if relationship table exists)
+CHILDREN(c("E10", "E11"), code_type = "icd10")
+
+# Get only the codes without descriptions
+CHILDREN(c("E10", "E11"), code_type = "icd10", codes_only = TRUE)
 }
 \seealso{
-\code{\link[=get_children_sct]{get_children_sct()}}
+\code{\link[=add_relationship_table]{add_relationship_table()}}
 
 Other Clinical code lookups and mappings: 
 \code{\link{CODES}()},
 \code{\link{GET_ATTRIBUTES}()},
 \code{\link{HAS_ATTRIBUTES}()},
 \code{\link{MAP}()},
-\code{\link{default_col_filters}()},
-\code{\link{get_children_sct}()},
-\code{\link{get_parents_sct}()}
+\code{\link{default_col_filters}()}
 }
 \concept{Clinical code lookups and mappings}
