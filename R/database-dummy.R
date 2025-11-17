@@ -34,7 +34,13 @@ create_dummy_database <- function(
   build_database(overwrite = TRUE)
 
   add_lookup_table(dummy_icd10_lookup(), dummy_icd10_metadata())
+  add_relationship_table(
+    dummy_icd10_relationship(),
+    dummy_icd10_relationship_metadata()
+  )
+
   add_lookup_table(dummy_read3_lookup(), dummy_read3_metadata())
+
   add_mapping_table(
     dummy_read3_icd10_mapping(),
     dummy_read3_icd10_mapping_metadata()
@@ -89,6 +95,39 @@ dummy_icd10_metadata <- function() {
     version = "v0",
     lookup_code_col = "code",
     lookup_description_col = "description"
+  )
+}
+
+# Helper to generate icd10 relationship data
+# icd10 child relationships are encoded directly into the ICD10_CODE
+# If a code is of the form `<prefix>.<suffix>` then the parent is the `<prefix>` code
+# E.g. `A00.1` is a child of `A00`.
+dummy_icd10_relationship <- function() {
+  lkp_tbl <- dummy_icd10_lookup()
+  icd10_codes <- lkp_tbl$code
+  children <- purrr::map(icd10_codes, \(x) {
+    # Don't consider code itself as child
+    candidates <- icd10_codes[icd10_codes != x]
+    is_child <- stringr::str_starts(candidates, x)
+    return(candidates[is_child])
+  }) |>
+    rlang::set_names(icd10_codes)
+  # Remove empty entries
+  children[lengths(children) == 0] <- NULL
+  tbl <- stack(children)
+  names(tbl) <- c("from", "to")
+  tbl$type <- "is a"
+  return(tbl)
+}
+
+dummy_icd10_relationship_metadata <- function() {
+  relationship_metadata(
+    code_type = "icd10",
+    version = "v0",
+    from_col = "from",
+    to_col = "to",
+    type_col = "type",
+    child_parent_relationship_code = "is a"
   )
 }
 
