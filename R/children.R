@@ -108,11 +108,12 @@ get_children <- function(
   return_col <- rel_meta$from_col
   filter_col <- rel_meta$to_col
   type_col <- rel_meta$type_col
-  child_parent_code <- rel_meta$child_parent_relationship_code
 
   # Filter for child-parent relationships only
   rel_table <- rel_table |>
-    dplyr::filter(.data[[type_col]] == .env$child_parent_code)
+    dplyr::filter(
+      .data[[type_col]] == .env$rel_meta$child_parent_relationship_code
+    )
 
   result <- rel_table |>
     dplyr::filter(.data[[filter_col]] %in% .env$codes) |>
