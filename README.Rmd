@@ -49,7 +49,7 @@ library(codeminer)
 create_dummy_database()
 ```
 
-Look up Read 2 codes for hypertension:
+Look up Read 3 codes for hypertension:
 
 ```{r}
 htn_read3 <- DESCRIPTION("Hypertension", code_type = "read3")

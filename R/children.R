@@ -1,4 +1,4 @@
-#' Get descendents for a code
+#' Get descendants for a code
 #'
 #' Retrieves children codes for a given set of codes (including the codes
 #' themselves). This function works with any relationship table added via
