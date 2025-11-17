@@ -145,7 +145,7 @@ test_that("CHILDREN() fails for missing code_type", {
 test_that("CHILDREN() fails for wrong version", {
   expect_error(
     CHILDREN("E10", code_type = "icd10", version = "nope"),
-    "No metadata found"
+    "No relationship metadata found"
   )
 })
 
@@ -153,7 +153,7 @@ test_that("CHILDREN() warns about missing codes", {
   test_codes <- c("foo", "bar")
   expect_warning(
     CHILDREN(test_codes, "icd10"),
-    "No valid codes found"
+    "No valid child codes found"
   )
 })
 
@@ -162,21 +162,21 @@ test_that("CHILDREN() returns empty result for invalid codes", {
 
   expect_warning(
     result_df <- CHILDREN(test_codes, "icd10", codes_only = FALSE),
-    "No valid codes found"
+    "No valid child codes found"
   )
   expect_s3_class(result_df, "data.frame")
   expect_equal(nrow(result_df), 0)
 
   expect_warning(
     result_vec <- CHILDREN(test_codes, "icd10", codes_only = TRUE),
-    "No valid codes found"
+    "No valid child codes found"
   )
   expect_type(result_vec, "character")
   expect_equal(length(result_vec), 0)
 })
 
 test_that("CHILDREN() handles empty input", {
-  result <- CHILDREN(character(0), "icd10")
+  expect_warning(result <- CHILDREN(character(0), "icd10"))
   expect_equal(nrow(result), 0)
 })
 
