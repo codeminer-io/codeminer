@@ -14,7 +14,6 @@
 #'   results including code descriptions (useful for manual validation).
 #' @param preferred_description_only logical. If `TRUE` (default), only returns
 #'   the preferred description for each code.
-#' @param include_self logical. If `TRUE` (default) include input codes in the result.
 #'
 #' @return A data frame with columns `code`, `description`, and `code_type`
 #'   (when `codes_only = FALSE`), or a character vector of codes (when
@@ -36,8 +35,7 @@ CHILDREN <- function(
   code_type = getOption("codeminer.code_type"),
   version = getOption("codeminer.relationship_version", default = "latest"),
   codes_only = FALSE,
-  preferred_description_only = TRUE,
-  include_self = TRUE
+  preferred_description_only = TRUE
 ) {
   check_codes(codes)
   check_code_type(code_type)
@@ -75,8 +73,7 @@ CHILDREN <- function(
     con = con,
     codes = input_codes,
     code_type = code_type,
-    version = version,
-    include_self = include_self
+    version = version
   )
 
   result <- CODES(
@@ -93,7 +90,7 @@ CHILDREN <- function(
   return(result)
 }
 
-#' Get related codes from relationship table
+#' Get child codes from relationship table
 #'
 #' Generic function to traverse relationship tables and retrieve related codes.
 #' This is an internal function used by [CHILDREN()].
@@ -101,7 +98,6 @@ CHILDREN <- function(
 #' @param codes Character vector of codes to start from.
 #' @param code_type The type of coding system.
 #' @param version The version of the relationship table.
-#' @param include_self Whether to include the input codes in the result.
 #'
 #' @return A character vector of related codes.
 #' @keywords internal
@@ -110,8 +106,7 @@ get_children <- function(
   con,
   codes,
   code_type,
-  version,
-  include_self = TRUE
+  version
 ) {
   rel_meta <- get_metadata_for_relationship(con, code_type, version)
 
@@ -134,11 +129,6 @@ get_children <- function(
     dplyr::select(dplyr::all_of(return_col)) |>
     dplyr::distinct() |>
     dplyr::pull(1)
-
-  # Remove self if requested
-  if (include_self) {
-    c(result, codes)
-  }
 
   return(unique(result))
 }
