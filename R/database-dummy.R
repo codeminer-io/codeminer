@@ -52,6 +52,9 @@ dummy_data_path <- function() {
 dummy_icd10_lookup <- function() {
   icd10 <- readxl::read_excel(dummy_data_path(), sheet = "icd10_lkp")
 
+  # Remove garbage Excel rows
+  icd10 <- dplyr::filter(icd10, !is.na(.data$ALT_CODE))
+
   # Some ICD-10 descriptions include a modifier e.g. "E10" = "Type 1 diabetes
   # mellitus", whereas "E10.0" = "Type 1 diabetes mellitus with coma". "With
   # coma" is contained in the modifier columns "MODIFIER-4". See 'S27' for an
