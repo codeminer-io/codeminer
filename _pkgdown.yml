@@ -13,12 +13,16 @@ reference:
       - build_database
       - create_dummy_database
       - add_lookup_table
+      - lookup_metadata
       - add_mapping_table
+      - mapping_metadata
+      - add_relationship_table
+      - relationship_metadata
       - get_lookup_metadata
       - get_mapping_metadata
 
   - title: Clinical codes
-    desc: Functions for looking up clinical codes and mapping between different codisng systems.
+    desc: Functions for looking up clinical codes and mapping between different coding systems.
   - contents:
       - CODES
       - CODES_LIKE
@@ -31,8 +35,6 @@ reference:
       - get_col_filters
       - matches("ATTRIBUTE")
       - filter_sct_relationship
-      - lookup_metadata
-      - mapping_metadata
 
   - title: Dummy data
     desc: Dummy data for tests.
@@ -41,7 +43,7 @@ reference:
       - starts_with("dummy")
       - example_ontology
 
-  - title:: Utilities
+  - title: Utilities
     desc: Miscellaneous utility functions.
   - contents:
       - infix_setops

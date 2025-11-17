@@ -12,6 +12,10 @@ test_that("add_lookup_table works with dummy data", {
   expect_no_error(
     add_lookup_table(test_table, test_metadata)
   )
+  expect_true(table_exists(
+    con = connect_to_db(),
+    test_metadata$lookup_table_name
+  ))
 })
 
 test_that("add_lookup_table fails without valid database", {
@@ -41,16 +45,6 @@ test_that("add_lookup_table warns when lookup_table_name already exists", {
   )
 })
 
-test_that("add_lookup_metadata can take multiple entries", {
-  local_build_temp_database()
-  con <- connect_to_db()
-
-  test_metadata <- lookup_metadata(c("foo", "bar", "baz"))
-
-  expect_no_error(add_lookup_metadata(con, test_metadata))
-  expect_equal(nrow(get_lookup_metadata(con)), 3)
-})
-
 test_that("add_lookup_table fails with invalid metadata", {
   local_build_temp_database()
 
@@ -76,6 +70,10 @@ test_that("add_mapping_table works with example data", {
   expect_no_error(
     add_mapping_table(test_table, test_metadata)
   )
+  expect_true(table_exists(
+    con = connect_to_db(),
+    test_metadata$mapping_table_name
+  ))
 })
 
 test_that("add_mapping_table fails without valid database", {
@@ -105,19 +103,6 @@ test_that("add_mapping_table warns when mapping_table_name already exists", {
   )
 })
 
-test_that("add_mapping_metadata can take multiple entries", {
-  local_build_temp_database()
-  con <- connect_to_db()
-
-  test_metadata <- mapping_metadata(
-    c("foo", "bar", "baz"),
-    c("alice", "bob", "charlie")
-  )
-
-  expect_no_error(add_mapping_metadata(con, test_metadata))
-  expect_equal(nrow(get_mapping_metadata(con)), 3)
-})
-
 test_that("add_mapping_table fails with invalid metadata", {
   local_build_temp_database()
 
@@ -126,6 +111,67 @@ test_that("add_mapping_table fails with invalid metadata", {
 
   expect_error(
     add_mapping_table(test_table, test_metadata),
+    "The metadata in `test_metadata` is incomplete"
+  )
+})
+
+
+# Relationship tables ---------------------------------------------------------------------------------------------
+
+test_that("add_relationship_table works with dummy data", {
+  local_build_temp_database()
+
+  test_table <- data.frame(
+    from = c("a", "b", "c"),
+    to = c("parent_a", "parent_b", "parent_c"),
+    type = c("is a", "is a", "is a")
+  )
+  test_metadata <- relationship_metadata("_test", version = "v99")
+
+  expect_no_error(
+    add_relationship_table(test_table, test_metadata)
+  )
+  expect_true(table_exists(
+    con = connect_to_db(),
+    test_metadata$relationship_table_name
+  ))
+})
+
+test_that("add_relationship_table fails without valid database", {
+  # Uninitialised db
+  local_temp_database()
+
+  expect_error(
+    add_relationship_table(
+      data.frame(from = "foo", to = "bar", type = "is a"),
+      relationship_metadata("foo", version = "v0")
+    ),
+    "The database is not initialised"
+  )
+})
+
+test_that("add_relationship_table warns when relationship_table_name already exists", {
+  local_build_temp_database()
+
+  test_table <- data.frame(from = "foo", to = "bar", type = "is a")
+  test_metadata <- relationship_metadata("foo", version = "v0")
+
+  # Adding same metadata twice should warn
+  expect_no_error(add_relationship_table(test_table, test_metadata))
+  expect_warning(
+    add_relationship_table(test_table, test_metadata),
+    "The relationship table foo_v0 already exists."
+  )
+})
+
+test_that("add_relationship_table fails with invalid metadata", {
+  local_build_temp_database()
+
+  test_table <- data.frame(from = "foo", to = "bar", type = "is a")
+  test_metadata <- list(foo = "bar")
+
+  expect_error(
+    add_relationship_table(test_table, test_metadata),
     "The metadata in `test_metadata` is incomplete"
   )
 })

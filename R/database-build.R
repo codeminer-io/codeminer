@@ -2,6 +2,7 @@
 codeminer_metadata_table_names <- new.env(parent = emptyenv())
 codeminer_metadata_table_names$lookup <- "_lookup_metadata"
 codeminer_metadata_table_names$mapping <- "_mapping_metadata"
+codeminer_metadata_table_names$relationship <- "_relationship_metadata"
 lockEnvironment(codeminer_metadata_table_names, bindings = TRUE)
 
 #' Build the Codeminer database
@@ -31,6 +32,7 @@ build_database <- function(overwrite = FALSE) {
   con <- connect_to_db()
   create_lookup_metadata_table(con, overwrite = overwrite)
   create_mapping_metadata_table(con, overwrite = overwrite)
+  create_relationship_metadata_table(con, overwrite = overwrite)
 
   invisible(TRUE)
 }
@@ -80,6 +82,31 @@ create_mapping_metadata_table <- function(con, overwrite = FALSE) {
     fields = c(
       mapping_table_name = "VARCHAR PRIMARY KEY",
       mapping_fields
+    ),
+    overwrite = overwrite
+  )
+}
+
+#' Create relationship metadata table in database
+#'
+#' @param con Database connection, as returned by [DBI::dbConnect()]
+#' @param overwrite Logical indicating whether to overwrite existing table (default: `FALSE`)
+#'
+#' @return Invisible `TRUE` on success
+#' @noRd
+create_relationship_metadata_table <- function(con, overwrite = FALSE) {
+  tbl_name <- codeminer_metadata_table_names$relationship
+
+  relationship_cols <- required_relationship_metadata_columns()
+  relationship_fields <- rep("VARCHAR", length(relationship_cols))
+  names(relationship_fields) <- relationship_cols
+
+  create_table(
+    con,
+    tbl_name = tbl_name,
+    fields = c(
+      relationship_table_name = "VARCHAR PRIMARY KEY",
+      relationship_fields
     ),
     overwrite = overwrite
   )
@@ -136,11 +163,11 @@ required_mapping_metadata_columns <- function() {
 #' @noRd
 required_relationship_metadata_columns <- function() {
   c(
-    "relationship_name",
+    "code_type",
     "relationship_version",
-    "relationship_from_col",
-    "relationship_to_col",
-    "relationship_type_col",
+    "from_col",
+    "to_col",
+    "type_col",
     "child_parent_relationship_code", # Code for child -> parent relationship (e.g. SNOMED 'is a')
     "relationship_source"
   )
