@@ -29,6 +29,10 @@ clinical coding systems.
   : Add a relationship table to the database
 - [`relationship_metadata()`](https://codeminer-io.github.io/codeminer/reference/relationship_metadata.md)
   : Create relationship metadata
+- [`get_lookup_metadata()`](https://codeminer-io.github.io/codeminer/reference/get_lookup_metadata.md)
+  : Return the lookup metadata table as a data frame
+- [`get_mapping_metadata()`](https://codeminer-io.github.io/codeminer/reference/get_mapping_metadata.md)
+  : Return the mapping metadata table as a data frame
 
 ## Clinical codes
 

@@ -38,7 +38,9 @@
 <url><loc>https://codeminer-io.github.io/codeminer/reference/get_bnf_from_open_prescribing.html</loc></url>
 <url><loc>https://codeminer-io.github.io/codeminer/reference/get_children_sct.html</loc></url>
 <url><loc>https://codeminer-io.github.io/codeminer/reference/get_col_filters.html</loc></url>
+<url><loc>https://codeminer-io.github.io/codeminer/reference/get_lookup_metadata.html</loc></url>
 <url><loc>https://codeminer-io.github.io/codeminer/reference/get_lookup_table.html</loc></url>
+<url><loc>https://codeminer-io.github.io/codeminer/reference/get_mapping_metadata.html</loc></url>
 <url><loc>https://codeminer-io.github.io/codeminer/reference/get_mapping_table.html</loc></url>
 <url><loc>https://codeminer-io.github.io/codeminer/reference/get_nhsbsa_snomed_bnf.html</loc></url>
 <url><loc>https://codeminer-io.github.io/codeminer/reference/get_parents_sct.html</loc></url>

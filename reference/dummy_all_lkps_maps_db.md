@@ -36,7 +36,7 @@ Other Dummy data:
 
 ``` r
 dummy_all_lkps_maps_db()
-#> Writing lookup and mapping tables to Duckdb database at /tmp/RtmprDVbPc/file19015a5d0dab.db
+#> Writing lookup and mapping tables to Duckdb database at /tmp/Rtmpv7eqly/file18f97109f155.db
 #> metadata_all_lkps_maps
 #> bnf_lkp
 #> dmd_lkp
@@ -63,5 +63,5 @@ dummy_all_lkps_maps_db()
 #> phecode_lkp
 #> icd10_phecode
 #> metadata_codeminer
-#> Success! Connect to database with `con <- DBI::dbConnect(duckdb::duckdb(), '/tmp/RtmprDVbPc/file19015a5d0dab.db', read_only = TRUE)`, then access all tables with `all_lkps_maps <- ukbwranglr::db_tables_to_list(con)`
+#> Success! Connect to database with `con <- DBI::dbConnect(duckdb::duckdb(), '/tmp/Rtmpv7eqly/file18f97109f155.db', read_only = TRUE)`, then access all tables with `all_lkps_maps <- ukbwranglr::db_tables_to_list(con)`
 ```
