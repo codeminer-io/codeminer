@@ -25,6 +25,8 @@ Other Clinical code lookups and mappings:
 \code{\link{CODES}()},
 \code{\link{GET_ATTRIBUTES}()},
 \code{\link{HAS_ATTRIBUTES}()},
-\code{\link{MAP}()}
+\code{\link{MAP}()},
+\code{\link{get_children_sct}()},
+\code{\link{get_parents_sct}()}
 }
 \concept{Clinical code lookups and mappings}
