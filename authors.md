@@ -5,6 +5,11 @@
 - **Alasdair Warwick**. Author, maintainer.
   [](https://orcid.org/0000-0002-0800-2890)
 
+- **Milan Malfait**. Author. [](https://orcid.org/0000-0001-9144-3701)
+
+- **Miguel Xochicale**. Author.
+  [](https://orcid.org/0000-0002-8225-7517)
+
 ## Citation
 
 Source:
