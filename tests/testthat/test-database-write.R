@@ -57,6 +57,34 @@ test_that("add_lookup_table fails with invalid metadata", {
   )
 })
 
+test_that("add_lookup_table fails when column names in metadata don't exist in table", {
+  local_build_temp_database()
+
+  test_table <- data.frame(my_code = "E10", my_desc = "Type 1 diabetes")
+  test_metadata <- lookup_metadata(
+    "test",
+    lookup_code_col = "code",
+    lookup_description_col = "description"
+  )
+
+  expect_error(
+    add_lookup_table(test_table, test_metadata),
+    "Invalid metadata supplied.*lookup_code_col"
+  )
+})
+
+test_that("add_lookup_table succeeds with custom column names", {
+  local_build_temp_database()
+
+  test_table <- data.frame(my_code = "a", my_description = "letter A")
+  test_metadata <- lookup_metadata(
+    "custom_cols",
+    lookup_code_col = "my_code",
+    lookup_description_col = "my_description"
+  )
+
+  expect_no_error(add_lookup_table(test_table, test_metadata))
+})
 
 # mapping tables --------------------------------------------------------------------------------------------------
 
