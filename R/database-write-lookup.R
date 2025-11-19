@@ -183,7 +183,7 @@ validate_lookup_metadata <- function(
       c(
         "Invalid metadata supplied in {.arg {metadata_arg}}.",
         "x" = "These metadata fields refer to columns not present in {.arg {table_arg}}:",
-        "!" = "{.field {names(missing_colnames)}} → {.val {unlist(missing_colnames)}}"
+        "!" = "{.field {names(missing_colnames)}} -> {.val {unlist(missing_colnames)}}"
       ),
       call = call
     )
