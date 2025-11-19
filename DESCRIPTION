@@ -2,12 +2,23 @@ Package: codeminer
 Title: Functions for Mapping Between Clinical Coding Systems
 Description: Functions for mapping between clinical coding systems.
 Version: 0.0.0.9004
-Authors@R:
+Authors@R: c(
     person(given = "Alasdair",
            family = "Warwick",
            role = c("aut", "cre"),
            email = "alasdair.warwick06@gmail.com",
-           comment = c(ORCID = "0000-0002-0800-2890"))
+           comment = c(ORCID = "0000-0002-0800-2890")),
+    person(given = "Milan",
+           family = "Malfait",
+           role = "aut",
+           email = "m.malfait@ucl.ac.uk",
+           comment = c(ORCID = "0000-0001-9144-3701")),
+    person(given = "Miguel",
+           family = "Xochicale",
+           role = "aut",
+           email = "m.xochicale@ucl.ac.uk",
+           comment = c(ORCID = "0000-0002-8225-7517"))
+    )
 License: MIT + file LICENSE
 URL: https://github.com/codeminer-io/codeminer, https://codeminer-io.github.io/codeminer/
 BugReports: https://github.com/codeminer-io/codeminer/issues
