@@ -58,8 +58,6 @@ test_that("add_lookup_table fails with invalid metadata", {
 })
 
 test_that("add_lookup_table fails when column names in metadata don't exist in table", {
-  local_build_temp_database()
-
   test_table <- data.frame(my_code = "E10", my_desc = "Type 1 diabetes")
   test_metadata <- lookup_metadata(
     "test",
