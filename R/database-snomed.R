@@ -410,6 +410,11 @@ add_snomed_database <- function(
   expected_zip_name <- trud_metadata$releases[[
     release_index
   ]]$archiveFileName
+  release_version <- gsub(
+    " ",
+    "_",
+    trud_metadata$releases[[release_index]]$name
+  )
   expected_base_name <- tools::file_path_sans_ext(expected_zip_name)
 
   # Construct dynamic path with trud_metadata
@@ -429,19 +434,9 @@ add_snomed_database <- function(
 
   snomedct <- read_snomed_ct_uk_monolith(expected_path)
 
-  # Print mapping table names
-  cli::cli_inform(c(
-    "i" = "Names in snomedct:",
-    ">" = paste(names(snomedct), collapse = ", ")
-  ))
-
-  # Print first rows of sct_lookup as a formatted preview
-  cli::cli_inform(c(
-    "i" = "Preview of snomedct$sct_lookup:"
-  ))
-  cli::cli_inform(c(
-    ">" = utils::capture.output(print(head(snomedct$sct_lookup)))
-  ))
+  lookup_table <- snomedct$sct_lookup
+  relationship_table <- snomedct$sct_relationship
+  mapping_table <- snomedct$sct_icd10_mapping
 
   # Build a temporary database
   db_path <- tempfile(fileext = ".duckdb")
@@ -451,5 +446,36 @@ add_snomed_database <- function(
   ))
   codeminer::build_database()
 
-  return(db_path)
+  add_lookup_table(
+    lookup_table,
+    lookup_metadata(
+      "SNOMED-CT",
+      version = release_version,
+      lookup_code_col = "conceptId"
+    )
+  )
+  add_relationship_table(
+    relationship_table,
+    relationship_metadata(
+      code_type = "SNOMED-CT",
+      version = "v0",
+      from_col = "moduleId",
+      to_col = "mapTarget"
+    )
+  )
+  add_mapping_table(
+    mapping_table,
+    mapping_metadata(
+      from_code_type = "ICD-10",
+      to_code_type = "SNOMED-CT",
+      version = release_version
+    )
+  )
+
+  lookup_metadata <- get_lookup_metadata()
+  mapping_metadata <- get_mapping_metadata()
+  return(list(
+    lookup_metadata = lookup_metadata,
+    mapping_metadata = mapping_metadata
+  ))
 }

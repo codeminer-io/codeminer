@@ -114,10 +114,14 @@ test_that("add_snomed_database() maps snomed database with codeminer ", {
   # Unit tests are intended for local execution.
   # See the function's documentation for prerequisites.
 
-  db_path <- add_snomed_database(
-    getwd(),
+  databases <- add_snomed_database(
+    path_destination = getwd(),
     release_index = 1
   )
 
-  expect_true(file.exists(db_path))
+  #TODO databases$lookup_metadata$lookup_table_name
+  expect_equal(
+    databases$mapping_metadata$mapping_table_name,
+    "ICD-10_SNOMED-CT_Release_41.1.0"
+  )
 })
