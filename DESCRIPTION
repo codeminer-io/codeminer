@@ -16,7 +16,8 @@ Authors@R: c(
     person(given = "Miguel",
            family = "Xochicale",
            role = "aut",
-           email = "m.xochicale@ucl.ac.uk")
+           email = "m.xochicale@ucl.ac.uk",
+           comment = c(ORCID = "0000-0002-8225-7517"))
     )
 License: MIT + file LICENSE
 URL: https://github.com/codeminer-io/codeminer, https://codeminer-io.github.io/codeminer/
