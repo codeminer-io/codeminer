@@ -216,8 +216,9 @@ download_latestversion_of_snomed_item <- function(
 #' @return
 #' A named list with three elements:
 #' \describe{
-#'   \item{`sct_description`}{A `data.table` combining SNOMED CT concepts and descriptions.}
+#'   \item{`sct_lookup`}{A `data.table` combining SNOMED CT concepts and descriptions.}
 #'   \item{`sct_relationship`}{A `data.table` containing concept relationships.}
+#'   \item{`sct_icd10_mapping`}{A `data.table` containing SNOMED CT–to–ICD-10 map entries.}
 #' }
 #'
 #' @examples
@@ -229,8 +230,9 @@ download_latestversion_of_snomed_item <- function(
 #' names(snomed)
 #'
 #' # Inspect a few rows of each
-#' head(snomed$sct_description)
+#' head(snomed$sct_lookup)
 #' head(snomed$sct_relationship)
+#' head(snomed$sct_icd10_mapping)
 #' }
 #'
 #' @export
@@ -351,7 +353,8 @@ read_snomed_ct_uk_monolith <- function(path_destination) {
     cli::cli_abort("Cannot proceed without required refset file.")
   }
 
-  sct_description <- snomed_monolith_terminology[[
+  # rename sct_lookup to sct_lookup
+  sct_lookup <- snomed_monolith_terminology[[
     "sct2_Description_MONOSnapshot-en.txt"
   ]] |>
     dplyr::rename_with(\(x) paste0(x, "_description")) |>
@@ -366,10 +369,21 @@ read_snomed_ct_uk_monolith <- function(path_destination) {
     "sct2_Relationship_MONOSnapshot.txt"
   ]]
 
+  sct_icd10_mapping <- snomed_monolith_refset$Map[[
+    "der2_iisssciRefset_ExtendedMapMONOSnapshot.txt"
+  ]] |>
+    dplyr::filter(.data[["refsetId"]] == "999002271000000101") |>
+    dplyr::filter(stringr::str_detect(
+      .data[["mapTarget"]],
+      "#",
+      negate = TRUE
+    ))
+
   return(
     list(
-      sct_description = sct_description,
-      sct_relationship = sct_relationship
+      sct_lookup = sct_lookup,
+      sct_relationship = sct_relationship,
+      sct_icd10_mapping = sct_icd10_mapping
     )
   )
 }
@@ -377,7 +391,7 @@ read_snomed_ct_uk_monolith <- function(path_destination) {
 #' Mapping SNOMED CT UK database with codeminer tables
 #' #TODO add docstring
 #'
-mapping_snomed_database <- function(
+add_snomed_database <- function(
   path_destination = ".",
   release_index = 1
 ) {
@@ -421,12 +435,12 @@ mapping_snomed_database <- function(
     ">" = paste(names(snomedct), collapse = ", ")
   ))
 
-  # Print first rows of sct_description as a formatted preview
+  # Print first rows of sct_lookup as a formatted preview
   cli::cli_inform(c(
-    "i" = "Preview of snomedct$sct_description:"
+    "i" = "Preview of snomedct$sct_lookup:"
   ))
   cli::cli_inform(c(
-    ">" = utils::capture.output(print(head(snomedct$sct_description)))
+    ">" = utils::capture.output(print(head(snomedct$sct_lookup)))
   ))
 
   # Build a temporary database

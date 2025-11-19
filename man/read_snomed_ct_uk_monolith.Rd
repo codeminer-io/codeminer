@@ -18,8 +18,9 @@ This directory must contain the subdirectories:
 \value{
 A named list with three elements:
 \describe{
-\item{\code{sct_description}}{A \code{data.table} combining SNOMED CT concepts and descriptions.}
+\item{\code{sct_lookup}}{A \code{data.table} combining SNOMED CT concepts and descriptions.}
 \item{\code{sct_relationship}}{A \code{data.table} containing concept relationships.}
+\item{\code{sct_icd10_mapping}}{A \code{data.table} containing SNOMED CT–to–ICD-10 map entries.}
 }
 }
 \description{
@@ -52,8 +53,9 @@ snomed <- read_snomed_ct_uk_monolith("~/SNOMEDCT_Release_UK")
 names(snomed)
 
 # Inspect a few rows of each
-head(snomed$sct_description)
+head(snomed$sct_lookup)
 head(snomed$sct_relationship)
+head(snomed$sct_icd10_mapping)
 }
 
 }

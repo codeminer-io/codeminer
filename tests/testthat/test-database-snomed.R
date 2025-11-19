@@ -75,7 +75,7 @@ test_that("read_snomed_ct_uk_monolith() returns appropriate tables", {
   snomedct <- read_snomed_ct_uk_monolith(expected_path)
 
   expect_equal(
-    names(snomedct$sct_description),
+    names(snomedct$sct_lookup),
     c(
       "id_description",
       "effectiveTime_description",
@@ -110,11 +110,11 @@ test_that("read_snomed_ct_uk_monolith() returns appropriate tables", {
   )
 })
 
-test_that("mapping_snomed_database() maps snomed database with codeminer ", {
+test_that("add_snomed_database() maps snomed database with codeminer ", {
   # Unit tests are intended for local execution.
   # See the function's documentation for prerequisites.
 
-  db_path <- mapping_snomed_database(
+  db_path <- add_snomed_database(
     getwd(),
     release_index = 1
   )
