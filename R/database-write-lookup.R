@@ -148,7 +148,8 @@ lookup_metadata <- function(
 #'
 #' @param metadata A list containing the lookup metadata.
 #' @param table The lookup table to add, should be coercible to a `data.frame`
-#' @param arg The argument name. Used to construct error message.
+#' @param metadata_arg The metadata argument name. Used to construct error message.
+#' @param table_arg The table argument name. Used to construct error message.
 #' @param call The calling environment. Used to construct error message.
 #' @return A logical value, invisibly, indicating whether the metadata is valid.
 #' @keywords internal
