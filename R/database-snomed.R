@@ -57,7 +57,9 @@ add_snomed_tables <- function(
     mapping_metadata(
       from_code_type = "ICD-10",
       to_code_type = "SNOMED-CT",
-      version = release_version
+      version = release_version,
+      from_col = "refsetId",
+      to_col = "sourceId"
     )
   )
 
