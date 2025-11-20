@@ -123,7 +123,10 @@ test_that("add_snomed_database() maps snomed database with codeminer ", {
     release_index = 1
   )
 
-  #TODO databases$lookup_metadata$lookup_table_name
+  expect_equal(
+    databases$lookup_metadata$lookup_table_name,
+    "SNOMED-CT_Release_41.1.0"
+  )
   expect_equal(
     databases$mapping_metadata$mapping_table_name,
     "ICD-10_SNOMED-CT_Release_41.1.0"
