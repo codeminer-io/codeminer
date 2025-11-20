@@ -57,10 +57,10 @@ test_that("add_lookup_table fails with invalid metadata", {
   )
 })
 
-test_that("add_lookup_table fails when column names in metadata don't exist in table", {
-  test_table <- data.frame(my_code = "E10", my_desc = "Type 1 diabetes")
+test_that("add_lookup_table fails when column names (my_code and my_description) in metadata don't exist in table", {
+  test_table <- data.frame(my_code = "E10", my_description = "Type 1 diabetes")
   test_metadata <- lookup_metadata(
-    "test",
+    code_type = "test",
     lookup_code_col = "code",
     lookup_description_col = "description"
   )
@@ -71,12 +71,12 @@ test_that("add_lookup_table fails when column names in metadata don't exist in t
   )
 })
 
-test_that("add_lookup_table succeeds with custom column names", {
+test_that("add_lookup_table succeeds with custom column names (my_code and my_description)", {
   local_build_temp_database()
 
   test_table <- data.frame(my_code = "a", my_description = "letter A")
   test_metadata <- lookup_metadata(
-    "custom_cols",
+    code_type = "custom_cols",
     lookup_code_col = "my_code",
     lookup_description_col = "my_description"
   )
@@ -140,7 +140,6 @@ test_that("add_mapping_table fails with invalid metadata", {
     "The metadata in `test_metadata` is incomplete"
   )
 })
-
 
 # Relationship tables ---------------------------------------------------------------------------------------------
 
