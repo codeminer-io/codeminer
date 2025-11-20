@@ -32,12 +32,6 @@ add_snomed_tables <- function(
   relationship_table <- snomedct$sct_relationship
   mapping_table <- snomedct$sct_icd10_mapping
 
-  # Build a temporary database
-  db_path <- tempfile(fileext = ".duckdb")
-  Sys.setenv(CODEMINER_DB_PATH = db_path)
-  cli::cli_inform(c(
-    "i" = paste0("Using CODEMINER_DB_PATH: ", Sys.getenv("CODEMINER_DB_PATH"))
-  ))
   codeminer::build_database()
 
   add_lookup_table(
