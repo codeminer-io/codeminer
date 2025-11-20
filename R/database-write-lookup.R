@@ -28,7 +28,12 @@
 #' build_database()
 #' add_lookup_table(lookup_table, lookup_metadata("capital_letters", version = "v3"))
 add_lookup_table <- function(table, metadata) {
-  validate_lookup_metadata(metadata, arg = rlang::caller_arg(metadata))
+  validate_lookup_metadata(
+    metadata,
+    table,
+    metadata_arg = rlang::caller_arg(metadata),
+    table_arg = rlang::caller_arg(table)
+  )
 
   table_name <- metadata$lookup_table_name
   if (length(table_name) != 1) {
@@ -138,15 +143,22 @@ lookup_metadata <- function(
 
 #' Validate lookup metadata
 #'
+#' Checks that required metadata is present, and that any column names are
+#' actually present in the accompanying lookup table.
+#'
 #' @param metadata A list containing the lookup metadata.
-#' @param arg The argument name. Used to construct error message.
+#' @param table The lookup table to add, should be coercible to a `data.frame`
+#' @param metadata_arg The metadata argument name. Used to construct error message.
+#' @param table_arg The table argument name. Used to construct error message.
 #' @param call The calling environment. Used to construct error message.
 #' @return A logical value, invisibly, indicating whether the metadata is valid.
 #' @keywords internal
 #' @noRd
 validate_lookup_metadata <- function(
   metadata,
-  arg = rlang::caller_arg(metadata),
+  table,
+  metadata_arg = rlang::caller_arg(metadata),
+  table_arg = rlang::caller_arg(table),
   call = rlang::caller_env()
 ) {
   required <- required_lookup_metadata_columns()
@@ -155,9 +167,23 @@ validate_lookup_metadata <- function(
   if (length(missing) > 0) {
     cli::cli_abort(
       c(
-        "The metadata in {.arg {arg}} is incomplete.",
+        "The metadata in {.arg {metadata_arg}} is incomplete.",
         "x" = "The following entries are missing: {.field {missing}}",
         "i" = "Use {.fun codeminer::lookup_metadata} to construct valid metadata."
+      ),
+      call = call
+    )
+  }
+
+  missing_colnames <- metadata[stringr::str_ends(names(metadata), "_col")] |>
+    purrr::keep(\(x) rlang::is_string(x) && !x %in% names(table))
+
+  if (length(missing_colnames) > 0) {
+    cli::cli_abort(
+      c(
+        "Invalid metadata supplied in {.arg {metadata_arg}}.",
+        "x" = "These metadata fields refer to columns not present in {.arg {table_arg}}:",
+        "!" = "{.field {names(missing_colnames)}} -> {.val {unlist(missing_colnames)}}"
       ),
       call = call
     )
