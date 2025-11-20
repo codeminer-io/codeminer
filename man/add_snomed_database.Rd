@@ -2,12 +2,19 @@
 % Please edit documentation in R/database-snomed.R
 \name{add_snomed_database}
 \alias{add_snomed_database}
-\title{Mapping SNOMED CT UK database with codeminer tables
-#TODO add docstring}
+\title{Add SNOMED Database}
 \usage{
 add_snomed_database(path_destination = ".", release_index = 1)
 }
+\arguments{
+\item{path_destination}{Character string. Path where the database files
+will be written.}
+
+\item{release_index}{Integer. Which TRUD release index to use (1 = latest).}
+}
+\value{
+Invisibly returns the output path.
+}
 \description{
-Mapping SNOMED CT UK database with codeminer tables
-#TODO add docstring
+Creates or updates a SNOMED CT database
 }

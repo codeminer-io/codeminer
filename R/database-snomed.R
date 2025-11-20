@@ -466,8 +466,16 @@ read_snomed_ct_uk_monolith <- function(path_destination) {
   )
 }
 
-#' Mapping SNOMED CT UK database with codeminer tables
-#' #TODO add docstring
+#' Add SNOMED Database
+#'
+#' @description
+#' Creates or updates a SNOMED CT database
+#'
+#' @param path_destination Character string. Path where the database files
+#'   will be written.
+#' @param release_index Integer. Which TRUD release index to use (1 = latest).
+#'
+#' @return Invisibly returns the output path.
 #'
 add_snomed_database <- function(
   path_destination = ".",
