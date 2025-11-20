@@ -16,3 +16,11 @@ Useful links:
 
 **Maintainer**: Alasdair Warwick <alasdair.warwick06@gmail.com>
 ([ORCID](https://orcid.org/0000-0002-0800-2890))
+
+Authors:
+
+- Milan Malfait <m.malfait@ucl.ac.uk>
+  ([ORCID](https://orcid.org/0000-0001-9144-3701))
+
+- Miguel Xochicale <m.xochicale@ucl.ac.uk>
+  ([ORCID](https://orcid.org/0000-0002-8225-7517))
