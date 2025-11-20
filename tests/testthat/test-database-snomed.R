@@ -118,6 +118,9 @@ test_that("add_snomed_tables() are added successfully", {
       release_index = 1
     )
   )
-
   expect_true(databases)
+
+  result <- CODES("all", code_type = "SNOMED-CT")
+  expect_s3_class(result, "data.frame")
+  expect_true(nrow(result) > 0)
 })
