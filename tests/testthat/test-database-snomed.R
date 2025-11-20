@@ -109,7 +109,7 @@ test_that("read_snomed_ct_uk_monolith() returns appropriate tables", {
   )
 })
 
-test_that("add_snomed_tables() maps snomed database with codeminer ", {
+test_that("add_snomed_tables() are added successfully", {
   expect_invisible(
     databases <- add_snomed_tables(
       path_destination = getwd(),
