@@ -2,7 +2,7 @@
 % Please edit documentation in R/database-snomed.R
 \name{add_snomed_tables}
 \alias{add_snomed_tables}
-\title{Add SNOMED Database}
+\title{Add SNOMED tables}
 \usage{
 add_snomed_tables(path_destination = ".", release_index = 1)
 }
@@ -13,7 +13,7 @@ will be written.}
 \item{release_index}{Integer. Which TRUD release index to use (1 = latest).}
 }
 \value{
-Invisibly returns the output path.
+Invisible \code{TRUE} on success
 }
 \description{
 Creates or updates a SNOMED CT database

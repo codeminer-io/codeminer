@@ -1,13 +1,12 @@
-#' Add SNOMED Database
+#' Add SNOMED tables
 #'
-#' @description
 #' Creates or updates a SNOMED CT database
 #'
 #' @param path_destination Character string. Path where the database files
 #'   will be written.
 #' @param release_index Integer. Which TRUD release index to use (1 = latest).
 #'
-#' @return Invisibly returns the output path.
+#' @return Invisible `TRUE` on success
 #'
 add_snomed_tables <- function(
   path_destination = ".",
@@ -68,12 +67,7 @@ add_snomed_tables <- function(
     )
   )
 
-  lookup_metadata <- get_lookup_metadata()
-  mapping_metadata <- get_mapping_metadata()
-  return(list(
-    lookup_metadata = lookup_metadata,
-    mapping_metadata = mapping_metadata
-  ))
+  invisible(TRUE)
 }
 
 

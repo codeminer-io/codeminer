@@ -110,17 +110,12 @@ test_that("read_snomed_ct_uk_monolith() returns appropriate tables", {
 })
 
 test_that("add_snomed_tables() maps snomed database with codeminer ", {
-  databases <- add_snomed_tables(
-    path_destination = getwd(),
-    release_index = 1
+  expect_invisible(
+    databases <- add_snomed_tables(
+      path_destination = getwd(),
+      release_index = 1
+    )
   )
 
-  expect_equal(
-    databases$lookup_metadata$lookup_table_name,
-    "SNOMED-CT_Release_41.1.0"
-  )
-  expect_equal(
-    databases$mapping_metadata$mapping_table_name,
-    "ICD-10_SNOMED-CT_Release_41.1.0"
-  )
+  expect_true(databases)
 })
