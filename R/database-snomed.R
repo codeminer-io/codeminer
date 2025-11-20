@@ -186,6 +186,84 @@ download_latestversion_of_snomed_item <- function(
 }
 
 
+#' Build SNOMED Expected Path and Metadata
+#'
+#' Retrieves TRUD metadata for a SNOMED CT item, parses the selected release,
+#' and constructs the expected filesystem path for the corresponding RF2
+#' release archive.
+#'
+#' This helper centralises duplicated logic used in tests and data-loading
+#' functions by generating:
+#' * the expected extraction path for the SNOMED release
+#' * a cleaned release version string (spaces replaced with underscores)
+#' * the metadata object for the selected release
+#'
+#' @param path_destination Character string. The base directory where the
+#'   SNOMED item directory and extracted files are expected to reside.
+#' @param release_index Integer (default = 1). The index of the release to use.
+#'   `1` corresponds to the latest release; increasing values refer to older
+#'   releases as returned by `trud::get_item_metadata()`.
+#' @param item_id Integer (default = 1799). The TRUD item ID to query.
+#'
+#' @return A named list with elements:
+#' \describe{
+#'   \item{expected_path}{Character string. The computed path where the
+#'     SNOMED RF2 release is expected to be located.}
+#'   \item{release_version}{Character string. The cleaned release name with
+#'     spaces replaced by underscores.}
+#'   \item{latest_version_metadata}{List. The metadata of the selected release
+#'     extracted from the TRUD item metadata.}
+#' }
+#'
+#' @examples
+#' \dontrun{
+#' build_snomed_metadata("/tmp/snomed")
+#' }
+#'
+#' @export
+build_snomed_metadata <- function(
+  path_destination,
+  release_index = 1,
+  item_id = 1799
+) {
+  # Fetch TRUD metadata for the given item
+  trud_metadata <- trud::get_item_metadata(item_id, release_scope = "all")
+
+  # Extract relevant release information
+  release <- trud_metadata$releases[[release_index]]
+  expected_zip_name <- release$archiveFileName
+
+  # Clean release name: replace spaces with underscores
+  release_version <- gsub(" ", "_", release$name)
+
+  # Remove file extension
+  expected_base_name <- tools::file_path_sans_ext(expected_zip_name)
+
+  # Extract the date segment (last 15 to last 8 characters)
+  date_segment <- substr(
+    expected_base_name,
+    nchar(expected_base_name) - 14,
+    nchar(expected_base_name) - 7
+  )
+
+  # Construct final expected path
+  expected_path <- file.path(
+    path_destination,
+    paste0("snomed_item_", item_id, "_", expected_zip_name),
+    paste0(
+      "SnomedCT_MonolithRF2_PRODUCTION_",
+      date_segment,
+      "T120000Z"
+    )
+  )
+
+  return(list(
+    expected_path = expected_path,
+    release_version = release_version,
+    latest_version_metadata = release
+  ))
+}
+
 #' Read the SNOMED CT UK Monolith Edition into R
 #'
 #' @description
@@ -401,36 +479,13 @@ add_snomed_database <- function(
     cli::cli_abort("Directory does not exist: {path_destination}")
   }
 
-  #TODO remove > duplicated lines 390-414 with test-database-snomed.R 45-66
-  # Set the index for the TRUD metadata release
-  # Use 1 for the latest version; increasing values retrieve older releases
-  release_index <- 1
-
-  trud_metadata <- trud::get_item_metadata(1799, release_scope = "all")
-  expected_zip_name <- trud_metadata$releases[[
-    release_index
-  ]]$archiveFileName
-  release_version <- gsub(
-    " ",
-    "_",
-    trud_metadata$releases[[release_index]]$name
-  )
-  expected_base_name <- tools::file_path_sans_ext(expected_zip_name)
-
-  # Construct dynamic path with trud_metadata
-  expected_path <- file.path(
+  build_snomed_metadata <- build_snomed_metadata(
     path_destination,
-    paste0("snomed_item_1799_", expected_zip_name),
-    paste0(
-      "SnomedCT_MonolithRF2_PRODUCTION_",
-      substr(
-        expected_base_name,
-        nchar(expected_base_name) - 14,
-        nchar(expected_base_name) - 7
-      ),
-      "T120000Z"
-    )
+    release_index = 1,
+    item_id = 1799
   )
+  expected_path <- build_snomed_metadata$expected_path
+  release_version <- build_snomed_metadata$release_version
 
   snomedct <- read_snomed_ct_uk_monolith(expected_path)
 

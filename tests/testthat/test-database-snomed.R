@@ -42,28 +42,13 @@ test_that("read_snomed_ct_uk_monolith() returns appropriate tables", {
 
   # Set the index for the TRUD metadata release
   # Use 1 for the latest version; increasing values retrieve older releases
-  release_index <- 1
 
-  trud_metadata <- trud::get_item_metadata(1799, release_scope = "all")
-  expected_zip_name <- trud_metadata$releases[[
-    release_index
-  ]]$archiveFileName
-  expected_base_name <- tools::file_path_sans_ext(expected_zip_name)
-
-  # Construct dynamic path with trud_metadata
-  expected_path <- file.path(
-    getwd(),
-    paste0("snomed_item_1799_", expected_zip_name),
-    paste0(
-      "SnomedCT_MonolithRF2_PRODUCTION_",
-      substr(
-        expected_base_name,
-        nchar(expected_base_name) - 14,
-        nchar(expected_base_name) - 7
-      ),
-      "T120000Z"
-    )
+  build_snomed_metadata <- build_snomed_metadata(
+    path_destination = getwd(),
+    release_index = 1,
+    item_id = 1799
   )
+  expected_path <- build_snomed_metadata$expected_path
 
   # Skip test for CI as path is for local test
   skip_if(
@@ -106,6 +91,25 @@ test_that("read_snomed_ct_uk_monolith() returns appropriate tables", {
       "typeId",
       "characteristicTypeId",
       "modifierId"
+    )
+  )
+
+  expect_equal(
+    names(snomedct$sct_icd10_mapping),
+    c(
+      "id",
+      "effectiveTime",
+      "active",
+      "moduleId",
+      "refsetId",
+      "referencedComponentId",
+      "mapGroup",
+      "mapPriority",
+      "mapRule",
+      "mapAdvice",
+      "mapTarget",
+      "correlationId",
+      "mapBlock"
     )
   )
 })
