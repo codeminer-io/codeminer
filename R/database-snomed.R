@@ -32,17 +32,16 @@ add_snomed_tables <- function(
   relationship_table <- snomedct$sct_relationship
   mapping_table <- snomedct$sct_icd10_mapping
 
-  codeminer::build_database()
-
   add_lookup_table(
     lookup_table,
     lookup_metadata(
       code_type = "SNOMED-CT",
       version = release_version,
       lookup_code_col = "conceptId",
-      lookup_description_col = "id_description"
+      lookup_description_col = "term_description"
     )
   )
+  # column names for relationship_table needs to be checked
   add_relationship_table(
     relationship_table,
     relationship_metadata(
@@ -52,6 +51,7 @@ add_snomed_tables <- function(
       to_col = "mapTarget"
     )
   )
+  # column names for mapping_table needs to be checked
   add_mapping_table(
     mapping_table,
     mapping_metadata(

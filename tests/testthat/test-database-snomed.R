@@ -1,3 +1,5 @@
+create_dummy_database()
+
 withr::local_options(
   # Silence logs generated with cli
   cli.default_handler = function(...) {}
