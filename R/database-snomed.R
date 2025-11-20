@@ -1,3 +1,82 @@
+#' Add SNOMED Database
+#'
+#' @description
+#' Creates or updates a SNOMED CT database
+#'
+#' @param path_destination Character string. Path where the database files
+#'   will be written.
+#' @param release_index Integer. Which TRUD release index to use (1 = latest).
+#'
+#' @return Invisibly returns the output path.
+#'
+add_snomed_tables <- function(
+  path_destination = ".",
+  release_index = 1
+) {
+  rlang::check_installed("trud")
+
+  if (!dir.exists(path_destination)) {
+    cli::cli_abort("Directory does not exist: {path_destination}")
+  }
+
+  build_snomed_metadata <- build_snomed_metadata(
+    path_destination,
+    release_index = 1,
+    item_id = 1799
+  )
+  expected_path <- build_snomed_metadata$expected_path
+  release_version <- build_snomed_metadata$release_version
+
+  snomedct <- read_snomed_ct_uk_monolith(expected_path)
+
+  lookup_table <- snomedct$sct_lookup
+  relationship_table <- snomedct$sct_relationship
+  mapping_table <- snomedct$sct_icd10_mapping
+
+  # Build a temporary database
+  db_path <- tempfile(fileext = ".duckdb")
+  Sys.setenv(CODEMINER_DB_PATH = db_path)
+  cli::cli_inform(c(
+    "i" = paste0("Using CODEMINER_DB_PATH: ", Sys.getenv("CODEMINER_DB_PATH"))
+  ))
+  codeminer::build_database()
+
+  add_lookup_table(
+    lookup_table,
+    lookup_metadata(
+      code_type = "SNOMED-CT",
+      version = release_version,
+      lookup_code_col = "conceptId",
+      lookup_description_col = "id_description"
+    )
+  )
+  add_relationship_table(
+    relationship_table,
+    relationship_metadata(
+      code_type = "SNOMED-CT",
+      version = "v0",
+      from_col = "moduleId",
+      to_col = "mapTarget"
+    )
+  )
+  add_mapping_table(
+    mapping_table,
+    mapping_metadata(
+      from_code_type = "ICD-10",
+      to_code_type = "SNOMED-CT",
+      version = release_version
+    )
+  )
+
+  lookup_metadata <- get_lookup_metadata()
+  mapping_metadata <- get_mapping_metadata()
+  return(list(
+    lookup_metadata = lookup_metadata,
+    mapping_metadata = mapping_metadata
+  ))
+}
+
+
 #' Download the Latest SNOMED CT Release from NHS TRUD
 #'
 #' This function automates downloading and extracting the most recent release of a SNOMED CT item from the
@@ -464,82 +543,4 @@ read_snomed_ct_uk_monolith <- function(path_destination) {
       sct_icd10_mapping = sct_icd10_mapping
     )
   )
-}
-
-#' Add SNOMED Database
-#'
-#' @description
-#' Creates or updates a SNOMED CT database
-#'
-#' @param path_destination Character string. Path where the database files
-#'   will be written.
-#' @param release_index Integer. Which TRUD release index to use (1 = latest).
-#'
-#' @return Invisibly returns the output path.
-#'
-add_snomed_database <- function(
-  path_destination = ".",
-  release_index = 1
-) {
-  rlang::check_installed("trud")
-
-  if (!dir.exists(path_destination)) {
-    cli::cli_abort("Directory does not exist: {path_destination}")
-  }
-
-  build_snomed_metadata <- build_snomed_metadata(
-    path_destination,
-    release_index = 1,
-    item_id = 1799
-  )
-  expected_path <- build_snomed_metadata$expected_path
-  release_version <- build_snomed_metadata$release_version
-
-  snomedct <- read_snomed_ct_uk_monolith(expected_path)
-
-  lookup_table <- snomedct$sct_lookup
-  relationship_table <- snomedct$sct_relationship
-  mapping_table <- snomedct$sct_icd10_mapping
-
-  # Build a temporary database
-  db_path <- tempfile(fileext = ".duckdb")
-  Sys.setenv(CODEMINER_DB_PATH = db_path)
-  cli::cli_inform(c(
-    "i" = paste0("Using CODEMINER_DB_PATH: ", Sys.getenv("CODEMINER_DB_PATH"))
-  ))
-  codeminer::build_database()
-
-  add_lookup_table(
-    lookup_table,
-    lookup_metadata(
-      code_type = "SNOMED-CT",
-      version = release_version,
-      lookup_code_col = "conceptId",
-      lookup_description_col = "id_description"
-    )
-  )
-  add_relationship_table(
-    relationship_table,
-    relationship_metadata(
-      code_type = "SNOMED-CT",
-      version = "v0",
-      from_col = "moduleId",
-      to_col = "mapTarget"
-    )
-  )
-  add_mapping_table(
-    mapping_table,
-    mapping_metadata(
-      from_code_type = "ICD-10",
-      to_code_type = "SNOMED-CT",
-      version = release_version
-    )
-  )
-
-  lookup_metadata <- get_lookup_metadata()
-  mapping_metadata <- get_mapping_metadata()
-  return(list(
-    lookup_metadata = lookup_metadata,
-    mapping_metadata = mapping_metadata
-  ))
 }

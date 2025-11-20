@@ -37,8 +37,8 @@ reference:
       - get_codeminer_metadata
       - download_latestversion_of_snomed_item
       - read_snomed_ct_uk_monolith
-      - add_snomed_database
       - build_snomed_metadata
+      - add_snomed_tables
 
   - title: Dummy data
     desc: Dummy data for tests.
