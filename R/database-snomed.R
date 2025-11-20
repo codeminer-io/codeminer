@@ -512,9 +512,10 @@ add_snomed_database <- function(
   add_lookup_table(
     lookup_table,
     lookup_metadata(
-      "SNOMED-CT",
+      code_type = "SNOMED-CT",
       version = release_version,
-      lookup_code_col = "conceptId"
+      lookup_code_col = "conceptId",
+      lookup_description_col = "id_description"
     )
   )
   add_relationship_table(
