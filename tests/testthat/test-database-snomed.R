@@ -3,15 +3,14 @@ withr::local_options(
   cli.default_handler = function(...) {}
 )
 
-# Skip the whole file/test if TRUD_API_KEY is not set
+# Skip the whole file/tests if TRUD_API_KEY is not set
+# Meaning that unit tests are intended for local execution.
+
 if (Sys.getenv("TRUD_API_KEY") == "") {
   skip("Skipping NHS TRUD tests because TRUD_API_KEY is not set")
 }
 
 test_that("download_latestversion_of_snomed_item() correctly downloads the latest version of SNOMED item 1799", {
-  # Unit tests are intended for local execution.
-  # See the function's documentation for prerequisites.
-
   # Set the index for the TRUD metadata release
   # Use 1 for the latest version; increasing values retrieve older releases
   release_index <- 1
@@ -37,9 +36,6 @@ test_that("download_latestversion_of_snomed_item() correctly downloads the lates
 })
 
 test_that("read_snomed_ct_uk_monolith() returns appropriate tables", {
-  # Unit tests are intended for local execution.
-  # See the function's documentation for prerequisites.
-
   # Set the index for the TRUD metadata release
   # Use 1 for the latest version; increasing values retrieve older releases
 
@@ -56,7 +52,6 @@ test_that("read_snomed_ct_uk_monolith() returns appropriate tables", {
     paste("Test data is for local test:", expected_path)
   )
 
-  # Run the function
   snomedct <- read_snomed_ct_uk_monolith(expected_path)
 
   expect_equal(
@@ -115,9 +110,6 @@ test_that("read_snomed_ct_uk_monolith() returns appropriate tables", {
 })
 
 test_that("add_snomed_database() maps snomed database with codeminer ", {
-  # Unit tests are intended for local execution.
-  # See the function's documentation for prerequisites.
-
   databases <- add_snomed_database(
     path_destination = getwd(),
     release_index = 1
