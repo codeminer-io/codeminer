@@ -112,14 +112,14 @@ list of data frames:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Create a temporary database with dummy data</span></span>
 <span><span class="op">(</span><span class="va">db_path</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/create_dummy_database.html">create_dummy_database</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Creating new database at <span style="color: #0000BB;">/tmp/RtmprdNhDZ/file1dc01e4367da.duckdb</span></span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Creating new database at <span style="color: #0000BB;">/tmp/Rtmp32VzV4/file1dc650b91929.duckdb</span></span></span>
 <span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Lookup table <span style="color: #00BB00;">icd10_v0</span> added successfully.</span></span>
 <span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Lookup table <span style="color: #00BB00;">read3_v0</span> added successfully.</span></span>
 <span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Mapping table <span style="color: #00BB00;">read3_icd10_v0</span> added successfully.</span></span>
 <span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Dummy database ready to use!</span></span>
-<span><span class="co">#&gt; [1] "/tmp/RtmprdNhDZ/file1dc01e4367da.duckdb"</span></span>
+<span><span class="co">#&gt; [1] "/tmp/Rtmp32VzV4/file1dc650b91929.duckdb"</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/Sys.getenv.html" class="external-link">Sys.getenv</a></span><span class="op">(</span><span class="st">"CODEMINER_DB_PATH"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] "/tmp/RtmprdNhDZ/file1dc01e4367da.duckdb"</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] "/tmp/Rtmp32VzV4/file1dc650b91929.duckdb"</span></span></code></pre></div>
 <p>Setting the <code>CODEMINER_DB_PATH</code> environment variable
 ensures that all subsequent <code>codeminer</code> calls will use this
 database.</p>
