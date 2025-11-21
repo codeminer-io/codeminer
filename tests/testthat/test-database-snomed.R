@@ -5,24 +5,7 @@ withr::local_options(
   cli.default_handler = function(...) {}
 )
 
-test_that("read_snomed_ct_uk_monolith() returns appropriate tables", {
-  # Set the index for the TRUD metadata release
-  # Use 1 for the latest version; increasing values retrieve older releases
-
-  #TODO
-  # build_snomed_metadata <- build_snomed_metadata(
-  #   # path_destination = path_destination,
-  #   path_destination = getwd(),
-  #   release_index = 1,
-  #   item_id = 1799
-  # )
-  # expected_path <- build_snomed_metadata$expected_path
-  # # Skip test for CI as path is for local test
-  # skip_if(
-  #   !dir.exists(expected_path),
-  #   paste("Test data is for local test:", expected_path)
-  # )
-
+test_that("read_snomed_ct_uk_monolith() with dummy_snomed_data_path() returns appropriate tables", {
   snomedct <- read_snomed_ct_uk_monolith(dummy_snomed_data_path())
 
   expect_equal(
