@@ -1,14 +1,14 @@
-#' CodeMiner error constructor
+#' CodeMiner error constructor *(internal helper)*
 #'
-#' Internal wrapper around [cli::cli_abort()] that creates a structured CodeMiner
-#' error condition. A base class `codeminer_error` is always appended to the
-#' condition class vector, and additional custom classes may be optionally
-#' prepended via the `class` argument. The original named `cli` message vector
-#' supplied in `message` is stored in the `cli_error_message` field of the
-#' condition
+#' *For internal package used only.* A wrapper around [cli::cli_abort()] that
+#' creates a structured CodeMiner error condition. A base class
+#' `codeminer_error` is always appended to the condition class vector, and
+#' additional custom classes may be optionally prepended via the `class`
+#' argument. The original named `cli` message vector supplied in `message` is
+#' stored in the `cli_error_message` field of the condition
 #'
 #' The original named `cli` message vector is stored in `cli_error_message` for
-#' use by the CodeMiner API.
+#' use by the CodeMiner API (see examples).
 #'
 #' @inheritParams cli::cli_abort
 #' @param class Optional character vector of additional classes to prepend
@@ -44,13 +44,15 @@ codeminer_abort <- function(
   message,
   class = NULL,
   ...,
-  call = rlang::caller_env()
+  call = rlang::caller_env(),
+  .envir = rlang::caller_env()
 ) {
   cli::cli_abort(
     message,
     class = c(class, "codeminer_error"),
     call = call,
     cli_error_message = message,
-    ...
+    ...,
+    .envir = .envir
   )
 }
