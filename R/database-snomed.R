@@ -12,8 +12,6 @@ add_snomed_tables <- function(
   path_destination = ".",
   release_index = 1
 ) {
-  rlang::check_installed("trud")
-
   if (!dir.exists(path_destination)) {
     cli::cli_abort("Directory does not exist: {path_destination}")
   }
@@ -103,7 +101,7 @@ add_snomed_tables <- function(
 #'
 #' ## Function Description
 #'
-#' `download_latestversion_of_snomed_item()` downloads and extracts the most recent release
+#' `download_snomed_item()` downloads and extracts the most recent release
 #' of a specified SNOMED CT item.
 #' By default, it retrieves the UK Clinical Edition Monolith (item 1799).
 #'
@@ -136,10 +134,10 @@ add_snomed_tables <- function(
 #' @examples
 #' \dontrun{
 #' # Download the default SNOMED CT UK Monolith
-#' result <- download_latestversion_of_snomed_item()
+#' result <- download_snomed_item()
 #'
 #' # Download a specific earlier release and extract to a custom folder
-#' download_latestversion_of_snomed_item(
+#' download_snomed_item(
 #'   item_number = 1799,
 #'   release_index = 5,
 #'   path_destination = "data/snomed_releases"
@@ -150,7 +148,7 @@ add_snomed_tables <- function(
 #' }
 #'
 #' @export
-download_latestversion_of_snomed_item <- function(
+download_snomed_item <- function(
   item_number = 1799,
   release_index = 1,
   path_destination = "."
@@ -289,7 +287,7 @@ download_latestversion_of_snomed_item <- function(
 #' build_snomed_metadata("/tmp/snomed")
 #' }
 #'
-#' @export
+#' @noRd
 build_snomed_metadata <- function(
   path_destination,
   release_index = 1,

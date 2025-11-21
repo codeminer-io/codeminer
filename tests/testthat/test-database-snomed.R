@@ -87,13 +87,13 @@ if (Sys.getenv("TRUD_API_KEY") == "") {
   skip("Skipping NHS TRUD tests because TRUD_API_KEY is not set")
 }
 
-test_that("download_latestversion_of_snomed_item() correctly downloads the latest version of SNOMED item 1799", {
+test_that("download_snomed_item() correctly downloads the latest version of SNOMED item 1799", {
   # Set the index for the TRUD metadata release
   # Use 1 for the latest version; increasing values retrieve older releases
   release_index <- 1
 
   # Download and extract the specified SNOMED CT UK TRUD release
-  results <- download_latestversion_of_snomed_item(
+  results <- download_snomed_item(
     1799,
     release_index
   )
