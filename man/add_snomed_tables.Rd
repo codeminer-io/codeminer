@@ -4,17 +4,26 @@
 \alias{add_snomed_tables}
 \title{Add SNOMED tables}
 \usage{
-add_snomed_tables(path_destination = ".", release_index = 1)
+add_snomed_tables(path = ".", release_index = 1)
 }
 \arguments{
-\item{path_destination}{Character string. Path where the database files
+\item{path}{Character string. Path where the database files
 will be written.}
 
 \item{release_index}{Integer. Which TRUD release index to use (1 = latest).}
 }
 \value{
-Invisible \code{TRUE} on success
+Invisible \code{TRUE} on success.
 }
 \description{
 Creates or updates a SNOMED CT database
+}
+\examples{
+\dontrun{
+success <- add_snomed_tables(
+    path = getwd(),
+    release_index = 1
+)
+}
+
 }

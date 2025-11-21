@@ -5,12 +5,15 @@
 \title{Download the Latest SNOMED CT Release from NHS TRUD}
 \usage{
 download_snomed_item(
+  path_destination = ".",
   item_number = 1799,
-  release_index = 1,
-  path_destination = "."
+  release_index = 1
 )
 }
 \arguments{
+\item{path_destination}{Character. Path to the directory where downloaded files
+should be extracted. Defaults to the current working directory (\code{"."}).}
+
 \item{item_number}{Numeric. The TRUD item number identifying the SNOMED CT UK data package.
 Defaults to \code{1799}, which corresponds to the SNOMED CT UK Clinical Edition (Monolith).}
 
@@ -18,9 +21,6 @@ Defaults to \code{1799}, which corresponds to the SNOMED CT UK Clinical Edition 
 Use \code{1} for the most recent release (e.g., \code{"uk_sct2mo_41.1.0_20251022000001Z.zip"}).
 Valid indices typically range from \code{1} (latest) to \code{48} (oldest, e.g., \code{"Release 32.11.0"}).
 \strong{Note:} These index ranges are subject to change as new releases become available on TRUD.}
-
-\item{path_destination}{Character. Path to the directory where downloaded files
-should be extracted. Defaults to the current working directory (\code{"."}).}
 }
 \value{
 A named list containing:
@@ -82,18 +82,17 @@ Ensure you have installed and configured it correctly before use.
 }
 \examples{
 \dontrun{
-# Download the default SNOMED CT UK Monolith
-result <- download_snomed_item()
-
-# Download a specific earlier release and extract to a custom folder
 download_snomed_item(
-  item_number = 1799,
-  release_index = 5,
-  path_destination = "data/snomed_releases"
+    path_destination = tempdir(),
+    item_number = 1799,
+    release_index = 1
 )
 
 # Check the extracted directory
 result$extracted_dir
+
+You are now ready to use add_snomed_tables("data/snomed_releases")
+to add the tables to the database
 }
 
 }

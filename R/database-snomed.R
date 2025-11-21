@@ -144,14 +144,10 @@ add_snomed_tables <- function(
 #'
 #' @examples
 #' \dontrun{
-#' # Download the default SNOMED CT UK Monolith
-#' result <- download_snomed_item()
-#'
-#' # Download a specific earlier release and extract to a custom folder
 #' download_snomed_item(
-#'   path_destination = "data/snomed_releases",
-#'   item_number = 1799,
-#'   release_index = 5
+#'     path_destination = tempdir(),
+#'     item_number = 1799,
+#'     release_index = 1
 #' )
 #'
 #' # Check the extracted directory
