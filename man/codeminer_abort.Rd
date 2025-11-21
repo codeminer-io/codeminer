@@ -26,25 +26,28 @@ before \code{codeminer_error}.}
 }
 \description{
 \emph{For internal package used only.} A wrapper around \code{\link[cli:cli_abort]{cli::cli_abort()}} that
-creates a structured CodeMiner error condition. A base class
-\code{codeminer_error} is always appended to the condition class vector, and
-additional custom classes may be optionally prepended via the \code{class}
-argument. The original named \code{cli} message vector supplied in \code{message} is
-stored in the \code{cli_error_message} field of the condition
+creates a structured CodeMiner error condition.
 }
 \details{
+A base class \code{codeminer_error} is always appended to the condition class
+vector, and additional custom classes may be optionally prepended via the
+\code{class} argument.
+
 The original named \code{cli} message vector is stored in \code{cli_error_message} for
 use by the CodeMiner API (see examples).
 }
 \examples{
-\dontrun{
 # Capture a CodeMiner error condition and inspect it
+invalid_code_type <- "foo"
+
+named_cli_message_vector <- c(
+  x = "Code type {.arg {invalid_code_type}} not found.",
+  i = "Use `add_lookup_table()`."
+)
+
 e <- tryCatch(
   codeminer_abort(
-    c(
-      x = "Code type 'icd1' not found.",
-      i = "Use add_lookup_table()."
-    ),
+    named_cli_message_vector,
     class = "codeminer_arg_validation_error"
   ),
   error = function(e) e
@@ -58,6 +61,5 @@ e$cli_error_message
 
 # Inspect the default formatted condition message
 conditionMessage(e)
-}
 }
 \keyword{internal}
