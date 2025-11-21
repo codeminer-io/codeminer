@@ -198,24 +198,3 @@ dummy_clinical_events_tidy <- function() {
    )
   # nolint end
 }
-
-
-## SNOMED CT Monolith RF2  -----------------------------------------------------
-
-#' Get full path to the SNOMED CT Monolith RF2 file
-#'
-#' This function returns the full path to the file
-#' `SnomedCT_MonolithRF2_PRODUCTION_00000000T000000Z`
-#' inside the `snomed_item_1799_uk_sct2mo` folder of the `codeminer` package.
-#'
-#' @return A character string with the full path to the SNOMED file.
-#' If the file does not exist, an empty string is returned.
-#' @examples
-#' snomed_item_1799_uk_sct2mo_path()
-snomed_item_1799_uk_sct2mo_path <- function() {
-  system.file(
-    "extdata",
-    "snomed_item_1799_uk_sct2mo/SnomedCT_MonolithRF2_PRODUCTION_00000000T000000Z",
-    package = "codeminer"
-  )
-}

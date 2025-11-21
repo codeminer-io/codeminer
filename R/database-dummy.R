@@ -70,3 +70,22 @@ create_dummy_database <- function(
 dummy_ukb_resource_592_path <- function() {
   system.file("extdata", "all_lkps_maps_v4.xlsx", package = "codeminer")
 }
+
+
+#' Get full path to the SNOMED CT Monolith RF2 file
+#'
+#' This function returns the full path to the file
+#' `SnomedCT_MonolithRF2_PRODUCTION_00000000T000000Z`
+#' inside the `snomed_item_1799_uk_sct2mo` folder of the `codeminer` package.
+#'
+#' @return A character string with the full path to the SNOMED file.
+#' If the file does not exist, an empty string is returned.
+#' @examples
+#' dummy_snomed_data_path()
+dummy_snomed_data_path <- function() {
+  system.file(
+    "extdata",
+    "snomed_item_1799_uk_sct2mo/SnomedCT_MonolithRF2_PRODUCTION_00000000T000000Z",
+    package = "codeminer"
+  )
+}

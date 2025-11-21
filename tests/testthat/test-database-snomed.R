@@ -23,7 +23,7 @@ test_that("read_snomed_ct_uk_monolith() returns appropriate tables", {
   #   paste("Test data is for local test:", expected_path)
   # )
 
-  snomedct <- read_snomed_ct_uk_monolith(snomed_item_1799_uk_sct2mo_path())
+  snomedct <- read_snomed_ct_uk_monolith(dummy_snomed_data_path())
 
   expect_equal(
     names(snomedct$sct_lookup),

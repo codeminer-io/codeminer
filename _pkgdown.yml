@@ -46,7 +46,7 @@ reference:
       - ends_with("dummy")
       - starts_with("dummy")
       - example_ontology
-      - snomed_item_1799_uk_sct2mo_path
+      - dummy_snomed_data_path
 
   - title: Utilities
     desc: Miscellaneous utility functions.
