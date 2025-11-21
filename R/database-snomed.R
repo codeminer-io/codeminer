@@ -16,6 +16,7 @@
 #'
 #' @return Invisible `TRUE` on success.
 #'
+#' @export
 add_snomed_tables <- function(
   path = ".",
   release_index = 1
@@ -384,7 +385,7 @@ build_snomed_metadata <- function(
 #' head(snomed$sct_icd10_mapping)
 #' }
 #'
-#' @export
+#' @noRd
 read_snomed_ct_uk_monolith <- function(path_destination) {
   # Define expected structure
   expected_dirs <- file.path(
