@@ -114,12 +114,12 @@ test_that("download_snomed_item() correctly downloads the latest version of SNOM
 
 test_that("add_snomed_tables() are added successfully", {
   expect_invisible(
-    databases <- add_snomed_tables(
+    success <- add_snomed_tables(
       path_destination = getwd(),
       release_index = 1
     )
   )
-  expect_true(databases)
+  expect_true(success)
 
   result <- CODES("all", code_type = "SNOMED-CT")
   expect_s3_class(result, "data.frame")
