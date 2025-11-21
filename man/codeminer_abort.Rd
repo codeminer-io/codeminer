@@ -2,9 +2,15 @@
 % Please edit documentation in R/conditions.R
 \name{codeminer_abort}
 \alias{codeminer_abort}
-\title{CodeMiner error constructor}
+\title{CodeMiner error constructor \emph{(internal helper)}}
 \usage{
-codeminer_abort(message, class = NULL, ..., call = rlang::caller_env())
+codeminer_abort(
+  message,
+  class = NULL,
+  ...,
+  call = rlang::caller_env(),
+  .envir = rlang::caller_env()
+)
 }
 \arguments{
 \item{message}{It is formatted via a call to \code{\link[cli:cli_bullets]{cli_bullets()}}.}
@@ -15,18 +21,20 @@ before \code{codeminer_error}.}
 \item{...}{Passed through to \code{\link[cli:cli_abort]{cli::cli_abort()}}.}
 
 \item{call}{Call environment.}
+
+\item{.envir}{Environment to evaluate the glue expressions in.}
 }
 \description{
-Internal wrapper around \code{\link[cli:cli_abort]{cli::cli_abort()}} that creates a structured CodeMiner
-error condition. A base class \code{codeminer_error} is always appended to the
-condition class vector, and additional custom classes may be optionally
-prepended via the \code{class} argument. The original named \code{cli} message vector
-supplied in \code{message} is stored in the \code{cli_error_message} field of the
-condition
+\emph{For internal package used only.} A wrapper around \code{\link[cli:cli_abort]{cli::cli_abort()}} that
+creates a structured CodeMiner error condition. A base class
+\code{codeminer_error} is always appended to the condition class vector, and
+additional custom classes may be optionally prepended via the \code{class}
+argument. The original named \code{cli} message vector supplied in \code{message} is
+stored in the \code{cli_error_message} field of the condition
 }
 \details{
 The original named \code{cli} message vector is stored in \code{cli_error_message} for
-use by the CodeMiner API.
+use by the CodeMiner API (see examples).
 }
 \examples{
 \dontrun{

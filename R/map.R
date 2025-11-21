@@ -68,7 +68,7 @@ MAP <- function(
 #' @param from The source code type to map from
 #' @param to The target code type to map to
 #' @param version The version of the mapping table.
-#' @param call The calling environment. Passed to [cli::cli_abort].
+#' @param call The calling environment. Passed to [codeminer_abort].
 #'
 #' @return A data frame containing the lookup table with two columns: `from` and `to`.
 #' @keywords internal
@@ -79,7 +79,7 @@ get_mapping_table <- function(
   version,
   call = rlang::caller_env()
 ) {
-  this_meta <- get_metadata_for_mapping(con, from, to, version, call = call)
+  this_meta <- get_meta_for_mapping(con, from, to, version, call = call)
   tbl_name <- this_meta$mapping_table_name
   tbl <- dplyr::tbl(con, tbl_name)
 
@@ -87,7 +87,7 @@ get_mapping_table <- function(
   return(tbl)
 }
 
-get_metadata_for_mapping <- function(
+get_meta_for_mapping <- function(
   con,
   from,
   to,
@@ -124,7 +124,7 @@ get_metadata_for_mapping <- function(
   this_meta <- dplyr::filter(all_version_meta, .data$mapping_version == version)
 
   if (nrow(this_meta) == 0) {
-    cli::cli_abort(
+    codeminer_abort(
       c(
         "No mapping table found for from type '{from}' and to type '{to}', version '{version}'.",
         "i" = "Did you add the mapping table with {.fun codeminer::add_mapping_table}?"
@@ -151,16 +151,16 @@ check_mapping_args <- function(
   version,
   call = rlang::caller_env()
 ) {
-  check_codes(codes, call = call)
-  check_version(version, call = call)
+  check_codes(codes)
+  check_version(version)
   if (length(from) != 1) {
-    cli::cli_abort(
+    codeminer_abort(
       "{.arg from} must have length 1, not {length(from)}",
       call = call
     )
   }
   if (length(to) != 1) {
-    cli::cli_abort(
+    codeminer_abort(
       "{.arg to} must have length 1, not {length(to)}",
       call = call
     )
