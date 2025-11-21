@@ -2,25 +2,33 @@
 #'
 #' Creates or updates a SNOMED CT database
 #'
-#' @param path_destination Character string. Path where the database files
+#' @param path Character string. Path where the database files
 #'   will be written.
 #' @param release_index Integer. Which TRUD release index to use (1 = latest).
 #'
-#' @return Invisible `TRUE` on success
+#' @examples
+#' \dontrun{
+#' success <- add_snomed_tables(
+#'     path = getwd(),
+#'     release_index = 1
+#' )
+#' }
+#'
+#' @return Invisible `TRUE` on success.
 #'
 add_snomed_tables <- function(
-  path_destination = ".",
+  path = ".",
   release_index = 1
 ) {
-  if (!dir.exists(path_destination)) {
+  if (!dir.exists(path)) {
     cli::cli_abort(c(
-      "Directory does not exist: {path_destination}",
+      "Directory does not exist: {path}",
       "i" = "Did you call {.fun codeminer::download_snomed_item} first?"
     ))
   }
 
   build_snomed_metadata <- build_snomed_metadata(
-    path_destination,
+    path_destination = path,
     release_index = 1,
     item_id = 1799
   )
@@ -108,6 +116,9 @@ add_snomed_tables <- function(
 #' of a specified SNOMED CT item.
 #' By default, it retrieves the UK Clinical Edition Monolith (item 1799).
 #'
+#' @param path_destination Character. Path to the directory where downloaded files
+#'   should be extracted. Defaults to the current working directory (`"."`).
+#'
 #' @param item_number Numeric. The TRUD item number identifying the SNOMED CT UK data package.
 #'   Defaults to `1799`, which corresponds to the SNOMED CT UK Clinical Edition (Monolith).
 #'
@@ -115,9 +126,6 @@ add_snomed_tables <- function(
 #'   Use `1` for the most recent release (e.g., `"uk_sct2mo_41.1.0_20251022000001Z.zip"`).
 #'   Valid indices typically range from `1` (latest) to `48` (oldest, e.g., `"Release 32.11.0"`).
 #'   **Note:** These index ranges are subject to change as new releases become available on TRUD.
-#'
-#' @param path_destination Character. Path to the directory where downloaded files
-#'   should be extracted. Defaults to the current working directory (`"."`).
 #'
 #' @return A named list containing:
 #' \describe{
@@ -141,20 +149,23 @@ add_snomed_tables <- function(
 #'
 #' # Download a specific earlier release and extract to a custom folder
 #' download_snomed_item(
+#'   path_destination = "data/snomed_releases",
 #'   item_number = 1799,
-#'   release_index = 5,
-#'   path_destination = "data/snomed_releases"
+#'   release_index = 5
 #' )
 #'
 #' # Check the extracted directory
 #' result$extracted_dir
+#'
+#' You are now ready to use add_snomed_tables("data/snomed_releases")
+#' to add the tables to the database
 #' }
 #'
 #' @export
 download_snomed_item <- function(
+  path_destination = ".",
   item_number = 1799,
-  release_index = 1,
-  path_destination = "."
+  release_index = 1
 ) {
   rlang::check_installed("trud")
 

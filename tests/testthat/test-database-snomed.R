@@ -9,6 +9,7 @@ test_that("read_snomed_ct_uk_monolith() returns appropriate tables", {
   # Set the index for the TRUD metadata release
   # Use 1 for the latest version; increasing values retrieve older releases
 
+  #TODO
   # build_snomed_metadata <- build_snomed_metadata(
   #   # path_destination = path_destination,
   #   path_destination = getwd(),
@@ -16,7 +17,6 @@ test_that("read_snomed_ct_uk_monolith() returns appropriate tables", {
   #   item_id = 1799
   # )
   # expected_path <- build_snomed_metadata$expected_path
-
   # # Skip test for CI as path is for local test
   # skip_if(
   #   !dir.exists(expected_path),
@@ -94,8 +94,9 @@ test_that("download_snomed_item() correctly downloads the latest version of SNOM
 
   # Download and extract the specified SNOMED CT UK TRUD release
   results <- download_snomed_item(
-    1799,
-    release_index
+    path_destination = getwd(),
+    item_number = 1799,
+    release_index = release_index
   )
 
   trud_metadata <- trud::get_item_metadata(1799, release_scope = "all")
@@ -115,7 +116,7 @@ test_that("download_snomed_item() correctly downloads the latest version of SNOM
 test_that("add_snomed_tables() are added successfully", {
   expect_invisible(
     success <- add_snomed_tables(
-      path_destination = getwd(),
+      path = getwd(),
       release_index = 1
     )
   )
