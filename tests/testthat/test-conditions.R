@@ -1,8 +1,8 @@
 test_that("codeminer_abort creates a CodeMiner error condition", {
-	expect_error(
-		codeminer_abort(c(x = "Test error.")),
-		class = "codeminer_error"
-	)
+  expect_error(
+    codeminer_abort(c(x = "Test error.")),
+    class = "codeminer_error"
+  )
 })
 
 test_that("codeminer_abort stores the original cli message vector in cli_error_message", {
