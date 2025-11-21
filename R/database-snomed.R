@@ -13,7 +13,10 @@ add_snomed_tables <- function(
   release_index = 1
 ) {
   if (!dir.exists(path_destination)) {
-    cli::cli_abort("Directory does not exist: {path_destination}")
+    cli::cli_abort(c(
+      "Directory does not exist: {path_destination}",
+      "i" = "Did you call {.fun codeminer::download_snomed_item} first?"
+    ))
   }
 
   build_snomed_metadata <- build_snomed_metadata(
@@ -176,12 +179,6 @@ download_snomed_item <- function(
     )
   }
 
-  if (!dir.exists(path_destination)) {
-    cli::cli_abort(
-      "The directory {.path {path_destination}} does not exist."
-    )
-  }
-
   cli::cli_alert_info("Retrieving metadata for item {.field {item_number}} ...")
 
   metadata <- tryCatch(
@@ -290,8 +287,8 @@ download_snomed_item <- function(
 #' @noRd
 build_snomed_metadata <- function(
   path_destination,
-  release_index = 1,
-  item_id = 1799
+  release_index = release_index,
+  item_id = item_id
 ) {
   # Fetch TRUD metadata for the given item
   trud_metadata <- trud::get_item_metadata(item_id, release_scope = "all")
