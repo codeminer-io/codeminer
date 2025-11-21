@@ -7,7 +7,7 @@
 CHILDREN(
   codes,
   code_type = getOption("codeminer.code_type"),
-  version = getOption("codeminer.relationship_version", default = "latest"),
+  version = getOption("codeminer.lookup_version", default = "latest"),
   codes_only = FALSE,
   preferred_description_only = TRUE
 )
@@ -18,8 +18,8 @@ CHILDREN(
 \item{code_type}{character. Type of clinical code system to be searched.
 This can also be configured through the \code{codeminer.code_type} option.}
 
-\item{version}{character. Version of the relationship table to use. Default:
-\code{"latest"}. Can be configured through the \code{codeminer.relationship_version} option.}
+\item{version}{character. Version of the lookup table to use. Default:
+\code{"latest"}. Can be configured through the \code{codeminer.lookup_version} option.}
 
 \item{codes_only}{logical. If \code{TRUE}, return a character vector of
 \emph{unique} codes. If \code{FALSE} (default), return a data frame of all
@@ -34,8 +34,10 @@ A data frame with columns \code{code}, \code{description}, and \code{code_type}
 \code{codes_only = TRUE}).
 }
 \description{
-Retrieves children codes for a given set of codes. This function works with
+Retrieves child codes for a given set of codes. This function works with
 any relationship table added via \code{\link[=add_relationship_table]{add_relationship_table()}}.
+After finding child codes, the code and description information is retrieved
+from the lookup table.
 }
 \examples{
 create_dummy_database()
@@ -47,7 +49,8 @@ CHILDREN(c("E10", "E11"), code_type = "icd10")
 CHILDREN(c("E10", "E11"), code_type = "icd10", codes_only = TRUE)
 }
 \seealso{
-\code{\link[=add_relationship_table]{add_relationship_table()}}
+\code{\link[=CODES]{CODES()}}, which is used to retrieve code information, and
+\code{\link[=add_relationship_table]{add_relationship_table()}} for how to add relationship tables.
 
 Other Clinical code lookups and mappings: 
 \code{\link{CODES}()},

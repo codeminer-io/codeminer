@@ -1,13 +1,15 @@
 #' Get child codes
 #'
-#' Retrieves children codes for a given set of codes. This function works with
+#' Retrieves child codes for a given set of codes. This function works with
 #' any relationship table added via [add_relationship_table()].
+#' After finding child codes, the code and description information is retrieved
+#' from the lookup table.
 #'
 #' @param codes character. A vector of code strings to retrieve child codes for.
 #' @param code_type character. Type of clinical code system to be searched.
 #'   This can also be configured through the `codeminer.code_type` option.
-#' @param version character. Version of the relationship table to use. Default:
-#'   `"latest"`. Can be configured through the `codeminer.relationship_version` option.
+#' @param version character. Version of the lookup table to use. Default:
+#'   `"latest"`. Can be configured through the `codeminer.lookup_version` option.
 #' @param codes_only logical. If `TRUE`, return a character vector of
 #'   \emph{unique} codes. If `FALSE` (default), return a data frame of all
 #'   results including code descriptions (useful for manual validation).
@@ -18,7 +20,8 @@
 #'   (when `codes_only = FALSE`), or a character vector of codes (when
 #'   `codes_only = TRUE`).
 #'
-#' @seealso [add_relationship_table()]
+#' @seealso [CODES()], which is used to retrieve code information, and
+#'   [add_relationship_table()] for how to add relationship tables.
 #' @family Clinical code lookups and mappings
 #' @export
 #' @examples
