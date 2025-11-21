@@ -5,7 +5,7 @@
 #' @param path Character string. Path where the database files
 #'   will be written.
 #'
-#' @param item_number Numeric. The TRUD item number identifying the SNOMED CT UK data package.
+#' @param item_id Numeric. The TRUD item number identifying the SNOMED CT UK data package.
 #'   Defaults to `1799`, which corresponds to the SNOMED CT UK Clinical Edition (Monolith).
 #'
 #' @param release_index Numeric. The index position of the TRUD metadata release to download.
@@ -162,7 +162,7 @@ add_snomed_tables <- function(
 #' # Check the extracted directory
 #' result$extracted_dir
 #'
-#' You are now ready to use add_snomed_tables("data/snomed_releases")
+#' You are now ready to use `add_snomed_tables()`
 #' to add the tables to the database
 #' }
 #'

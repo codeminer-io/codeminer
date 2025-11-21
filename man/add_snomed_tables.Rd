@@ -10,13 +10,13 @@ add_snomed_tables(path = ".", item_id = 1799, release_index = 1)
 \item{path}{Character string. Path where the database files
 will be written.}
 
+\item{item_id}{Numeric. The TRUD item number identifying the SNOMED CT UK data package.
+Defaults to \code{1799}, which corresponds to the SNOMED CT UK Clinical Edition (Monolith).}
+
 \item{release_index}{Numeric. The index position of the TRUD metadata release to download.
 Use \code{1} for the most recent release (e.g., \code{"uk_sct2mo_41.1.0_20251022000001Z.zip"}).
 Valid indices typically range from \code{1} (latest) to \code{48} (oldest, e.g., \code{"Release 32.11.0"}).
 \strong{Note:} These index ranges are subject to change as new releases become available on TRUD.}
-
-\item{item_number}{Numeric. The TRUD item number identifying the SNOMED CT UK data package.
-Defaults to \code{1799}, which corresponds to the SNOMED CT UK Clinical Edition (Monolith).}
 }
 \value{
 Invisible \code{TRUE} on success.

@@ -91,7 +91,7 @@ download_snomed_item(
 # Check the extracted directory
 result$extracted_dir
 
-You are now ready to use add_snomed_tables("data/snomed_releases")
+You are now ready to use `add_snomed_tables()`
 to add the tables to the database
 }
 
