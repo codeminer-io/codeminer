@@ -11,7 +11,7 @@ get_lookup_table(con, code_type, version, call = rlang::caller_env())
 
 \item{code_type}{The code type for which to retrieve the lookup table.}
 
-\item{call}{The calling environment. Passed to \link[cli:cli_abort]{cli::cli_abort}.}
+\item{call}{The calling environment. Passed to \link{codeminer_abort}.}
 }
 \value{
 A data frame containing the lookup table with three columns:

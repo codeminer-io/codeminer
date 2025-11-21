@@ -37,7 +37,7 @@ add_lookup_table <- function(table, metadata) {
 
   table_name <- metadata$lookup_table_name
   if (length(table_name) != 1) {
-    cli::cli_abort(
+    codeminer_abort(
       "`metadata$lookup_table_name` must have length 1, not {length(table_name)}."
     )
   }
@@ -124,7 +124,7 @@ lookup_metadata <- function(
     !is.na(preferred_description_col) &&
       is.na(preferred_description_indicator)
   ) {
-    cli::cli_abort(
+    codeminer_abort(
       "{.arg preferred_description_indicator} must be provided if {.arg preferred_description_col} is not `NA`"
     )
   }
@@ -165,7 +165,7 @@ validate_lookup_metadata <- function(
   missing <- setdiff(required, names(metadata))
 
   if (length(missing) > 0) {
-    cli::cli_abort(
+    codeminer_abort(
       c(
         "The metadata in {.arg {metadata_arg}} is incomplete.",
         "x" = "The following entries are missing: {.field {missing}}",
@@ -179,7 +179,7 @@ validate_lookup_metadata <- function(
     purrr::keep(\(x) rlang::is_string(x) && !x %in% names(table))
 
   if (length(missing_colnames) > 0) {
-    cli::cli_abort(
+    codeminer_abort(
       c(
         "Invalid metadata supplied in {.arg {metadata_arg}}.",
         "x" = "These metadata fields refer to columns not present in {.arg {table_arg}}:",
