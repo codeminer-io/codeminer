@@ -4,7 +4,14 @@
 #'
 #' @param path Character string. Path where the database files
 #'   will be written.
-#' @param release_index Integer. Which TRUD release index to use (1 = latest).
+#'
+#' @param item_number Numeric. The TRUD item number identifying the SNOMED CT UK data package.
+#'   Defaults to `1799`, which corresponds to the SNOMED CT UK Clinical Edition (Monolith).
+#'
+#' @param release_index Numeric. The index position of the TRUD metadata release to download.
+#'   Use `1` for the most recent release (e.g., `"uk_sct2mo_41.1.0_20251022000001Z.zip"`).
+#'   Valid indices typically range from `1` (latest) to `48` (oldest, e.g., `"Release 32.11.0"`).
+#'   **Note:** These index ranges are subject to change as new releases become available on TRUD.
 #'
 #' @examples
 #' \dontrun{
@@ -19,6 +26,7 @@
 #' @export
 add_snomed_tables <- function(
   path = ".",
+  item_id = 1799,
   release_index = 1
 ) {
   if (!dir.exists(path)) {
@@ -30,8 +38,8 @@ add_snomed_tables <- function(
 
   build_snomed_metadata <- build_snomed_metadata(
     path_destination = path,
-    release_index = 1,
-    item_id = 1799
+    release_index = release_index,
+    item_id = item_id
   )
   expected_path <- build_snomed_metadata$expected_path
   release_version <- build_snomed_metadata$release_version

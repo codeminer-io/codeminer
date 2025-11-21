@@ -82,6 +82,7 @@ dummy_ukb_resource_592_path <- function() {
 #' If the file does not exist, an empty string is returned.
 #' @examples
 #' dummy_snomed_data_path()
+#' @export
 dummy_snomed_data_path <- function() {
   system.file(
     "extdata",
