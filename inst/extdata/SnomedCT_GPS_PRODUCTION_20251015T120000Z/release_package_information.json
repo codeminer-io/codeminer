@@ -1,0 +1,19 @@
+{
+  "effectiveTime": "20250701",
+  "previousPublishedPackage": "SnomedCT_GPS_PRODUCTION_20241220T120000Z.zip",
+  "licenceStatement": "",
+  "languageRefsets": [
+    {
+      "id": "900000000000508004",
+      "term": "GB English"
+    },
+    {
+      "id": "900000000000509007",
+      "term": "US English"
+    }
+  ],
+  "packageComposition": {
+    "essentialComponents": {},
+    "optionalComponents": {}
+  }
+}

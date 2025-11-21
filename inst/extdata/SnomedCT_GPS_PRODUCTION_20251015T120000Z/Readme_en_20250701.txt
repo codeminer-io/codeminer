@@ -1,0 +1,79 @@
+The SNOMED CT GPS Refset Production package is provided in RF2 format, and is delivered to IHTSDO Member National Centers and authorised Affiliate Licensees via Internet download.
+
+The SNOMED CT files are designed as relational tables with each line in the file representing a row in the table. The first row of each table contains column headings. All other rows contain data.
+
+This package is dependent upon the SNOMED CT July 2025 International Edition, and so should be consumed and analysed accordingly.
+
+The RF2 package convention dictates that the package contain all relevant files, regardless of whether or not there is content to be included in each particular release.  Therefore, the package contains a mixture of a) files which contain both header rows and content data, and b) files that are intentionally left blank (with just a header record).  This allows users to easily distinguish between files that have purposefully been removed from the package, as otherwise if files were left out of the package it could be interpreted as an error, rather than an intentional lack of content in that release.
+
+© International Health Terminology Standards Development Organisation 2002-2025.  All rights reserved.  SNOMED CT® was originally created by the College of American Pathologists.  "SNOMED" and "SNOMED CT" are registered trademarks of International Health Terminology Standards Development Organisation, trading as SNOMED International.
+
+SNOMED CT has been created by combining SNOMED RT and a computer based nomenclature and classification known as Clinical Terms Version 3, formerly known as Read Codes Version 3, which was created on behalf of the UK Department of Health and is Crown copyright.
+
+This document forms part of the SNOMED CT® GPS Refset Production package distributed by SNOMED International, which is subject to SNOMED International’s SNOMED CT® Affiliate License, details of which may be found at http://www.snomed.org/snomed-ct/get-snomed-ct/.
+
+Directory listing:
+
+    SnomedCT_GPS_PRODUCTION_20251015T120000Z
+        Snapshot
+            Terminology
+                sct2_Concept_GPSSnapshot_INT_20250701.txt
+                sct2_Description_GPSSnapshot-en_INT_20250701.txt
+                sct2_StatedRelationship_GPSSnapshot_INT_20250701.txt
+                sct2_Relationship_GPSSnapshot_INT_20250701.txt
+                sct2_RelationshipConcreteValues_GPSSnapshot_INT_20250701.txt
+                sct2_sRefset_GPSOWLExpressionSnapshot_INT_20250701.txt
+                sct2_Identifier_GPSSnapshot_INT_20250701.txt
+                sct2_TextDefinition_GPSSnapshot-en_INT_20250701.txt
+            Refset
+                Content
+                    der2_Refset_GPSSimpleSnapshot_INT_20250701.txt
+                    der2_cRefset_GPSAssociationSnapshot_INT_20250701.txt
+                    der2_cRefset_GPSAttributeValueSnapshot_INT_20250701.txt
+                Map
+                    der2_sRefset_GPSSimpleMapSnapshot_INT_20250701.txt
+                    der2_iisssccRefset_GPSExtendedMapSnapshot_INT_20250701.txt
+                Language
+                    der2_cRefset_GPSLanguageSnapshot-en_INT_20250701.txt
+                Metadata
+                    der2_cciRefset_GPSRefsetDescriptorSnapshot_INT_20250701.txt
+                    der2_ssRefset_GPSModuleDependencySnapshot_INT_20250701.txt
+                    der2_ciRefset_GPSDescriptionTypeSnapshot_INT_20250701.txt
+                    der2_sssssssRefset_GPSMRCMDomainSnapshot_INT_20250701.txt
+                    der2_cissccRefset_GPSMRCMAttributeDomainSnapshot_INT_20250701.txt
+                    der2_ssccRefset_GPSMRCMAttributeRangeSnapshot_INT_20250701.txt
+                    der2_cRefset_GPSMRCMModuleScopeSnapshot_INT_20250701.txt
+                    der2_scsRefset_GPSComponentAnnotationStringValueSnapshot_INT_20250701.txt
+                    der2_sscsRefset_GPSMemberAnnotationStringValueSnapshot_INT_20250701.txt
+        Full
+            Terminology
+                sct2_Concept_GPSFull_INT_20250701.txt
+                sct2_Description_GPSFull-en_INT_20250701.txt
+                sct2_StatedRelationship_GPSFull_INT_20250701.txt
+                sct2_Relationship_GPSFull_INT_20250701.txt
+                sct2_Identifier_GPSFull_INT_20250701.txt
+                sct2_TextDefinition_GPSFull-en_INT_20250701.txt
+                sct2_RelationshipConcreteValues_GPSFull_INT_20250701.txt
+                sct2_sRefset_GPSOWLExpressionFull_INT_20250701.txt
+            Refset
+                Content
+                    der2_Refset_GPSSimpleFull_INT_20250701.txt
+                    der2_cRefset_GPSAssociationFull_INT_20250701.txt
+                    der2_cRefset_GPSAttributeValueFull_INT_20250701.txt
+                Map
+                    der2_sRefset_GPSSimpleMapFull_INT_20250701.txt
+                    der2_iisssccRefset_GPSExtendedMapFull_INT_20250701.txt
+                Language
+                    der2_cRefset_GPSLanguageFull-en_INT_20250701.txt
+                Metadata
+                    der2_cciRefset_GPSRefsetDescriptorFull_INT_20250701.txt
+                    der2_ssRefset_GPSModuleDependencyFull_INT_20250701.txt
+                    der2_ciRefset_GPSDescriptionTypeFull_INT_20250701.txt
+                    der2_sssssssRefset_GPSMRCMDomainFull_INT_20250701.txt
+                    der2_cissccRefset_GPSMRCMAttributeDomainFull_INT_20250701.txt
+                    der2_ssccRefset_GPSMRCMAttributeRangeFull_INT_20250701.txt
+                    der2_cRefset_GPSMRCMModuleScopeFull_INT_20250701.txt
+                    der2_scsRefset_GPSComponentAnnotationStringValueFull_INT_20250701.txt
+                    der2_sscsRefset_GPSMemberAnnotationStringValueFull_INT_20250701.txt
+        Readme_en_20250701.txt
+        release_package_information.json

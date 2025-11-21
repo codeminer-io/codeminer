@@ -5,56 +5,25 @@ withr::local_options(
   cli.default_handler = function(...) {}
 )
 
-# Skip the whole file/tests if TRUD_API_KEY is not set
-# Meaning that unit tests are intended for local execution.
-
-if (Sys.getenv("TRUD_API_KEY") == "") {
-  skip("Skipping NHS TRUD tests because TRUD_API_KEY is not set")
-}
-
-test_that("download_latestversion_of_snomed_item() correctly downloads the latest version of SNOMED item 1799", {
-  # Set the index for the TRUD metadata release
-  # Use 1 for the latest version; increasing values retrieve older releases
-  release_index <- 1
-
-  # Download and extract the specified SNOMED CT UK TRUD release
-  results <- download_latestversion_of_snomed_item(
-    1799,
-    release_index
-  )
-
-  trud_metadata <- trud::get_item_metadata(1799, release_scope = "all")
-  latest_release_id <- trud_metadata$releases[[
-    release_index
-  ]]$id
-
-  # Compare the downloaded release ID to the latest one in metadata
-  expect_equal(
-    results$release_id,
-    latest_release_id,
-    label = "Downloaded release ID",
-    expected.label = "Latest TRUD release ID"
-  )
-})
-
 test_that("read_snomed_ct_uk_monolith() returns appropriate tables", {
   # Set the index for the TRUD metadata release
   # Use 1 for the latest version; increasing values retrieve older releases
 
-  build_snomed_metadata <- build_snomed_metadata(
-    path_destination = getwd(),
-    release_index = 1,
-    item_id = 1799
-  )
-  expected_path <- build_snomed_metadata$expected_path
+  # build_snomed_metadata <- build_snomed_metadata(
+  #   # path_destination = path_destination,
+  #   path_destination = getwd(),
+  #   release_index = 1,
+  #   item_id = 1799
+  # )
+  # expected_path <- build_snomed_metadata$expected_path
 
-  # Skip test for CI as path is for local test
-  skip_if(
-    !dir.exists(expected_path),
-    paste("Test data is for local test:", expected_path)
-  )
+  # # Skip test for CI as path is for local test
+  # skip_if(
+  #   !dir.exists(expected_path),
+  #   paste("Test data is for local test:", expected_path)
+  # )
 
-  snomedct <- read_snomed_ct_uk_monolith(expected_path)
+  snomedct <- read_snomed_ct_uk_monolith(snomed_item_1799_uk_sct2mo_path())
 
   expect_equal(
     names(snomedct$sct_lookup),
@@ -108,6 +77,38 @@ test_that("read_snomed_ct_uk_monolith() returns appropriate tables", {
       "correlationId",
       "mapBlock"
     )
+  )
+})
+
+# Skip the whole file/tests if TRUD_API_KEY is not set
+# Meaning that unit tests are intended for local execution.
+
+if (Sys.getenv("TRUD_API_KEY") == "") {
+  skip("Skipping NHS TRUD tests because TRUD_API_KEY is not set")
+}
+
+test_that("download_latestversion_of_snomed_item() correctly downloads the latest version of SNOMED item 1799", {
+  # Set the index for the TRUD metadata release
+  # Use 1 for the latest version; increasing values retrieve older releases
+  release_index <- 1
+
+  # Download and extract the specified SNOMED CT UK TRUD release
+  results <- download_latestversion_of_snomed_item(
+    1799,
+    release_index
+  )
+
+  trud_metadata <- trud::get_item_metadata(1799, release_scope = "all")
+  latest_release_id <- trud_metadata$releases[[
+    release_index
+  ]]$id
+
+  # Compare the downloaded release ID to the latest one in metadata
+  expect_equal(
+    results$release_id,
+    latest_release_id,
+    label = "Downloaded release ID",
+    expected.label = "Latest TRUD release ID"
   )
 })
 
