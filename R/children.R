@@ -35,7 +35,7 @@
 CHILDREN <- function(
   codes,
   code_type = getOption("codeminer.code_type"),
-  version = getOption("codeminer.relationship_version", default = "latest"),
+  version = getOption("codeminer.lookup_version", default = "latest"),
   codes_only = FALSE,
   preferred_description_only = TRUE
 ) {
@@ -157,12 +157,12 @@ get_metadata_for_relationship <- function(
   all_version_meta <- dplyr::filter(meta, .data$code_type == .env$code_type)
 
   if (version == "latest") {
-    version <- get_latest_version(all_version_meta$relationship_version)
+    version <- get_latest_version(all_version_meta$lookup_version)
   }
 
   this_meta <- dplyr::filter(
     all_version_meta,
-    .data$relationship_version == .env$version
+    .data$lookup_version == .env$version
   )
 
   if (nrow(this_meta) == 0) {

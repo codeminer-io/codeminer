@@ -124,7 +124,7 @@ relationship_metadata <- function(
   return(list(
     relationship_table_name = relationship_table_name,
     code_type = code_type,
-    relationship_version = version,
+    lookup_version = version,
     from_col = from_col,
     to_col = to_col,
     type_col = type_col,

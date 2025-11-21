@@ -188,7 +188,7 @@ test_that("get_metadata_for_relationship() works correctly", {
   expect_s3_class(meta, "data.frame")
   expect_equal(nrow(meta), 1)
   expect_true(all(
-    c("code_type", "relationship_version", "relationship_table_name") %in%
+    c("code_type", "lookup_version", "relationship_table_name") %in%
       names(meta)
   ))
 
