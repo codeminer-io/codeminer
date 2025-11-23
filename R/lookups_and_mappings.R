@@ -88,7 +88,7 @@ all_lkps_maps_to_db <- function(
         )
       )
     } else if (
-      overwrite &
+      overwrite &&
         !rlang::is_empty(tables_already_present_in_db)
     ) {
       warning(
@@ -701,7 +701,11 @@ get_ukb_self_report_med_to_atc_map <- function(
   )
 ) {
   download_file(
-    download_url = "https://static-content.springer.com/esm/art%3A10.1038%2Fs41467-019-09572-5/MediaObjects/41467_2019_9572_MOESM3_ESM.xlsx",
+    download_url = paste0(
+      "https://static-content.springer.com/esm/",
+      "art%3A10.1038%2Fs41467-019-09572-5/MediaObjects/",
+      "41467_2019_9572_MOESM3_ESM.xlsx"
+    ),
     path = path
   )
 }
@@ -1013,8 +1017,6 @@ extend_read_v2_drugs_bnf <- function(all_lkps_maps) {
   read_v2_drugs_bnf <- all_lkps_maps[["read_v2_drugs_bnf"]] %>%
     dplyr::collect()
   read_v2_drugs_lkp <- all_lkps_maps[["read_v2_drugs_lkp"]] %>%
-    dplyr::collect()
-  bnf_lkp <- all_lkps_maps[["bnf_lkp"]] %>%
     dplyr::collect()
 
   # extend 'bnf_lkp'
