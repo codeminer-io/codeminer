@@ -24,9 +24,9 @@ lockEnvironment(codeminer_metadata_table_names, bindings = TRUE)
 build_database <- function(overwrite = FALSE) {
   db_exists <- file.exists(db_path())
   if (db_exists) {
-    cli::cli_alert_info("Existing database found at {.file {db_path()}}")
+    codeminer_inform("Existing database found at {.file {db_path()}}")
   } else {
-    cli::cli_alert_info("Creating new database at {.file {db_path()}}")
+    codeminer_inform("Creating new database at {.file {db_path()}}")
   }
 
   con <- connect_to_db()
@@ -115,10 +115,10 @@ create_relationship_metadata_table <- function(con, overwrite = FALSE) {
 create_table <- function(con, tbl_name, fields, overwrite = FALSE) {
   tbl_exists <- table_exists(con, tbl_name)
   if (tbl_exists && overwrite) {
-    cli::cli_alert_info("Dropping existing table {tbl_name}")
+    codeminer_inform("Dropping existing table {tbl_name}")
     DBI::dbRemoveTable(con, tbl_name)
   } else if (tbl_exists) {
-    cli::cli_alert_info(
+    codeminer_inform(
       "Table {tbl_name} already exists and `overwrite = FALSE`. Leaving as is."
     )
     return(invisible(TRUE))

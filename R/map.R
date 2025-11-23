@@ -54,8 +54,10 @@ MAP <- function(
 
   missing_codes <- setdiff(codes, mapping$from)
   if (length(missing_codes) > 0) {
-    cli::cli_warn(
-      "The following codes were not found in the mapping table: {.code {missing_codes}}"
+    codeminer_warn(
+      c(
+        "!" = "The following codes were not found in the mapping table: {.code {missing_codes}}"
+      )
     )
   }
   mapped_codes <- unique(mapping$to)
@@ -100,10 +102,10 @@ get_metadata_for_mapping <- function(
   swap <- !(from %in% all_meta$from_code_type) &&
     from %in% all_meta$to_code_type
   if (swap) {
-    cli::cli_warn(
+    codeminer_warn(
       c(
-        "No explicit mapping table found for '{from} -> {to}', but found '{to} -> {from}'.",
-        "Using the reverse of '{to} -> {from}' instead.",
+        "!" = "No explicit mapping table found for '{from} -> {to}', but found '{to} -> {from}'.",
+        ">" = "Using the reverse of '{to} -> {from}' instead.",
         "i" = "You can add a new mapping table with {.fun codeminer::add_mapping_table}."
       ),
       call = call
