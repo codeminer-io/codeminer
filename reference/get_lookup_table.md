@@ -21,7 +21,7 @@ get_lookup_table(con, code_type, version, call = rlang::caller_env())
 - call:
 
   The calling environment. Passed to
-  [codeminer_abort](https://codeminer-io.github.io/codeminer/reference/codeminer_abort.md).
+  [codeminer_abort](https://codeminer-io.github.io/codeminer/reference/conditions.md).
 
 ## Value
 

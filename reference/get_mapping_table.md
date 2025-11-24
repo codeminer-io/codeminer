@@ -30,7 +30,7 @@ get_mapping_table(con, from, to, version, call = rlang::caller_env())
 - call:
 
   The calling environment. Passed to
-  [codeminer_abort](https://codeminer-io.github.io/codeminer/reference/codeminer_abort.md).
+  [codeminer_abort](https://codeminer-io.github.io/codeminer/reference/conditions.md).
 
 ## Value
 

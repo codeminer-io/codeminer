@@ -72,7 +72,7 @@ Other Clinical code lookups and mappings:
 # Set up a temporary dummy database
 temp_db <- tempfile(fileext = ".duckdb")
 create_dummy_database(temp_db)
-#> ℹ Creating new database at /tmp/RtmpZPw1IG/file192a414be5ad.duckdb
+#> Creating new database at /tmp/RtmpIG4lZV/file19106282278b.duckdb
 #> ✔ Lookup table icd10_v0 added successfully.
 #> ✔ Lookup table read3_v0 added successfully.
 #> ✔ Mapping table read3_icd10_v0 added successfully.

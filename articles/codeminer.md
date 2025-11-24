@@ -51,14 +51,14 @@ of data frames:
 ``` r
 # Create a temporary database with dummy data
 (db_path <- create_dummy_database())
-#> ℹ Creating new database at /tmp/Rtmp32VzV4/file1dc650b91929.duckdb
+#> Creating new database at /tmp/Rtmp93sd48/file1dadbf179e9.duckdb
 #> ✔ Lookup table icd10_v0 added successfully.
 #> ✔ Lookup table read3_v0 added successfully.
 #> ✔ Mapping table read3_icd10_v0 added successfully.
 #> ✔ Dummy database ready to use!
-#> [1] "/tmp/Rtmp32VzV4/file1dc650b91929.duckdb"
+#> [1] "/tmp/Rtmp93sd48/file1dadbf179e9.duckdb"
 Sys.getenv("CODEMINER_DB_PATH")
-#> [1] "/tmp/Rtmp32VzV4/file1dc650b91929.duckdb"
+#> [1] "/tmp/Rtmp93sd48/file1dadbf179e9.duckdb"
 ```
 
 Setting the `CODEMINER_DB_PATH` environment variable ensures that all

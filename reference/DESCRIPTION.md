@@ -64,7 +64,7 @@ for codes that match the description, or a character vector of codes if
 ``` r
 # build dummy database
 create_dummy_database()
-#> ℹ Creating new database at /tmp/RtmpZPw1IG/file192a3944a923.duckdb
+#> Creating new database at /tmp/RtmpIG4lZV/file191025ea2aa0.duckdb
 #> ✔ Lookup table icd10_v0 added successfully.
 #> ✔ Lookup table read3_v0 added successfully.
 #> ✔ Mapping table read3_icd10_v0 added successfully.

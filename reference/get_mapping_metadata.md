@@ -23,7 +23,7 @@ A data frame containing the mapping metadata.
 
 ``` r
 create_dummy_database()
-#> ℹ Creating new database at /tmp/RtmpZPw1IG/file192a4dd6f145.duckdb
+#> Creating new database at /tmp/RtmpIG4lZV/file191052b3b868.duckdb
 #> ✔ Lookup table icd10_v0 added successfully.
 #> ✔ Lookup table read3_v0 added successfully.
 #> ✔ Mapping table read3_icd10_v0 added successfully.

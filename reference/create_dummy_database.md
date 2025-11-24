@@ -40,7 +40,7 @@ The path to the created database file, invisibly.
 # Create dummy database in a temporary location
 temp_db <- tempfile(fileext = ".duckdb")
 create_dummy_database(temp_db)
-#> ℹ Creating new database at /tmp/RtmpZPw1IG/file192a6275553.duckdb
+#> Creating new database at /tmp/RtmpIG4lZV/file1910209e04ab.duckdb
 #> ✔ Lookup table icd10_v0 added successfully.
 #> ✔ Lookup table read3_v0 added successfully.
 #> ✔ Mapping table read3_icd10_v0 added successfully.
@@ -48,5 +48,5 @@ create_dummy_database(temp_db)
 
 # This also sets the environment variable `CODEMINER_DB_PATH`
 Sys.getenv("CODEMINER_DB_PATH")
-#> [1] "/tmp/RtmpZPw1IG/file192a38332f43.duckdb"
+#> [1] "/tmp/RtmpIG4lZV/file19106bb2010c.duckdb"
 ```
