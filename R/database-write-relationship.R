@@ -57,9 +57,9 @@ add_relationship_table <- function(table, metadata) {
 
   meta_added <- add_metadata_table(con, metadata, type = "relationship")
   if (!meta_added) {
-    cli::cli_warn(
+    codeminer_warn(
       c(
-        "The relationship table {.field {metadata$relationship_table_name}} already exists.",
+        "!" = "The relationship table {.field {metadata$relationship_table_name}} already exists.",
         "i" = "Use a different {.arg code_type} or {.arg version} in {.arg metadata} to add a new relationship table."
       )
     )
@@ -73,8 +73,10 @@ add_relationship_table <- function(table, metadata) {
     overwrite = FALSE
   )
   if (success) {
-    cli::cli_alert_success(
-      "Relationship table {.field {metadata$relationship_table_name}} added successfully."
+    codeminer_inform(
+      c(
+        "v" = "Relationship table {.field {metadata$relationship_table_name}} added successfully."
+      )
     )
   }
   return(invisible(success))

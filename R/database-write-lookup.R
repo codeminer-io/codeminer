@@ -58,9 +58,9 @@ add_lookup_table <- function(table, metadata) {
 
   meta_added <- add_metadata_table(con, metadata, type = "lookup")
   if (!meta_added) {
-    cli::cli_warn(
+    codeminer_warn(
       c(
-        "The lookup table {.field {metadata$lookup_table_name}} already exists.",
+        "!" = "The lookup table {.field {metadata$lookup_table_name}} already exists.",
         "i" = "Use a different {.arg code_type} or {.arg version} in {.arg metadata} to add a new lookup table."
       )
     )
@@ -74,8 +74,10 @@ add_lookup_table <- function(table, metadata) {
     overwrite = FALSE
   )
   if (success) {
-    cli::cli_alert_success(
-      "Lookup table {.field {metadata$lookup_table_name}} added successfully."
+    codeminer_inform(
+      c(
+        "v" = "Lookup table {.field {metadata$lookup_table_name}} added successfully."
+      )
     )
   }
   return(invisible(success))

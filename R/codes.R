@@ -48,8 +48,10 @@ CODES <- function(
 
   missing_codes <- setdiff(codes, result[["code"]])
   if (length(missing_codes) > 0) {
-    cli::cli_warn(
-      "The following codes were not found in the lookup table: {.code {missing_codes}}"
+    codeminer_warn(
+      c(
+        "!" = "The following codes were not found in the lookup table: {.code {missing_codes}}"
+      )
     )
   }
 
@@ -219,6 +221,6 @@ get_latest_version <- function(versions) {
   } else {
     latest_version <- versions[which.max(versions_numeric)]
   }
-  cli::cli_alert_info("Using '{latest_version}' as latest version")
+  codeminer_inform(c("i" = "Using '{latest_version}' as latest version"))
   return(latest_version)
 }
