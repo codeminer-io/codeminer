@@ -94,11 +94,15 @@ check_code_type <- function(code_type, call = rlang::caller_env()) {
 
 check_version <- function(version, call = rlang::caller_env()) {
   version_expr <- rlang::enquo(version)
+
+  # nolint next: object_usage_linter.
   version_name <- rlang::as_label(version_expr)
 
   if (length(version) != 1) {
     codeminer_abort(
-      "{.arg {version_name}} must have length 1, not {length(version)}",
+      c(
+        "x" = "{.arg {version_name}} must have length 1, not {length(version)}"
+      ),
       ,
       call = call
     )
