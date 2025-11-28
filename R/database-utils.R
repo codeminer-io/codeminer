@@ -17,19 +17,19 @@ check_database <- function(con) {
   )
 
   if (!has_lookup_meta) {
-    cli::cli_abort(c(
+    codeminer_abort(c(
       error_msg,
       "x" = "The lookup metadata table does not exist in the database."
     ))
   }
   if (!has_mapping_meta) {
-    cli::cli_abort(c(
+    codeminer_abort(c(
       error_msg,
       "x" = "The mapping metadata table does not exist in the database."
     ))
   }
   if (!has_relationship_meta) {
-    cli::cli_abort(c(
+    codeminer_abort(c(
       error_msg,
       "x" = "The relationship metadata table does not exist in the database."
     ))
@@ -60,11 +60,11 @@ add_metadata_table <- function(
     lookup = "lookup_table_name",
     mapping = "mapping_table_name",
     relationship = "relationship_table_name",
-    cli::cli_abort("Invalid metadata type: {type}.")
+    codeminer_abort("Invalid metadata type: {type}.")
   )
   ids <- metadata[[id_col]]
   if (is.null(ids)) {
-    cli::cli_abort("Missing field {id_col} in metadata.")
+    codeminer_abort("Missing field {id_col} in metadata.")
   }
 
   current_metadata <- read_table_from_db(con, tbl_name)

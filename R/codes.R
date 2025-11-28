@@ -48,8 +48,10 @@ CODES <- function(
 
   missing_codes <- setdiff(codes, result[["code"]])
   if (length(missing_codes) > 0) {
-    cli::cli_warn(
-      "The following codes were not found in the lookup table: {.code {missing_codes}}"
+    codeminer_warn(
+      c(
+        "!" = "The following codes were not found in the lookup table: {.code {missing_codes}}"
+      )
     )
   }
 
@@ -74,7 +76,7 @@ check_lookup_args <- function(
 
 check_codes <- function(codes, call = rlang::caller_env()) {
   if (!rlang::is_character(codes)) {
-    cli::cli_abort(
+    codeminer_abort(
       "{.arg codes} must be a character vector, not {typeof(codes)}",
       call = call
     )
@@ -83,7 +85,7 @@ check_codes <- function(codes, call = rlang::caller_env()) {
 
 check_code_type <- function(code_type, call = rlang::caller_env()) {
   if (!rlang::is_string(code_type)) {
-    cli::cli_abort(
+    codeminer_abort(
       "{.arg code_type} must be a string, not {typeof(code_type)} with length {length(code_type)}",
       call = call
     )
@@ -95,8 +97,9 @@ check_version <- function(version, call = rlang::caller_env()) {
   version_name <- rlang::as_label(version_expr)
 
   if (length(version) != 1) {
-    cli::cli_abort(
+    codeminer_abort(
       "{.arg {version_name}} must have length 1, not {length(version)}",
+      ,
       call = call
     )
   }
@@ -143,7 +146,7 @@ CODES_LIKE <- function(
 #'
 #' @param con A database connection.
 #' @param code_type The code type for which to retrieve the lookup table.
-#' @param call The calling environment. Passed to [cli::cli_abort].
+#' @param call The calling environment. Passed to [codeminer_abort].
 #'
 #' @return A data frame containing the lookup table with three columns:
 #'   `code`, `description` and `code_type`.
@@ -187,7 +190,7 @@ get_metadata_for_table <- function(
 ) {
   meta <- get_lookup_metadata(con = con)
   if (!(code_type %in% meta$code_type)) {
-    cli::cli_abort(
+    codeminer_abort(
       c(
         "Code type '{code_type}' not found in lookup metadata.",
         "i" = "Did you add the lookup table with {.fun codeminer::add_lookup_table}?"
@@ -207,8 +210,9 @@ get_metadata_for_table <- function(
   )
 
   if (nrow(this_meta) == 0) {
-    cli::cli_abort(
-      "No lookup metadata found for '{code_type}' version '{lookup_version}'"
+    codeminer_abort(
+      "No lookup metadata found for '{code_type}' version '{lookup_version}'",
+      call = call
     )
   }
   stopifnot(nrow(this_meta) == 1) # code_type + version combo should be unique
@@ -227,6 +231,6 @@ get_latest_version <- function(versions) {
   } else {
     latest_version <- versions[which.max(versions_numeric)]
   }
-  cli::cli_alert_info("Using '{latest_version}' as latest version")
+  codeminer_inform(c("i" = "Using '{latest_version}' as latest version"))
   return(latest_version)
 }

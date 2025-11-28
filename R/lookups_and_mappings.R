@@ -88,7 +88,7 @@ all_lkps_maps_to_db <- function(
         )
       )
     } else if (
-      overwrite &
+      overwrite &&
         !rlang::is_empty(tables_already_present_in_db)
     ) {
       warning(
@@ -460,11 +460,13 @@ build_all_lkps_maps <-
                 stringr::str_detect(
                   .data[["mapTarget"]],
                   stringr::regex("A$")
-                ) ~ "A",
+                ) ~
+                  "A",
                 stringr::str_detect(
                   .data[["mapTarget"]],
                   stringr::regex("D$")
-                ) ~ "D",
+                ) ~
+                  "D",
                 TRUE ~ NA_character_
               )
             ) %>%
@@ -665,7 +667,9 @@ get_bnf_from_open_prescribing <- function() {
           readr::read_csv(col_types = readr::cols(.default = "c"))
       },
       error = function(e) {
-        cli::cli_alert_warning("Failed to retrieve URL {.url {url}}, skipping.")
+        codeminer_warn(c(
+          "!" = "Failed to retrieve URL {.url {url}}, skipping."
+        ))
         return(NULL)
       }
     )
@@ -697,7 +701,11 @@ get_ukb_self_report_med_to_atc_map <- function(
   )
 ) {
   download_file(
-    download_url = "https://static-content.springer.com/esm/art%3A10.1038%2Fs41467-019-09572-5/MediaObjects/41467_2019_9572_MOESM3_ESM.xlsx",
+    download_url = paste0(
+      "https://static-content.springer.com/esm/",
+      "art%3A10.1038%2Fs41467-019-09572-5/MediaObjects/",
+      "41467_2019_9572_MOESM3_ESM.xlsx"
+    ),
     path = path
   )
 }
@@ -903,16 +911,19 @@ extend_bnf_lkp <- function(all_lkps_maps) {
         .data[["BNF_Code_Level"]] == "chapter" ~ .data[["BNF_Chapter"]],
         .data[["BNF_Code_Level"]] == "section" ~ .data[["BNF_Section"]],
         .data[["BNF_Code_Level"]] == "paragraph" ~ .data[["BNF_Paragraph"]],
-        .data[["BNF_Code_Level"]] == "subparagraph" ~ .data[[
-          "BNF_Subparagraph"
-        ]],
-        .data[["BNF_Code_Level"]] == "chemical_substance" ~ .data[[
-          "BNF_Chemical_Substance"
-        ]],
+        .data[["BNF_Code_Level"]] == "subparagraph" ~
+          .data[[
+            "BNF_Subparagraph"
+          ]],
+        .data[["BNF_Code_Level"]] == "chemical_substance" ~
+          .data[[
+            "BNF_Chemical_Substance"
+          ]],
         .data[["BNF_Code_Level"]] == "product_name" ~ .data[["BNF_Product"]],
-        .data[["BNF_Code_Level"]] == "further_info" ~ .data[[
-          "BNF_Presentation"
-        ]],
+        .data[["BNF_Code_Level"]] == "further_info" ~
+          .data[[
+            "BNF_Presentation"
+          ]],
         .data[["BNF_Code_Level"]] == "full" ~ .data[["BNF_Presentation"]]
       )
     ) %>%
@@ -922,7 +933,8 @@ extend_bnf_lkp <- function(all_lkps_maps) {
           c(
             "full",
             "further_info"
-          ) ~ as.character(NA),
+          ) ~
+          as.character(NA),
         TRUE ~ .data[["BNF_Presentation"]]
       ),
       "BNF_Product" = dplyr::case_when(
@@ -931,7 +943,8 @@ extend_bnf_lkp <- function(all_lkps_maps) {
             "full",
             "further_info",
             "product_name"
-          ) ~ as.character(NA),
+          ) ~
+          as.character(NA),
         TRUE ~ .data[["BNF_Product"]]
       ),
       "BNF_Chemical_Substance" = dplyr::case_when(
@@ -941,7 +954,8 @@ extend_bnf_lkp <- function(all_lkps_maps) {
             "further_info",
             "product_name",
             "chemical_substance"
-          ) ~ as.character(NA),
+          ) ~
+          as.character(NA),
         TRUE ~ .data[["BNF_Chemical_Substance"]]
       ),
       "BNF_Subparagraph" = dplyr::case_when(
@@ -952,7 +966,8 @@ extend_bnf_lkp <- function(all_lkps_maps) {
             "product_name",
             "chemical_substance",
             "subparagraph"
-          ) ~ as.character(NA),
+          ) ~
+          as.character(NA),
         TRUE ~ .data[["BNF_Subparagraph"]]
       ),
       "BNF_Paragraph" = dplyr::case_when(
@@ -964,7 +979,8 @@ extend_bnf_lkp <- function(all_lkps_maps) {
             "chemical_substance",
             "subparagraph",
             "paragraph"
-          ) ~ as.character(NA),
+          ) ~
+          as.character(NA),
         TRUE ~ .data[["BNF_Paragraph"]]
       ),
       "BNF_Section" = dplyr::case_when(
@@ -977,7 +993,8 @@ extend_bnf_lkp <- function(all_lkps_maps) {
             "subparagraph",
             "paragraph",
             "section"
-          ) ~ as.character(NA),
+          ) ~
+          as.character(NA),
         TRUE ~ .data[["BNF_Section"]]
       ),
     ) %>%
@@ -1000,8 +1017,6 @@ extend_read_v2_drugs_bnf <- function(all_lkps_maps) {
   read_v2_drugs_bnf <- all_lkps_maps[["read_v2_drugs_bnf"]] %>%
     dplyr::collect()
   read_v2_drugs_lkp <- all_lkps_maps[["read_v2_drugs_lkp"]] %>%
-    dplyr::collect()
-  bnf_lkp <- all_lkps_maps[["bnf_lkp"]] %>%
     dplyr::collect()
 
   # extend 'bnf_lkp'

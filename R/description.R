@@ -28,7 +28,7 @@ DESCRIPTION <- function(
   preferred_description_only = TRUE
 ) {
   if (!rlang::is_string(pattern)) {
-    cli::cli_abort(
+    codeminer_abort(
       "{.arg pattern} must be a length 1 string, not {typeof(pattern)} with length {length(pattern)}"
     )
   }

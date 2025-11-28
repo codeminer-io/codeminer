@@ -61,8 +61,10 @@ MAP <- function(
 
   missing_codes <- setdiff(codes, mapping$from)
   if (length(missing_codes) > 0) {
-    cli::cli_warn(
-      "The following codes were not found in the mapping table: {.code {missing_codes}}"
+    codeminer_warn(
+      c(
+        "!" = "The following codes were not found in the mapping table: {.code {missing_codes}}"
+      )
     )
   }
   mapped_codes <- unique(mapping$to)
@@ -75,7 +77,7 @@ MAP <- function(
 #' @param from The source code type to map from
 #' @param to The target code type to map to
 #' @param map_version The version of the mapping table.
-#' @param call The calling environment. Passed to [cli::cli_abort].
+#' @param call The calling environment. Passed to [codeminer_abort].
 #'
 #' @return A data frame containing the lookup table with two columns: `from` and `to`.
 #' @keywords internal
@@ -107,10 +109,10 @@ get_metadata_for_mapping <- function(
   swap <- !(from %in% all_meta$from_code_type) &&
     from %in% all_meta$to_code_type
   if (swap) {
-    cli::cli_warn(
+    codeminer_warn(
       c(
-        "No explicit mapping table found for '{from} -> {to}', but found '{to} -> {from}'.",
-        "Using the reverse of '{to} -> {from}' instead.",
+        "!" = "No explicit mapping table found for '{from} -> {to}', but found '{to} -> {from}'.",
+        ">" = "Using the reverse of '{to} -> {from}' instead.",
         "i" = "You can add a new mapping table with {.fun codeminer::add_mapping_table}."
       ),
       call = call
@@ -134,7 +136,7 @@ get_metadata_for_mapping <- function(
   )
 
   if (nrow(this_meta) == 0) {
-    cli::cli_abort(
+    codeminer_abort(
       c(
         "No mapping table found for from type '{from}' and to type '{to}', version '{map_version}'.",
         "i" = "Did you add the mapping table with {.fun codeminer::add_mapping_table}?"
@@ -163,14 +165,15 @@ check_mapping_args <- function(
 ) {
   check_codes(codes, call = call)
   check_version(map_version, call = call)
+
   if (length(from) != 1) {
-    cli::cli_abort(
+    codeminer_abort(
       "{.arg from} must have length 1, not {length(from)}",
       call = call
     )
   }
   if (length(to) != 1) {
-    cli::cli_abort(
+    codeminer_abort(
       "{.arg to} must have length 1, not {length(to)}",
       call = call
     )

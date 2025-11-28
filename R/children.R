@@ -57,7 +57,7 @@ CHILDREN <- function(
 
   relationship_meta <- get_relationship_metadata(con)
   if (!(code_type %in% relationship_meta$code_type)) {
-    cli::cli_abort(
+    codeminer_abort(
       c(
         "No relationship table found for code type '{code_type}'.",
         "i" = "Add a relationship table with {.fun codeminer::add_relationship_table}."
@@ -73,7 +73,7 @@ CHILDREN <- function(
   )
 
   if (length(child_codes) == 0) {
-    cli::cli_warn("No valid child codes found.")
+    codeminer_warn("No valid child codes found.")
     return(if (codes_only) character(0) else data.frame())
   }
 
@@ -158,7 +158,7 @@ get_metadata_for_relationship <- function(
   meta <- get_relationship_metadata(con = con)
 
   if (!(code_type %in% meta$code_type)) {
-    cli::cli_abort(
+    codeminer_abort(
       c(
         "Code type '{code_type}' not found in relationship metadata.",
         "i" = "Did you add the relationship table with {.fun codeminer::add_relationship_table}?"
@@ -181,7 +181,7 @@ get_metadata_for_relationship <- function(
   )
 
   if (nrow(this_meta) == 0) {
-    cli::cli_abort(
+    codeminer_abort(
       "No relationship metadata found for '{code_type}' version '{relationship_version}'",
       call = call
     )

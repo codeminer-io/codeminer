@@ -15,7 +15,7 @@ get_mapping_table(con, from, to, map_version, call = rlang::caller_env())
 
 \item{map_version}{The version of the mapping table.}
 
-\item{call}{The calling environment. Passed to \link[cli:cli_abort]{cli::cli_abort}.}
+\item{call}{The calling environment. Passed to \link{codeminer_abort}.}
 }
 \value{
 A data frame containing the lookup table with two columns: \code{from} and \code{to}.

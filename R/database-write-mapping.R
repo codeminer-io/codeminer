@@ -33,7 +33,7 @@ add_mapping_table <- function(table, metadata) {
 
   table_name <- metadata$mapping_table_name
   if (length(table_name) != 1) {
-    cli::cli_abort(
+    codeminer_abort(
       "`metadata$mapping_table_name` must have length 1, not {length(table_name)}."
     )
   }
@@ -46,10 +46,10 @@ add_mapping_table <- function(table, metadata) {
 
   meta_added <- add_metadata_table(con, metadata, type = "mapping")
   if (!meta_added) {
-    cli::cli_warn(
+    codeminer_warn(
       c(
-        "The mapping table {.field {metadata$mapping_table_name}} already exists.",
-        "i" = "Use a different {.arg code_type} or {.arg map_version} in {.arg metadata} to add a new mapping table."
+        "!" = "The mapping table {.field {metadata$mapping_table_name}} already exists.",
+        "i" = "Use a different {.arg code_type} or {.arg version} in {.arg metadata} to add a new mapping table."
       )
     )
     return(invisible(FALSE))
@@ -62,8 +62,10 @@ add_mapping_table <- function(table, metadata) {
     overwrite = FALSE
   )
   if (success) {
-    cli::cli_alert_success(
-      "Mapping table {.field {metadata$mapping_table_name}} added successfully."
+    codeminer_inform(
+      c(
+        "v" = "Mapping table {.field {metadata$mapping_table_name}} added successfully."
+      )
     )
   }
   return(invisible(success))
@@ -132,7 +134,7 @@ validate_mapping_metadata <- function(
   missing <- setdiff(required, names(metadata))
 
   if (length(missing) > 0) {
-    cli::cli_abort(
+    codeminer_abort(
       c(
         "The metadata in {.arg {arg}} is incomplete.",
         "x" = "The following entries are missing: {.field {missing}}",

@@ -49,7 +49,7 @@ add_relationship_table <- function(table, metadata) {
 
   table_name <- metadata$relationship_table_name
   if (length(table_name) != 1) {
-    cli::cli_abort(
+    codeminer_abort(
       "`metadata$relationship_table_name` must have length 1, not {length(table_name)}."
     )
   }
@@ -62,9 +62,9 @@ add_relationship_table <- function(table, metadata) {
 
   meta_added <- add_metadata_table(con, metadata, type = "relationship")
   if (!meta_added) {
-    cli::cli_warn(
+    codeminer_warn(
       c(
-        "The relationship table {.field {metadata$relationship_table_name}} already exists.",
+        "!" = "The relationship table {.field {metadata$relationship_table_name}} already exists.",
         "i" = "Use a different {.arg code_type} or {.arg relationship_version} in {.arg metadata} to add a new relationship table."
       )
     )
@@ -78,8 +78,10 @@ add_relationship_table <- function(table, metadata) {
     overwrite = FALSE
   )
   if (success) {
-    cli::cli_alert_success(
-      "Relationship table {.field {metadata$relationship_table_name}} added successfully."
+    codeminer_inform(
+      c(
+        "v" = "Relationship table {.field {metadata$relationship_table_name}} added successfully."
+      )
     )
   }
   return(invisible(success))
@@ -154,7 +156,7 @@ validate_relationship_metadata <- function(
   missing <- setdiff(required, names(metadata))
 
   if (length(missing) > 0) {
-    cli::cli_abort(
+    codeminer_abort(
       c(
         "The metadata in {.arg {arg}} is incomplete.",
         "x" = "The following entries are missing: {.field {missing}}",

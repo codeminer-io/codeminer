@@ -46,7 +46,7 @@ create_dummy_database <- function(
     dummy_read3_icd10_mapping_metadata()
   )
 
-  cli::cli_alert_success("Dummy database ready to use!")
+  codeminer_inform(c("v" = "Dummy database ready to use!"))
   return(invisible(db_path))
 }
 
