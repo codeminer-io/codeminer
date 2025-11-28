@@ -108,7 +108,7 @@ add_lookup_table <- function(table, metadata) {
 #' lookup_metadata("ICD-10", version = "2023")
 lookup_metadata <- function(
   code_type,
-  version = "v0",
+  lookup_version = "v0",
   ...,
   lookup_code_col = "code",
   lookup_description_col = "description",
@@ -118,7 +118,7 @@ lookup_metadata <- function(
 ) {
   rlang::check_dots_empty()
 
-  lookup_table_name <- paste(code_type, version, sep = "_")
+  lookup_table_name <- paste(code_type, lookup_version, sep = "_")
 
   if (
     !is.na(preferred_description_col) &&
@@ -132,7 +132,7 @@ lookup_metadata <- function(
   return(list(
     lookup_table_name = lookup_table_name,
     code_type = code_type,
-    lookup_version = version,
+    lookup_version = lookup_version,
     lookup_code_col = lookup_code_col,
     lookup_description_col = lookup_description_col,
     lookup_source = lookup_source,

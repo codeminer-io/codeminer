@@ -4,7 +4,7 @@
 \alias{get_mapping_table}
 \title{Get the mapping table for the given from and to types in standardised format}
 \usage{
-get_mapping_table(con, from, to, version, call = rlang::caller_env())
+get_mapping_table(con, from, to, map_version, call = rlang::caller_env())
 }
 \arguments{
 \item{con}{A database connection.}
@@ -13,7 +13,7 @@ get_mapping_table(con, from, to, version, call = rlang::caller_env())
 
 \item{to}{The target code type to map to}
 
-\item{version}{The version of the mapping table.}
+\item{map_version}{The version of the mapping table.}
 
 \item{call}{The calling environment. Passed to \link[cli:cli_abort]{cli::cli_abort}.}
 }

@@ -6,7 +6,7 @@
 \usage{
 lookup_metadata(
   code_type,
-  version = "v0",
+  lookup_version = "v0",
   ...,
   lookup_code_col = "code",
   lookup_description_col = "description",
@@ -17,8 +17,6 @@ lookup_metadata(
 }
 \arguments{
 \item{code_type}{The type of coding system (e.g., ICD-10, SNOMED-CT)}
-
-\item{version}{The version of the lookup metadata (default: "v0")}
 
 \item{...}{These dots are for future extensions and must be empty.}
 
@@ -35,6 +33,8 @@ descriptions for the same code (default: \code{NA_character_}).}
 \item{preferred_description_indicator}{The value in the
 \code{preferred_description_col} column that indicates the preferred description
 (default: \code{NA_character_})}
+
+\item{version}{The version of the lookup metadata (default: "v0")}
 }
 \value{
 A list containing the lookup metadata

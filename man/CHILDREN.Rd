@@ -7,7 +7,8 @@
 CHILDREN(
   codes,
   code_type = getOption("codeminer.code_type"),
-  version = getOption("codeminer.lookup_version", default = "latest"),
+  lookup_version = getOption("codeminer.lookup_version", default = "latest"),
+  relationship_version = getOption("codeminer.relationship_version", default = "latest"),
   codes_only = FALSE,
   preferred_description_only = TRUE
 )
@@ -15,11 +16,16 @@ CHILDREN(
 \arguments{
 \item{codes}{character. A vector of code strings to retrieve child codes for.}
 
-\item{code_type}{character. Type of clinical code system to be searched.
-This can also be configured through the \code{codeminer.code_type} option.}
+\item{code_type}{character. Type of clinical code system to be searched. This
+can also be configured through the \code{codeminer.code_type} option.}
 
-\item{version}{character. Version of the lookup table to use. Default:
-\code{"latest"}. Can be configured through the \code{codeminer.lookup_version} option.}
+\item{lookup_version}{character. Version of the lookup table to use. Default:
+\code{"latest"}. Can be configured through the \code{codeminer.lookup_version}
+option.}
+
+\item{relationship_version}{character. Version of the relationship table to
+use. Default: \code{"latest"}. Can be configured through the
+\code{codeminer.relationship_version} option.}
 
 \item{codes_only}{logical. If \code{TRUE}, return a character vector of
 \emph{unique} codes. If \code{FALSE} (default), return a data frame of all
@@ -34,10 +40,10 @@ A data frame with columns \code{code}, \code{description}, and \code{code_type}
 \code{codes_only = TRUE}).
 }
 \description{
-Retrieves child codes for a given set of codes. This function works with
-any relationship table added via \code{\link[=add_relationship_table]{add_relationship_table()}}.
-After finding child codes, the code and description information is retrieved
-from the lookup table.
+Retrieves child codes for a given set of codes. This function works with any
+relationship table added via \code{\link[=add_relationship_table]{add_relationship_table()}}. After finding child
+codes, the code and description information is retrieved from the lookup
+table.
 }
 \examples{
 create_dummy_database()

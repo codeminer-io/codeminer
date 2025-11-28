@@ -58,7 +58,7 @@ test_that("add_metadata_table() fails for invalid type", {
 })
 
 test_that("add_metadata_table() works with mapping type", {
-  test_metadata <- mapping_metadata("code_a", "code_b", version = "v1")
+  test_metadata <- mapping_metadata("code_a", "code_b", map_version = "v1")
 
   result <- add_metadata_table(con, test_metadata, type = "mapping")
   expect_type(result, "integer")
@@ -69,7 +69,7 @@ test_that("add_metadata_table() works with mapping type", {
 })
 
 test_that("add_metadata_table() works with relationship type", {
-  test_metadata <- relationship_metadata("test", version = "v1")
+  test_metadata <- relationship_metadata("test", relationship_version = "v1")
 
   result <- add_metadata_table(con, test_metadata, type = "relationship")
   expect_type(result, "integer")
@@ -80,7 +80,7 @@ test_that("add_metadata_table() works with relationship type", {
 })
 
 test_that("add_metadata_table() prevents duplicate entries", {
-  test_metadata <- lookup_metadata("duplicate_test", version = "v1")
+  test_metadata <- lookup_metadata("duplicate_test", lookup_version = "v1")
 
   # First addition should succeed
   result1 <- add_metadata_table(con, test_metadata, type = "lookup")
@@ -100,7 +100,7 @@ test_that("add_metadata_table() fails when missing required id column", {
   # Create metadata missing the lookup_table_name field
   bad_metadata <- data.frame(
     code_type = "test",
-    version = "v1"
+    lookup_version = "v1"
   )
 
   expect_error(
@@ -110,7 +110,7 @@ test_that("add_metadata_table() fails when missing required id column", {
 })
 
 test_that("add_metadata_table() handles single entry correctly", {
-  test_metadata <- lookup_metadata("single_entry", version = "v0")
+  test_metadata <- lookup_metadata("single_entry", lookup_version = "v0")
 
   initial_count <- nrow(get_lookup_metadata(con))
   result <- add_metadata_table(con, test_metadata, type = "lookup")
@@ -131,7 +131,7 @@ test_that("get_lookup_metadata() returns all added entries", {
   # Add multiple entries
   test_metadata <- lookup_metadata(
     c("test1", "test2", "test3"),
-    version = "v99"
+    lookup_version = "v99"
   )
   add_metadata_table(con, test_metadata, type = "lookup")
 
@@ -156,8 +156,8 @@ test_that("get_mapping_metadata() returns a data frame", {
 
 test_that("get_mapping_metadata() returns all added entries", {
   # Add multiple mapping entries
-  test_metadata1 <- mapping_metadata("type1", "type2", version = "v1")
-  test_metadata2 <- mapping_metadata("type3", "type4", version = "v2")
+  test_metadata1 <- mapping_metadata("type1", "type2", map_version = "v1")
+  test_metadata2 <- mapping_metadata("type3", "type4", map_version = "v2")
 
   add_metadata_table(con, test_metadata1, type = "mapping")
   add_metadata_table(con, test_metadata2, type = "mapping")
@@ -182,8 +182,14 @@ test_that("get_relationship_metadata() returns a data frame", {
 
 test_that("get_relationship_metadata() returns all added entries", {
   # Add multiple relationship entries
-  test_metadata1 <- relationship_metadata("rel_type1", version = "v1")
-  test_metadata2 <- relationship_metadata("rel_type2", version = "v2")
+  test_metadata1 <- relationship_metadata(
+    "rel_type1",
+    relationship_version = "v1"
+  )
+  test_metadata2 <- relationship_metadata(
+    "rel_type2",
+    relationship_version = "v2"
+  )
 
   add_metadata_table(con, test_metadata1, type = "relationship")
   add_metadata_table(con, test_metadata2, type = "relationship")

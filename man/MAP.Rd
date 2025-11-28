@@ -8,7 +8,8 @@ MAP(
   codes,
   from = getOption("codeminer.map_from"),
   to = getOption("codeminer.map_to"),
-  version = getOption("codeminer.map_version", default = "latest")
+  map_version = getOption("codeminer.map_version", default = "latest"),
+  lookup_version = getOption("codeminer.lookup_version", default = "latest")
 )
 }
 \arguments{
@@ -18,7 +19,10 @@ MAP(
 
 \item{to}{Coding system to map \code{codes} to.}
 
-\item{version}{Version of the mapping table to use.}
+\item{map_version}{Version of the mapping table to use.}
+
+\item{lookup_version}{character. Version of the lookup table to use. Default:
+\code{"latest"}. Can be configured through the \code{codeminer.lookup_version} option.}
 }
 \value{
 A \code{data.frame} of the mapped codes with their descriptions, as returned by \code{\link[=CODES]{CODES()}}.

@@ -151,7 +151,7 @@ required_mapping_metadata_columns <- function() {
   c(
     "from_code_type",
     "to_code_type",
-    "mapping_version",
+    "map_version",
     "from_col",
     "to_col"
   )
@@ -164,7 +164,7 @@ required_mapping_metadata_columns <- function() {
 required_relationship_metadata_columns <- function() {
   c(
     "code_type",
-    "lookup_version",
+    "relationship_version",
     "from_col",
     "to_col",
     "type_col",

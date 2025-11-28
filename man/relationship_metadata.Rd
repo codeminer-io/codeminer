@@ -6,7 +6,7 @@
 \usage{
 relationship_metadata(
   code_type,
-  version = "v0",
+  relationship_version = "v0",
   ...,
   from_col = "from",
   to_col = "to",
@@ -18,7 +18,7 @@ relationship_metadata(
 \arguments{
 \item{code_type}{The type of coding system (e.g., ICD-10, SNOMED-CT)}
 
-\item{version}{The version of the relationship metadata (default: "v0")}
+\item{relationship_version}{The version of the relationship metadata (default: "v0")}
 
 \item{...}{These dots are for future extensions and must be empty.}
 
@@ -42,7 +42,7 @@ to generate the necessary metadata when adding a new relationship table to
 the database with \code{\link[=add_relationship_table]{add_relationship_table()}}.
 }
 \examples{
-relationship_metadata("SNOMED-CT", version = "2023")
+relationship_metadata("SNOMED-CT", relationship_version = "2023")
 }
 \seealso{
 \code{\link[=add_relationship_table]{add_relationship_table()}}

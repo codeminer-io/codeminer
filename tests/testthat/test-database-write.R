@@ -7,7 +7,7 @@ test_that("add_lookup_table works with dummy data", {
     code = c("a", "b", "c"),
     description = c("letter A", "letter B", "letter C")
   )
-  test_metadata <- lookup_metadata("_test", version = "v99")
+  test_metadata <- lookup_metadata("_test", lookup_version = "v99")
 
   expect_no_error(
     add_lookup_table(test_table, test_metadata)
@@ -25,7 +25,7 @@ test_that("add_lookup_table fails without valid database", {
   expect_error(
     add_lookup_table(
       data.frame(code = "foo", description = "bar"),
-      lookup_metadata("foo", version = "v0")
+      lookup_metadata("foo", lookup_version = "v0")
     ),
     "The database is not initialised"
   )
@@ -35,7 +35,7 @@ test_that("add_lookup_table warns when lookup_table_name already exists", {
   local_build_temp_database()
 
   test_table <- data.frame(code = "foo", description = "bar")
-  test_metadata <- lookup_metadata("foo", version = "v0")
+  test_metadata <- lookup_metadata("foo", lookup_version = "v0")
 
   # Adding same metadata twice should warn
   expect_no_error(add_lookup_table(test_table, test_metadata))
@@ -109,7 +109,7 @@ test_that("add_mapping_table fails without valid database", {
   expect_error(
     add_mapping_table(
       data.frame(from = "foo1", to = "bar1"),
-      mapping_metadata("foo", "bar", version = "v0")
+      mapping_metadata("foo", "bar", map_version = "v0")
     ),
     "The database is not initialised"
   )
@@ -119,7 +119,7 @@ test_that("add_mapping_table warns when mapping_table_name already exists", {
   local_build_temp_database()
 
   test_table <- data.frame(from = "foo1", to = "bar1")
-  test_metadata <- mapping_metadata("foo", "bar", version = "v0")
+  test_metadata <- mapping_metadata("foo", "bar", map_version = "v0")
 
   # Adding same metadata twice should warn
   expect_no_error(add_mapping_table(test_table, test_metadata))
@@ -151,7 +151,7 @@ test_that("add_relationship_table works with dummy data", {
     to = c("parent_a", "parent_b", "parent_c"),
     type = c("is a", "is a", "is a")
   )
-  test_metadata <- relationship_metadata("_test", version = "v99")
+  test_metadata <- relationship_metadata("_test", relationship_version = "v99")
 
   expect_no_error(
     add_relationship_table(test_table, test_metadata)
@@ -169,7 +169,7 @@ test_that("add_relationship_table fails without valid database", {
   expect_error(
     add_relationship_table(
       data.frame(from = "foo", to = "bar", type = "is a"),
-      relationship_metadata("foo", version = "v0")
+      relationship_metadata("foo", relationship_version = "v0")
     ),
     "The database is not initialised"
   )
@@ -179,7 +179,7 @@ test_that("add_relationship_table warns when relationship_table_name already exi
   local_build_temp_database()
 
   test_table <- data.frame(from = "foo", to = "bar", type = "is a")
-  test_metadata <- relationship_metadata("foo", version = "v0")
+  test_metadata <- relationship_metadata("foo", relationship_version = "v0")
 
   # Adding same metadata twice should warn
   expect_no_error(add_relationship_table(test_table, test_metadata))

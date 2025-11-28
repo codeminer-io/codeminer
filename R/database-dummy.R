@@ -92,7 +92,7 @@ dummy_icd10_lookup <- function() {
 dummy_icd10_metadata <- function() {
   lookup_metadata(
     "icd10",
-    version = "v0",
+    lookup_version = "v0",
     lookup_code_col = "code",
     lookup_description_col = "description"
   )
@@ -123,7 +123,7 @@ dummy_icd10_relationship <- function() {
 dummy_icd10_relationship_metadata <- function() {
   relationship_metadata(
     code_type = "icd10",
-    version = "v0",
+    relationship_version = "v0",
     from_col = "from",
     to_col = "to",
     type_col = "type",
@@ -150,7 +150,7 @@ dummy_read3_lookup <- function() {
 dummy_read3_metadata <- function() {
   lookup_metadata(
     "read3",
-    version = "v0",
+    lookup_version = "v0",
     lookup_code_col = "code",
     lookup_description_col = "description",
     preferred_description_col = "description_type",
@@ -187,7 +187,7 @@ dummy_read3_icd10_mapping_metadata <- function() {
   mapping_metadata(
     "read3",
     "icd10",
-    version = "v0",
+    map_version = "v0",
     from_col = "from",
     to_col = "to"
   )

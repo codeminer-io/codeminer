@@ -1,20 +1,21 @@
 #' Add a mapping table to the database
 #'
-#' Add a mapping table to the database together with its metadata.
-#' Note that it is not possible to overwrite an existing mapping table.
+#' Add a mapping table to the database together with its metadata. Note that it
+#' is not possible to overwrite an existing mapping table.
 #'
 #' Mapping tables are indexed by the combination of `from_code_type`,
-#' `to_code_type`, and `version`, specified in [mapping_metadata()]. This
-#' index needs to be unique and is used to identify the mapping table in the
-#' database. If a mapping table with the same index already exists, the function
-#' will emit a warning and return `FALSE` (invisibly) without any effect. Use a
-#' different `version` to add a new version of the mapping table.
+#' `to_code_type`, and `map_version`, specified in [mapping_metadata()].
+#' This index needs to be unique and is used to identify the mapping table in
+#' the database. If a mapping table with the same index already exists, the
+#' function will emit a warning and return `FALSE` (invisibly) without any
+#' effect. Use a different `map_version` to add a new version of the mapping
+#' table.
 #'
 #' @param table The mapping table to add, should be coercible to a `data.frame`
 #' @param metadata The mapping metadata, as specified by [mapping_metadata()].
 #'
-#' @return `TRUE` invisibly if successful, `FALSE` invisibly if the mapping table
-#' already exists.
+#' @return `TRUE` invisibly if successful, `FALSE` invisibly if the mapping
+#'   table already exists.
 #'
 #' @seealso [mapping_metadata()] for the specification of the metadata.
 #' @export
@@ -26,7 +27,7 @@
 #' # Using a temporary database
 #' Sys.setenv(CODEMINER_DB_PATH = tempfile())
 #' build_database()
-#' add_mapping_table(mapping_table, mapping_metadata("capital", "lowercase", version = "v3"))
+#' add_mapping_table(mapping_table, mapping_metadata("capital", "lowercase", map_version = "v3"))
 add_mapping_table <- function(table, metadata) {
   validate_mapping_metadata(metadata, arg = rlang::caller_arg(metadata))
 
@@ -48,7 +49,7 @@ add_mapping_table <- function(table, metadata) {
     cli::cli_warn(
       c(
         "The mapping table {.field {metadata$mapping_table_name}} already exists.",
-        "i" = "Use a different {.arg code_type} or {.arg version} in {.arg metadata} to add a new mapping table."
+        "i" = "Use a different {.arg code_type} or {.arg map_version} in {.arg metadata} to add a new mapping table."
       )
     )
     return(invisible(FALSE))
@@ -76,7 +77,7 @@ add_mapping_table <- function(table, metadata) {
 #'
 #' @param from_code_type The type of coding system for the source codes (e.g., ICD-10, SNOMED-CT)
 #' @param to_code_type The type of coding system for the target codes (e.g., ICD-10, SNOMED-CT)
-#' @param version The version of the mapping metadata (default: "v0")
+#' @param map_version The version of the mapping metadata (default: "v0")
 #' @inheritParams rlang::args_dots_empty
 #' @param from_col The column name for the source codes (default: "from")
 #' @param to_col The column name for the target codes (default: "to")
@@ -86,11 +87,11 @@ add_mapping_table <- function(table, metadata) {
 #' @seealso [add_mapping_table()]
 #' @export
 #' @examples
-#' mapping_metadata("ICD-10", "SNOMED-CT", version = "2023")
+#' mapping_metadata("ICD-10", "SNOMED-CT", map_version = "2023")
 mapping_metadata <- function(
   from_code_type,
   to_code_type,
-  version = "v0",
+  map_version = "v0",
   ...,
   from_col = "from",
   to_col = "to"
@@ -100,7 +101,7 @@ mapping_metadata <- function(
   mapping_table_name <- paste(
     from_code_type,
     to_code_type,
-    version,
+    map_version,
     sep = "_"
   )
 
@@ -108,7 +109,7 @@ mapping_metadata <- function(
     mapping_table_name = mapping_table_name,
     from_code_type = from_code_type,
     to_code_type = to_code_type,
-    mapping_version = version,
+    map_version = map_version,
     from_col = from_col,
     to_col = to_col
   ))

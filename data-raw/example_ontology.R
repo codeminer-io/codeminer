@@ -80,8 +80,10 @@ create_example_data <- function() {
     )
   )
 
+  # Stops air from malforming the tribble
+  # fmt: skip
   mapping_metadata <- tibble::tribble(
-    ~mapping_table_name       , ~from_code_type   , ~to_code_type       , ~mapping_version , ~from_col , ~to_col     ,
+    ~mapping_table_name       , ~from_code_type   , ~to_code_type       , ~map_version , ~from_col , ~to_col     ,
     "capital_to_lowercase_v1" , "capital_letters" , "lowercase_letters" , "v1"             , "capital" , "lowercase" ,
     "capital_to_lowercase_v2" , "capital_letters" , "lowercase_letters" , "v2"             , "capital" , "lowercase" ,
     "capital_to_lowercase_v3" , "capital_letters" , "lowercase_letters" , "v3"             , "capital" , "lowercase"

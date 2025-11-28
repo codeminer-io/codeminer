@@ -1,21 +1,24 @@
 #' Add a relationship table to the database
 #'
-#' Add a relationship table to the database together with its metadata.
-#' Note that it is not possible to overwrite an existing relationship table.
+#' Add a relationship table to the database together with its metadata. Note
+#' that it is not possible to overwrite an existing relationship table.
 #'
-#' Relationship tables are indexed by their `code_type` and `version`, specified
-#' in [relationship_metadata()]. This index needs to be unique and is used to
-#' identify the relationship table in the database. If a relationship table with
-#' the same `code_type` and `version` already exists, the function will emit a
-#' warning and return `FALSE` (invisibly) without any effect. Use a different
-#' `version` to add a new version of the relationship table for the given
-#' `code_type`.
+#' Relationship tables are indexed by their `code_type` and
+#' `relationship_version`, specified in [relationship_metadata()]. This index
+#' needs to be unique and is used to identify the relationship table in the
+#' database. If a relationship table with the same `code_type` and
+#' `relationship_version` already exists, the function will emit a warning and
+#' return `FALSE` (invisibly) without any effect. Use a different
+#' `relationship_version` to add a new version of the relationship table for the
+#' given `code_type`.
 #'
-#' @param table The relationship table to add, should be coercible to a `data.frame`
-#' @param metadata The relationship metadata, as specified by [relationship_metadata()].
+#' @param table The relationship table to add, should be coercible to a
+#'   `data.frame`
+#' @param metadata The relationship metadata, as specified by
+#'   [relationship_metadata()].
 #'
 #' @return `TRUE` invisibly if successful, `FALSE` invisibly if the relationship
-#' table already exists.
+#'   table already exists.
 #'
 #' @seealso [relationship_metadata()] for the specification of the metadata.
 #' @export
@@ -33,7 +36,8 @@
 #' add_relationship_table(
 #'   relationship_table,
 #'   relationship_metadata(
-#'     "test", version = "v1",
+#'     "test",
+#'     relationship_version = "v1",
 #'     from_col = "source",
 #'     to_col = "target",
 #'     type_col = "type",
@@ -61,7 +65,7 @@ add_relationship_table <- function(table, metadata) {
     cli::cli_warn(
       c(
         "The relationship table {.field {metadata$relationship_table_name}} already exists.",
-        "i" = "Use a different {.arg code_type} or {.arg version} in {.arg metadata} to add a new relationship table."
+        "i" = "Use a different {.arg code_type} or {.arg relationship_version} in {.arg metadata} to add a new relationship table."
       )
     )
     return(invisible(FALSE))
@@ -88,7 +92,7 @@ add_relationship_table <- function(table, metadata) {
 #' the database with [add_relationship_table()].
 #'
 #' @param code_type The type of coding system (e.g., ICD-10, SNOMED-CT)
-#' @param version The version of the relationship metadata (default: "v0")
+#' @param relationship_version The version of the relationship metadata (default: "v0")
 #' @inheritParams rlang::args_dots_empty
 #' @param from_col The column name for the source code in the relationship (default: "from")
 #' @param to_col The column name for the target code in the relationship (default: "to")
@@ -102,10 +106,10 @@ add_relationship_table <- function(table, metadata) {
 #' @seealso [add_relationship_table()]
 #' @export
 #' @examples
-#' relationship_metadata("SNOMED-CT", version = "2023")
+#' relationship_metadata("SNOMED-CT", relationship_version = "2023")
 relationship_metadata <- function(
   code_type,
-  version = "v0",
+  relationship_version = "v0",
   ...,
   from_col = "from",
   to_col = "to",
@@ -118,13 +122,13 @@ relationship_metadata <- function(
   relationship_table_name <- paste(
     code_type,
     "relationship",
-    version,
+    relationship_version,
     sep = "_"
   )
   return(list(
     relationship_table_name = relationship_table_name,
     code_type = code_type,
-    lookup_version = version,
+    relationship_version = relationship_version,
     from_col = from_col,
     to_col = to_col,
     type_col = type_col,

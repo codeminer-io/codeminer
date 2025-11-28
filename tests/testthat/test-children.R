@@ -4,7 +4,7 @@ test_that("CHILDREN() returns the expected data format", {
   test_codes <- c("E10", "E11")
   test_type <- "icd10"
 
-  result <- CHILDREN(test_codes, code_type = test_type, version = "v0")
+  result <- CHILDREN(test_codes, code_type = test_type, lookup_version = "v0")
 
   expect_s3_class(result, "data.frame")
   expect_true(all(c("code", "description", "code_type") %in% names(result)))
@@ -63,14 +63,14 @@ test_that("CHILDREN() handles versions correctly", {
   result_v0 <- CHILDREN(
     test_codes,
     code_type = test_type,
-    version = test_version
+    lookup_version = test_version
   )
   expect_s3_class(result_v0, "data.frame")
 
   result_latest <- CHILDREN(
     test_codes,
     code_type = test_type,
-    version = "latest"
+    lookup_version = "latest"
   )
   expect_s3_class(result_latest, "data.frame")
   expect_equal(result_latest, result_v0)
@@ -109,7 +109,7 @@ test_that("CHILDREN() uses correct latest version", {
   v2_result <- CHILDREN(
     "PARENT_A",
     code_type = test_type,
-    version = test_version,
+    lookup_version = test_version,
     codes_only = TRUE
   )
   expect_identical(v2_result, "A")
@@ -117,7 +117,7 @@ test_that("CHILDREN() uses correct latest version", {
   latest_result <- CHILDREN(
     "PARENT_A",
     code_type = test_type,
-    version = "latest",
+    lookup_version = "latest",
     codes_only = TRUE
   )
   expect_identical(latest_result, v2_result)
@@ -144,7 +144,7 @@ test_that("CHILDREN() fails for missing code_type", {
 
 test_that("CHILDREN() fails for wrong version", {
   expect_error(
-    CHILDREN("E10", code_type = "icd10", version = "nope"),
+    CHILDREN("E10", code_type = "icd10", relationship_version = "nope"),
     "No relationship metadata found"
   )
 })
@@ -188,7 +188,7 @@ test_that("get_metadata_for_relationship() works correctly", {
   expect_s3_class(meta, "data.frame")
   expect_equal(nrow(meta), 1)
   expect_true(all(
-    c("code_type", "lookup_version", "relationship_table_name") %in%
+    c("code_type", "relationship_version", "relationship_table_name") %in%
       names(meta)
   ))
 

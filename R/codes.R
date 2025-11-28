@@ -6,7 +6,7 @@
 #' @param code_type character. Type of clinical code system to be searched.
 #'   Depends on what is available in the lookup tables. See [add_lookup_table()]
 #'   on how to add new lookup tables. This can also be configured through the `codeminer.code_type` option.
-#' @param version character. Version of the lookup table to use. Default:
+#' @param lookup_version character. Version of the lookup table to use. Default:
 #'   `"latest"`. Can be configured through the `codeminer.lookup_version` option.
 #' @param preferred_description_only logical. If `TRUE`, only returns the preferred description for each code.
 #'   Default: `FALSE`.
@@ -28,15 +28,15 @@
 CODES <- function(
   codes,
   code_type = getOption("codeminer.code_type"),
-  version = getOption("codeminer.lookup_version", default = "latest"),
+  lookup_version = getOption("codeminer.lookup_version", default = "latest"),
   preferred_description_only = TRUE
 ) {
-  check_lookup_args(codes, code_type, version)
+  check_lookup_args(codes, code_type, lookup_version)
 
   con <- connect_to_db()
   check_database(con)
 
-  lookup_table <- get_lookup_table(con, code_type, version)
+  lookup_table <- get_lookup_table(con, code_type, lookup_version)
 
   if (identical(codes, "all")) {
     return(dplyr::collect(lookup_table))
@@ -64,12 +64,12 @@ CODES <- function(
 check_lookup_args <- function(
   codes,
   code_type,
-  version,
+  lookup_version,
   call = rlang::caller_env()
 ) {
   check_codes(codes, call)
   check_code_type(code_type, call)
-  check_version(version, call)
+  check_version(lookup_version, call)
 }
 
 check_codes <- function(codes, call = rlang::caller_env()) {
@@ -91,9 +91,12 @@ check_code_type <- function(code_type, call = rlang::caller_env()) {
 }
 
 check_version <- function(version, call = rlang::caller_env()) {
+  version_expr <- rlang::enquo(version)
+  version_name <- rlang::as_label(version_expr)
+
   if (length(version) != 1) {
     cli::cli_abort(
-      "{.arg version} must have length 1, not {length(version)}",
+      "{.arg {version_name}} must have length 1, not {length(version)}",
       call = call
     )
   }
@@ -112,15 +115,15 @@ check_version <- function(version, call = rlang::caller_env()) {
 CODES_LIKE <- function(
   pattern,
   code_type = getOption("codeminer.code_type"),
-  version = getOption("codeminer.lookup_version", default = "latest"),
+  lookup_version = getOption("codeminer.lookup_version", default = "latest"),
   preferred_description_only = TRUE
 ) {
-  check_lookup_args(pattern, code_type, version)
+  check_lookup_args(pattern, code_type, lookup_version)
 
   con <- connect_to_db()
   check_database(con)
 
-  lookup_table <- get_lookup_table(con, code_type, version)
+  lookup_table <- get_lookup_table(con, code_type, lookup_version)
   like_codes <- dplyr::filter(
     lookup_table,
     stringr::str_detect(.data$code, pattern)
@@ -130,7 +133,7 @@ CODES_LIKE <- function(
   result <- CODES(
     unique(like_codes),
     code_type = code_type,
-    version = version,
+    lookup_version = lookup_version,
     preferred_description_only = preferred_description_only
   )
   return(result)
@@ -148,10 +151,10 @@ CODES_LIKE <- function(
 get_lookup_table <- function(
   con,
   code_type,
-  version,
+  lookup_version,
   call = rlang::caller_env()
 ) {
-  this_meta <- get_metadata_for_table(con, code_type, version, call)
+  this_meta <- get_metadata_for_table(con, code_type, lookup_version, call)
 
   tbl_name <- this_meta$lookup_table_name
   tbl <- dplyr::tbl(con, tbl_name)
@@ -179,7 +182,7 @@ get_lookup_table <- function(
 get_metadata_for_table <- function(
   con,
   code_type,
-  version,
+  lookup_version,
   call = rlang::caller_env()
 ) {
   meta <- get_lookup_metadata(con = con)
@@ -195,13 +198,18 @@ get_metadata_for_table <- function(
 
   all_version_meta <- dplyr::filter(meta, .data$code_type == .env$code_type)
 
-  if (version == "latest") {
-    version <- get_latest_version(all_version_meta$lookup_version)
+  if (lookup_version == "latest") {
+    lookup_version <- get_latest_version(all_version_meta$lookup_version)
   }
-  this_meta <- dplyr::filter(all_version_meta, .data$lookup_version == version)
+  this_meta <- dplyr::filter(
+    all_version_meta,
+    .data$lookup_version == .env$lookup_version
+  )
 
   if (nrow(this_meta) == 0) {
-    cli::cli_abort("No metadata found for '{code_type}' version '{version}'")
+    cli::cli_abort(
+      "No lookup metadata found for '{code_type}' version '{lookup_version}'"
+    )
   }
   stopifnot(nrow(this_meta) == 1) # code_type + version combo should be unique
 

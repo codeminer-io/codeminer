@@ -8,14 +8,14 @@
 CODES(
   codes,
   code_type = getOption("codeminer.code_type"),
-  version = getOption("codeminer.lookup_version", default = "latest"),
+  lookup_version = getOption("codeminer.lookup_version", default = "latest"),
   preferred_description_only = TRUE
 )
 
 CODES_LIKE(
   pattern,
   code_type = getOption("codeminer.code_type"),
-  version = getOption("codeminer.lookup_version", default = "latest"),
+  lookup_version = getOption("codeminer.lookup_version", default = "latest"),
   preferred_description_only = TRUE
 )
 }
@@ -26,7 +26,7 @@ CODES_LIKE(
 Depends on what is available in the lookup tables. See \code{\link[=add_lookup_table]{add_lookup_table()}}
 on how to add new lookup tables. This can also be configured through the \code{codeminer.code_type} option.}
 
-\item{version}{character. Version of the lookup table to use. Default:
+\item{lookup_version}{character. Version of the lookup table to use. Default:
 \code{"latest"}. Can be configured through the \code{codeminer.lookup_version} option.}
 
 \item{preferred_description_only}{logical. If \code{TRUE}, only returns the preferred description for each code.

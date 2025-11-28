@@ -1,15 +1,19 @@
 #' Get child codes
 #'
-#' Retrieves child codes for a given set of codes. This function works with
-#' any relationship table added via [add_relationship_table()].
-#' After finding child codes, the code and description information is retrieved
-#' from the lookup table.
+#' Retrieves child codes for a given set of codes. This function works with any
+#' relationship table added via [add_relationship_table()]. After finding child
+#' codes, the code and description information is retrieved from the lookup
+#' table.
 #'
 #' @param codes character. A vector of code strings to retrieve child codes for.
-#' @param code_type character. Type of clinical code system to be searched.
-#'   This can also be configured through the `codeminer.code_type` option.
-#' @param version character. Version of the lookup table to use. Default:
-#'   `"latest"`. Can be configured through the `codeminer.lookup_version` option.
+#' @param code_type character. Type of clinical code system to be searched. This
+#'   can also be configured through the `codeminer.code_type` option.
+#' @param lookup_version character. Version of the lookup table to use. Default:
+#'   `"latest"`. Can be configured through the `codeminer.lookup_version`
+#'   option.
+#' @param relationship_version character. Version of the relationship table to
+#'   use. Default: `"latest"`. Can be configured through the
+#'   `codeminer.relationship_version` option.
 #' @param codes_only logical. If `TRUE`, return a character vector of
 #'   \emph{unique} codes. If `FALSE` (default), return a data frame of all
 #'   results including code descriptions (useful for manual validation).
@@ -35,13 +39,18 @@
 CHILDREN <- function(
   codes,
   code_type = getOption("codeminer.code_type"),
-  version = getOption("codeminer.lookup_version", default = "latest"),
+  lookup_version = getOption("codeminer.lookup_version", default = "latest"),
+  relationship_version = getOption(
+    "codeminer.relationship_version",
+    default = "latest"
+  ),
   codes_only = FALSE,
   preferred_description_only = TRUE
 ) {
   check_codes(codes)
   check_code_type(code_type)
-  check_version(version)
+  check_version(lookup_version)
+  check_version(relationship_version)
 
   con <- connect_to_db()
   check_database(con)
@@ -60,7 +69,7 @@ CHILDREN <- function(
     con = con,
     codes = codes,
     code_type = code_type,
-    version = version
+    relationship_version = relationship_version
   )
 
   if (length(child_codes) == 0) {
@@ -71,7 +80,7 @@ CHILDREN <- function(
   result <- CODES(
     codes = child_codes,
     code_type = code_type,
-    version = version,
+    lookup_version = lookup_version,
     preferred_description_only = preferred_description_only
   )
 
@@ -89,7 +98,7 @@ CHILDREN <- function(
 #'
 #' @param codes Character vector of codes to start from.
 #' @param code_type The type of coding system.
-#' @param version The version of the relationship table.
+#' @param relationship_version The version of the relationship table.
 #'
 #' @return A character vector of related codes.
 #' @keywords internal
@@ -98,9 +107,13 @@ get_children <- function(
   con,
   codes,
   code_type,
-  version
+  relationship_version
 ) {
-  rel_meta <- get_metadata_for_relationship(con, code_type, version)
+  rel_meta <- get_metadata_for_relationship(
+    con,
+    code_type,
+    relationship_version
+  )
 
   # Get the relationship table
   rel_table_name <- rel_meta$relationship_table_name
@@ -130,7 +143,7 @@ get_children <- function(
 #'
 #' @param con Database connection.
 #' @param code_type The code type.
-#' @param version The version.
+#' @param relationship_version The version.
 #' @param call Calling environment for error messages.
 #'
 #' @return A single row data frame with the relationship metadata.
@@ -139,7 +152,7 @@ get_children <- function(
 get_metadata_for_relationship <- function(
   con,
   code_type,
-  version,
+  relationship_version,
   call = rlang::caller_env()
 ) {
   meta <- get_relationship_metadata(con = con)
@@ -156,18 +169,20 @@ get_metadata_for_relationship <- function(
 
   all_version_meta <- dplyr::filter(meta, .data$code_type == .env$code_type)
 
-  if (version == "latest") {
-    version <- get_latest_version(all_version_meta$lookup_version)
+  if (identical(relationship_version, "latest")) {
+    relationship_version <- get_latest_version(
+      all_version_meta$relationship_version
+    )
   }
 
   this_meta <- dplyr::filter(
     all_version_meta,
-    .data$lookup_version == .env$version
+    .data$relationship_version == .env$relationship_version
   )
 
   if (nrow(this_meta) == 0) {
     cli::cli_abort(
-      "No relationship metadata found for '{code_type}' version '{version}'",
+      "No relationship metadata found for '{code_type}' version '{relationship_version}'",
       call = call
     )
   }
