@@ -64,8 +64,15 @@ add_relationship_table <- function(table, metadata) {
   if (!meta_added) {
     codeminer_warn(
       c(
-        "!" = "The relationship table {.field {metadata$relationship_table_name}} already exists.",
-        "i" = "Use a different {.arg code_type} or {.arg relationship_version} in {.arg metadata} to add a new relationship table."
+        "!" = paste0(
+          "The relationship table ",
+          "{.field {metadata$relationship_table_name}} already exists."
+        ),
+        "i" = paste0(
+          "Use a different {.arg code_type} or ",
+          "{.arg relationship_version} in {.arg metadata} to add a ",
+          "new relationship table."
+        )
       )
     )
     return(invisible(FALSE))

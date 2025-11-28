@@ -18,6 +18,8 @@ lookup_metadata(
 \arguments{
 \item{code_type}{The type of coding system (e.g., ICD-10, SNOMED-CT)}
 
+\item{lookup_version}{The version of the lookup metadata (default: "v0")}
+
 \item{...}{These dots are for future extensions and must be empty.}
 
 \item{lookup_code_col}{The column name for the lookup code (default: "code")}
@@ -33,8 +35,6 @@ descriptions for the same code (default: \code{NA_character_}).}
 \item{preferred_description_indicator}{The value in the
 \code{preferred_description_col} column that indicates the preferred description
 (default: \code{NA_character_})}
-
-\item{version}{The version of the lookup metadata (default: "v0")}
 }
 \value{
 A list containing the lookup metadata
@@ -45,7 +45,7 @@ generate the necessary metadata when adding a new lookup table to the database
 with \code{\link[=add_lookup_table]{add_lookup_table()}}.
 }
 \examples{
-lookup_metadata("ICD-10", version = "2023")
+lookup_metadata("ICD-10", lookup_version = "2023")
 }
 \seealso{
 \code{\link[=add_lookup_table]{add_lookup_table()}}

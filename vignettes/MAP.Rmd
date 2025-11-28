@@ -26,7 +26,7 @@ create_dummy_database()
 Use `MAP()` to map a vector of codes from one clinical coding system to another:
 
 ```{r MAP}
-MAP(codes = "X40J4", from = "read3", to = "icd10", version = "v0")
+MAP(codes = "X40J4", from = "read3", to = "icd10", map_version = "v0")
 ```
 
 Use `MAP("all")` to return the entire mapping table:
