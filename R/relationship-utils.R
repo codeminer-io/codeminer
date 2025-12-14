@@ -1,11 +1,65 @@
-#' Get relationship metadata for a specific code type and version
+#' Retrieve parent or child codes
 #'
-#' @param con Database connection.
-#' @param code_type The code type.
-#' @param relationship_version The version.
-#' @param call Calling environment for error messages.
+#' Returns immediate or transitive parent or child codes for the given codes by
+#' traversing the relationship graph.
 #'
-#' @return A single row data frame with the relationship metadata.
+#' Use `N_PARENTS()`/`N_CHILDREN()` for immediate relationships (one step), and
+#' `PARENTS()`/`CHILDREN()` for transitive closure (all reachable
+#' ancestors/descendants).
+#'
+#' @param codes Character vector of codes to start from.
+#' @param depth Integer. Maximum number of steps to traverse. Use `Inf` for
+#'   transitive closure (all ancestors/descendants). Only used by `N_PARENTS()`
+#'   and `N_CHILDREN()`.
+#' @param code_type Code type (character).
+#' @param lookup_version Lookup table version (character).
+#' @param relationship_version Relationship table version (character).
+#' @param codes_only Logical. If `TRUE`, return only unique codes. If `FALSE`,
+#'   return a data frame with code and description.
+#' @param preferred_description_only Logical. If `TRUE`, return only preferred
+#'   descriptions.
+#'
+#' @return A data frame of codes and descriptions, or a character vector if
+#'   `codes_only = TRUE`.
+#' @seealso [ATTRIBUTES()]
+#' @name parent_child_retrieval
+#' @examples
+#' create_dummy_database()
+#' PARENTS(c("E10", "E11"), code_type = "icd10")
+#' CHILDREN(c("E10", "E11"), code_type = "icd10")
+#' N_PARENTS(c("E10", "E11"), code_type = "icd10")
+#' N_CHILDREN(c("E10", "E11"), code_type = "icd10")
+NULL
+
+#' Mark a value to be extracted from metadata
+#'
+#' Use this helper to indicate that a parameter value should be extracted
+#' from the relationship metadata rather than used directly.
+#'
+#' @param col_name A string. The column name to extract from metadata.
+#' @return A character vector of class `from_meta` and `character`.
+#' @keywords internal
+#' @noRd
+from_meta <- function(col_name) {
+  rlang::check_required(col_name)
+  if (!rlang::is_string(col_name)) {
+    cli::cli_abort(
+      "{.arg col_name} must be a single string, not {.obj_type_friendly {col_name}}."
+    )
+  }
+  structure(col_name, class = c("from_meta", "character"))
+}
+
+
+#' Retrieve relationship metadata for a code type and version
+#'
+#' @param con A database connection.
+#' @param code_type Code type (character).
+#' @param relationship_version Relationship table version (character).
+#' @param call Calling environment for error messages. Defaults to
+#'   [rlang::caller_env()].
+#'
+#' @return A single-row data frame with the relationship metadata.
 #' @keywords internal
 #' @noRd
 get_metadata_for_relationship <- function(
@@ -52,20 +106,20 @@ get_metadata_for_relationship <- function(
 }
 
 
-#' Perform a single step graph traversal
+#' Perform a single-step graph traversal
 #'
-#' Returns nodes that are immediately connected to the input nodes by following
-#' edges in the specified direction.
+#' Returns nodes immediately connected to the input nodes by following edges in
+#' the specified direction.
 #'
 #' @param nodes Character vector of node IDs to start from.
-#' @param relationship_tbl A dbplyr table containing relationship data.
-#' @param from_colname Name of column containing 'from' nodes (e.g., child).
-#' @param to_colname Name of column containing 'to' nodes (e.g., parent).
+#' @param relationship_tbl A `dbplyr` table containing relationship data.
+#' @param from_colname Name of column containing 'from' nodes (e.g. child).
+#' @param to_colname Name of column containing 'to' nodes (e.g. parent).
 #' @param type_colname Name of column containing relationship type.
-#' @param direction Character. Either "out" (follow edges from nodes) or "in"
-#'   (follow edges to nodes).
-#' @param rel_type Character vector of relationship types to filter by. If NULL,
-#'   all relationship types are included.
+#' @param direction Either `"out"` (follow edges from nodes) or `"in"` (follow
+#'   edges to nodes).
+#' @param rel_type Character vector of relationship types to filter by. If
+#'   `NULL`, all types are included.
 #'
 #' @return Character vector of node IDs reached in one step.
 #' @keywords internal
@@ -113,9 +167,10 @@ graph_step <- function(
 #' edges until no new nodes are discovered.
 #'
 #' @inheritParams graph_step
-#' @param include_self Logical. If TRUE, include the starting nodes in the result.
-#' @param max_depth Integer. Maximum number of steps to traverse. Default is Inf
-#'   (complete traversal).
+#' @param include_self Logical. If `TRUE`, include the starting nodes in the
+#'   result.
+#' @param max_depth Integer. Maximum number of steps to traverse. Default is
+#'   `Inf` (complete traversal).
 #'
 #' @return Character vector of all reachable node IDs.
 #' @keywords internal
@@ -212,11 +267,92 @@ graph_closure <- function(
   result_nodes
 }
 
-#' Get parent codes
+
+#' Graph closure with code lookup
 #'
-#' Returns immediate parent codes for the given codes.
+#' Wrapper around `graph_closure()` that handles metadata retrieval, performs
+#' the graph traversal, and returns codes with descriptions via [CODES()].
 #'
-#' @inheritParams CHILDREN
+#' @param codes Character vector of codes to start from.
+#' @param code_type Code type (character).
+#' @param lookup_version Lookup table version (character).
+#' @param relationship_version Relationship table version (character).
+#' @param codes_only Logical. If `TRUE`, return only unique codes.
+#' @param preferred_description_only Logical. If `TRUE`, return only preferred
+#'   descriptions.
+#' @param direction Either `"out"` or `"in"`.
+#' @param rel_type Relationship type filter. Can be:
+#'   - `from_meta()` to extract from metadata
+#'   - A direct value (character vector)
+#'   - `NULL` for no filtering.
+#' @param include_self Logical. If `TRUE`, include starting codes in result.
+#' @param max_depth Maximum traversal depth (integer).
+#' @param empty_warning Warning message when no codes are found (character).
+#'
+#' @return A data frame with code information, or a character vector if
+#'   `codes_only = TRUE`.
+#' @keywords internal
+#' @noRd
+graph_closure_codes <- function(
+  codes,
+  code_type,
+  lookup_version,
+  relationship_version,
+  codes_only,
+  preferred_description_only,
+  direction,
+  rel_type = from_meta("child_parent_relationship_code"),
+  include_self = TRUE,
+  max_depth = Inf,
+  empty_warning = "No valid codes found."
+) {
+  check_codes(codes)
+  check_code_type(code_type)
+
+  con <- connect_to_db()
+  meta <- get_metadata_for_relationship(con, code_type, relationship_version)
+  rel_table <- dplyr::tbl(con, meta$relationship_table_name)
+
+  # Resolve rel_type if it's a from_meta reference
+
+  if (inherits(rel_type, "from_meta")) {
+    rel_type <- meta[[as.character(rel_type)]]
+  }
+
+  result_codes <- graph_closure(
+    nodes = codes,
+    relationship_tbl = rel_table,
+    from_colname = meta$from_col,
+    to_colname = meta$to_col,
+    type_colname = meta$type_col,
+    direction = direction,
+    rel_type = rel_type,
+    include_self = include_self,
+    max_depth = max_depth
+  )
+
+  # Include self (graph_closure handles this, but we also add original codes)
+  if (include_self) {
+    result_codes <- c(codes, result_codes) |> unique()
+  }
+
+  if (length(result_codes) == 0) {
+    codeminer_warn(empty_warning)
+    return(if (codes_only) character(0) else data.frame())
+  }
+
+  result <- CODES(
+    codes = result_codes,
+    code_type = code_type,
+    lookup_version = lookup_version,
+    preferred_description_only = preferred_description_only
+  )
+
+  if (codes_only) return(unique(result$code))
+  return(result)
+}
+
+#' @rdname parent_child_retrieval
 #' @export
 N_PARENTS <- function(
   codes,
@@ -230,49 +366,22 @@ N_PARENTS <- function(
   codes_only = FALSE,
   preferred_description_only = TRUE
 ) {
-  check_codes(codes)
-  check_code_type(code_type)
-
-  con <- connect_to_db()
-  meta <- get_metadata_for_relationship(con, code_type, relationship_version)
-  rel_table <- dplyr::tbl(con, meta$relationship_table_name)
-
-  parent_codes <- graph_closure(
-    nodes = codes,
-    relationship_tbl = rel_table,
-    from_colname = meta$from_col,
-    to_colname = meta$to_col,
-    type_colname = meta$type_col,
-    direction = "out",
-    rel_type = meta$child_parent_relationship_code,
-    include_self = TRUE,
-    max_depth = depth
-  )
-
-  # Include self
-  parent_codes <- c(codes, parent_codes) |> unique()
-
-  if (length(parent_codes) == 0) {
-    codeminer_warn("No valid parent codes found.")
-    return(if (codes_only) character(0) else data.frame())
-  }
-
-  result <- CODES(
-    codes = parent_codes,
+  graph_closure_codes(
+    codes = codes,
     code_type = code_type,
     lookup_version = lookup_version,
-    preferred_description_only = preferred_description_only
+    relationship_version = relationship_version,
+    codes_only = codes_only,
+    preferred_description_only = preferred_description_only,
+    direction = "out",
+    rel_type = from_meta("child_parent_relationship_code"),
+    include_self = TRUE,
+    max_depth = depth,
+    empty_warning = "No valid parent codes found."
   )
-
-  if (codes_only) return(unique(result$code))
-  return(result)
 }
 
-#' Get ancestor codes
-#'
-#' Returns all ancestor codes (transitive closure) for the given codes.
-#'
-#' @inheritParams CHILDREN
+#' @rdname parent_child_retrieval
 #' @export
 PARENTS <- function(
   codes,
@@ -296,44 +405,8 @@ PARENTS <- function(
   )
 }
 
-#' Get child codes
-#'
-#' Retrieves child codes for a given set of codes. This function works with any
-#' relationship table added via [add_relationship_table()]. After finding child
-#' codes, the code and description information is retrieved from the lookup
-#' table.
-#'
-#' @param codes character. A vector of code strings to retrieve child codes for.
-#' @param code_type character. Type of clinical code system to be searched. This
-#'   can also be configured through the `codeminer.code_type` option.
-#' @param lookup_version character. Version of the lookup table to use. Default:
-#'   `"latest"`. Can be configured through the `codeminer.lookup_version`
-#'   option.
-#' @param relationship_version character. Version of the relationship table to
-#'   use. Default: `"latest"`. Can be configured through the
-#'   `codeminer.relationship_version` option.
-#' @param codes_only logical. If `TRUE`, return a character vector of
-#'   \emph{unique} codes. If `FALSE` (default), return a data frame of all
-#'   results including code descriptions (useful for manual validation).
-#' @param preferred_description_only logical. If `TRUE` (default), only returns
-#'   the preferred description for each code.
-#'
-#' @return A data frame with columns `code`, `description`, and `code_type`
-#'   (when `codes_only = FALSE`), or a character vector of codes (when
-#'   `codes_only = TRUE`).
-#'
-#' @seealso [CODES()], which is used to retrieve code information, and
-#'   [add_relationship_table()] for how to add relationship tables.
-#' @family Clinical code lookups and mappings
+#' @rdname parent_child_retrieval
 #' @export
-#' @examples
-#' create_dummy_database()
-#'
-#' # Get children for ICD-10 codes (if relationship table exists)
-#' CHILDREN(c("E10", "E11"), code_type = "icd10")
-#'
-#' # Get only the codes without descriptions
-#' CHILDREN(c("E10", "E11"), code_type = "icd10", codes_only = TRUE)
 N_CHILDREN <- function(
   codes,
   depth = 1,
@@ -346,49 +419,22 @@ N_CHILDREN <- function(
   codes_only = FALSE,
   preferred_description_only = TRUE
 ) {
-  check_codes(codes)
-  check_code_type(code_type)
-
-  con <- connect_to_db()
-  meta <- get_metadata_for_relationship(con, code_type, relationship_version)
-  rel_table <- dplyr::tbl(con, meta$relationship_table_name)
-
-  child_codes <- graph_closure(
-    nodes = codes,
-    relationship_tbl = rel_table,
-    from_colname = meta$from_col,
-    to_colname = meta$to_col,
-    type_colname = meta$type_col,
-    direction = "in",
-    rel_type = meta$child_parent_relationship_code,
-    include_self = TRUE,
-    max_depth = depth
-  )
-
-  # Include self
-  child_codes <- c(codes, child_codes) |> unique()
-
-  if (length(child_codes) == 0) {
-    codeminer_warn("No valid child codes found.")
-    return(if (codes_only) character(0) else data.frame())
-  }
-
-  result <- CODES(
-    codes = child_codes,
+  graph_closure_codes(
+    codes = codes,
     code_type = code_type,
     lookup_version = lookup_version,
-    preferred_description_only = preferred_description_only
+    relationship_version = relationship_version,
+    codes_only = codes_only,
+    preferred_description_only = preferred_description_only,
+    direction = "in",
+    rel_type = from_meta("child_parent_relationship_code"),
+    include_self = TRUE,
+    max_depth = depth,
+    empty_warning = "No valid child codes found."
   )
-
-  if (codes_only) return(unique(result$code))
-  return(result)
 }
 
-#' Get descendant codes
-#'
-#' Returns all descendant codes (transitive closure) for the given codes.
-#'
-#' @inheritParams CHILDREN
+#' @rdname parent_child_retrieval
 #' @export
 CHILDREN <- function(
   codes,
@@ -414,9 +460,11 @@ CHILDREN <- function(
 
 #' Get attributes for codes
 #'
-#' Returns attributes for a set of codes.
+#' Returns attributes for a set of codes by traversing the relationship graph.
 #'
 #' @inheritParams CHILDREN
+#' @return A data frame of attribute codes and descriptions, or a character
+#'   vector if `codes_only = TRUE`.
 #' @export
 ATTRIBUTES <- function(
   codes,
@@ -429,37 +477,17 @@ ATTRIBUTES <- function(
   codes_only = FALSE,
   preferred_description_only = TRUE
 ) {
-  check_codes(codes)
-  check_code_type(code_type)
-
-  con <- connect_to_db()
-  meta <- get_metadata_for_relationship(con, code_type, relationship_version)
-  rel_table <- dplyr::tbl(con, meta$relationship_table_name)
-
-  codes_with_attributes <- graph_closure(
-    nodes = codes,
-    relationship_tbl = rel_table,
-    from_colname = meta$from_col,
-    to_colname = meta$to_col,
-    type_colname = meta$type_col,
+  graph_closure_codes(
+    codes = codes,
+    code_type = code_type,
+    lookup_version = lookup_version,
+    relationship_version = relationship_version,
+    codes_only = codes_only,
+    preferred_description_only = preferred_description_only,
     direction = "out",
     rel_type = NULL,
     include_self = FALSE,
-    max_depth = 1
+    max_depth = 1,
+    empty_warning = "No codes found with specified attributes."
   )
-
-  if (length(codes_with_attributes) == 0) {
-    codeminer_warn("No codes found with specified attributes.")
-    return(if (codes_only) character(0) else data.frame())
-  }
-
-  result <- CODES(
-    codes = codes_with_attributes,
-    code_type = code_type,
-    lookup_version = lookup_version,
-    preferred_description_only = preferred_description_only
-  )
-
-  if (codes_only) return(unique(result$code))
-  return(result)
 }
