@@ -40,12 +40,9 @@ GET_ATTRIBUTES(enterobacteriaceae_infections,
 }
 \seealso{
 Other Clinical code lookups and mappings: 
-\code{\link{CHILDREN}()},
 \code{\link{CODES}()},
 \code{\link{HAS_ATTRIBUTES}()},
 \code{\link{MAP}()},
-\code{\link{default_col_filters}()},
-\code{\link{get_children_sct}()},
-\code{\link{get_parents_sct}()}
+\code{\link{default_col_filters}()}
 }
 \concept{Clinical code lookups and mappings}
