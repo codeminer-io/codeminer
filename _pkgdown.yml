@@ -18,8 +18,7 @@ reference:
       - mapping_metadata
       - add_relationship_table
       - relationship_metadata
-      - get_lookup_metadata
-      - get_mapping_metadata
+      - get_codeminer_metadata
 
   - title: Clinical codes
     desc: Functions for looking up clinical codes and mapping between different coding systems.
@@ -27,14 +26,11 @@ reference:
       - CODES
       - CODES_LIKE
       - CHILDREN
-      - get_children_sct
-      - get_parents_sct
       - DESCRIPTION
       - MAP
       - default_col_filters
       - get_col_filters
       - matches("ATTRIBUTE")
-      - filter_sct_relationship
 
   - title: Dummy data
     desc: Dummy data for tests.
