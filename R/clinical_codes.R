@@ -264,33 +264,33 @@ summarise_attributes_sct <- function(
     all_lkps_maps = all_lkps_maps
   )
 
-  output_descriptions <- output_codes %>%
-    as.list() %>%
+  output_descriptions <- output_codes |>
+    as.list() |>
     purrr::map(\(x) {
       CODES(
         codes = x,
         code_type = "sct",
         preferred_description_only = TRUE
-      ) %>%
+      ) |>
         dplyr::select(-tidyselect::all_of("code_type"))
-    }) %>%
+    }) |>
     purrr::imap(\(x, idx) {
-      x %>%
+      x |>
         dplyr::rename_with(
           ~ paste0(idx, "_description"),
           tidyselect::all_of("description")
-        ) %>%
+        ) |>
         dplyr::rename_with(~idx, tidyselect::all_of("code"))
     })
 
   result <- output_codes
 
   for (x in names(output_descriptions)) {
-    result <- result %>%
+    result <- result |>
       dplyr::full_join(output_descriptions[[x]], by = x)
   }
 
-  result %>%
+  result |>
     dplyr::select(
       tidyselect::starts_with("sourceId"),
       tidyselect::starts_with("typeId"),
@@ -433,11 +433,11 @@ db_tables_to_list <- function(con, md) {
 get_all_sct_relation_types <- function(all_lkps_maps = NULL) {
   create_db_connection(all_lkps_maps)
 
-  all_lkps_maps$sct_relationship %>%
-    dplyr::select(tidyselect::all_of("typeId")) %>%
-    dplyr::distinct() %>%
-    dplyr::collect() %>%
-    dplyr::pull(.data[["typeId"]]) %>%
+  all_lkps_maps$sct_relationship |>
+    dplyr::select(tidyselect::all_of("typeId")) |>
+    dplyr::distinct() |>
+    dplyr::collect() |>
+    dplyr::pull(.data[["typeId"]]) |>
     CODES(
       code_type = "sct",
       preferred_description_only = TRUE
@@ -490,34 +490,34 @@ filter_sct_relationship <- function(
 
   if (!is.null(destinationId_filter)) {
     related_codes <-
-      all_lkps_maps$sct_relationship %>%
+      all_lkps_maps$sct_relationship |>
       dplyr::filter(.data[["destinationId"]] %in% !!destinationId_filter)
   }
 
   if (!is.null(sourceId_filter)) {
-    related_codes <- related_codes %>%
+    related_codes <- related_codes |>
       dplyr::filter(.data[["sourceId"]] %in% !!sourceId_filter)
   }
 
   if (!is.null(typeId_filter)) {
-    related_codes <- related_codes %>%
+    related_codes <- related_codes |>
       dplyr::filter(.data[["typeId"]] %in% !!typeId_filter)
   }
 
   if (active_only) {
-    related_codes <- related_codes %>%
+    related_codes <- related_codes |>
       dplyr::filter(.data[["active"]] == "1")
   }
 
-  related_codes <- related_codes %>%
+  related_codes <- related_codes |>
     dplyr::select(tidyselect::all_of(c(
       "destinationId",
       "sourceId",
       "typeId"
-    ))) %>%
+    ))) |>
     dplyr::collect()
 
-  result <- dplyr::bind_rows(codes, related_codes) %>%
+  result <- dplyr::bind_rows(codes, related_codes) |>
     dplyr::distinct()
 
   if (recursive) {
@@ -623,27 +623,27 @@ get_relatives_attributes_sct <- function(
 
   if (!is.null(codes$code)) {
     related_codes <-
-      all_lkps_maps$sct_relationship %>%
+      all_lkps_maps$sct_relationship |>
       dplyr::filter(.data[[filter_col]] %in% !!codes$code)
   }
 
   if (!is.null(relationship)) {
-    related_codes <- related_codes %>%
+    related_codes <- related_codes |>
       dplyr::filter(.data[["typeId"]] %in% !!relationship)
   }
 
   if (active_only) {
-    related_codes <- related_codes %>%
+    related_codes <- related_codes |>
       dplyr::filter(.data[["active"]] == "1")
   }
 
-  related_codes <- related_codes %>%
-    dplyr::select(tidyselect::all_of(c(return_col, "typeId"))) %>%
+  related_codes <- related_codes |>
+    dplyr::select(tidyselect::all_of(c(return_col, "typeId"))) |>
     dplyr::collect()
 
   names(related_codes)[which(names(related_codes) == return_col)] <- "code"
 
-  result <- dplyr::bind_rows(codes, related_codes) %>%
+  result <- dplyr::bind_rows(codes, related_codes) |>
     dplyr::distinct()
 
   if (is.null(codes)) {
@@ -689,31 +689,31 @@ get_col_filters <- function(defaults_only = TRUE, selected_table = NULL) {
 
   # get filter_cols
   result <- list(
-    lookup = CODE_TYPE_TO_LKP_TABLE_MAP %>%
+    lookup = CODE_TYPE_TO_LKP_TABLE_MAP |>
       dplyr::rename("table" = "lkp_table"),
-    map = CLINICAL_CODE_MAPPINGS_MAP %>%
+    map = CLINICAL_CODE_MAPPINGS_MAP |>
       dplyr::rename("table" = "mapping_table")
-  ) %>%
-    dplyr::bind_rows(.id = "lookup_map") %>%
-    dplyr::select(tidyselect::all_of(c("table", "filter_cols"))) %>%
+  ) |>
+    dplyr::bind_rows(.id = "lookup_map") |>
+    dplyr::select(tidyselect::all_of(c("table", "filter_cols"))) |>
     dplyr::filter(!is.na(.data[["filter_cols"]]))
 
-  result <- rlang::set_names(result$filter_cols, nm = result$table) %>%
+  result <- rlang::set_names(result$filter_cols, nm = result$table) |>
     purrr::map(\(x) x[[1]])
 
   # get either all values, or default selections only for filter_cols
   if (defaults_only) {
-    result <- result %>%
+    result <- result |>
       purrr::map(\(x) {
-        x %>%
+        x |>
           purrr::map(\(x) subset(x, stringr::str_detect(x, "\\*")))
       })
   }
 
   # remove '*' (these are used to indicate default choices)
-  result <- result %>%
+  result <- result |>
     purrr::map(\(x) {
-      x %>%
+      x |>
         purrr::map(stringr::str_remove_all, pattern = "\\*")
     })
 
@@ -800,7 +800,7 @@ filter_cols <- function(df, df_name, col_filters = NULL) {
     stop("Each item in `col_filters` must be named")
   }
 
-  col_filters_item_types <- col_filters %>%
+  col_filters_item_types <- col_filters |>
     purrr::map_lgl(\(x) is.vector(x) || is.null(x))
 
   assertthat::assert_that(
@@ -854,7 +854,7 @@ filter_cols <- function(df, df_name, col_filters = NULL) {
         )
       )
 
-      df <- df %>%
+      df <- df |>
         dplyr::filter(.data[[i]] %in% !!col_filter_values)
     }
   }
@@ -885,10 +885,10 @@ get_icd10_code_alt_code_x_map <- function(
   match.arg(as_named_list, choices = c("names_no_x", "names_with_x"))
 
   # make mapping df
-  icd10_lkp_alt_x_map <- icd10_lkp %>%
-    dplyr::select(tidyselect::all_of("ALT_CODE")) %>%
-    dplyr::filter(!is.na(.data[["ALT_CODE"]])) %>%
-    dplyr::collect() %>%
+  icd10_lkp_alt_x_map <- icd10_lkp |>
+    dplyr::select(tidyselect::all_of("ALT_CODE")) |>
+    dplyr::filter(!is.na(.data[["ALT_CODE"]])) |>
+    dplyr::collect() |>
     dplyr::mutate(
       "ALT_CODE_minus_x" = stringr::str_remove(
         .data[["ALT_CODE"]],
@@ -914,7 +914,7 @@ get_icd10_code_alt_code_x_map <- function(
   ))
 
   if (undivided_3char_only) {
-    icd10_lkp_alt_x_map <- icd10_lkp_alt_x_map %>%
+    icd10_lkp_alt_x_map <- icd10_lkp_alt_x_map |>
       dplyr::filter(.data[["ALT_CODE_minus_x"]] != .data[["ALT_CODE"]])
   }
 
@@ -922,17 +922,17 @@ get_icd10_code_alt_code_x_map <- function(
   if (!is.null(as_named_list)) {
     icd10_lkp_alt_x_map <- switch(
       as_named_list,
-      names_no_x = icd10_lkp_alt_x_map %>%
+      names_no_x = icd10_lkp_alt_x_map |>
         tidyr::pivot_wider(
           names_from = "ALT_CODE_minus_x",
           values_from = "ALT_CODE"
-        ) %>%
+        ) |>
         as.list(),
-      names_with_x = icd10_lkp_alt_x_map %>%
+      names_with_x = icd10_lkp_alt_x_map |>
         tidyr::pivot_wider(
           names_from = "ALT_CODE",
           values_from = "ALT_CODE_minus_x"
-        ) %>%
+        ) |>
         as.list()
     )
   }
@@ -990,12 +990,12 @@ get_icd10_code_range <- function(start_icd10_code, end_icd10_code, icd10_lkp) {
   )
 
   # get start and end row indices
-  start_rowid <- icd10_lkp %>%
-    dplyr::filter(.data[["ALT_CODE"]] == !!start_icd10_code) %>%
+  start_rowid <- icd10_lkp |>
+    dplyr::filter(.data[["ALT_CODE"]] == !!start_icd10_code) |>
     dplyr::pull(.data[[".rowid"]])
 
-  end_rowid <- icd10_lkp %>%
-    dplyr::filter(.data[["ALT_CODE"]] == !!end_icd10_code) %>%
+  end_rowid <- icd10_lkp |>
+    dplyr::filter(.data[["ALT_CODE"]] == !!end_icd10_code) |>
     dplyr::pull(.data[[".rowid"]])
 
   # check start/end row indices are scalar, and create range of row index integers
@@ -1005,8 +1005,8 @@ get_icd10_code_range <- function(start_icd10_code, end_icd10_code, icd10_lkp) {
   icd10_lkp_rowids <- start_rowid:end_rowid
 
   # filter for selected row index integers
-  result <- icd10_lkp %>%
-    dplyr::filter(.data[[".rowid"]] %in% icd10_lkp_rowids) %>%
+  result <- icd10_lkp |>
+    dplyr::filter(.data[[".rowid"]] %in% icd10_lkp_rowids) |>
     dplyr::pull(.data[["ALT_CODE"]])
 
   pattern <- stringr::str_c(paste0("^", result), sep = "", collapse = "|")
@@ -1014,11 +1014,11 @@ get_icd10_code_range <- function(start_icd10_code, end_icd10_code, icd10_lkp) {
   # expand (e.g. for 'A80-A81', at this stage all 'A80' should be present
   # ('A800-A809'), but for 'A81', only 'A81' wil be present - needs expanding
   # to 'A801-A819')
-  result <- icd10_lkp %>%
+  result <- icd10_lkp |>
     dplyr::filter(stringr::str_detect(
       .data[["ALT_CODE"]],
       pattern = pattern
-    )) %>%
+    )) |>
     dplyr::pull(.data[["ALT_CODE"]])
 
   return(result)
