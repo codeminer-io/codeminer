@@ -26,10 +26,15 @@ get_codeminer_metadata <- function(
   con <- connect_to_db()
 
   result <- list()
-  if ("lookup" %in% type) result$lookup <- get_lookup_metadata(con)
-  if ("mapping" %in% type) result$mapping <- get_mapping_metadata(con)
-  if ("relationship" %in% type)
+  if ("lookup" %in% type) {
+    result$lookup <- get_lookup_metadata(con)
+  }
+  if ("mapping" %in% type) {
+    result$mapping <- get_mapping_metadata(con)
+  }
+  if ("relationship" %in% type) {
     result$relationship <- get_relationship_metadata(con)
+  }
 
   if (length(result) == 1L) {
     return(result[[1L]])

@@ -188,7 +188,8 @@ update_code_selection <- function(current_selection, previous_codelist) {
       "category" = .data[["category_TOREMOVE"]],
       "selected" = dplyr::case_when(
         (!is.na(.data[["category"]])) |
-          (.data[["category"]] != "") ~ "Yes",
+          (.data[["category"]] != "") ~
+          "Yes",
         TRUE ~ ""
       )
     ) %>%

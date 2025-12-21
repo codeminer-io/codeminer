@@ -30,6 +30,7 @@ test_that("`update_code_selection()` works as expected", {
 
   expect_equal(
     result,
+    # fmt: skip
     tibble::tribble(
       ~disease   , ~description                              , ~category              , ~code_type      , ~code   , ~author , ~selected ,
       "Diabetes" , "diabetes"                                , "Diabetes unspecified" , "data_coding_6" , "1220"  , "ukbwr" , "Yes"     ,

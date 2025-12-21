@@ -1,4 +1,6 @@
 create_dummy_database()
+
+# fmt: skip
 test_lookup_table <- tibble::tribble(
   ~code , ~description ,
   "f1"  , "apple"      ,

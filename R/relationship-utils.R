@@ -324,7 +324,9 @@ graph_closure_codes <- function(
     preferred_description_only = preferred_description_only
   )
 
-  if (codes_only) return(unique(result$code))
+  if (codes_only) {
+    return(unique(result$code))
+  }
   return(result)
 }
 
