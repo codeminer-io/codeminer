@@ -61,10 +61,10 @@ MAP <- function(
 
   missing_codes <- setdiff(codes, mapping$from)
   if (length(missing_codes) > 0) {
-    codeminer_warn(
-      c(
-        "!" = "The following codes were not found in the mapping table: {.code {missing_codes}}"
-      )
+    missing_codes_warning(
+      missing_codes,
+      table_type = "mapping",
+      table_meta = get_metadata_for_mapping(con, from, to, map_version)
     )
   }
   mapped_codes <- unique(mapping$to)

@@ -48,10 +48,10 @@ CODES <- function(
 
   missing_codes <- setdiff(codes, result[["code"]])
   if (length(missing_codes) > 0) {
-    codeminer_warn(
-      c(
-        "!" = "The following codes were not found in the lookup table: {.code {missing_codes}}"
-      )
+    missing_codes_warning(
+      missing_codes,
+      table_type = "lookup",
+      table_meta = get_metadata_for_table(con, code_type, lookup_version)
     )
   }
 
@@ -81,6 +81,8 @@ check_codes <- function(codes, call = rlang::caller_env()) {
       call = call
     )
   }
+
+  unique(codes)
 }
 
 check_code_type <- function(code_type, call = rlang::caller_env()) {

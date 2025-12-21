@@ -169,9 +169,9 @@ graph_closure <- function(
     # Collect the edges
     related_edges <- related_edges |>
       dplyr::select(
-        !!from_colname := .data[[from_colname]],
-        !!to_colname := .data[[to_colname]],
-        !!type_colname := .data[[type_colname]]
+        !!from_colname := dplyr::all_of(from_colname),
+        !!to_colname := dplyr::all_of(to_colname),
+        !!type_colname := dplyr::all_of(type_colname)
       ) |>
       dplyr::collect()
 
@@ -251,19 +251,48 @@ graph_closure_codes <- function(
   rel_type = from_meta("child_parent_relationship_code"),
   include_self = TRUE,
   max_depth = Inf,
-  empty_warning = "No valid codes found."
+  empty_warning = "No valid codes found.",
+  call = rlang::caller_env()
 ) {
   check_codes(codes)
   check_code_type(code_type)
 
   con <- connect_to_db()
-  meta <- get_metadata_for_relationship(con, code_type, relationship_version)
+  meta <- get_metadata_for_relationship(
+    con,
+    code_type,
+    relationship_version,
+    call = call
+  )
   rel_table <- dplyr::tbl(con, meta$relationship_table_name)
 
   # Resolve rel_type if it's a from_meta reference
 
   if (inherits(rel_type, "from_meta")) {
     rel_type <- meta[[as.character(rel_type)]]
+  }
+
+  # Warning if any input codes are not present in relationship table
+  available_codes <- rel_table |>
+    dplyr::filter(
+      .data[[meta$from_col]] %in%
+        .env$codes |
+        .data[[meta$to_col]] %in% .env$codes
+    ) |>
+    dplyr::select(dplyr::all_of(c(meta$from_col, meta$to_col))) |>
+    tidyr::pivot_longer(dplyr::everything()) |>
+    dplyr::select(dplyr::all_of("value")) |>
+    dplyr::distinct() |>
+    dplyr::pull(dplyr::all_of("value"))
+
+  missing_codes <- setdiff(codes, available_codes)
+
+  if (length(missing_codes) > 0) {
+    missing_codes_warning(
+      missing_codes,
+      table_type = "relationship",
+      table_meta = meta
+    )
   }
 
   result_codes <- graph_closure(
