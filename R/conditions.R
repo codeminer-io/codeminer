@@ -188,7 +188,7 @@ missing_codes_warning <- function(
 
   table_type <- rlang::arg_match(
     table_type,
-    c("lookup", "mapping", "relationship")
+    names(codeminer_metadata_table_names)
   )
 
   missing_codes <- sort(unique(missing_codes))
