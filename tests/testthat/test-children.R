@@ -22,23 +22,34 @@ test_that("CHILDREN() works with codes_only = TRUE", {
   expect_true(length(result) >= length(test_codes))
 })
 
-test_that("CHILDREN() respects relationship types", {
+test_that("CHILDREN() returns all hierarchy descendants and ignores non-is_a relationships", {
   test_type <- "dummy"
 
   dummy_lookup <- data.frame(
-    code = c("parent", "child1", "child2", "notachild"),
-    description = c("a parent", "a child", "another child", "not a child")
+    code = c("parent", "child1", "child2", "grandchild", "notachild"),
+    description = c(
+      "a parent",
+      "a child",
+      "another child",
+      "a grandchild",
+      "not a child"
+    )
   )
   add_lookup_table(dummy_lookup, lookup_metadata(test_type))
+
   dummy_relationships <- data.frame(
-    from = c("child1", "child2", "notachild"),
-    to = c("parent", "parent", "parent"),
-    type = c("is a", "is a", "has a")
+    from = c("child1", "child2", "grandchild", "notachild"),
+    to = c("parent", "parent", "child1", "parent"),
+    type = c("is a", "is a", "is a", "has a")
   )
   add_relationship_table(dummy_relationships, relationship_metadata(test_type))
 
   result <- CHILDREN("parent", code_type = "dummy", codes_only = TRUE)
-  expect_identical(result, c("child1", "child2"))
+
+  expect_identical(
+    sort(result),
+    c("child1", "child2", "grandchild", "parent")
+  )
 })
 
 
@@ -112,7 +123,7 @@ test_that("CHILDREN() uses correct latest version", {
     lookup_version = test_version,
     codes_only = TRUE
   )
-  expect_identical(v2_result, "A")
+  expect_identical(v2_result, c("A", "PARENT_A"))
 
   latest_result <- CHILDREN(
     "PARENT_A",
@@ -138,7 +149,7 @@ test_that("CHILDREN() fails for wrong argument types", {
 test_that("CHILDREN() fails for missing code_type", {
   expect_error(
     CHILDREN("E10", code_type = "idontexist"),
-    "No relationship table found for code type 'idontexist'"
+    "Code type 'idontexist' not found in relationship metadata"
   )
 })
 
@@ -152,25 +163,30 @@ test_that("CHILDREN() fails for wrong version", {
 test_that("CHILDREN() warns about missing codes", {
   test_codes <- c("foo", "bar")
   expect_warning(
-    CHILDREN(test_codes, "icd10"),
-    "No valid child codes found"
+    with_mocked_bindings(
+      CHILDREN(test_codes, "icd10"),
+
+      # 2 codeminer_missing_codes warnings are raised, one for CHILDREN() and one for
+      # CODES(). Here we are only testing CHILDREN(), so CODES() is mocked
+      CODES = function(...) invisible()
+    ),
+    class = "codeminer_missing_codes"
   )
 })
 
 test_that("CHILDREN() returns empty result for invalid codes", {
   test_codes <- c("nonexistent1", "nonexistent2")
 
-  expect_warning(
-    result_df <- CHILDREN(test_codes, "icd10", codes_only = FALSE),
-    "No valid child codes found"
-  )
+  suppressMessages(suppressWarnings(
+    result_df <- CHILDREN(test_codes, "icd10", codes_only = FALSE)
+  ))
+
   expect_s3_class(result_df, "data.frame")
   expect_equal(nrow(result_df), 0)
 
-  expect_warning(
-    result_vec <- CHILDREN(test_codes, "icd10", codes_only = TRUE),
-    "No valid child codes found"
-  )
+  suppressMessages(suppressWarnings(
+    result_vec <- CHILDREN(test_codes, "icd10", codes_only = TRUE)
+  ))
   expect_type(result_vec, "character")
   expect_equal(length(result_vec), 0)
 })

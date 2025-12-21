@@ -69,8 +69,7 @@ test_that("CODES warns about missing codes", {
   test_codes <- c("foo", "bar")
   expect_warning(
     CODES(test_codes, "icd10"),
-    "The following codes were not found in the lookup table: `foo` and `bar`",
-    fixed = TRUE
+    class = "codeminer_missing_codes"
   )
 })
 
