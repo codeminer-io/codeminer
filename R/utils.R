@@ -59,12 +59,12 @@ read_excel_to_named_list <- function(
   ...
 ) {
   # validate args
-  if (!is.null(to_include) & !is.null(to_exclude)) {
+  if (!is.null(to_include) && !is.null(to_exclude)) {
     stop("Error! One or both of `to_include` and `to_exclude` must be `NULL`")
   }
 
   # get sheet names
-  sheet_names <- path %>%
+  sheet_names <- path |>
     readxl::excel_sheets()
 
   # choose sheets
@@ -78,8 +78,8 @@ read_excel_to_named_list <- function(
   }
 
   # read sheets into named list
-  sheet_names %>%
-    purrr::set_names() %>%
+  sheet_names |>
+    purrr::set_names() |>
     purrr::map(readxl::read_excel, path = path, col_types = col_types, ...)
 }
 
@@ -101,8 +101,8 @@ rm_footer_rows_all_lkps_maps_df <- function(df, footer_metadata_col_idx = 1) {
   footer_metadata_col_colname <- names(df)[footer_metadata_col_idx]
 
   # get rowids for rows with `NA` in column containing footer metadata
-  df <- df %>%
-    tibble::rowid_to_column() %>%
+  df <- df |>
+    tibble::rowid_to_column() |>
     dplyr::mutate(
       "rowid" = ifelse(
         !is.na(.data[[footer_metadata_col_colname]]),
@@ -128,16 +128,16 @@ rm_footer_rows_all_lkps_maps_df <- function(df, footer_metadata_col_idx = 1) {
 
   # convert rowid col to NA, unless rowid equals `max_rowid`. Then, fill
   # downwards, and remove these rows
-  df %>%
+  df |>
     dplyr::mutate(
       "rowid" = ifelse(
         .data[["rowid"]] == !!max_rowid,
         yes = .data[["rowid"]],
         no = NA_character_
       )
-    ) %>%
-    tidyr::fill(tidyselect::all_of("rowid"), .direction = "down") %>%
-    dplyr::filter(is.na(.data[["rowid"]])) %>%
+    ) |>
+    tidyr::fill(tidyselect::all_of("rowid"), .direction = "down") |>
+    dplyr::filter(is.na(.data[["rowid"]])) |>
     dplyr::select(-tidyselect::all_of("rowid"))
 }
 
@@ -177,13 +177,13 @@ update_code_selection <- function(current_selection, previous_codelist) {
   ukbwranglr::validate_clinical_codes(previous_codelist)
 
   # copy over previous categories and mark these codes as selected
-  current_selection %>%
+  current_selection |>
     dplyr::left_join(
       previous_codelist,
       # match on these columns (NB, does not include 'description' or author')
       by = UPDATE_CODE_SELECTION_MATCHING_VARS,
       suffix = c("", "_TOREMOVE")
-    ) %>%
+    ) |>
     dplyr::mutate(
       "category" = .data[["category_TOREMOVE"]],
       "selected" = dplyr::case_when(
@@ -192,7 +192,7 @@ update_code_selection <- function(current_selection, previous_codelist) {
           "Yes",
         TRUE ~ ""
       )
-    ) %>%
+    ) |>
     dplyr::select(-tidyselect::ends_with("_TOREMOVE"))
 }
 
