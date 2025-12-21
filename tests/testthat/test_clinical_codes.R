@@ -70,7 +70,7 @@ test_that("`handle_unrecognised_codes()` produces an error/warning message appro
 
 test_that("`filter_cols` filters columns as expected (or returns `df` unchanged, if appropriate)", {
   # change `Species` column to class 'character'
-  iris_chr <- iris %>%
+  iris_chr <- iris |>
     dplyr::mutate(Species = as.character(Species))
 
   # check returns expected number of rows for single/multiple column/value combinations
@@ -170,16 +170,22 @@ test_that("`filter_cols` raises error if `col_filters` contains items that are n
   )
 })
 
-test_that("`filter_cols` raises error if class of df column to be filtered does not match class of supplied filter values", {
-  expect_error(
-    filter_cols(
-      df = iris,
-      df_name = "iris",
-      col_filters = list(iris = list(Species = c("setosa")))
-    ),
-    "classes do not match"
-  )
-})
+test_that(
+  paste0(
+    "`filter_cols` raises error if class of df column to be ",
+    "filtered does not match class of supplied filter values"
+  ),
+  {
+    expect_error(
+      filter_cols(
+        df = iris,
+        df_name = "iris",
+        col_filters = list(iris = list(Species = c("setosa")))
+      ),
+      "classes do not match"
+    )
+  }
+)
 
 # `rm_footer_rows_all_lkps_maps_df()` ----------------------------------------
 

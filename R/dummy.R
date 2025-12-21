@@ -199,6 +199,7 @@ read_icd10_phecode_map_dummy <- function() {
 #' dummy_clinical_events_tidy()
 dummy_clinical_events_tidy <- function() {
   # fmt: skip
+  # nolint start
   tibble::tribble(
    ~eid,   ~source, ~index,   ~code,        ~date,
       1,  "f40001",  "0_0",   "I10", "1917-10-08",
@@ -209,4 +210,5 @@ dummy_clinical_events_tidy <- function() {
       1, "gpc3_r3",    "3", "XaIP9", "1917-10-08",
       1, "gpc3_r3",    "3", "XE0Uc", "1917-10-08"
    )
+  # nolint end
 }

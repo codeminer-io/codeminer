@@ -22,8 +22,6 @@ default_col_filters()
 \seealso{
 Other Clinical code lookups and mappings: 
 \code{\link{CODES}()},
-\code{\link{GET_ATTRIBUTES}()},
-\code{\link{HAS_ATTRIBUTES}()},
 \code{\link{MAP}()}
 }
 \concept{Clinical code lookups and mappings}

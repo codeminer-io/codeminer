@@ -23,7 +23,7 @@ test_that("`rm_footer_rows_all_lkps_maps_df()` raises error if more than 3 rows 
 test_that("`update_code_selection()` works as expected", {
   result <-
     update_code_selection(
-      current_selection = ukbwranglr::example_clinical_codes() %>%
+      current_selection = ukbwranglr::example_clinical_codes() |>
         dplyr::mutate(category = NA),
       previous_codelist = ukbwranglr::example_clinical_codes()[1:3, ]
     )
@@ -31,6 +31,7 @@ test_that("`update_code_selection()` works as expected", {
   expect_equal(
     result,
     # fmt: skip
+    # nolint start
     tibble::tribble(
       ~disease   , ~description                              , ~category              , ~code_type      , ~code   , ~author , ~selected ,
       "Diabetes" , "diabetes"                                , "Diabetes unspecified" , "data_coding_6" , "1220"  , "ukbwr" , "Yes"     ,
@@ -42,5 +43,6 @@ test_that("`update_code_selection()` works as expected", {
       "Diabetes" , "Insulin dependent diabetes mellitus"     , NA                     , "read2"         , "C108." , "ukbwr" , ""        ,
       "Diabetes" , "Non-insulin dependent diabetes mellitus" , NA                     , "read2"         , "C109." , "ukbwr" , ""
     )
+    # nolint end
   )
 })

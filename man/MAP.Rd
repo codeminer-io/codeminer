@@ -56,8 +56,6 @@ MAP("all", from = "read3", to = "icd10")
 
 Other Clinical code lookups and mappings: 
 \code{\link{CODES}()},
-\code{\link{GET_ATTRIBUTES}()},
-\code{\link{HAS_ATTRIBUTES}()},
 \code{\link{default_col_filters}()}
 }
 \concept{Clinical code lookups and mappings}

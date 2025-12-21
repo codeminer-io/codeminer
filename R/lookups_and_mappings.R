@@ -1,5 +1,7 @@
 # EXPORTED ----------------------------------------------------------------
 
+# nolint start
+
 #' Build a Duckdb database of clinical code look up and mapping tables
 #'
 #' Write the output from \code{\link{build_all_lkps_maps}} to a Duckdb database.
@@ -1210,3 +1212,5 @@ read_cprd_aurum_codebrowser_dir <- function(cprd_aurum_codebrowser_dir) {
 
   return(result)
 }
+
+# nolint end
