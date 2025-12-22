@@ -7,7 +7,7 @@
 #' @return A data frame of attribute codes and descriptions, or a character
 #'   vector if `codes_only = TRUE`.
 #' @export
-ATTRIBUTES <- function(
+ATTRIBUTES_FOR <- function(
   codes,
   code_type = getOption("codeminer.code_type"),
   lookup_version = getOption("codeminer.lookup_version", default = "latest"),

@@ -1,6 +1,6 @@
 create_dummy_database()
 
-test_that("ATTRIBUTES() returns the expected data format", {
+test_that("ATTRIBUTES_FOR() returns the expected data format", {
   # setup
   test_type <- "dummy_attr"
 
@@ -18,7 +18,7 @@ test_that("ATTRIBUTES() returns the expected data format", {
   add_relationship_table(dummy_relationships, relationship_metadata(test_type))
 
   # tests
-  result <- ATTRIBUTES("code1", code_type = test_type)
+  result <- ATTRIBUTES_FOR("code1", code_type = test_type)
 
   expect_s3_class(result, "data.frame")
   expect_true(all(c("code", "description", "code_type") %in% names(result)))
@@ -26,7 +26,7 @@ test_that("ATTRIBUTES() returns the expected data format", {
   expect_identical(sort(result$code), c("attr1", "attr2"))
 
   # codes_only = TRUE
-  result_codes_only <- ATTRIBUTES(
+  result_codes_only <- ATTRIBUTES_FOR(
     "code1",
     code_type = test_type,
     codes_only = TRUE
@@ -39,7 +39,7 @@ test_that("ATTRIBUTES() returns the expected data format", {
   expect_false("code1" %in% result_codes_only)
 })
 
-test_that("ATTRIBUTES() only returns immediate attributes (max_depth = 1)", {
+test_that("ATTRIBUTES_FOR() only returns immediate attributes (max_depth = 1)", {
   test_type <- "dummy_attr2"
 
   dummy_lookup <- data.frame(
@@ -55,13 +55,13 @@ test_that("ATTRIBUTES() only returns immediate attributes (max_depth = 1)", {
   )
   add_relationship_table(dummy_relationships, relationship_metadata(test_type))
 
-  result <- ATTRIBUTES("code1", code_type = test_type, codes_only = TRUE)
+  result <- ATTRIBUTES_FOR("code1", code_type = test_type, codes_only = TRUE)
 
   # Should only return attr1, not attr2 (which is an attribute of attr1)
   expect_identical(result, "attr1")
 })
 
-test_that("ATTRIBUTES() returns empty for codes with no attributes", {
+test_that("ATTRIBUTES_FOR() returns empty for codes with no attributes", {
   test_type <- "dummy_attr3"
 
   dummy_lookup <- data.frame(
@@ -78,7 +78,7 @@ test_that("ATTRIBUTES() returns empty for codes with no attributes", {
   add_relationship_table(dummy_relationships, relationship_metadata(test_type))
 
   suppressWarnings(
-    result_df <- ATTRIBUTES(
+    result_df <- ATTRIBUTES_FOR(
       "code_no_attr",
       code_type = test_type,
       codes_only = FALSE
@@ -88,7 +88,7 @@ test_that("ATTRIBUTES() returns empty for codes with no attributes", {
   expect_equal(nrow(result_df), 0)
 
   suppressWarnings(
-    result_vec <- ATTRIBUTES(
+    result_vec <- ATTRIBUTES_FOR(
       "code_no_attr",
       code_type = test_type,
       codes_only = TRUE
@@ -98,7 +98,7 @@ test_that("ATTRIBUTES() returns empty for codes with no attributes", {
   expect_equal(length(result_vec), 0)
 })
 
-test_that("ATTRIBUTES() works with multiple codes", {
+test_that("ATTRIBUTES_FOR() works with multiple codes", {
   test_type <- "dummy_attr4"
 
   dummy_lookup <- data.frame(
@@ -114,7 +114,7 @@ test_that("ATTRIBUTES() works with multiple codes", {
   )
   add_relationship_table(dummy_relationships, relationship_metadata(test_type))
 
-  result <- ATTRIBUTES(
+  result <- ATTRIBUTES_FOR(
     c("code1", "code2"),
     code_type = test_type,
     codes_only = TRUE
