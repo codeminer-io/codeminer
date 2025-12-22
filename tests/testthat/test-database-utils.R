@@ -211,3 +211,43 @@ test_that("read_table_from_db() fails for non-existent table", {
     "does not exist"
   )
 })
+
+test_that("get_codeminer_metadata() returns all metadata as a list by default", {
+  result <- get_codeminer_metadata()
+
+  expect_type(result, "list")
+  expect_named(result, c("lookup", "mapping", "relationship"))
+  expect_s3_class(result$lookup, "data.frame")
+  expect_s3_class(result$mapping, "data.frame")
+  expect_s3_class(result$relationship, "data.frame")
+})
+
+test_that("get_codeminer_metadata() returns a data frame for single type", {
+  result_lookup <- get_codeminer_metadata("lookup")
+  result_mapping <- get_codeminer_metadata("mapping")
+  result_relationship <- get_codeminer_metadata("relationship")
+
+  expect_s3_class(result_lookup, "data.frame")
+  expect_s3_class(result_mapping, "data.frame")
+  expect_s3_class(result_relationship, "data.frame")
+
+  expect_true("lookup_table_name" %in% names(result_lookup))
+  expect_true("mapping_table_name" %in% names(result_mapping))
+  expect_true("relationship_table_name" %in% names(result_relationship))
+})
+
+test_that("get_codeminer_metadata() returns a list for multiple types", {
+  result <- get_codeminer_metadata(c("lookup", "mapping"))
+
+  expect_type(result, "list")
+  expect_named(result, c("lookup", "mapping"))
+  expect_s3_class(result$lookup, "data.frame")
+  expect_s3_class(result$mapping, "data.frame")
+})
+
+test_that("get_codeminer_metadata() fails for invalid type", {
+  expect_error(
+    get_codeminer_metadata("invalid"),
+    '`type` must be one of "lookup", "mapping", or "relationship"'
+  )
+})

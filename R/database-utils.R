@@ -19,7 +19,7 @@ get_codeminer_metadata <- function(
 ) {
   type <- rlang::arg_match(
     type,
-    names(codeminer_metadata_table_names),
+    sort(names(codeminer_metadata_table_names)),
     multiple = TRUE
   )
 
