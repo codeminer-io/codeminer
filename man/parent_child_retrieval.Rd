@@ -87,6 +87,7 @@ N_CHILDREN(c("E10", "E11"), code_type = "icd10")
 }
 \seealso{
 Other Code relationships: 
-\code{\link{ATTRIBUTES_FOR}()}
+\code{\link{attributes}()},
+\code{\link{relationship_types}}
 }
 \concept{Code relationships}
