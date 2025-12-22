@@ -1,3 +1,5 @@
+create_dummy_database()
+
 test_that("get_metadata_for_relationship() works correctly", {
   con <- connect_to_db()
 

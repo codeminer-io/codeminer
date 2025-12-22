@@ -13,16 +13,19 @@ A list with the following structure:
 \item \code{lookup_metadata} - Lookup metadata data frame
 \item \code{mapping_tables} - List of mapping data frames (capital_to_lowercase)
 \item \code{mapping_metadata} - Mapping metadata data frame
+\item \code{relationship_tables} - List of relationship data frames (capital_letters_relationship)
+\item \code{relationship_metadata} - Relationship metadata data frame
 }
 
-Each category contains versions v1, v2, and v3.
+Each category contains versions v1, v2, and v3. The relationship tables include
+both hierarchical relationships ("is a") and attribute relationships ("has attribute").
 }
 }
 \usage{
 example_ontology
 }
 \description{
-An example ontology dataset consisting of a structured list of lookup and mapping tables,
-and their associated metadata across multiple versions.
+An example ontology dataset consisting of a structured list of lookup, mapping,
+and relationship tables, and their associated metadata across multiple versions.
 }
 \keyword{datasets}

@@ -63,7 +63,9 @@ RELATIONSHIP_TYPES_FROM <- function(
   }
 
   if (length(result) == 0) {
-    codeminer_warn("No relationship types found originating from the specified codes.")
+    codeminer_warn(
+      "No relationship types found originating from the specified codes."
+    )
   }
 
   result
@@ -116,7 +118,9 @@ RELATIONSHIP_TYPES_TO <- function(
   }
 
   if (length(result) == 0) {
-    codeminer_warn("No relationship types found pointing to the specified codes.")
+    codeminer_warn(
+      "No relationship types found pointing to the specified codes."
+    )
   }
 
   result

@@ -1,13 +1,15 @@
 #' Create example ontology tables for testing
 #'
-#' Returns an example ontology consisting of a structured list of lookup and mapping tables,
-#' and their associated metadata across multiple versions.
+#' Returns an example ontology consisting of a structured list of lookup, mapping,
+#' and relationship tables, and their associated metadata across multiple versions.
 #'
 #' @return A list with the following structure:
 #'   - `lookup_tables`: List of lookup data frames (capital_letters, lowercase_letters)
 #'   - `lookup_metadata`: Data frame containing the metadata for the lookup tables
 #'   - `mapping_tables`: List of mapping data frames (capital_to_lowercase)
 #'   - `mapping_metadata`: Data frame containing the metadata for the mapping tables
+#'   - `relationship_tables`: List of relationship data frames
+#'   - `relationship_metadata`: Data frame containing the metadata for the relationship tables
 #'
 #'   Each category contains versions v1, v2, and v3.
 #'
@@ -20,12 +22,39 @@ create_example_data <- function() {
       description = c("ALPHA", "BRAVO", "CHARLIE")
     ),
     capital_letters_v2 = tibble::tibble(
-      code = c("A", "B", "C", "D"),
-      description = c("ALPHA", "BRAVO", "CHARLIE", "DELTA")
+      code = c("A", "B", "C", "D", "alpha_code", "beta_code"),
+      description = c(
+        "ALPHA",
+        "BRAVO",
+        "CHARLIE",
+        "DELTA",
+        "Alpha Attribute",
+        "Beta Attribute"
+      )
     ),
     capital_letters_v3 = tibble::tibble(
-      code = c("A", "B", "C", "D", "E"),
-      description = c("ALPHA", "BRAVO", "CHARLIE", "DELTA", "ECHO")
+      code = c(
+        "A",
+        "B",
+        "C",
+        "D",
+        "E",
+        "alpha_code",
+        "beta_code",
+        "gamma_code",
+        "delta_code"
+      ),
+      description = c(
+        "ALPHA",
+        "BRAVO",
+        "CHARLIE",
+        "DELTA",
+        "ECHO",
+        "Alpha Attribute",
+        "Beta Attribute",
+        "Gamma Attribute",
+        "Delta Attribute"
+      )
     ),
     lowercase_letters_v1 = tibble::tibble(
       code = c("a", "b", "c"),
@@ -49,8 +78,8 @@ create_example_data <- function() {
     lookup_code_col = "code",
     lookup_description_col = "description",
     lookup_source = "example_data",
-    preferred_synonym_col = NA_character_,
-    preferred_code = NA_character_
+    preferred_description_col = NA_character_,
+    preferred_description_indicator = NA_character_
   )
   lower_metadata <- tibble::tibble(
     lookup_table_name = paste0("lowercase_letters_", versions),
@@ -59,8 +88,8 @@ create_example_data <- function() {
     lookup_code_col = "code",
     lookup_description_col = "description",
     lookup_source = "example_data",
-    preferred_synonym_col = NA_character_,
-    preferred_code = NA_character_
+    preferred_description_col = NA_character_,
+    preferred_description_indicator = NA_character_
   )
   lookup_metadata <- dplyr::bind_rows(capital_metadata, lower_metadata)
 
@@ -89,11 +118,65 @@ create_example_data <- function() {
     "capital_to_lowercase_v3" , "capital_letters" , "lowercase_letters" , "v3"             , "capital" , "lowercase"
   )
 
+  # Relationship tables and metadata
+  # v1: Basic hierarchy (A -> B -> C)
+  # v2: Add D to hierarchy (A -> B -> C -> D) and attributes
+  # v3: Add E and more complex relationships
+  relationship_tables <- list(
+    capital_letters_relationship_v1 = tibble::tibble(
+      from = c("B", "C"),
+      to = c("A", "B"),
+      type = c("is a", "is a")
+    ),
+    capital_letters_relationship_v2 = tibble::tibble(
+      from = c("B", "C", "D", "A", "B"),
+      to = c("A", "B", "C", "alpha_code", "beta_code"),
+      type = c("is a", "is a", "is a", "has attribute", "has attribute")
+    ),
+    capital_letters_relationship_v3 = tibble::tibble(
+      from = c("B", "C", "D", "E", "A", "B", "C", "E"),
+      to = c(
+        "A",
+        "B",
+        "C",
+        "D",
+        "alpha_code",
+        "beta_code",
+        "gamma_code",
+        "delta_code"
+      ),
+      type = c(
+        "is a",
+        "is a",
+        "is a",
+        "is a",
+        "has attribute",
+        "has attribute",
+        "has attribute",
+        "has attribute"
+      )
+    )
+  )
+
+  # Stops air from malforming the tribble
+  # fmt: skip
+  # nolint start
+  relationship_metadata <- tibble::tribble(
+    ~relationship_table_name            , ~code_type        , ~relationship_version , ~from_col , ~to_col , ~type_col , ~child_parent_relationship_code ,
+    "capital_letters_relationship_v1"  , "capital_letters" , "v1"                  , "from"    , "to"    , "type"    , "is a"                          ,
+    "capital_letters_relationship_v2"  , "capital_letters" , "v2"                  , "from"    , "to"    , "type"    , "is a"                          ,
+    "capital_letters_relationship_v3"  , "capital_letters" , "v3"                  , "from"    , "to"    , "type"    , "is a"
+  ) |>
+    dplyr::mutate(relationship_source = NA_character_)
+  # nolint end
+
   return(list(
     lookup_tables = lookup_tables,
     lookup_metadata = lookup_metadata,
     mapping_tables = mapping_tables,
-    mapping_metadata = mapping_metadata
+    mapping_metadata = mapping_metadata,
+    relationship_tables = relationship_tables,
+    relationship_metadata = relationship_metadata
   ))
 }
 

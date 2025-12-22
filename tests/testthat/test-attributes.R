@@ -1,53 +1,55 @@
 create_dummy_database()
 
 test_that("ATTRIBUTES_FOR() and HAS_ATTRIBUTES() return the expected data format", {
-  # setup
-  test_type <- "dummy_attr"
+  # Setup using example_ontology v2 (has both hierarchy and attributes)
+  test_type <- "capital_letters"
 
-  dummy_lookup <- data.frame(
-    code = c("code1", "code2", "attr1", "attr2"),
-    description = c("Code 1", "Code 2", "Attribute 1", "Attribute 2")
+  # Add lookup table for capital letters
+  add_lookup_table(
+    example_ontology$lookup_tables$capital_letters_v2,
+    example_ontology$lookup_metadata |>
+      dplyr::filter(code_type == test_type, lookup_version == "v2")
   )
-  add_lookup_table(dummy_lookup, lookup_metadata(test_type))
 
-  dummy_relationships <- data.frame(
-    from = c("code1", "code1", "code2"),
-    to = c("attr1", "attr2", "attr1"),
-    type = c("has attribute", "has attribute", "has attribute")
+  # Add relationship table (includes "has attribute" relationships)
+  add_relationship_table(
+    example_ontology$relationship_tables$capital_letters_relationship_v2,
+    example_ontology$relationship_metadata |>
+      dplyr::filter(code_type == test_type, relationship_version == "v2")
   )
-  add_relationship_table(dummy_relationships, relationship_metadata(test_type))
 
-  # ATTRIBUTES_FOR tests
-  result <- ATTRIBUTES_FOR("code1", code_type = test_type)
+  # ATTRIBUTES_FOR tests - A has attribute alpha_code, B has attribute beta_code
+  result <- ATTRIBUTES_FOR("A", code_type = test_type)
   expect_s3_class(result, "data.frame")
   expect_true(all(c("code", "description", "code_type") %in% names(result)))
   expect_identical(unique(result$code_type), test_type)
-  expect_identical(sort(result$code), c("attr1", "attr2"))
+  expect_identical(result$code, "alpha_code")
 
-  # codes_only = TRUE
+  # With `codes_only = TRUE`
   result_codes_only <- ATTRIBUTES_FOR(
-    "code1",
+    "B",
     code_type = test_type,
-    codes_only = TRUE
+    codes_only = TRUE,
+    relationship_types = "has attribute"
   )
   expect_type(result_codes_only, "character")
-  expect_identical(sort(result_codes_only), c("attr1", "attr2"))
-  expect_false("code1" %in% result_codes_only)
+  expect_identical(result_codes_only, "beta_code")
+  expect_false("B" %in% result_codes_only)
 
-  # HAS_ATTRIBUTES tests
-  has_result <- HAS_ATTRIBUTES("attr1", code_type = test_type)
+  # HAS_ATTRIBUTES tests - alpha_code is an attribute of A
+  has_result <- HAS_ATTRIBUTES("alpha_code", code_type = test_type)
   expect_s3_class(has_result, "data.frame")
   expect_true(all(c("code", "description", "code_type") %in% names(has_result)))
-  expect_identical(sort(has_result$code), c("code1", "code2"))
+  expect_identical(has_result$code, "A")
 
   has_result_codes <- HAS_ATTRIBUTES(
-    "attr1",
+    "beta_code",
     code_type = test_type,
     codes_only = TRUE
   )
   expect_type(has_result_codes, "character")
-  expect_identical(sort(has_result_codes), c("code1", "code2"))
-  expect_false("attr1" %in% has_result_codes)
+  expect_identical(has_result_codes, "B")
+  expect_false("beta_code" %in% has_result_codes)
 })
 
 test_that("ATTRIBUTES_FOR() and HAS_ATTRIBUTES() filter by relationship_types", {

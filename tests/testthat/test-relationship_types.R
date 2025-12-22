@@ -1,38 +1,39 @@
 create_dummy_database()
 
 test_that("RELATIONSHIP_TYPES_FROM() and RELATIONSHIP_TYPES_TO() return expected types", {
-  test_type <- "dummy_rel_types"
+  # Setup using example_ontology v2 (has both "is a" and "has attribute")
+  test_type <- "capital_letters"
 
-  dummy_lookup <- data.frame(
-    code = c("code1", "code2", "attr1", "attr2", "target1"),
-    description = c("Code 1", "Code 2", "Attr 1", "Attr 2", "Target 1")
+  add_lookup_table(
+    example_ontology$lookup_tables$capital_letters_v2,
+    example_ontology$lookup_metadata |>
+      dplyr::filter(code_type == test_type, lookup_version == "v2")
   )
-  add_lookup_table(dummy_lookup, lookup_metadata(test_type))
 
-  dummy_relationships <- data.frame(
-    from = c("code1", "code1", "code2", "attr1"),
-    to = c("attr1", "target1", "attr2", "target1"),
-    type = c("has attribute", "relates to", "has property", "relates to")
+  add_relationship_table(
+    example_ontology$relationship_tables$capital_letters_relationship_v2,
+    example_ontology$relationship_metadata |>
+      dplyr::filter(code_type == test_type, relationship_version == "v2")
   )
-  add_relationship_table(dummy_relationships, relationship_metadata(test_type))
 
   # RELATIONSHIP_TYPES_FROM
-  types_from_code1 <- RELATIONSHIP_TYPES_FROM("code1", code_type = test_type)
-  expect_type(types_from_code1, "character")
-  expect_identical(sort(types_from_code1), c("has attribute", "relates to"))
+  # B has "is a" relationship to A, and "has attribute" relationship to beta_code
+  types_from_b <- RELATIONSHIP_TYPES_FROM("B", code_type = test_type)
+  expect_type(types_from_b, "character")
+  expect_identical(sort(types_from_b), c("has attribute", "is a"))
 
-  types_from_code2 <- RELATIONSHIP_TYPES_FROM("code2", code_type = test_type)
-  expect_identical(types_from_code2, "has property")
+  # A only has "has attribute" relationship
+  types_from_a <- RELATIONSHIP_TYPES_FROM("A", code_type = test_type)
+  expect_identical(types_from_a, "has attribute")
 
   # RELATIONSHIP_TYPES_TO
-  types_to_target1 <- RELATIONSHIP_TYPES_TO("target1", code_type = test_type)
-  expect_identical(types_to_target1, "relates to")
+  # A is the target of "is a" relationships from B, C, D
+  types_to_a <- RELATIONSHIP_TYPES_TO("A", code_type = test_type)
+  expect_identical(types_to_a, "is a")
 
-  types_to_attr1 <- RELATIONSHIP_TYPES_TO("attr1", code_type = test_type)
-  expect_identical(types_to_attr1, "has attribute")
-
-  types_to_attr2 <- RELATIONSHIP_TYPES_TO("attr2", code_type = test_type)
-  expect_identical(types_to_attr2, "has property")
+  # alpha_code is target of "has attribute" from A
+  types_to_alpha <- RELATIONSHIP_TYPES_TO("alpha_code", code_type = test_type)
+  expect_identical(types_to_alpha, "has attribute")
 })
 
 test_that("RELATIONSHIP_TYPES_FROM() and RELATIONSHIP_TYPES_TO() handle multiple codes", {
