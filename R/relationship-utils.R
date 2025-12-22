@@ -52,11 +52,10 @@ get_metadata_for_relationship <- function(
   return(this_meta)
 }
 
-
-#' Perform a single-step graph traversal
+#' Perform transitive closure graph traversal
 #'
-#' Returns nodes immediately connected to the input nodes by following edges in
-#' the specified direction.
+#' Returns all nodes reachable from the input nodes by recursively following
+#' edges until no new nodes are discovered.
 #'
 #' @param nodes Character vector of node IDs to start from.
 #' @param relationship_tbl A `dbplyr` table containing relationship data.
@@ -67,53 +66,6 @@ get_metadata_for_relationship <- function(
 #'   edges to nodes).
 #' @param rel_type Character vector of relationship types to filter by. If
 #'   `NULL`, all types are included.
-#'
-#' @return Character vector of node IDs reached in one step.
-#' @keywords internal
-graph_step <- function(
-  nodes,
-  relationship_tbl,
-  from_colname = "from_col",
-  to_colname = "to_col",
-  type_colname = "type_col",
-  direction = c("out", "in"),
-  rel_type = NULL
-) {
-  direction <- rlang::arg_match(direction)
-
-  # Determine which column to filter and which to return
-  filter_col <- if (direction == "out") from_colname else to_colname
-  return_col <- if (direction == "out") to_colname else from_colname
-
-  # Ensure nodes is a vector
-  if (!is.vector(nodes)) {
-    nodes <- unique(nodes)
-  } else {
-    nodes <- unique(nodes)
-  }
-
-  # Query the relationship table
-  result <- relationship_tbl |>
-    dplyr::filter(.data[[filter_col]] %in% .env$nodes)
-
-  # Apply relationship type filter if specified
-  if (!is.null(rel_type)) {
-    result <- result |>
-      dplyr::filter(.data[[type_colname]] %in% .env$rel_type)
-  }
-
-  # Return unique IDs from the return column
-  result |>
-    dplyr::pull(!!return_col) |>
-    unique()
-}
-
-#' Perform transitive closure graph traversal
-#'
-#' Returns all nodes reachable from the input nodes by recursively following
-#' edges until no new nodes are discovered.
-#'
-#' @inheritParams graph_step
 #' @param include_self Logical. If `TRUE`, include the starting nodes in the
 #'   result.
 #' @param max_depth Integer. Maximum number of steps to traverse. Default is
