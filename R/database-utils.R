@@ -3,9 +3,9 @@
 #' Returns metadata about the lookup, mapping, and relationship tables in the
 #' codeminer database.
 #'
-#' @param type The type of metadata to return. If `NULL` (the default), returns
-#'   a list containing all metadata types. Otherwise, returns a data frame for
-#'   the specified type. Must be one of "lookup", "mapping" or "relationship".
+#' @param type The type of metadata to return. By default returns a list
+#'   containing all metadata types. Otherwise, returns a data frame for the
+#'   specified type. Must be one of "lookup", "mapping" or "relationship".
 #' @return If a single type is requested, a data frame. If multiple types are
 #'   requested, a named list of data frames.
 #' @export

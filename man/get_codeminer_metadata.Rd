@@ -7,9 +7,9 @@
 get_codeminer_metadata(type = c("lookup", "mapping", "relationship"))
 }
 \arguments{
-\item{type}{The type of metadata to return. If \code{NULL} (the default), returns
-a list containing all metadata types. Otherwise, returns a data frame for
-the specified type. Must be one of "lookup", "mapping" or "relationship".}
+\item{type}{The type of metadata to return. By default returns a list
+containing all metadata types. Otherwise, returns a data frame for the
+specified type. Must be one of "lookup", "mapping" or "relationship".}
 }
 \value{
 If a single type is requested, a data frame. If multiple types are
