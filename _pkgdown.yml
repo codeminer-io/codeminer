@@ -23,14 +23,15 @@ reference:
   - title: Clinical codes
     desc: Functions for looking up clinical codes and mapping between different coding systems.
   - contents:
+      - DESCRIPTION
       - CODES
       - CODES_LIKE
       - CHILDREN
-      - DESCRIPTION
+      - attributes
+      - relationship_types
       - MAP
       - default_col_filters
       - get_col_filters
-      - matches("ATTRIBUTE")
 
   - title: Dummy data
     desc: Dummy data for tests.
