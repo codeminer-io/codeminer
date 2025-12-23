@@ -90,12 +90,8 @@ graph_closure <- function(
   filter_col <- if (direction == "out") from_colname else to_colname
   return_col <- if (direction == "out") to_colname else from_colname
 
-  # Ensure nodes is a vector
-  if (!is.vector(nodes)) {
-    seed_nodes <- unique(nodes)
-  } else {
-    seed_nodes <- unique(nodes)
-  }
+  # Ensure nodes is unique
+  seed_nodes <- unique(nodes)
 
   # Recursive traversal function
   traverse <- function(
