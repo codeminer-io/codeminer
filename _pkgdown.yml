@@ -3,6 +3,19 @@ template:
   bootstrap: 5
 
 reference:
+  - title: Clinical codes
+    desc: Functions for looking up clinical codes and mapping between different coding systems.
+  - contents:
+      - DESCRIPTION
+      - CODES
+      - CODES_LIKE
+      - CHILDREN
+      - attributes
+      - relationship_types
+      - MAP
+      - default_col_filters
+      - get_col_filters
+
   - title: Database management
     desc: Build a local database with lookup and mapping tables for various clinical coding systems.
   - contents:
@@ -19,19 +32,6 @@ reference:
       - add_relationship_table
       - relationship_metadata
       - get_codeminer_metadata
-
-  - title: Clinical codes
-    desc: Functions for looking up clinical codes and mapping between different coding systems.
-  - contents:
-      - DESCRIPTION
-      - CODES
-      - CODES_LIKE
-      - CHILDREN
-      - attributes
-      - relationship_types
-      - MAP
-      - default_col_filters
-      - get_col_filters
 
   - title: Dummy data
     desc: Dummy data for tests.
