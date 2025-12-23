@@ -26,7 +26,10 @@
 #' # Using a temporary database
 #' Sys.setenv(CODEMINER_DB_PATH = tempfile())
 #' build_database()
-#' add_lookup_table(lookup_table, lookup_metadata("capital_letters", version = "v3"))
+#' add_lookup_table(
+#'   lookup_table,
+#'   lookup_metadata("capital_letters", lookup_version = "v3")
+#' )
 add_lookup_table <- function(table, metadata) {
   validate_lookup_metadata(
     metadata,
@@ -90,7 +93,7 @@ add_lookup_table <- function(table, metadata) {
 #' with [add_lookup_table()].
 #'
 #' @param code_type The type of coding system (e.g., ICD-10, SNOMED-CT)
-#' @param version The version of the lookup metadata (default: "v0")
+#' @param lookup_version The version of the lookup metadata (default: "v0")
 #' @inheritParams rlang::args_dots_empty
 #' @param lookup_code_col The column name for the lookup code (default: "code")
 #' @param lookup_description_col The column name for the lookup description (default: "description")
@@ -107,10 +110,10 @@ add_lookup_table <- function(table, metadata) {
 #' @seealso [add_lookup_table()]
 #' @export
 #' @examples
-#' lookup_metadata("ICD-10", version = "2023")
+#' lookup_metadata("ICD-10", lookup_version = "2023")
 lookup_metadata <- function(
   code_type,
-  version = "v0",
+  lookup_version = "v0",
   ...,
   lookup_code_col = "code",
   lookup_description_col = "description",
@@ -120,7 +123,7 @@ lookup_metadata <- function(
 ) {
   rlang::check_dots_empty()
 
-  lookup_table_name <- paste(code_type, version, sep = "_")
+  lookup_table_name <- paste(code_type, lookup_version, sep = "_")
 
   if (
     !is.na(preferred_description_col) &&
@@ -134,7 +137,7 @@ lookup_metadata <- function(
   return(list(
     lookup_table_name = lookup_table_name,
     code_type = code_type,
-    lookup_version = version,
+    lookup_version = lookup_version,
     lookup_code_col = lookup_code_col,
     lookup_description_col = lookup_description_col,
     lookup_source = lookup_source,

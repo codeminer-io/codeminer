@@ -6,7 +6,7 @@ test_that("MAP() returns the expected data format", {
   test_from <- "read3"
   test_to <- "icd10"
 
-  result <- MAP(test_codes, from = test_from, to = test_to, version = "v0")
+  result <- MAP(test_codes, from = test_from, to = test_to, map_version = "v0")
 
   expect_s3_class(result, "data.frame")
   expect_true(all(c("code", "description", "code_type") %in% names(result)))
@@ -36,7 +36,7 @@ test_that("MAP fails for missing mapping table", {
     expected_msg
   )
   expect_error(
-    MAP("foo", from = "read3", to = "icd10", version = "nope"),
+    MAP("foo", from = "read3", to = "icd10", map_version = "nope"),
     expected_msg
   )
 })
@@ -67,7 +67,7 @@ test_that("MAP() swaps `to` and `from` if necessary and warns", {
 })
 
 test_that("MAP('all') returns the mapping table", {
-  result <- MAP("all", from = "read3", to = "icd10", version = "v0")
+  result <- MAP("all", from = "read3", to = "icd10", map_version = "v0")
   expect_identical(result, dummy_read3_icd10_mapping())
 })
 
@@ -95,7 +95,7 @@ test_that("MAP handles versions correctly", {
     "all",
     from = test_from,
     to = test_to,
-    version = test_version
+    map_version = test_version
   )
   expect_identical(v2_result$to, test_lookup_table$code)
 
@@ -103,7 +103,7 @@ test_that("MAP handles versions correctly", {
     "all",
     from = test_from,
     to = test_to,
-    version = "latest"
+    map_version = "latest"
   )
   expect_identical(latest_result, v2_result)
 })

@@ -46,35 +46,29 @@ First, build a local resource containing lookup and mapping tables for various c
 
 ```{r example}
 library(codeminer)
-
-all_lkps_maps_dummy <- build_all_lkps_maps_dummy()
+create_dummy_database()
 ```
 
-Look up Read 2 codes for hypertension:
+Look up Read 3 codes for hypertension:
 
 ```{r}
-htn_read2 <- DESCRIPTION("Hypertension",
-  code_type = "read2",
-  all_lkps_maps = all_lkps_maps_dummy
-)
-
-htn_read2
+htn_read3 <- DESCRIPTION("Hypertension", code_type = "read3")
+htn_read3
 ```
 
 Map these to ICD10:
 
 ```{r}
 htn_icd10 <- MAP(
-  codes = htn_read2$code,
-  from = "read2",
-  to = "icd10",
-  all_lkps_maps = all_lkps_maps_dummy
+  codes = htn_read3$code,
+  from = "read3",
+  to = "icd10"
 )
 
 htn_icd10
 ```
 
-See `vignette('codeminer')` for further details, including how to build a clinical codelist with R Shiny using `RunCodelistBuilder()`.
+See the main [codeminer vignette](https://codeminer-io.github.io/codeminer/articles/codeminer.html) for further details.
 
 ## 🏗️ Development
 

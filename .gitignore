@@ -11,3 +11,4 @@ inst/doc
 .vscode/*
 all_lkps_maps.db
 docs
+*.db

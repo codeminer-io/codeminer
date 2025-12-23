@@ -47,44 +47,56 @@ various clinical codings systems. A dummy dataset is used here:
 
 ``` r
 library(codeminer)
-
-all_lkps_maps_dummy <- build_all_lkps_maps_dummy()
+create_dummy_database()
+#> ℹ Creating new database at '/var/folders/9z/4rs_sqvj38n8b02wv8p4j77h0000gn/T//RtmppmCOJL/file16e0e4fff8db0.duckdb'
+#> ✔ Lookup table icd10_v0 added successfully.
+#> ✔ Lookup table read3_v0 added successfully.
+#> ✔ Mapping table read3_icd10_v0 added successfully.
+#> ✔ Dummy database ready to use!
 ```
 
 Look up Read 2 codes for hypertension:
 
 ``` r
-htn_read2 <- DESCRIPTION("Hypertension",
-  code_type = "read2",
-  all_lkps_maps = all_lkps_maps_dummy
-)
-
-htn_read2
-#> # A tibble: 1 × 3
-#>   code  description            code_type
-#>   <chr> <chr>                  <chr>    
-#> 1 G20.. Essential hypertension read2
+htn_read3 <- DESCRIPTION("Hypertension", code_type = "read3")
+#> ℹ Using 'v0' as latest version
+#> ℹ Using 'v0' as latest version
+htn_read3
+#> # A tibble: 1 × 5
+#>   code  description            preferred_description status code_type
+#>   <chr> <chr>                  <lgl>                 <chr>  <chr>    
+#> 1 XE0Uc Essential hypertension TRUE                  C      read3
 ```
 
 Map these to ICD10:
 
 ``` r
 htn_icd10 <- MAP(
-  codes = htn_read2$code,
-  from = "read2",
-  to = "icd10",
-  all_lkps_maps = all_lkps_maps_dummy
+  codes = htn_read3$code,
+  from = "read3",
+  to = "icd10"
 )
+#> ℹ Using 'v0' as latest version
+#> ℹ Using 'v0' as latest version
 
 htn_icd10
-#> # A tibble: 1 × 3
-#>   code  description                      code_type
-#>   <chr> <chr>                            <chr>    
-#> 1 I10X  Essential (primary) hypertension icd10
+#> # A tibble: 7 × 12
+#>   code  description     ICD10_CODE USAGE USAGE_UK QUALIFIERS GENDER_MASK MIN_AGE
+#>   <chr> <chr>           <chr>      <chr>    <dbl> <chr>            <dbl>   <dbl>
+#> 1 I10X  Essential (pri… I10        DEFA…        3 <NA>                NA      NA
+#> 2 I11   Hypertensive h… I11        DEFA…        3 <NA>                NA      NA
+#> 3 I12   Hypertensive r… I12        DEFA…        3 <NA>                NA      NA
+#> 4 I13   Hypertensive h… I13        DEFA…        3 <NA>                NA      NA
+#> 5 O10   Pre-existing h… O10        DEFA…        3 <NA>                NA      NA
+#> 6 O11X  Pre-eclampsia … O11        DEFA…        3 <NA>                 1      15
+#> 7 P000  Fetus and newb… P00.0      DEFA…        3 <NA>                NA      NA
+#> # ℹ 4 more variables: MAX_AGE <dbl>, TREE_DESCRIPTION <lgl>, code_type <chr>,
+#> #   preferred_description <lgl>
 ```
 
-See `vignette('codeminer')` for further details, including how to build
-a clinical codelist with R Shiny using `RunCodelistBuilder()`.
+See the main [codeminer
+vignette](https://codeminer-io.github.io/codeminer/articles/codeminer.html)
+for further details.
 
 ## 🏗️ Development
 

@@ -8,392 +8,6 @@
 
 # EXPORTED FUNCTIONS ------------------------------------------------------
 
-# Exploring and mapping clinical codes ------------------------------------
-
-#' Get children for SNOMED codes
-#'
-#' @param codes Character vector of SNOMED codes.
-#' @param standardise_output If `TRUE` (default) return a data frame with columns
-#'   'code', 'description' and 'code_type'.
-#' @param include_self If `TRUE` (default) include input codes in the result.
-#' @param include_descendants If `TRUE` (default) return all descendant codes,
-#'   as well as immediate children.
-#' @inheritParams CODES
-#' @inheritParams CHILDREN
-#'
-#' @return A dataframe
-#' @seealso [CHILDREN()], [get_parents_sct()]
-#' @family Clinical code lookups and mappings
-#' @export
-get_children_sct <- function(
-  codes,
-  standardise_output = TRUE,
-  include_self = TRUE,
-  include_descendants = TRUE,
-  preferred_description_only = TRUE
-) {
-  get_relatives_sct(
-    codes = codes,
-    filter_col = "destinationId",
-    return_col = "sourceId",
-    typeId = "116680003",
-    standardise_output = standardise_output,
-    include_self = include_self,
-    recursive = include_descendants,
-    preferred_description_only = preferred_description_only
-  )
-}
-
-#' Get parents for SNOMED codes
-#'
-#' @param codes Character vector of SNOMED codes.
-#' @param standardise_output If `TRUE` (default) return a data frame with columns
-#'   'code', 'description' and 'code_type'.
-#' @param include_self If `TRUE` (default) include input codes in the result.
-#' @param include_ancestors If `TRUE` (default) return all ancestor codes,
-#'   as well as immediate parents.
-#' @inheritParams CODES
-#' @inheritParams CHILDREN
-#'
-#' @return A dataframe
-#' @seealso [CHILDREN()], [get_children_sct()]
-#' @family Clinical code lookups and mappings
-#' @export
-get_parents_sct <- function(
-  codes,
-  standardise_output = TRUE,
-  include_self = TRUE,
-  include_ancestors = TRUE,
-  preferred_description_only = TRUE
-) {
-  get_relatives_sct(
-    codes = codes,
-    filter_col = "sourceId",
-    return_col = "destinationId",
-    typeId = "116680003",
-    standardise_output = standardise_output,
-    include_self = include_self,
-    recursive = include_ancestors,
-    preferred_description_only = preferred_description_only
-  )
-}
-
-#' Get SNOMED codes with a specific set of one or more attributes
-#'
-#' Optionally filtered for specific relationship types. See examples (credit to
-#' [snomedizer](https://snomedizer.web.app/articles/snomedizer.html)).
-#'
-#' @param attribute_codes Character vector of SNOMED codes.
-#' @param relationship_type Character vector of SNOMED codes.
-#' @inheritParams CODES
-#' @inheritParams CHILDREN
-#'
-#' @return A dataframe
-#' @family Clinical code lookups and mappings
-#' @export
-#'
-#' @examples
-#' \dontrun{
-#' # Conditions associated with multiple sclerosis
-#' HAS_ATTRIBUTES("24700007", relationship_type = "42752001")
-#'
-#' # Medicines with active ingredient timolol maleate
-#' HAS_ATTRIBUTES("75359005", relationship_type = "10362801000001104")
-#'
-#' # Medicines with active ingredient beta blocker
-#' HAS_ATTRIBUTES(CHILDREN("373254001", code_type = "sct"), relationship_type = "10362801000001104")
-#'
-#' # Conditions that are caused by bacteria belonging to Enterobacteriaceae
-#' HAS_ATTRIBUTES(CHILDREN("106544002", code_type = "sct"), relationship_type = "246075003")
-#'
-#' # Infectious conditions that are caused by bacteria belonging to Enterobacteriaceae
-#' HAS_ATTRIBUTES(CHILDREN("106544002", code_type = "sct"), relationship_type = "246075003") %AND%
-#'   CHILDREN("40733004", code_type = "sct")
-#' }
-HAS_ATTRIBUTES <- function(
-  attribute_codes,
-  relationship_type = NULL,
-  preferred_description_only = TRUE
-) {
-  get_relatives_sct(
-    codes = attribute_codes,
-    filter_col = "destinationId",
-    return_col = "sourceId",
-    typeId = relationship_type,
-    include_self = FALSE,
-    recursive = FALSE,
-    preferred_description_only = preferred_description_only
-  )
-}
-
-#' Get attributes for a set of SNOMED codes
-#'
-#' See examples (credit to
-#' [snomedizer](https://snomedizer.web.app/articles/snomedizer.html)).
-#'
-#' @inheritParams HAS_ATTRIBUTES
-#'
-#' @return A data frame
-#' @family Clinical code lookups and mappings
-#' @export
-#'
-#' @examples
-#' \dontrun{
-#' # Body sites that can be affected by Enterobacteriaceae infections
-#' enterobacteriaceae_infections <- HAS_ATTRIBUTES(
-#'     CHILDREN("106544002 << Family Enterobacteriaceae (organism) >>",
-#'              code_type = "sct"),
-#'     relationship_type = "246075003 << Causative agent (attribute) >>") %AND%
-#'   CHILDREN("40733004 << Infectious disease (disorder) >>", code_type = "sct")
-#'
-#' GET_ATTRIBUTES(enterobacteriaceae_infections,
-#'                relationship_type = "363698007 << Finding site (attribute) >>")
-#' }
-GET_ATTRIBUTES <- function(
-  attribute_codes,
-  relationship_type = NULL,
-  preferred_description_only = TRUE
-) {
-  get_relatives_sct(
-    codes = attribute_codes,
-    filter_col = "sourceId",
-    return_col = "destinationId",
-    typeId = relationship_type,
-    include_self = FALSE,
-    recursive = FALSE,
-    preferred_description_only = preferred_description_only
-  )
-}
-
-#' Find attribute types that point from a set of codes
-#'
-#' Find attribute types that point from a set of codes
-#'
-#' @param codes Codes to get attribute types for
-#' @inheritParams HAS_ATTRIBUTES
-#'
-#' @return Data frame
-#' @export
-#'
-#' @examples
-#' \dontrun{
-#' # sct for acute iritis
-#' acute_iritis <- CODES("29050005", "sct")
-#'
-#' # all attributes for this code
-#' summarise_attributes_sct(acute_iritis)
-#'
-#' # attribute types pointing to this code
-#' attribute_types <- ATTRIBUTE_TYPES_FROM(acute_iritis)
-#' print(attribute_types)
-#'
-#' # codes with acute iritis as an attribute, with one of these attribute types specifically
-#' GET_ATTRIBUTES(acute_iritis, attribute_types[1, ])
-#' }
-ATTRIBUTE_TYPES_FROM <- function(
-  codes,
-  preferred_description_only = TRUE
-) {
-  get_relatives_sct(
-    codes = codes,
-    filter_col = "sourceId",
-    return_col = "typeId",
-    typeId = NULL,
-    include_self = FALSE,
-    recursive = FALSE,
-    preferred_description_only = preferred_description_only
-  )
-}
-
-#' Find attribute types that point to a set of codes
-#'
-#' Find attribute types that point to a set of codes
-#'
-#' @param codes Codes to get attribute types for
-#' @inheritParams HAS_ATTRIBUTES
-#'
-#' @return Data frame
-#' @export
-#'
-#' @examples
-#' \dontrun{
-#' # sct for acute iritis
-#' acute_iritis <- CODES("29050005", "sct")
-#'
-#' # attribute types pointing to this code
-#' attribute_types <- ATTRIBUTE_TYPES_TO(acute_iritis)
-#' print(attribute_types)
-#'
-#' # codes with acute iritis as an attribute, with these attributes type(s)
-#' HAS_ATTRIBUTES(acute_iritis, attribute_types)
-#' }
-ATTRIBUTE_TYPES_TO <- function(
-  codes,
-  preferred_description_only = TRUE
-) {
-  get_relatives_sct(
-    codes = codes,
-    filter_col = "destinationId",
-    return_col = "typeId",
-    typeId = NULL,
-    include_self = FALSE,
-    recursive = FALSE,
-    preferred_description_only = preferred_description_only
-  )
-}
-
-get_relatives_sct <- function(
-  codes = NULL,
-  filter_col = "destinationId",
-  return_col = "sourceId",
-  typeId = "116680003",
-  standardise_output = TRUE,
-  include_self = TRUE,
-  recursive = TRUE,
-  all_lkps_maps = NULL,
-  preferred_description_only = TRUE,
-  col_filters = getOption("codeminer.col_filters")
-) {
-  match.arg(filter_col, choices = c("sourceId", "destinationId"))
-
-  # set up
-  sourceId_filter <- destinationId_filter <- NULL
-
-  if (filter_col == "sourceId") {
-    sourceId_filter <- codes
-  }
-
-  if (filter_col == "destinationId") {
-    destinationId_filter <- codes
-  }
-
-  # get codes from relationship table
-  input_codes <- filter_sct_relationship(
-    codes = NULL,
-    sourceId_filter = sourceId_filter,
-    destinationId_filter = destinationId_filter,
-    typeId_filter = typeId,
-    active_only = TRUE,
-    recursive = FALSE,
-    all_lkps_maps = all_lkps_maps
-  )
-
-  sourceId_filter <- destinationId_filter <- NULL
-
-  if (filter_col == "sourceId") {
-    sourceId_filter <- unique(input_codes$destinationId)
-  }
-
-  if (filter_col == "destinationId") {
-    destinationId_filter <- unique(input_codes$sourceId)
-  }
-
-  # perform search recursively
-  if (recursive) {
-    output_codes <- filter_sct_relationship(
-      codes = input_codes,
-      sourceId_filter = sourceId_filter,
-      destinationId_filter = destinationId_filter,
-      typeId_filter = typeId,
-      active_only = TRUE,
-      recursive = recursive,
-      all_lkps_maps = all_lkps_maps
-    )
-  } else {
-    output_codes <- input_codes
-  }
-
-  # lookup results
-  result <- unique(output_codes[[return_col]])
-
-  if (include_self) {
-    result <- c(codes, result)
-  }
-
-  CODES(
-    codes = result,
-    code_type = "sct",
-    preferred_description_only = preferred_description_only
-  )
-}
-
-summarise_attributes_sct <- function(
-  codes,
-  all_lkps_maps = NULL,
-  col_filters = getOption("codeminer.col_filters")
-) {
-  output_codes <- filter_sct_relationship(
-    codes = NULL,
-    sourceId_filter = codes,
-    destinationId_filter = NULL,
-    typeId_filter = NULL,
-    active_only = TRUE,
-    recursive = FALSE,
-    all_lkps_maps = all_lkps_maps
-  )
-
-  output_descriptions <- output_codes %>%
-    as.list() %>%
-    purrr::map(\(x) {
-      CODES(
-        codes = x,
-        code_type = "sct",
-        preferred_description_only = TRUE
-      ) %>%
-        dplyr::select(-tidyselect::all_of("code_type"))
-    }) %>%
-    purrr::imap(\(x, idx) {
-      x %>%
-        dplyr::rename_with(
-          ~ paste0(idx, "_description"),
-          tidyselect::all_of("description")
-        ) %>%
-        dplyr::rename_with(~idx, tidyselect::all_of("code"))
-    })
-
-  result <- output_codes
-
-  for (x in names(output_descriptions)) {
-    result <- result %>%
-      dplyr::full_join(output_descriptions[[x]], by = x)
-  }
-
-  result %>%
-    dplyr::select(
-      tidyselect::starts_with("sourceId"),
-      tidyselect::starts_with("typeId"),
-      tidyselect::starts_with("destinationId")
-    )
-}
-
-get_attributes_sct <- function(
-  codes,
-  standardise_output = TRUE,
-  all_lkps_maps = NULL,
-  preferred_description_only = TRUE,
-  col_filters = getOption("codeminer.col_filters")
-) {
-  output_codes <- filter_sct_relationship(
-    codes = NULL,
-    sourceId_filter = codes,
-    destinationId_filter = NULL,
-    typeId_filter = NULL,
-    active_only = TRUE,
-    recursive = FALSE,
-    all_lkps_maps = all_lkps_maps
-  )
-
-  ## then expand to include both primary and secondary descriptions
-  result <- unique(output_codes$destinationId)
-
-  CODES(
-    codes = result,
-    code_type = "sct",
-    preferred_description_only = preferred_description_only
-  )
-}
-
-
 # Utilities ---------------------------------------------------------------
 
 #' Default filtering parameters for lookup and mapping tables.
@@ -440,7 +54,6 @@ create_db_connection <- function(all_lkps_maps) {
     })
   } else if (is.null(all_lkps_maps)) {
     if (Sys.getenv("ALL_LKPS_MAPS_DB") != "") {
-      # message(paste0("Attempting to connect to ", Sys.getenv("ALL_LKPS_MAPS_DB")))
       expr <- rlang::expr({
         all_lkps_maps <- Sys.getenv("ALL_LKPS_MAPS_DB")
         md <- stringr::str_starts(all_lkps_maps, "md:")
@@ -450,7 +63,6 @@ create_db_connection <- function(all_lkps_maps) {
         on.exit(DBI::dbDisconnect(con, shutdown = TRUE))
       })
     } else if (file.exists("all_lkps_maps.db")) {
-      # message("Attempting to connect to all_lkps_maps.db in current working directory")
       expr <- rlang::expr({
         con <- check_all_lkps_maps_path("all_lkps_maps.db", FALSE)
         all_lkps_maps <- db_tables_to_list(con, FALSE)
@@ -458,7 +70,11 @@ create_db_connection <- function(all_lkps_maps) {
       })
     } else {
       stop(
-        "No/invalid path supplied to `all_lkps_maps` and no file called 'all_lkps_maps.db' found in current working directory. See `?all_lkps_maps_to_db()`"
+        paste0(
+          "No/invalid path supplied to `all_lkps_maps` and no file ",
+          "called 'all_lkps_maps.db' found in current working directory. ",
+          "See `?all_lkps_maps_to_db()`"
+        )
       )
     }
   }
@@ -501,121 +117,15 @@ db_tables_to_list <- function(con, md) {
 get_all_sct_relation_types <- function(all_lkps_maps = NULL) {
   create_db_connection(all_lkps_maps)
 
-  all_lkps_maps$sct_relationship %>%
-    dplyr::select(tidyselect::all_of("typeId")) %>%
-    dplyr::distinct() %>%
-    dplyr::collect() %>%
-    dplyr::pull(.data[["typeId"]]) %>%
+  all_lkps_maps$sct_relationship |>
+    dplyr::select(tidyselect::all_of("typeId")) |>
+    dplyr::distinct() |>
+    dplyr::collect() |>
+    dplyr::pull(.data[["typeId"]]) |>
     CODES(
       code_type = "sct",
       preferred_description_only = TRUE
     )
-}
-
-#' Filter SNOMED CT relationships based on various criteria
-#'
-#' @param codes A vector of SNOMED CT codes to filter relationships by.
-#' @param sourceId_filter A vector of SNOMED CT codes to filter relationships by source.
-#' @param destinationId_filter A vector of SNOMED CT codes to filter relationships by destination.
-#' @param typeId_filter A vector of SNOMED CT codes to filter relationships by type.
-#' @param active_only Logical indicating whether to filter relationships by active status.
-#' @param recursive Logical indicating whether to filter relationships recursively.
-#' @param all_lkps_maps A list of lookup maps.
-#'
-#' @return A data frame of filtered SNOMED CT relationships.
-#' @export
-filter_sct_relationship <- function(
-  codes = NULL,
-  sourceId_filter = NULL,
-  destinationId_filter = NULL,
-  typeId_filter = NULL,
-  active_only = TRUE,
-  recursive = FALSE,
-  all_lkps_maps = NULL
-) {
-  # validate args
-  stopifnot(
-    !is.null(sourceId_filter) |
-      !is.null(destinationId_filter) |
-      !is.null(typeId_filter)
-  )
-
-  # either `sourceId_filter` or `destinationId_filter` should be `NULL` for
-  # recursion
-  if (recursive) {
-    stopifnot(is.null(sourceId_filter) | is.null(destinationId_filter))
-  }
-
-  create_db_connection(all_lkps_maps)
-
-  check_table_exists_in_all_lkps_maps(
-    all_lkps_maps = all_lkps_maps,
-    table_name = "sct_relationship"
-  )
-
-  # get related codes, applying supplied filters
-  related_codes <- all_lkps_maps$sct_relationship
-
-  if (!is.null(destinationId_filter)) {
-    related_codes <-
-      all_lkps_maps$sct_relationship %>%
-      dplyr::filter(.data[["destinationId"]] %in% !!destinationId_filter)
-  }
-
-  if (!is.null(sourceId_filter)) {
-    related_codes <- related_codes %>%
-      dplyr::filter(.data[["sourceId"]] %in% !!sourceId_filter)
-  }
-
-  if (!is.null(typeId_filter)) {
-    related_codes <- related_codes %>%
-      dplyr::filter(.data[["typeId"]] %in% !!typeId_filter)
-  }
-
-  if (active_only) {
-    related_codes <- related_codes %>%
-      dplyr::filter(.data[["active"]] == "1")
-  }
-
-  related_codes <- related_codes %>%
-    dplyr::select(tidyselect::all_of(c(
-      "destinationId",
-      "sourceId",
-      "typeId"
-    ))) %>%
-    dplyr::collect()
-
-  result <- dplyr::bind_rows(codes, related_codes) %>%
-    dplyr::distinct()
-
-  if (recursive) {
-    if (nrow(result) > nrow(codes)) {
-      ## determine relationship direction
-      if (!is.null(destinationId_filter)) {
-        destinationId_filter <- unique(result[["sourceId"]])
-      }
-
-      if (!is.null(sourceId_filter)) {
-        sourceId_filter <- unique(result[["destinationId"]])
-      }
-
-      return(
-        filter_sct_relationship(
-          codes = result,
-          sourceId_filter = sourceId_filter,
-          destinationId_filter = destinationId_filter,
-          typeId_filter = typeId_filter,
-          active_only = active_only,
-          recursive = recursive,
-          all_lkps_maps = all_lkps_maps
-        )
-      )
-    } else {
-      return(result)
-    }
-  } else {
-    return(result)
-  }
 }
 
 #' Get data frame of relatives and attributes for a set of SNOMED codes
@@ -691,27 +201,27 @@ get_relatives_attributes_sct <- function(
 
   if (!is.null(codes$code)) {
     related_codes <-
-      all_lkps_maps$sct_relationship %>%
+      all_lkps_maps$sct_relationship |>
       dplyr::filter(.data[[filter_col]] %in% !!codes$code)
   }
 
   if (!is.null(relationship)) {
-    related_codes <- related_codes %>%
+    related_codes <- related_codes |>
       dplyr::filter(.data[["typeId"]] %in% !!relationship)
   }
 
   if (active_only) {
-    related_codes <- related_codes %>%
+    related_codes <- related_codes |>
       dplyr::filter(.data[["active"]] == "1")
   }
 
-  related_codes <- related_codes %>%
-    dplyr::select(tidyselect::all_of(c(return_col, "typeId"))) %>%
+  related_codes <- related_codes |>
+    dplyr::select(tidyselect::all_of(c(return_col, "typeId"))) |>
     dplyr::collect()
 
   names(related_codes)[which(names(related_codes) == return_col)] <- "code"
 
-  result <- dplyr::bind_rows(codes, related_codes) %>%
+  result <- dplyr::bind_rows(codes, related_codes) |>
     dplyr::distinct()
 
   if (is.null(codes)) {
@@ -757,31 +267,31 @@ get_col_filters <- function(defaults_only = TRUE, selected_table = NULL) {
 
   # get filter_cols
   result <- list(
-    lookup = CODE_TYPE_TO_LKP_TABLE_MAP %>%
+    lookup = CODE_TYPE_TO_LKP_TABLE_MAP |>
       dplyr::rename("table" = "lkp_table"),
-    map = CLINICAL_CODE_MAPPINGS_MAP %>%
+    map = CLINICAL_CODE_MAPPINGS_MAP |>
       dplyr::rename("table" = "mapping_table")
-  ) %>%
-    dplyr::bind_rows(.id = "lookup_map") %>%
-    dplyr::select(tidyselect::all_of(c("table", "filter_cols"))) %>%
+  ) |>
+    dplyr::bind_rows(.id = "lookup_map") |>
+    dplyr::select(tidyselect::all_of(c("table", "filter_cols"))) |>
     dplyr::filter(!is.na(.data[["filter_cols"]]))
 
-  result <- rlang::set_names(result$filter_cols, nm = result$table) %>%
+  result <- rlang::set_names(result$filter_cols, nm = result$table) |>
     purrr::map(\(x) x[[1]])
 
   # get either all values, or default selections only for filter_cols
   if (defaults_only) {
-    result <- result %>%
+    result <- result |>
       purrr::map(\(x) {
-        x %>%
+        x |>
           purrr::map(\(x) subset(x, stringr::str_detect(x, "\\*")))
       })
   }
 
   # remove '*' (these are used to indicate default choices)
-  result <- result %>%
+  result <- result |>
     purrr::map(\(x) {
-      x %>%
+      x |>
         purrr::map(stringr::str_remove_all, pattern = "\\*")
     })
 
@@ -868,7 +378,7 @@ filter_cols <- function(df, df_name, col_filters = NULL) {
     stop("Each item in `col_filters` must be named")
   }
 
-  col_filters_item_types <- col_filters %>%
+  col_filters_item_types <- col_filters |>
     purrr::map_lgl(\(x) is.vector(x) || is.null(x))
 
   assertthat::assert_that(
@@ -922,7 +432,7 @@ filter_cols <- function(df, df_name, col_filters = NULL) {
         )
       )
 
-      df <- df %>%
+      df <- df |>
         dplyr::filter(.data[[i]] %in% !!col_filter_values)
     }
   }
@@ -953,10 +463,10 @@ get_icd10_code_alt_code_x_map <- function(
   match.arg(as_named_list, choices = c("names_no_x", "names_with_x"))
 
   # make mapping df
-  icd10_lkp_alt_x_map <- icd10_lkp %>%
-    dplyr::select(tidyselect::all_of("ALT_CODE")) %>%
-    dplyr::filter(!is.na(.data[["ALT_CODE"]])) %>%
-    dplyr::collect() %>%
+  icd10_lkp_alt_x_map <- icd10_lkp |>
+    dplyr::select(tidyselect::all_of("ALT_CODE")) |>
+    dplyr::filter(!is.na(.data[["ALT_CODE"]])) |>
+    dplyr::collect() |>
     dplyr::mutate(
       "ALT_CODE_minus_x" = stringr::str_remove(
         .data[["ALT_CODE"]],
@@ -982,7 +492,7 @@ get_icd10_code_alt_code_x_map <- function(
   ))
 
   if (undivided_3char_only) {
-    icd10_lkp_alt_x_map <- icd10_lkp_alt_x_map %>%
+    icd10_lkp_alt_x_map <- icd10_lkp_alt_x_map |>
       dplyr::filter(.data[["ALT_CODE_minus_x"]] != .data[["ALT_CODE"]])
   }
 
@@ -990,17 +500,17 @@ get_icd10_code_alt_code_x_map <- function(
   if (!is.null(as_named_list)) {
     icd10_lkp_alt_x_map <- switch(
       as_named_list,
-      names_no_x = icd10_lkp_alt_x_map %>%
+      names_no_x = icd10_lkp_alt_x_map |>
         tidyr::pivot_wider(
           names_from = "ALT_CODE_minus_x",
           values_from = "ALT_CODE"
-        ) %>%
+        ) |>
         as.list(),
-      names_with_x = icd10_lkp_alt_x_map %>%
+      names_with_x = icd10_lkp_alt_x_map |>
         tidyr::pivot_wider(
           names_from = "ALT_CODE",
           values_from = "ALT_CODE_minus_x"
-        ) %>%
+        ) |>
         as.list()
     )
   }
@@ -1058,12 +568,12 @@ get_icd10_code_range <- function(start_icd10_code, end_icd10_code, icd10_lkp) {
   )
 
   # get start and end row indices
-  start_rowid <- icd10_lkp %>%
-    dplyr::filter(.data[["ALT_CODE"]] == !!start_icd10_code) %>%
+  start_rowid <- icd10_lkp |>
+    dplyr::filter(.data[["ALT_CODE"]] == !!start_icd10_code) |>
     dplyr::pull(.data[[".rowid"]])
 
-  end_rowid <- icd10_lkp %>%
-    dplyr::filter(.data[["ALT_CODE"]] == !!end_icd10_code) %>%
+  end_rowid <- icd10_lkp |>
+    dplyr::filter(.data[["ALT_CODE"]] == !!end_icd10_code) |>
     dplyr::pull(.data[[".rowid"]])
 
   # check start/end row indices are scalar, and create range of row index integers
@@ -1073,8 +583,8 @@ get_icd10_code_range <- function(start_icd10_code, end_icd10_code, icd10_lkp) {
   icd10_lkp_rowids <- start_rowid:end_rowid
 
   # filter for selected row index integers
-  result <- icd10_lkp %>%
-    dplyr::filter(.data[[".rowid"]] %in% icd10_lkp_rowids) %>%
+  result <- icd10_lkp |>
+    dplyr::filter(.data[[".rowid"]] %in% icd10_lkp_rowids) |>
     dplyr::pull(.data[["ALT_CODE"]])
 
   pattern <- stringr::str_c(paste0("^", result), sep = "", collapse = "|")
@@ -1082,11 +592,11 @@ get_icd10_code_range <- function(start_icd10_code, end_icd10_code, icd10_lkp) {
   # expand (e.g. for 'A80-A81', at this stage all 'A80' should be present
   # ('A800-A809'), but for 'A81', only 'A81' wil be present - needs expanding
   # to 'A801-A819')
-  result <- icd10_lkp %>%
+  result <- icd10_lkp |>
     dplyr::filter(stringr::str_detect(
       .data[["ALT_CODE"]],
       pattern = pattern
-    )) %>%
+    )) |>
     dplyr::pull(.data[["ALT_CODE"]])
 
   return(result)

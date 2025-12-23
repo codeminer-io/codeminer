@@ -1,3 +1,82 @@
+#' Get codeminer metadata
+#'
+#' Returns metadata about the lookup, mapping, and relationship tables in the
+#' codeminer database.
+#'
+#' @param type The type of metadata to return. By default returns a list
+#'   containing all metadata types. Otherwise, returns a data frame for the
+#'   specified type. Must be one of "lookup", "mapping" or "relationship".
+#' @return If a single type is requested, a data frame. If multiple types are
+#'   requested, a named list of data frames.
+#' @export
+#' @examples
+#' create_dummy_database()
+#' get_codeminer_metadata()
+#' get_codeminer_metadata("lookup")
+#' get_codeminer_metadata(c("lookup", "mapping"))
+get_codeminer_metadata <- function(
+  type = c("lookup", "mapping", "relationship")
+) {
+  type <- rlang::arg_match(
+    type,
+    sort(names(codeminer_metadata_table_names)),
+    multiple = TRUE
+  )
+
+  con <- connect_to_db()
+
+  result <- list()
+  if ("lookup" %in% type) {
+    result$lookup <- get_lookup_metadata(con)
+  }
+  if ("mapping" %in% type) {
+    result$mapping <- get_mapping_metadata(con)
+  }
+  if ("relationship" %in% type) {
+    result$relationship <- get_relationship_metadata(con)
+  }
+
+  if (length(result) == 1L) {
+    return(result[[1L]])
+  }
+  result
+}
+
+# Return the lookup metadata table as a data frame
+#' @param con A database connection object. Uses the default connection if not provided.
+#' @return A data frame containing the lookup metadata.
+#' @noRd
+#' @keywords internal
+get_lookup_metadata <- function(con = connect_to_db()) {
+  tbl_name <- codeminer_metadata_table_names$lookup
+  read_table_from_db(con, tbl_name)
+}
+
+# Return the mapping metadata table as a data frame
+#' @param con A database connection object. Uses the default connection if not provided.
+#' @return A data frame containing the mapping metadata.
+#' @noRd
+#' @keywords internal
+get_mapping_metadata <- function(con = connect_to_db()) {
+  tbl_name <- codeminer_metadata_table_names$mapping
+  read_table_from_db(con, tbl_name)
+}
+
+# Return the relationship metadata table as a data frame
+#' @param con A database connection object. Uses the default connection if not provided.
+#' @return A data frame containing the relationship metadata.
+#' @noRd
+#' @keywords internal
+get_relationship_metadata <- function(con = connect_to_db()) {
+  tbl_name <- codeminer_metadata_table_names$relationship
+  read_table_from_db(con, tbl_name)
+}
+
+# Helper to read a table from the database as a data.frame
+read_table_from_db <- function(con, tbl_name) {
+  DBI::dbReadTable(con, tbl_name)
+}
+
 table_exists <- function(con, tbl_name) {
   existing_tables <- DBI::dbListTables(con)
   return(tbl_name %in% existing_tables)
@@ -78,47 +157,4 @@ add_metadata_table <- function(
   meta_df <- as.data.frame(metadata)
   rows_added <- DBI::dbAppendTable(con, tbl_name, meta_df)
   return(invisible(rows_added))
-}
-
-
-#' Return the lookup metadata table as a data frame
-#'
-#' @param con A database connection object. Uses the default connection if not provided.
-#' @return A data frame containing the lookup metadata.
-#' @export
-#' @examples
-#' create_dummy_database()
-#' get_lookup_metadata()
-get_lookup_metadata <- function(con = connect_to_db()) {
-  tbl_name <- codeminer_metadata_table_names$lookup
-  read_table_from_db(con, tbl_name)
-}
-
-#' Return the mapping metadata table as a data frame
-#'
-#' @param con A database connection object. Uses the default connection if not provided.
-#' @return A data frame containing the mapping metadata.
-#' @export
-#' @examples
-#' create_dummy_database()
-#' get_mapping_metadata()
-get_mapping_metadata <- function(con = connect_to_db()) {
-  tbl_name <- codeminer_metadata_table_names$mapping
-  read_table_from_db(con, tbl_name)
-}
-
-#' Return the relationship metadata table as a data frame
-#'
-#' @param con A database connection object. Uses the default connection if not provided.
-#' @return A data frame containing the relationship metadata.
-#' @keywords internal
-#' @noRd
-get_relationship_metadata <- function(con = connect_to_db()) {
-  tbl_name <- codeminer_metadata_table_names$relationship
-  read_table_from_db(con, tbl_name)
-}
-
-# Helper to read a table from the database as a data.frame
-read_table_from_db <- function(con, tbl_name) {
-  DBI::dbReadTable(con, tbl_name)
 }

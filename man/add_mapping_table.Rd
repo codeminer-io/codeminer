@@ -12,20 +12,21 @@ add_mapping_table(table, metadata)
 \item{metadata}{The mapping metadata, as specified by \code{\link[=mapping_metadata]{mapping_metadata()}}.}
 }
 \value{
-\code{TRUE} invisibly if successful, \code{FALSE} invisibly if the mapping table
-already exists.
+\code{TRUE} invisibly if successful, \code{FALSE} invisibly if the mapping
+table already exists.
 }
 \description{
-Add a mapping table to the database together with its metadata.
-Note that it is not possible to overwrite an existing mapping table.
+Add a mapping table to the database together with its metadata. Note that it
+is not possible to overwrite an existing mapping table.
 }
 \details{
 Mapping tables are indexed by the combination of \code{from_code_type},
-\code{to_code_type}, and \code{version}, specified in \code{\link[=mapping_metadata]{mapping_metadata()}}. This
-index needs to be unique and is used to identify the mapping table in the
-database. If a mapping table with the same index already exists, the function
-will emit a warning and return \code{FALSE} (invisibly) without any effect. Use a
-different \code{version} to add a new version of the mapping table.
+\code{to_code_type}, and \code{map_version}, specified in \code{\link[=mapping_metadata]{mapping_metadata()}}.
+This index needs to be unique and is used to identify the mapping table in
+the database. If a mapping table with the same index already exists, the
+function will emit a warning and return \code{FALSE} (invisibly) without any
+effect. Use a different \code{map_version} to add a new version of the mapping
+table.
 }
 \examples{
 # Using the example ontology data included in codeminer
@@ -35,7 +36,7 @@ mapping_table
 # Using a temporary database
 Sys.setenv(CODEMINER_DB_PATH = tempfile())
 build_database()
-add_mapping_table(mapping_table, mapping_metadata("capital", "lowercase", version = "v3"))
+add_mapping_table(mapping_table, mapping_metadata("capital", "lowercase", map_version = "v3"))
 }
 \seealso{
 \code{\link[=mapping_metadata]{mapping_metadata()}} for the specification of the metadata.

@@ -9,7 +9,7 @@
 #' @details
 #' Available functions:
 #'
-#' - `r paste(paste0("\\code{", codeminer::codeminer_metadata()$lookup_tables$code, "()}"), sep = "", collapse = "\n- ")`
+#' - `r paste(paste0("\\code{", codeminer::codeminer_metadata()$lookup_tables$code, "()}"), sep="", collapse="\n- ")`
 #'
 #' @return The result of executing the code within the specified `code_type`
 #'   context.

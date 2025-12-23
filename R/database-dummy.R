@@ -34,7 +34,13 @@ create_dummy_database <- function(
   build_database(overwrite = TRUE)
 
   add_lookup_table(dummy_icd10_lookup(), dummy_icd10_metadata())
+  add_relationship_table(
+    dummy_icd10_relationship(),
+    dummy_icd10_relationship_metadata()
+  )
+
   add_lookup_table(dummy_read3_lookup(), dummy_read3_metadata())
+
   add_mapping_table(
     dummy_read3_icd10_mapping(),
     dummy_read3_icd10_mapping_metadata()
@@ -51,6 +57,9 @@ dummy_data_path <- function() {
 # Helper to generate dummy ICD-10 Lookup data
 dummy_icd10_lookup <- function() {
   icd10 <- readxl::read_excel(dummy_data_path(), sheet = "icd10_lkp")
+
+  # Remove garbage Excel rows
+  icd10 <- dplyr::filter(icd10, !is.na(.data$ALT_CODE))
 
   # Some ICD-10 descriptions include a modifier e.g. "E10" = "Type 1 diabetes
   # mellitus", whereas "E10.0" = "Type 1 diabetes mellitus with coma". "With
@@ -83,9 +92,42 @@ dummy_icd10_lookup <- function() {
 dummy_icd10_metadata <- function() {
   lookup_metadata(
     "icd10",
-    version = "v0",
+    lookup_version = "v0",
     lookup_code_col = "code",
     lookup_description_col = "description"
+  )
+}
+
+# Helper to generate icd10 relationship data
+# icd10 child relationships are encoded directly into the ICD10_CODE
+# If a code is of the form `<prefix>.<suffix>` then the parent is the `<prefix>` code
+# E.g. `A00.1` is a child of `A00`.
+dummy_icd10_relationship <- function() {
+  lkp_tbl <- dummy_icd10_lookup()
+  icd10_codes <- lkp_tbl$code
+  children <- purrr::map(icd10_codes, \(x) {
+    # Don't consider code itself as child
+    candidates <- icd10_codes[icd10_codes != x]
+    is_child <- stringr::str_starts(candidates, x)
+    return(candidates[is_child])
+  }) |>
+    rlang::set_names(icd10_codes)
+  # Remove empty entries
+  children[lengths(children) == 0] <- NULL
+  tbl <- utils::stack(children)
+  names(tbl) <- c("from", "to")
+  tbl$type <- "is a"
+  return(tbl)
+}
+
+dummy_icd10_relationship_metadata <- function() {
+  relationship_metadata(
+    code_type = "icd10",
+    relationship_version = "v0",
+    from_col = "from",
+    to_col = "to",
+    type_col = "type",
+    child_parent_relationship_code = "is a"
   )
 }
 
@@ -108,7 +150,7 @@ dummy_read3_lookup <- function() {
 dummy_read3_metadata <- function() {
   lookup_metadata(
     "read3",
-    version = "v0",
+    lookup_version = "v0",
     lookup_code_col = "code",
     lookup_description_col = "description",
     preferred_description_col = "description_type",
@@ -145,7 +187,7 @@ dummy_read3_icd10_mapping_metadata <- function() {
   mapping_metadata(
     "read3",
     "icd10",
-    version = "v0",
+    map_version = "v0",
     from_col = "from",
     to_col = "to"
   )

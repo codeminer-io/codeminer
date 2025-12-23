@@ -7,26 +7,29 @@
 add_relationship_table(table, metadata)
 }
 \arguments{
-\item{table}{The relationship table to add, should be coercible to a \code{data.frame}}
+\item{table}{The relationship table to add, should be coercible to a
+\code{data.frame}}
 
-\item{metadata}{The relationship metadata, as specified by \code{\link[=relationship_metadata]{relationship_metadata()}}.}
+\item{metadata}{The relationship metadata, as specified by
+\code{\link[=relationship_metadata]{relationship_metadata()}}.}
 }
 \value{
 \code{TRUE} invisibly if successful, \code{FALSE} invisibly if the relationship
 table already exists.
 }
 \description{
-Add a relationship table to the database together with its metadata.
-Note that it is not possible to overwrite an existing relationship table.
+Add a relationship table to the database together with its metadata. Note
+that it is not possible to overwrite an existing relationship table.
 }
 \details{
-Relationship tables are indexed by their \code{code_type} and \code{version}, specified
-in \code{\link[=relationship_metadata]{relationship_metadata()}}. This index needs to be unique and is used to
-identify the relationship table in the database. If a relationship table with
-the same \code{code_type} and \code{version} already exists, the function will emit a
-warning and return \code{FALSE} (invisibly) without any effect. Use a different
-\code{version} to add a new version of the relationship table for the given
-\code{code_type}.
+Relationship tables are indexed by their \code{code_type} and
+\code{relationship_version}, specified in \code{\link[=relationship_metadata]{relationship_metadata()}}. This index
+needs to be unique and is used to identify the relationship table in the
+database. If a relationship table with the same \code{code_type} and
+\code{relationship_version} already exists, the function will emit a warning and
+return \code{FALSE} (invisibly) without any effect. Use a different
+\code{relationship_version} to add a new version of the relationship table for the
+given \code{code_type}.
 }
 \examples{
 relationship_table <- data.frame(
@@ -42,10 +45,12 @@ build_database()
 add_relationship_table(
   relationship_table,
   relationship_metadata(
-    "test", version = "v1",
+    "test",
+    relationship_version = "v1",
     from_col = "source",
     to_col = "target",
-    type_col = "type"
+    type_col = "type",
+    child_parent_relationship_code = "child"
   )
 )
 }

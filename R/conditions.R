@@ -118,3 +118,104 @@ codeminer_interpolate_message <- function(
     .envir = .envir
   )
 }
+
+#' Warn about missing codes in a table
+#'
+#' Emits a truncated warning listing codes that were not found in a given table.
+#' The warning carries the missing codes and table context as structured data
+#' and can be handled programmatically.
+#'
+#' ## Handling missing-code warnings
+#'
+#' This function signals a warning of class `"codeminer_missing_codes"`. The
+#' warning object contains the following fields:
+#'
+#' - `missing_codes`: a character vector of all missing codes (untruncated)
+#' - `table_type`: the type of table the codes were expected to be found in
+#' (e.g. `"lookup"`, `"mapping"`, `"relationship"`)
+#' - `table_meta`: metadata for the table that was queried (including table
+#' name, version, code type, and source)
+#'
+#' You can intercept and act on these warnings using [withCallingHandlers()]
+#' (see examples). This allows you to collect missing inputs without printing a
+#' warning, while still preserving full context about where the lookup failed.
+#'
+#' @param missing_codes Character vector of all missing codes (untruncated).
+#' @param table_type Type of table the codes were expected to be found in. Must
+#'   be one of 'relationship', 'lookup', or 'mapping'.
+#' @param table_meta Data frame of metadata for the table the codes were
+#'   expected to be found in.
+#' @param max_show Maximum number of missing codes to display. Defaults to 10.
+#'
+#' @return Invisibly returns `missing_codes`.
+#'
+#' @keywords internal
+#' @examples
+#' # Set up a temporary dummy database
+#' temp_db <- tempfile(fileext = ".duckdb")
+#' create_dummy_database(temp_db)
+#' missing_codes <- table_type <- table_meta <- NULL
+#'
+#' # Capture missing codes from waning using `withCallingHandlers()`
+#' withCallingHandlers(
+#'   {
+#'     codes <- CODES(c("foo", "bar", "E10"), code_type = "icd10")
+#'   },
+#'   codeminer_missing_codes = function(w) {
+#'     missing_codes <<- w$missing_codes
+#'     table_type <<- w$table_type
+#'     table_meta <<- w$table_meta
+#'     invokeRestart("muffleWarning")
+#'   }
+#' )
+#'
+#' # Recognised codes
+#' codes
+#'
+#' # Unrecognised codes and related context
+#' missing_codes
+#' table_type
+#' table_meta
+missing_codes_warning <- function(
+  missing_codes,
+  table_meta,
+  table_type = c("lookup", "mapping", "relationship"),
+  max_show = 10
+) {
+  if (length(missing_codes) == 0) {
+    return(invisible(missing_codes))
+  }
+
+  table_type <- rlang::arg_match(
+    table_type,
+    names(codeminer_metadata_table_names)
+  )
+
+  missing_codes <- sort(unique(missing_codes))
+
+  shown <- utils::head(missing_codes, max_show)
+  n_extra <- length(missing_codes) - length(shown)
+
+  msg <- if (n_extra > 0) {
+    c(
+      "!" = "The following codes were not found in the {table_type} table:",
+      "*" = "{.code {shown}}",
+      "i" = "{n_extra} more not shown"
+    )
+  } else {
+    c(
+      "!" = "The following codes were not found in the {table_type} table:",
+      "*" = "{.code {shown}}"
+    )
+  }
+
+  codeminer_warn(
+    msg,
+    class = "codeminer_missing_codes",
+    missing_codes = missing_codes,
+    table_type = table_type,
+    table_meta = table_meta
+  )
+
+  invisible(missing_codes)
+}

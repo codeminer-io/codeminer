@@ -8,7 +8,8 @@ MAP(
   codes,
   from = getOption("codeminer.map_from"),
   to = getOption("codeminer.map_to"),
-  version = getOption("codeminer.map_version", default = "latest")
+  map_version = getOption("codeminer.map_version", default = "latest"),
+  lookup_version = getOption("codeminer.lookup_version", default = "latest")
 )
 }
 \arguments{
@@ -18,7 +19,10 @@ MAP(
 
 \item{to}{Coding system to map \code{codes} to.}
 
-\item{version}{Version of the mapping table to use.}
+\item{map_version}{Version of the mapping table to use.}
+
+\item{lookup_version}{character. Version of the lookup table to use. Default:
+\code{"latest"}. Can be configured through the \code{codeminer.lookup_version} option.}
 }
 \value{
 A \code{data.frame} of the mapped codes with their descriptions, as returned by \code{\link[=CODES]{CODES()}}.
@@ -51,12 +55,7 @@ MAP("all", from = "read3", to = "icd10")
 \code{\link[=add_mapping_table]{add_mapping_table()}} for adding new mapping tables to the codeminer database.
 
 Other Clinical code lookups and mappings: 
-\code{\link{CHILDREN}()},
 \code{\link{CODES}()},
-\code{\link{GET_ATTRIBUTES}()},
-\code{\link{HAS_ATTRIBUTES}()},
-\code{\link{default_col_filters}()},
-\code{\link{get_children_sct}()},
-\code{\link{get_parents_sct}()}
+\code{\link{default_col_filters}()}
 }
 \concept{Clinical code lookups and mappings}

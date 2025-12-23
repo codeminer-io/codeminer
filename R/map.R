@@ -3,7 +3,8 @@
 #' @param codes A character vector of codes to be mapped. If passing `"all"`, all mapped codes will be returned.
 #' @param from Coding system that `codes` belong to.
 #' @param to Coding system to map `codes` to.
-#' @param version Version of the mapping table to use.
+#' @param map_version Version of the mapping table to use.
+#' @inheritParams CODES
 #'
 #' @details
 #' If no mapping table matching the `from -> to` direction is found, but there is a table for `to -> from`,
@@ -32,14 +33,20 @@ MAP <- function(
   codes,
   from = getOption("codeminer.map_from"),
   to = getOption("codeminer.map_to"),
-  version = getOption("codeminer.map_version", default = "latest")
+  map_version = getOption("codeminer.map_version", default = "latest"),
+  lookup_version = getOption("codeminer.lookup_version", default = "latest")
 ) {
-  check_mapping_args(codes = codes, from = from, to = to, version = version)
+  check_mapping_args(
+    codes = codes,
+    from = from,
+    to = to,
+    map_version = map_version
+  )
 
   con <- connect_to_db()
   check_database(con)
 
-  mapping_table <- get_mapping_table(con, from, to, version)
+  mapping_table <- get_mapping_table(con, from, to, map_version)
 
   if (identical(codes, "all")) {
     return(dplyr::collect(mapping_table))
@@ -54,14 +61,14 @@ MAP <- function(
 
   missing_codes <- setdiff(codes, mapping$from)
   if (length(missing_codes) > 0) {
-    codeminer_warn(
-      c(
-        "!" = "The following codes were not found in the mapping table: {.code {missing_codes}}"
-      )
+    missing_codes_warning(
+      missing_codes,
+      table_type = "mapping",
+      table_meta = get_metadata_for_mapping(con, from, to, map_version)
     )
   }
   mapped_codes <- unique(mapping$to)
-  return(CODES(mapped_codes, code_type = to, version = version))
+  return(CODES(mapped_codes, code_type = to, lookup_version = lookup_version))
 }
 
 #' Get the mapping table for the given from and to types in standardised format
@@ -69,7 +76,7 @@ MAP <- function(
 #' @param con A database connection.
 #' @param from The source code type to map from
 #' @param to The target code type to map to
-#' @param version The version of the mapping table.
+#' @param map_version The version of the mapping table.
 #' @param call The calling environment. Passed to [codeminer_abort].
 #'
 #' @return A data frame containing the lookup table with two columns: `from` and `to`.
@@ -78,10 +85,10 @@ get_mapping_table <- function(
   con,
   from,
   to,
-  version,
+  map_version,
   call = rlang::caller_env()
 ) {
-  this_meta <- get_metadata_for_mapping(con, from, to, version, call = call)
+  this_meta <- get_metadata_for_mapping(con, from, to, map_version, call = call)
   tbl_name <- this_meta$mapping_table_name
   tbl <- dplyr::tbl(con, tbl_name)
 
@@ -93,7 +100,7 @@ get_metadata_for_mapping <- function(
   con,
   from,
   to,
-  version,
+  map_version,
   call = rlang::caller_env()
 ) {
   all_meta <- get_mapping_metadata(con = con)
@@ -120,15 +127,18 @@ get_metadata_for_mapping <- function(
     .data$from_code_type == from,
     .data$to_code_type == to
   )
-  if (version == "latest") {
-    version <- get_latest_version(all_version_meta$mapping_version)
+  if (map_version == "latest") {
+    map_version <- get_latest_version(all_version_meta$map_version)
   }
-  this_meta <- dplyr::filter(all_version_meta, .data$mapping_version == version)
+  this_meta <- dplyr::filter(
+    all_version_meta,
+    .data$map_version == .env$map_version
+  )
 
   if (nrow(this_meta) == 0) {
     codeminer_abort(
       c(
-        "No mapping table found for from type '{from}' and to type '{to}', version '{version}'.",
+        "No mapping table found for from type '{from}' and to type '{to}', version '{map_version}'.",
         "i" = "Did you add the mapping table with {.fun codeminer::add_mapping_table}?"
       ),
       call = call
@@ -150,11 +160,12 @@ check_mapping_args <- function(
   codes,
   from,
   to,
-  version,
+  map_version,
   call = rlang::caller_env()
 ) {
-  check_codes(codes)
-  check_version(version)
+  check_codes(codes, call = call)
+  check_version(map_version, call = call)
+
   if (length(from) != 1) {
     codeminer_abort(
       "{.arg from} must have length 1, not {length(from)}",

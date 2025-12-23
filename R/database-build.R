@@ -30,6 +30,19 @@ build_database <- function(overwrite = FALSE) {
   }
 
   con <- connect_to_db()
+
+  if (db_exists && overwrite) {
+    codeminer_inform("Removing existing tables from database")
+
+    # Get all table names
+    tables <- DBI::dbListTables(con)
+
+    # Drop each table
+    for (table in tables) {
+      DBI::dbRemoveTable(con, table)
+    }
+  }
+
   create_lookup_metadata_table(con, overwrite = overwrite)
   create_mapping_metadata_table(con, overwrite = overwrite)
   create_relationship_metadata_table(con, overwrite = overwrite)
@@ -151,7 +164,7 @@ required_mapping_metadata_columns <- function() {
   c(
     "from_code_type",
     "to_code_type",
-    "mapping_version",
+    "map_version",
     "from_col",
     "to_col"
   )

@@ -7,7 +7,7 @@
 mapping_metadata(
   from_code_type,
   to_code_type,
-  version = "v0",
+  map_version = "v0",
   ...,
   from_col = "from",
   to_col = "to"
@@ -18,7 +18,7 @@ mapping_metadata(
 
 \item{to_code_type}{The type of coding system for the target codes (e.g., ICD-10, SNOMED-CT)}
 
-\item{version}{The version of the mapping metadata (default: "v0")}
+\item{map_version}{The version of the mapping metadata (default: "v0")}
 
 \item{...}{These dots are for future extensions and must be empty.}
 
@@ -35,7 +35,7 @@ generate the necessary metadata when adding a new mapping table to the database
 with \code{\link[=add_mapping_table]{add_mapping_table()}}.
 }
 \examples{
-mapping_metadata("ICD-10", "SNOMED-CT", version = "2023")
+mapping_metadata("ICD-10", "SNOMED-CT", map_version = "2023")
 }
 \seealso{
 \code{\link[=add_mapping_table]{add_mapping_table()}}

@@ -36,25 +36,12 @@ ALL_LKPS_MAPS_TABLE_NAMES <- c(
   "phecode_lkp"
 )
 
-# TODO - unhash this
-# assertthat::assert_that(
-#   all(sort(ALL_LKPS_MAPS_TABLE_NAMES) == sort(names(all_lkps_maps))),
-#   msg = "`ALL_LKPS_MAPS_TABLE_NAMES` does not match the expected names"
-# )
-
-# TO DELETE?
-# colnames for each excel spreadsheet in resource 592 ---------------------
-# colnames_for_ukb_code_mappings_sheet_names <- ukb_code_mappings_sheet_names %>%
-#   purrr::set_names() %>%
-#   purrr::map(~ names(ukb_code_mappings[[.x]]))
-
 # clinical code system to lookup table map --------------------------------
 # mappings note, BNF - 'description_col' is for chemical substances only (TODO
 # amend this?)
 
-# TODO - category col for tables?
-
 # fmt: skip
+# nolint start
 CODE_TYPE_TO_LKP_TABLE_MAP <- tibble::tribble(
   ~code, ~code_label, ~lkp_table, ~code_col, ~description_col, ~preferred_synonym_col, ~preferred_code, ~grouping_col, ~filter_cols,
   "icd10", "ICD-10", "icd10_lkp", "ALT_CODE", "DESCRIPTION", NA, NA, "category", NA,
@@ -75,6 +62,7 @@ CODE_TYPE_TO_LKP_TABLE_MAP <- tibble::tribble(
   "medcode_aurum", "MedCode (CPRD Aurum)", "medcode_aurum", "MedCodeId", "Term", NA, NA, NA, NA,
   "prodcode_aurum", "ProdCode (CPRD Aurum)", "prodcode_aurum", "ProdCodeId", "Term_from_EMIS", NA, NA, NA, NA
 )
+# nolint end
 
 # CLINICAL_CODE_MAPPINGS_MAP ----------------------------------------------
 
@@ -85,6 +73,7 @@ CODE_TYPE_TO_LKP_TABLE_MAP <- tibble::tribble(
 # Note, `preferred_synonym_col` and `preferred_code` refer to `to_col`
 
 # fmt: skip
+# nolint start
 CLINICAL_CODE_MAPPINGS_MAP <- tibble::tribble(
   ~from, ~to, ~mapping_table, ~from_col, ~to_col, ~preferred_synonym_col, ~preferred_code, ~filter_cols,
   "icd9", "icd10", "icd9_icd10", "ICD9", "ICD10", NA, NA, NA,
@@ -107,6 +96,7 @@ CLINICAL_CODE_MAPPINGS_MAP <- tibble::tribble(
   "medcode_aurum", "sct", "medcode_aurum", "MedCodeId", "SnomedCTConceptId", NA, NA, NA,
   "prodcode_aurum", "sct", "prodcode_aurum", "ProdCodeId", "dmdid", NA, NA, NA
 )
+# nolint end
 
 # PUBLIC ------------------------------------------------------------------
 

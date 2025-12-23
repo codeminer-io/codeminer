@@ -5,7 +5,7 @@ test_that("CODES() returns the expected data format", {
   test_codes <- c("A028", "U838", "E12", "E106", "O109")
   test_type <- "icd10"
 
-  result <- CODES(test_codes, code_type = test_type, version = "v0")
+  result <- CODES(test_codes, code_type = test_type, lookup_version = "v0")
 
   expect_s3_class(result, "data.frame")
   expect_true(all(c("code", "description", "code_type") %in% names(result)))
@@ -27,7 +27,7 @@ test_that("CODES works with the codeminer.code_type option", {
 
 test_that("CODES allows querying all codes", {
   test_type <- "icd10"
-  expected_rows <- 199
+  expected_rows <- nrow(dummy_icd10_lookup())
 
   result <- CODES("all", code_type = test_type)
   expect_s3_class(result, "data.frame")
@@ -45,15 +45,23 @@ test_that("CODES handles versions correctly", {
   )
   add_lookup_table(
     test_table,
-    lookup_metadata(test_type, version = test_version)
+    lookup_metadata(test_type, lookup_version = test_version)
   )
 
-  v2_result <- CODES("all", code_type = test_type, version = test_version)
+  v2_result <- CODES(
+    "all",
+    code_type = test_type,
+    lookup_version = test_version
+  )
   expect_identical(v2_result$code, test_table$code)
   expect_identical(v2_result$description, test_table$description)
   expect_identical(unique(v2_result$code_type), test_type)
 
-  latest_result <- CODES("all", code_type = test_type, version = "latest")
+  latest_result <- CODES(
+    "all",
+    code_type = test_type,
+    lookup_version = "latest"
+  )
   expect_identical(latest_result, v2_result)
 })
 
@@ -61,8 +69,7 @@ test_that("CODES warns about missing codes", {
   test_codes <- c("foo", "bar")
   expect_warning(
     CODES(test_codes, "icd10"),
-    "The following codes were not found in the lookup table: `foo` and `bar`",
-    fixed = TRUE
+    class = "codeminer_missing_codes"
   )
 })
 
@@ -80,10 +87,10 @@ test_that("CODES fails for missing code_type", {
   )
 })
 
-test_that("CODES fails for wrong version", {
+test_that("CODES fails for wrong lookup_version", {
   expect_error(
-    CODES("all", code_type = "icd10", version = "nope"),
-    "No metadata found for 'icd10' version 'nope'"
+    CODES("all", code_type = "icd10", lookup_version = "nope"),
+    "No lookup metadata found for 'icd10' version 'nope'"
   )
 })
 
@@ -124,7 +131,7 @@ test_that("CODES_LIKE can handle regular expressions", {
   result <- CODES_LIKE(
     test_pattern,
     code_type = "icd10",
-    version = "v0"
+    lookup_version = "v0"
   )
   expect_equal(nrow(result), 4)
   expect_true(all(stringr::str_detect(result$code, test_pattern)))

@@ -6,8 +6,8 @@ test_that("Functions that return a path to dummy data work", {
     dummy_ukb_codings_path(),
     dummy_phecode_lkp_path(),
     dummy_icd10_phecode_map_path()
-  ) %>%
-    purrr::map_chr(class) %>%
+  ) |>
+    purrr::map_chr(class) |>
     unique()
 
   expect_equal(

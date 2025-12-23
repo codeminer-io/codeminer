@@ -22,7 +22,7 @@
 DESCRIPTION <- function(
   pattern,
   code_type = getOption("codeminer.code_type"),
-  version = getOption("codeminer.lookup_version", default = "latest"),
+  lookup_version = getOption("codeminer.lookup_version", default = "latest"),
   ignore_case = TRUE,
   codes_only = FALSE,
   preferred_description_only = TRUE
@@ -34,7 +34,11 @@ DESCRIPTION <- function(
   }
 
   con <- connect_to_db()
-  lkp_table <- get_lookup_table(con, code_type = code_type, version = version)
+  lkp_table <- get_lookup_table(
+    con,
+    code_type = code_type,
+    lookup_version = lookup_version
+  )
   code_col <- "code"
   description_col <- "description"
 
@@ -65,7 +69,7 @@ DESCRIPTION <- function(
   result <- CODES(
     codes,
     code_type = code_type,
-    version = version,
+    lookup_version = lookup_version,
     preferred_description_only = preferred_description_only
   )
 
