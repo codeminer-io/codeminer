@@ -31,46 +31,56 @@ various clinical codings systems. A dummy dataset is used here:
 
 ``` r
 library(codeminer)
-
-all_lkps_maps_dummy <- build_all_lkps_maps_dummy()
+create_dummy_database()
+#> ℹ Creating new database at '/var/folders/9z/4rs_sqvj38n8b02wv8p4j77h0000gn/T//RtmppmCOJL/file16e0e4fff8db0.duckdb'
+#> ✔ Lookup table icd10_v0 added successfully.
+#> ✔ Lookup table read3_v0 added successfully.
+#> ✔ Mapping table read3_icd10_v0 added successfully.
+#> ✔ Dummy database ready to use!
 ```
 
 Look up Read 2 codes for hypertension:
 
 ``` r
-htn_read2 <- DESCRIPTION("Hypertension",
-  code_type = "read2",
-  all_lkps_maps = all_lkps_maps_dummy
-)
-
-htn_read2
-#> # A tibble: 1 × 3
-#>   code  description            code_type
-#>   <chr> <chr>                  <chr>    
-#> 1 G20.. Essential hypertension read2
+htn_read3 <- DESCRIPTION("Hypertension", code_type = "read3")
+#> ℹ Using 'v0' as latest version
+#> ℹ Using 'v0' as latest version
+htn_read3
+#> # A tibble: 1 × 5
+#>   code  description            preferred_description status code_type
+#>   <chr> <chr>                  <lgl>                 <chr>  <chr>    
+#> 1 XE0Uc Essential hypertension TRUE                  C      read3
 ```
 
 Map these to ICD10:
 
 ``` r
 htn_icd10 <- MAP(
-  codes = htn_read2$code,
-  from = "read2",
-  to = "icd10",
-  all_lkps_maps = all_lkps_maps_dummy
+  codes = htn_read3$code,
+  from = "read3",
+  to = "icd10"
 )
+#> ℹ Using 'v0' as latest version
+#> ℹ Using 'v0' as latest version
 
 htn_icd10
-#> # A tibble: 1 × 3
-#>   code  description                      code_type
-#>   <chr> <chr>                            <chr>    
-#> 1 I10X  Essential (primary) hypertension icd10
+#> # A tibble: 7 × 12
+#>   code  description     ICD10_CODE USAGE USAGE_UK QUALIFIERS GENDER_MASK MIN_AGE
+#>   <chr> <chr>           <chr>      <chr>    <dbl> <chr>            <dbl>   <dbl>
+#> 1 I10X  Essential (pri… I10        DEFA…        3 <NA>                NA      NA
+#> 2 I11   Hypertensive h… I11        DEFA…        3 <NA>                NA      NA
+#> 3 I12   Hypertensive r… I12        DEFA…        3 <NA>                NA      NA
+#> 4 I13   Hypertensive h… I13        DEFA…        3 <NA>                NA      NA
+#> 5 O10   Pre-existing h… O10        DEFA…        3 <NA>                NA      NA
+#> 6 O11X  Pre-eclampsia … O11        DEFA…        3 <NA>                 1      15
+#> 7 P000  Fetus and newb… P00.0      DEFA…        3 <NA>                NA      NA
+#> # ℹ 4 more variables: MAX_AGE <dbl>, TREE_DESCRIPTION <lgl>, code_type <chr>,
+#> #   preferred_description <lgl>
 ```
 
-See
-[`vignette('codeminer')`](https://codeminer-io.github.io/codeminer/articles/codeminer.md)
-for further details, including how to build a clinical codelist with R
-Shiny using `RunCodelistBuilder()`.
+See the main [codeminer
+vignette](https://codeminer-io.github.io/codeminer/articles/codeminer.html)
+for further details.
 
 ## 🏗️ Development
 
@@ -130,6 +140,34 @@ For more details about R package development and good practices, see the
 
 # Package index
 
+## Clinical codes
+
+Functions for looking up clinical codes and mapping between different
+coding systems.
+
+- [`DESCRIPTION()`](https://codeminer-io.github.io/codeminer/reference/DESCRIPTION.md)
+  : Search for codes that match a description
+- [`CODES()`](https://codeminer-io.github.io/codeminer/reference/CODES.md)
+  [`CODES_LIKE()`](https://codeminer-io.github.io/codeminer/reference/CODES.md)
+  : Look up descriptions for clinical codes
+- [`CHILDREN()`](https://codeminer-io.github.io/codeminer/reference/parent_child_retrieval.md)
+  [`PARENTS()`](https://codeminer-io.github.io/codeminer/reference/parent_child_retrieval.md)
+  [`N_CHILDREN()`](https://codeminer-io.github.io/codeminer/reference/parent_child_retrieval.md)
+  [`N_PARENTS()`](https://codeminer-io.github.io/codeminer/reference/parent_child_retrieval.md)
+  : Retrieve parent or child codes
+- [`ATTRIBUTES_FOR()`](https://codeminer-io.github.io/codeminer/reference/attributes.md)
+  [`HAS_ATTRIBUTES()`](https://codeminer-io.github.io/codeminer/reference/attributes.md)
+  : Get attributes or codes with attributes
+- [`RELATIONSHIP_TYPES_FROM()`](https://codeminer-io.github.io/codeminer/reference/relationship_types.md)
+  [`RELATIONSHIP_TYPES_TO()`](https://codeminer-io.github.io/codeminer/reference/relationship_types.md)
+  : Get relationship types for codes
+- [`MAP()`](https://codeminer-io.github.io/codeminer/reference/MAP.md) :
+  Map clinical codes from one coding system to another
+- [`default_col_filters()`](https://codeminer-io.github.io/codeminer/reference/default_col_filters.md)
+  : Default filtering parameters for lookup and mapping tables.
+- [`get_col_filters()`](https://codeminer-io.github.io/codeminer/reference/get_col_filters.md)
+  : Extract column filters from metadata tables
+
 ## Database management
 
 Build a local database with lookup and mapping tables for various
@@ -159,43 +197,8 @@ clinical coding systems.
   : Add a relationship table to the database
 - [`relationship_metadata()`](https://codeminer-io.github.io/codeminer/reference/relationship_metadata.md)
   : Create relationship metadata
-- [`get_lookup_metadata()`](https://codeminer-io.github.io/codeminer/reference/get_lookup_metadata.md)
-  : Return the lookup metadata table as a data frame
-- [`get_mapping_metadata()`](https://codeminer-io.github.io/codeminer/reference/get_mapping_metadata.md)
-  : Return the mapping metadata table as a data frame
-
-## Clinical codes
-
-Functions for looking up clinical codes and mapping between different
-coding systems.
-
-- [`CODES()`](https://codeminer-io.github.io/codeminer/reference/CODES.md)
-  [`CODES_LIKE()`](https://codeminer-io.github.io/codeminer/reference/CODES.md)
-  : Look up descriptions for clinical codes
-- [`CHILDREN()`](https://codeminer-io.github.io/codeminer/reference/CHILDREN.md)
-  : Get descendents for a code
-- [`get_children_sct()`](https://codeminer-io.github.io/codeminer/reference/get_children_sct.md)
-  : Get children for SNOMED codes
-- [`get_parents_sct()`](https://codeminer-io.github.io/codeminer/reference/get_parents_sct.md)
-  : Get parents for SNOMED codes
-- [`DESCRIPTION()`](https://codeminer-io.github.io/codeminer/reference/DESCRIPTION.md)
-  : Search for codes that match a description
-- [`MAP()`](https://codeminer-io.github.io/codeminer/reference/MAP.md) :
-  Map clinical codes from one coding system to another
-- [`default_col_filters()`](https://codeminer-io.github.io/codeminer/reference/default_col_filters.md)
-  : Default filtering parameters for lookup and mapping tables.
-- [`get_col_filters()`](https://codeminer-io.github.io/codeminer/reference/get_col_filters.md)
-  : Extract column filters from metadata tables
-- [`ATTRIBUTE_TYPES_FROM()`](https://codeminer-io.github.io/codeminer/reference/ATTRIBUTE_TYPES_FROM.md)
-  : Find attribute types that point from a set of codes
-- [`ATTRIBUTE_TYPES_TO()`](https://codeminer-io.github.io/codeminer/reference/ATTRIBUTE_TYPES_TO.md)
-  : Find attribute types that point to a set of codes
-- [`GET_ATTRIBUTES()`](https://codeminer-io.github.io/codeminer/reference/GET_ATTRIBUTES.md)
-  : Get attributes for a set of SNOMED codes
-- [`HAS_ATTRIBUTES()`](https://codeminer-io.github.io/codeminer/reference/HAS_ATTRIBUTES.md)
-  : Get SNOMED codes with a specific set of one or more attributes
-- [`filter_sct_relationship()`](https://codeminer-io.github.io/codeminer/reference/filter_sct_relationship.md)
-  : Filter SNOMED CT relationships based on various criteria
+- [`get_codeminer_metadata()`](https://codeminer-io.github.io/codeminer/reference/get_codeminer_metadata.md)
+  : Get codeminer metadata
 
 ## Dummy data
 

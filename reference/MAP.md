@@ -9,7 +9,8 @@ MAP(
   codes,
   from = getOption("codeminer.map_from"),
   to = getOption("codeminer.map_to"),
-  version = getOption("codeminer.map_version", default = "latest")
+  map_version = getOption("codeminer.map_version", default = "latest"),
+  lookup_version = getOption("codeminer.lookup_version", default = "latest")
 )
 ```
 
@@ -28,9 +29,14 @@ MAP(
 
   Coding system to map `codes` to.
 
-- version:
+- map_version:
 
   Version of the mapping table to use.
+
+- lookup_version:
+
+  character. Version of the lookup table to use. Default: `"latest"`.
+  Can be configured through the `codeminer.lookup_version` option.
 
 ## Value
 
@@ -58,13 +64,8 @@ as most mapping tables only work one way.
 for adding new mapping tables to the codeminer database.
 
 Other Clinical code lookups and mappings:
-[`CHILDREN()`](https://codeminer-io.github.io/codeminer/reference/CHILDREN.md),
 [`CODES()`](https://codeminer-io.github.io/codeminer/reference/CODES.md),
-[`GET_ATTRIBUTES()`](https://codeminer-io.github.io/codeminer/reference/GET_ATTRIBUTES.md),
-[`HAS_ATTRIBUTES()`](https://codeminer-io.github.io/codeminer/reference/HAS_ATTRIBUTES.md),
-[`default_col_filters()`](https://codeminer-io.github.io/codeminer/reference/default_col_filters.md),
-[`get_children_sct()`](https://codeminer-io.github.io/codeminer/reference/get_children_sct.md),
-[`get_parents_sct()`](https://codeminer-io.github.io/codeminer/reference/get_parents_sct.md)
+[`default_col_filters()`](https://codeminer-io.github.io/codeminer/reference/default_col_filters.md)
 
 ## Examples
 
@@ -72,8 +73,9 @@ Other Clinical code lookups and mappings:
 # Set up a temporary dummy database
 temp_db <- tempfile(fileext = ".duckdb")
 create_dummy_database(temp_db)
-#> Creating new database at /tmp/RtmpIG4lZV/file19106282278b.duckdb
+#> Creating new database at /tmp/RtmpE2JCfn/file1c245f5e2b85.duckdb
 #> ✔ Lookup table icd10_v0 added successfully.
+#> ✔ Relationship table icd10_relationship_v0 added successfully.
 #> ✔ Lookup table read3_v0 added successfully.
 #> ✔ Mapping table read3_icd10_v0 added successfully.
 #> ✔ Dummy database ready to use!

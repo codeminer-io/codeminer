@@ -5,7 +5,7 @@ Get the lookup table for the given code type in standardised format
 ## Usage
 
 ``` r
-get_lookup_table(con, code_type, version, call = rlang::caller_env())
+get_lookup_table(con, code_type, lookup_version, call = rlang::caller_env())
 ```
 
 ## Arguments

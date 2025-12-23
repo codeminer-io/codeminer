@@ -19,13 +19,8 @@ A named list.
 ## See also
 
 Other Clinical code lookups and mappings:
-[`CHILDREN()`](https://codeminer-io.github.io/codeminer/reference/CHILDREN.md),
 [`CODES()`](https://codeminer-io.github.io/codeminer/reference/CODES.md),
-[`GET_ATTRIBUTES()`](https://codeminer-io.github.io/codeminer/reference/GET_ATTRIBUTES.md),
-[`HAS_ATTRIBUTES()`](https://codeminer-io.github.io/codeminer/reference/HAS_ATTRIBUTES.md),
-[`MAP()`](https://codeminer-io.github.io/codeminer/reference/MAP.md),
-[`get_children_sct()`](https://codeminer-io.github.io/codeminer/reference/get_children_sct.md),
-[`get_parents_sct()`](https://codeminer-io.github.io/codeminer/reference/get_parents_sct.md)
+[`MAP()`](https://codeminer-io.github.io/codeminer/reference/MAP.md)
 
 ## Examples
 

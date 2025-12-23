@@ -47,19 +47,26 @@ for the specification of the metadata.
 # Using the example ontology data included in codeminer
 lookup_table <- example_ontology$lookup_tables$capital_letters_v3
 lookup_table
-#> # A tibble: 5 × 2
-#>   code  description
-#>   <chr> <chr>      
-#> 1 A     ALPHA      
-#> 2 B     BRAVO      
-#> 3 C     CHARLIE    
-#> 4 D     DELTA      
-#> 5 E     ECHO       
+#> # A tibble: 9 × 2
+#>   code       description    
+#>   <chr>      <chr>          
+#> 1 A          ALPHA          
+#> 2 B          BRAVO          
+#> 3 C          CHARLIE        
+#> 4 D          DELTA          
+#> 5 E          ECHO           
+#> 6 alpha_code Alpha Attribute
+#> 7 beta_code  Beta Attribute 
+#> 8 gamma_code Gamma Attribute
+#> 9 delta_code Delta Attribute
 
 # Using a temporary database
 Sys.setenv(CODEMINER_DB_PATH = tempfile())
 build_database()
-#> Creating new database at /tmp/RtmpIG4lZV/file1910606eb271
-add_lookup_table(lookup_table, lookup_metadata("capital_letters", version = "v3"))
+#> Creating new database at /tmp/RtmpE2JCfn/file1c243cb198fb
+add_lookup_table(
+  lookup_table,
+  lookup_metadata("capital_letters", lookup_version = "v3")
+)
 #> ✔ Lookup table capital_letters_v3 added successfully.
 ```

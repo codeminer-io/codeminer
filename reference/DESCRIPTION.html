@@ -46,7 +46,7 @@
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">DESCRIPTION</span><span class="op">(</span></span>
 <span>  <span class="va">pattern</span>,</span>
 <span>  code_type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"codeminer.code_type"</span><span class="op">)</span>,</span>
-<span>  version <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"codeminer.lookup_version"</span>, default <span class="op">=</span> <span class="st">"latest"</span><span class="op">)</span>,</span>
+<span>  lookup_version <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"codeminer.lookup_version"</span>, default <span class="op">=</span> <span class="st">"latest"</span><span class="op">)</span>,</span>
 <span>  ignore_case <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  codes_only <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  preferred_description_only <span class="op">=</span> <span class="cn">TRUE</span></span>
@@ -67,7 +67,7 @@ Depends on what is available in the lookup tables. See <code><a href="add_lookup
 on how to add new lookup tables. This can also be configured through the <code>codeminer.code_type</code> option.</p></dd>
 
 
-<dt id="arg-version">version<a class="anchor" aria-label="anchor" href="#arg-version"></a></dt>
+<dt id="arg-lookup-version">lookup_version<a class="anchor" aria-label="anchor" href="#arg-lookup-version"></a></dt>
 <dd><p>character. Version of the lookup table to use. Default:
 <code>"latest"</code>. Can be configured through the <code>codeminer.lookup_version</code> option.</p></dd>
 
@@ -97,8 +97,9 @@ Default: <code>FALSE</code>.</p></dd>
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># build dummy database</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="create_dummy_database.html">create_dummy_database</a></span><span class="op">(</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Creating new database at <span style="color: #0000BB;">/tmp/RtmpIG4lZV/file191025ea2aa0.duckdb</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Creating new database at <span style="color: #0000BB;">/tmp/RtmpE2JCfn/file1c24696711b0.duckdb</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Lookup table <span style="color: #00BB00;">icd10_v0</span> added successfully.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Relationship table <span style="color: #00BB00;">icd10_relationship_v0</span> added successfully.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Lookup table <span style="color: #00BB00;">read3_v0</span> added successfully.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Mapping table <span style="color: #00BB00;">read3_icd10_v0</span> added successfully.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Dummy database ready to use!</span>

@@ -10,7 +10,7 @@ table to the database with
 ``` r
 relationship_metadata(
   code_type,
-  version = "v0",
+  relationship_version = "v0",
   ...,
   from_col = "from",
   to_col = "to",
@@ -26,7 +26,7 @@ relationship_metadata(
 
   The type of coding system (e.g., ICD-10, SNOMED-CT)
 
-- version:
+- relationship_version:
 
   The version of the relationship metadata (default: "v0")
 
@@ -68,9 +68,9 @@ A list containing the relationship metadata
 ## Examples
 
 ``` r
-relationship_metadata("SNOMED-CT", version = "2023")
+relationship_metadata("SNOMED-CT", relationship_version = "2023")
 #> $relationship_table_name
-#> [1] "SNOMED-CT_2023"
+#> [1] "SNOMED-CT_relationship_2023"
 #> 
 #> $code_type
 #> [1] "SNOMED-CT"

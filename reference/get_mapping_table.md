@@ -6,7 +6,7 @@ format
 ## Usage
 
 ``` r
-get_mapping_table(con, from, to, version, call = rlang::caller_env())
+get_mapping_table(con, from, to, map_version, call = rlang::caller_env())
 ```
 
 ## Arguments
@@ -23,7 +23,7 @@ get_mapping_table(con, from, to, version, call = rlang::caller_env())
 
   The target code type to map to
 
-- version:
+- map_version:
 
   The version of the mapping table.
 

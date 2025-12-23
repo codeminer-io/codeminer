@@ -28,15 +28,15 @@ table already exists.
 
 ## Details
 
-Relationship tables are indexed by their `code_type` and `version`,
-specified in
+Relationship tables are indexed by their `code_type` and
+`relationship_version`, specified in
 [`relationship_metadata()`](https://codeminer-io.github.io/codeminer/reference/relationship_metadata.md).
 This index needs to be unique and is used to identify the relationship
 table in the database. If a relationship table with the same `code_type`
-and `version` already exists, the function will emit a warning and
-return `FALSE` (invisibly) without any effect. Use a different `version`
-to add a new version of the relationship table for the given
-`code_type`.
+and `relationship_version` already exists, the function will emit a
+warning and return `FALSE` (invisibly) without any effect. Use a
+different `relationship_version` to add a new version of the
+relationship table for the given `code_type`.
 
 ## See also
 
@@ -60,15 +60,17 @@ relationship_table
 # Using a temporary database
 Sys.setenv(CODEMINER_DB_PATH = tempfile())
 build_database()
-#> Creating new database at /tmp/RtmpIG4lZV/file191069378753
+#> Creating new database at /tmp/RtmpE2JCfn/file1c241e23c0db
 add_relationship_table(
   relationship_table,
   relationship_metadata(
-    "test", version = "v1",
+    "test",
+    relationship_version = "v1",
     from_col = "source",
     to_col = "target",
-    type_col = "type"
+    type_col = "type",
+    child_parent_relationship_code = "child"
   )
 )
-#> ✔ Relationship table test_v1 added successfully.
+#> ✔ Relationship table test_relationship_v1 added successfully.
 ```

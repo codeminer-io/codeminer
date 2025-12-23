@@ -8,14 +8,14 @@ Returns a data frame including descriptions for the codes of interest
 CODES(
   codes,
   code_type = getOption("codeminer.code_type"),
-  version = getOption("codeminer.lookup_version", default = "latest"),
+  lookup_version = getOption("codeminer.lookup_version", default = "latest"),
   preferred_description_only = TRUE
 )
 
 CODES_LIKE(
   pattern,
   code_type = getOption("codeminer.code_type"),
-  version = getOption("codeminer.lookup_version", default = "latest"),
+  lookup_version = getOption("codeminer.lookup_version", default = "latest"),
   preferred_description_only = TRUE
 )
 ```
@@ -35,7 +35,7 @@ CODES_LIKE(
   on how to add new lookup tables. This can also be configured through
   the `codeminer.code_type` option.
 
-- version:
+- lookup_version:
 
   character. Version of the lookup table to use. Default: `"latest"`.
   Can be configured through the `codeminer.lookup_version` option.
@@ -64,13 +64,8 @@ The matching is case-insensitive.
 for adding new lookup tables to the database.
 
 Other Clinical code lookups and mappings:
-[`CHILDREN()`](https://codeminer-io.github.io/codeminer/reference/CHILDREN.md),
-[`GET_ATTRIBUTES()`](https://codeminer-io.github.io/codeminer/reference/GET_ATTRIBUTES.md),
-[`HAS_ATTRIBUTES()`](https://codeminer-io.github.io/codeminer/reference/HAS_ATTRIBUTES.md),
 [`MAP()`](https://codeminer-io.github.io/codeminer/reference/MAP.md),
-[`default_col_filters()`](https://codeminer-io.github.io/codeminer/reference/default_col_filters.md),
-[`get_children_sct()`](https://codeminer-io.github.io/codeminer/reference/get_children_sct.md),
-[`get_parents_sct()`](https://codeminer-io.github.io/codeminer/reference/get_parents_sct.md)
+[`default_col_filters()`](https://codeminer-io.github.io/codeminer/reference/default_col_filters.md)
 
 ## Examples
 
@@ -78,8 +73,9 @@ Other Clinical code lookups and mappings:
 # Set up a temporary dummy database
 temp_db <- tempfile(fileext = ".duckdb")
 create_dummy_database(temp_db)
-#> Creating new database at /tmp/RtmpIG4lZV/file191045b16dbb.duckdb
+#> Creating new database at /tmp/RtmpE2JCfn/file1c2473203ec3.duckdb
 #> ✔ Lookup table icd10_v0 added successfully.
+#> ✔ Relationship table icd10_relationship_v0 added successfully.
 #> ✔ Lookup table read3_v0 added successfully.
 #> ✔ Mapping table read3_icd10_v0 added successfully.
 #> ✔ Dummy database ready to use!

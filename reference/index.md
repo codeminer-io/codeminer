@@ -1,5 +1,33 @@
 # Package index
 
+## Clinical codes
+
+Functions for looking up clinical codes and mapping between different
+coding systems.
+
+- [`DESCRIPTION()`](https://codeminer-io.github.io/codeminer/reference/DESCRIPTION.md)
+  : Search for codes that match a description
+- [`CODES()`](https://codeminer-io.github.io/codeminer/reference/CODES.md)
+  [`CODES_LIKE()`](https://codeminer-io.github.io/codeminer/reference/CODES.md)
+  : Look up descriptions for clinical codes
+- [`CHILDREN()`](https://codeminer-io.github.io/codeminer/reference/parent_child_retrieval.md)
+  [`PARENTS()`](https://codeminer-io.github.io/codeminer/reference/parent_child_retrieval.md)
+  [`N_CHILDREN()`](https://codeminer-io.github.io/codeminer/reference/parent_child_retrieval.md)
+  [`N_PARENTS()`](https://codeminer-io.github.io/codeminer/reference/parent_child_retrieval.md)
+  : Retrieve parent or child codes
+- [`ATTRIBUTES_FOR()`](https://codeminer-io.github.io/codeminer/reference/attributes.md)
+  [`HAS_ATTRIBUTES()`](https://codeminer-io.github.io/codeminer/reference/attributes.md)
+  : Get attributes or codes with attributes
+- [`RELATIONSHIP_TYPES_FROM()`](https://codeminer-io.github.io/codeminer/reference/relationship_types.md)
+  [`RELATIONSHIP_TYPES_TO()`](https://codeminer-io.github.io/codeminer/reference/relationship_types.md)
+  : Get relationship types for codes
+- [`MAP()`](https://codeminer-io.github.io/codeminer/reference/MAP.md) :
+  Map clinical codes from one coding system to another
+- [`default_col_filters()`](https://codeminer-io.github.io/codeminer/reference/default_col_filters.md)
+  : Default filtering parameters for lookup and mapping tables.
+- [`get_col_filters()`](https://codeminer-io.github.io/codeminer/reference/get_col_filters.md)
+  : Extract column filters from metadata tables
+
 ## Database management
 
 Build a local database with lookup and mapping tables for various
@@ -29,43 +57,8 @@ clinical coding systems.
   : Add a relationship table to the database
 - [`relationship_metadata()`](https://codeminer-io.github.io/codeminer/reference/relationship_metadata.md)
   : Create relationship metadata
-- [`get_lookup_metadata()`](https://codeminer-io.github.io/codeminer/reference/get_lookup_metadata.md)
-  : Return the lookup metadata table as a data frame
-- [`get_mapping_metadata()`](https://codeminer-io.github.io/codeminer/reference/get_mapping_metadata.md)
-  : Return the mapping metadata table as a data frame
-
-## Clinical codes
-
-Functions for looking up clinical codes and mapping between different
-coding systems.
-
-- [`CODES()`](https://codeminer-io.github.io/codeminer/reference/CODES.md)
-  [`CODES_LIKE()`](https://codeminer-io.github.io/codeminer/reference/CODES.md)
-  : Look up descriptions for clinical codes
-- [`CHILDREN()`](https://codeminer-io.github.io/codeminer/reference/CHILDREN.md)
-  : Get descendents for a code
-- [`get_children_sct()`](https://codeminer-io.github.io/codeminer/reference/get_children_sct.md)
-  : Get children for SNOMED codes
-- [`get_parents_sct()`](https://codeminer-io.github.io/codeminer/reference/get_parents_sct.md)
-  : Get parents for SNOMED codes
-- [`DESCRIPTION()`](https://codeminer-io.github.io/codeminer/reference/DESCRIPTION.md)
-  : Search for codes that match a description
-- [`MAP()`](https://codeminer-io.github.io/codeminer/reference/MAP.md) :
-  Map clinical codes from one coding system to another
-- [`default_col_filters()`](https://codeminer-io.github.io/codeminer/reference/default_col_filters.md)
-  : Default filtering parameters for lookup and mapping tables.
-- [`get_col_filters()`](https://codeminer-io.github.io/codeminer/reference/get_col_filters.md)
-  : Extract column filters from metadata tables
-- [`ATTRIBUTE_TYPES_FROM()`](https://codeminer-io.github.io/codeminer/reference/ATTRIBUTE_TYPES_FROM.md)
-  : Find attribute types that point from a set of codes
-- [`ATTRIBUTE_TYPES_TO()`](https://codeminer-io.github.io/codeminer/reference/ATTRIBUTE_TYPES_TO.md)
-  : Find attribute types that point to a set of codes
-- [`GET_ATTRIBUTES()`](https://codeminer-io.github.io/codeminer/reference/GET_ATTRIBUTES.md)
-  : Get attributes for a set of SNOMED codes
-- [`HAS_ATTRIBUTES()`](https://codeminer-io.github.io/codeminer/reference/HAS_ATTRIBUTES.md)
-  : Get SNOMED codes with a specific set of one or more attributes
-- [`filter_sct_relationship()`](https://codeminer-io.github.io/codeminer/reference/filter_sct_relationship.md)
-  : Filter SNOMED CT relationships based on various criteria
+- [`get_codeminer_metadata()`](https://codeminer-io.github.io/codeminer/reference/get_codeminer_metadata.md)
+  : Get codeminer metadata
 
 ## Dummy data
 

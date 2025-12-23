@@ -28,12 +28,12 @@ already exists.
 ## Details
 
 Mapping tables are indexed by the combination of `from_code_type`,
-`to_code_type`, and `version`, specified in
+`to_code_type`, and `map_version`, specified in
 [`mapping_metadata()`](https://codeminer-io.github.io/codeminer/reference/mapping_metadata.md).
 This index needs to be unique and is used to identify the mapping table
 in the database. If a mapping table with the same index already exists,
 the function will emit a warning and return `FALSE` (invisibly) without
-any effect. Use a different `version` to add a new version of the
+any effect. Use a different `map_version` to add a new version of the
 mapping table.
 
 ## See also
@@ -59,7 +59,7 @@ mapping_table
 # Using a temporary database
 Sys.setenv(CODEMINER_DB_PATH = tempfile())
 build_database()
-#> Creating new database at /tmp/RtmpIG4lZV/file191042117a92
-add_mapping_table(mapping_table, mapping_metadata("capital", "lowercase", version = "v3"))
+#> Creating new database at /tmp/RtmpE2JCfn/file1c2416ae1797
+add_mapping_table(mapping_table, mapping_metadata("capital", "lowercase", map_version = "v3"))
 #> ✔ Mapping table capital_lowercase_v3 added successfully.
 ```

@@ -11,7 +11,7 @@ the database with
 mapping_metadata(
   from_code_type,
   to_code_type,
-  version = "v0",
+  map_version = "v0",
   ...,
   from_col = "from",
   to_col = "to"
@@ -30,7 +30,7 @@ mapping_metadata(
   The type of coding system for the target codes (e.g., ICD-10,
   SNOMED-CT)
 
-- version:
+- map_version:
 
   The version of the mapping metadata (default: "v0")
 
@@ -57,7 +57,7 @@ A list containing the mapping metadata
 ## Examples
 
 ``` r
-mapping_metadata("ICD-10", "SNOMED-CT", version = "2023")
+mapping_metadata("ICD-10", "SNOMED-CT", map_version = "2023")
 #> $mapping_table_name
 #> [1] "ICD-10_SNOMED-CT_2023"
 #> 
@@ -67,7 +67,7 @@ mapping_metadata("ICD-10", "SNOMED-CT", version = "2023")
 #> $to_code_type
 #> [1] "SNOMED-CT"
 #> 
-#> $mapping_version
+#> $map_version
 #> [1] "2023"
 #> 
 #> $from_col

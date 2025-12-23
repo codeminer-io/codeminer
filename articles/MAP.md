@@ -13,8 +13,9 @@ library(dplyr)
 #>     intersect, setdiff, setequal, union
 
 create_dummy_database()
-#> Creating new database at /tmp/RtmpX0x9gF/file1e124144d43.duckdb
+#> Creating new database at /tmp/RtmpuQLQoo/file219e436c4df1.duckdb
 #> ✔ Lookup table icd10_v0 added successfully.
+#> ✔ Relationship table icd10_relationship_v0 added successfully.
 #> ✔ Lookup table read3_v0 added successfully.
 #> ✔ Mapping table read3_icd10_v0 added successfully.
 #> ✔ Dummy database ready to use!
@@ -26,7 +27,8 @@ Use [`MAP()`](https://codeminer-io.github.io/codeminer/reference/MAP.md)
 to map a vector of codes from one clinical coding system to another:
 
 ``` r
-MAP(codes = "X40J4", from = "read3", to = "icd10", version = "v0")
+MAP(codes = "X40J4", from = "read3", to = "icd10", map_version = "v0")
+#> ℹ Using 'v0' as latest version
 #> # A tibble: 2 × 12
 #>   code  description     ICD10_CODE USAGE USAGE_UK QUALIFIERS GENDER_MASK MIN_AGE
 #>   <chr> <chr>           <chr>      <chr>    <dbl> <chr>            <dbl>   <dbl>
@@ -66,7 +68,7 @@ mapping.[¹](#fn1) For example, the Read 3 to ICD10 mapping table
 includes `mapping_status` and `refine_flag` columns:
 
 ``` r
-MAP("all", from = "read3", to = "icd10") |> 
+MAP("all", from = "read3", to = "icd10") |>
   filter(from == "XaIP9")
 #> ℹ Using 'v0' as latest version
 #> # A tibble: 5 × 7
@@ -85,7 +87,7 @@ map to a number of ICD10 codes, some of which are sex-specific (‘N508’
 and ‘N948’):
 
 ``` r
-MAP("XaIP9", from = "read3", to = "icd10") |> 
+MAP("XaIP9", from = "read3", to = "icd10") |>
   filter(!is.na(GENDER_MASK))
 #> ℹ Using 'v0' as latest version
 #> ℹ Using 'v0' as latest version

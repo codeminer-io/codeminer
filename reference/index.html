@@ -36,6 +36,71 @@
     </div>
 
     <div class="section level2">
+      <h2 id="clinical-codes">Clinical codes<a class="anchor" aria-label="anchor" href="#clinical-codes"></a></h2>
+
+      <div class="section-desc"><p>Functions for looking up clinical codes and mapping between different coding systems.</p></div>
+
+      <dl></dl></div><div class="section level2">
+
+
+
+
+      <dl><dt>
+
+          <code><a href="DESCRIPTION.html">DESCRIPTION()</a></code>
+
+        </dt>
+        <dd>Search for codes that match a description</dd>
+
+        <dt>
+
+          <code><a href="CODES.html">CODES()</a></code> <code><a href="CODES.html">CODES_LIKE()</a></code>
+
+        </dt>
+        <dd>Look up descriptions for clinical codes</dd>
+
+        <dt>
+
+          <code><a href="parent_child_retrieval.html">CHILDREN()</a></code> <code><a href="parent_child_retrieval.html">PARENTS()</a></code> <code><a href="parent_child_retrieval.html">N_CHILDREN()</a></code> <code><a href="parent_child_retrieval.html">N_PARENTS()</a></code>
+
+        </dt>
+        <dd>Retrieve parent or child codes</dd>
+
+        <dt>
+
+          <code><a href="attributes.html">ATTRIBUTES_FOR()</a></code> <code><a href="attributes.html">HAS_ATTRIBUTES()</a></code>
+
+        </dt>
+        <dd>Get attributes or codes with attributes</dd>
+
+        <dt>
+
+          <code><a href="relationship_types.html">RELATIONSHIP_TYPES_FROM()</a></code> <code><a href="relationship_types.html">RELATIONSHIP_TYPES_TO()</a></code>
+
+        </dt>
+        <dd>Get relationship types for codes</dd>
+
+        <dt>
+
+          <code><a href="MAP.html">MAP()</a></code>
+
+        </dt>
+        <dd>Map clinical codes from one coding system to another</dd>
+
+        <dt>
+
+          <code><a href="default_col_filters.html">default_col_filters()</a></code>
+
+        </dt>
+        <dd>Default filtering parameters for lookup and mapping tables.</dd>
+
+        <dt>
+
+          <code><a href="get_col_filters.html">get_col_filters()</a></code>
+
+        </dt>
+        <dd>Extract column filters from metadata tables</dd>
+      </dl></div><div class="section level2">
       <h2 id="database-management">Database management<a class="anchor" aria-label="anchor" href="#database-management"></a></h2>
 
       <div class="section-desc"><p>Build a local database with lookup and mapping tables for various clinical coding systems.</p></div>
@@ -131,117 +196,10 @@
 
         <dt>
 
-          <code><a href="get_lookup_metadata.html">get_lookup_metadata()</a></code>
+          <code><a href="get_codeminer_metadata.html">get_codeminer_metadata()</a></code>
 
         </dt>
-        <dd>Return the lookup metadata table as a data frame</dd>
-
-        <dt>
-
-          <code><a href="get_mapping_metadata.html">get_mapping_metadata()</a></code>
-
-        </dt>
-        <dd>Return the mapping metadata table as a data frame</dd>
-      </dl></div><div class="section level2">
-      <h2 id="clinical-codes">Clinical codes<a class="anchor" aria-label="anchor" href="#clinical-codes"></a></h2>
-
-      <div class="section-desc"><p>Functions for looking up clinical codes and mapping between different coding systems.</p></div>
-
-      <dl></dl></div><div class="section level2">
-
-
-
-
-      <dl><dt>
-
-          <code><a href="CODES.html">CODES()</a></code> <code><a href="CODES.html">CODES_LIKE()</a></code>
-
-        </dt>
-        <dd>Look up descriptions for clinical codes</dd>
-
-        <dt>
-
-          <code><a href="CHILDREN.html">CHILDREN()</a></code>
-
-        </dt>
-        <dd>Get descendents for a code</dd>
-
-        <dt>
-
-          <code><a href="get_children_sct.html">get_children_sct()</a></code>
-
-        </dt>
-        <dd>Get children for SNOMED codes</dd>
-
-        <dt>
-
-          <code><a href="get_parents_sct.html">get_parents_sct()</a></code>
-
-        </dt>
-        <dd>Get parents for SNOMED codes</dd>
-
-        <dt>
-
-          <code><a href="DESCRIPTION.html">DESCRIPTION()</a></code>
-
-        </dt>
-        <dd>Search for codes that match a description</dd>
-
-        <dt>
-
-          <code><a href="MAP.html">MAP()</a></code>
-
-        </dt>
-        <dd>Map clinical codes from one coding system to another</dd>
-
-        <dt>
-
-          <code><a href="default_col_filters.html">default_col_filters()</a></code>
-
-        </dt>
-        <dd>Default filtering parameters for lookup and mapping tables.</dd>
-
-        <dt>
-
-          <code><a href="get_col_filters.html">get_col_filters()</a></code>
-
-        </dt>
-        <dd>Extract column filters from metadata tables</dd>
-
-        <dt>
-
-          <code><a href="ATTRIBUTE_TYPES_FROM.html">ATTRIBUTE_TYPES_FROM()</a></code>
-
-        </dt>
-        <dd>Find attribute types that point from a set of codes</dd>
-
-        <dt>
-
-          <code><a href="ATTRIBUTE_TYPES_TO.html">ATTRIBUTE_TYPES_TO()</a></code>
-
-        </dt>
-        <dd>Find attribute types that point to a set of codes</dd>
-
-        <dt>
-
-          <code><a href="GET_ATTRIBUTES.html">GET_ATTRIBUTES()</a></code>
-
-        </dt>
-        <dd>Get attributes for a set of SNOMED codes</dd>
-
-        <dt>
-
-          <code><a href="HAS_ATTRIBUTES.html">HAS_ATTRIBUTES()</a></code>
-
-        </dt>
-        <dd>Get SNOMED codes with a specific set of one or more attributes</dd>
-
-        <dt>
-
-          <code><a href="filter_sct_relationship.html">filter_sct_relationship()</a></code>
-
-        </dt>
-        <dd>Filter SNOMED CT relationships based on various criteria</dd>
+        <dd>Get codeminer metadata</dd>
       </dl></div><div class="section level2">
       <h2 id="dummy-data">Dummy data<a class="anchor" aria-label="anchor" href="#dummy-data"></a></h2>
 

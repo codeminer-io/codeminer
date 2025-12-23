@@ -78,8 +78,9 @@
 <span><span class="co">#&gt;     intersect, setdiff, setequal, union</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/create_dummy_database.html">create_dummy_database</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Creating new database at <span style="color: #0000BB;">/tmp/RtmpX0x9gF/file1e124144d43.duckdb</span></span></span>
+<span><span class="co">#&gt; Creating new database at <span style="color: #0000BB;">/tmp/RtmpuQLQoo/file219e436c4df1.duckdb</span></span></span>
 <span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Lookup table <span style="color: #00BB00;">icd10_v0</span> added successfully.</span></span>
+<span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Relationship table <span style="color: #00BB00;">icd10_relationship_v0</span> added successfully.</span></span>
 <span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Lookup table <span style="color: #00BB00;">read3_v0</span> added successfully.</span></span>
 <span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Mapping table <span style="color: #00BB00;">read3_icd10_v0</span> added successfully.</span></span>
 <span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Dummy database ready to use!</span></span></code></pre></div>
@@ -89,7 +90,8 @@
 <p>Use <code><a href="../reference/MAP.html">MAP()</a></code> to map a vector of codes from one clinical
 coding system to another:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/MAP.html">MAP</a></span><span class="op">(</span>codes <span class="op">=</span> <span class="st">"X40J4"</span>, from <span class="op">=</span> <span class="st">"read3"</span>, to <span class="op">=</span> <span class="st">"icd10"</span>, version <span class="op">=</span> <span class="st">"v0"</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/MAP.html">MAP</a></span><span class="op">(</span>codes <span class="op">=</span> <span class="st">"X40J4"</span>, from <span class="op">=</span> <span class="st">"read3"</span>, to <span class="op">=</span> <span class="st">"icd10"</span>, map_version <span class="op">=</span> <span class="st">"v0"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Using 'v0' as latest version</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 2 × 12</span></span></span>
 <span><span class="co">#&gt;   code  description     ICD10_CODE USAGE USAGE_UK QUALIFIERS GENDER_MASK MIN_AGE</span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
@@ -126,7 +128,7 @@ code mappings, with a separate column indicating the type of mapping.<a class="f
 example, the Read 3 to ICD10 mapping table includes
 <code>mapping_status</code> and <code>refine_flag</code> columns:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/MAP.html">MAP</a></span><span class="op">(</span><span class="st">"all"</span>, from <span class="op">=</span> <span class="st">"read3"</span>, to <span class="op">=</span> <span class="st">"icd10"</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/MAP.html">MAP</a></span><span class="op">(</span><span class="st">"all"</span>, from <span class="op">=</span> <span class="st">"read3"</span>, to <span class="op">=</span> <span class="st">"icd10"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">from</span> <span class="op">==</span> <span class="st">"XaIP9"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Using 'v0' as latest version</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 5 × 7</span></span></span>
@@ -142,7 +144,7 @@ no filters are applied then the Read 3 code for sebaceous cyst ‘XaIP9’
 will map to a number of ICD10 codes, some of which are sex-specific
 (‘N508’ and ‘N948’):</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/MAP.html">MAP</a></span><span class="op">(</span><span class="st">"XaIP9"</span>, from <span class="op">=</span> <span class="st">"read3"</span>, to <span class="op">=</span> <span class="st">"icd10"</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/MAP.html">MAP</a></span><span class="op">(</span><span class="st">"XaIP9"</span>, from <span class="op">=</span> <span class="st">"read3"</span>, to <span class="op">=</span> <span class="st">"icd10"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">GENDER_MASK</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Using 'v0' as latest version</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Using 'v0' as latest version</span></span>

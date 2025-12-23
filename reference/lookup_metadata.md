@@ -10,7 +10,7 @@ database with
 ``` r
 lookup_metadata(
   code_type,
-  version = "v0",
+  lookup_version = "v0",
   ...,
   lookup_code_col = "code",
   lookup_description_col = "description",
@@ -26,7 +26,7 @@ lookup_metadata(
 
   The type of coding system (e.g., ICD-10, SNOMED-CT)
 
-- version:
+- lookup_version:
 
   The version of the lookup metadata (default: "v0")
 
@@ -68,7 +68,7 @@ A list containing the lookup metadata
 ## Examples
 
 ``` r
-lookup_metadata("ICD-10", version = "2023")
+lookup_metadata("ICD-10", lookup_version = "2023")
 #> $lookup_table_name
 #> [1] "ICD-10_2023"
 #> 

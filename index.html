@@ -74,35 +74,46 @@
 <p>First, build a local resource containing lookup and mapping tables for various clinical codings systems. A dummy dataset is used here:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/codeminer-io/codeminer" class="external-link">codeminer</a></span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">all_lkps_maps_dummy</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/build_all_lkps_maps_dummy.html">build_all_lkps_maps_dummy</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="reference/create_dummy_database.html">create_dummy_database</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; ℹ Creating new database at '/var/folders/9z/4rs_sqvj38n8b02wv8p4j77h0000gn/T//RtmppmCOJL/file16e0e4fff8db0.duckdb'</span></span>
+<span><span class="co">#&gt; ✔ Lookup table icd10_v0 added successfully.</span></span>
+<span><span class="co">#&gt; ✔ Lookup table read3_v0 added successfully.</span></span>
+<span><span class="co">#&gt; ✔ Mapping table read3_icd10_v0 added successfully.</span></span>
+<span><span class="co">#&gt; ✔ Dummy database ready to use!</span></span></code></pre></div>
 <p>Look up Read 2 codes for hypertension:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">htn_read2</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/DESCRIPTION.html">DESCRIPTION</a></span><span class="op">(</span><span class="st">"Hypertension"</span>,</span>
-<span>  code_type <span class="op">=</span> <span class="st">"read2"</span>,</span>
-<span>  all_lkps_maps <span class="op">=</span> <span class="va">all_lkps_maps_dummy</span></span>
-<span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">htn_read2</span></span>
-<span><span class="co">#&gt; # A tibble: 1 × 3</span></span>
-<span><span class="co">#&gt;   code  description            code_type</span></span>
-<span><span class="co">#&gt;   &lt;chr&gt; &lt;chr&gt;                  &lt;chr&gt;    </span></span>
-<span><span class="co">#&gt; 1 G20.. Essential hypertension read2</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">htn_read3</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/DESCRIPTION.html">DESCRIPTION</a></span><span class="op">(</span><span class="st">"Hypertension"</span>, code_type <span class="op">=</span> <span class="st">"read3"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; ℹ Using 'v0' as latest version</span></span>
+<span><span class="co">#&gt; ℹ Using 'v0' as latest version</span></span>
+<span><span class="va">htn_read3</span></span>
+<span><span class="co">#&gt; # A tibble: 1 × 5</span></span>
+<span><span class="co">#&gt;   code  description            preferred_description status code_type</span></span>
+<span><span class="co">#&gt;   &lt;chr&gt; &lt;chr&gt;                  &lt;lgl&gt;                 &lt;chr&gt;  &lt;chr&gt;    </span></span>
+<span><span class="co">#&gt; 1 XE0Uc Essential hypertension TRUE                  C      read3</span></span></code></pre></div>
 <p>Map these to ICD10:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">htn_icd10</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/MAP.html">MAP</a></span><span class="op">(</span></span>
-<span>  codes <span class="op">=</span> <span class="va">htn_read2</span><span class="op">$</span><span class="va">code</span>,</span>
-<span>  from <span class="op">=</span> <span class="st">"read2"</span>,</span>
-<span>  to <span class="op">=</span> <span class="st">"icd10"</span>,</span>
-<span>  all_lkps_maps <span class="op">=</span> <span class="va">all_lkps_maps_dummy</span></span>
+<span>  codes <span class="op">=</span> <span class="va">htn_read3</span><span class="op">$</span><span class="va">code</span>,</span>
+<span>  from <span class="op">=</span> <span class="st">"read3"</span>,</span>
+<span>  to <span class="op">=</span> <span class="st">"icd10"</span></span>
 <span><span class="op">)</span></span>
+<span><span class="co">#&gt; ℹ Using 'v0' as latest version</span></span>
+<span><span class="co">#&gt; ℹ Using 'v0' as latest version</span></span>
 <span></span>
 <span><span class="va">htn_icd10</span></span>
-<span><span class="co">#&gt; # A tibble: 1 × 3</span></span>
-<span><span class="co">#&gt;   code  description                      code_type</span></span>
-<span><span class="co">#&gt;   &lt;chr&gt; &lt;chr&gt;                            &lt;chr&gt;    </span></span>
-<span><span class="co">#&gt; 1 I10X  Essential (primary) hypertension icd10</span></span></code></pre></div>
-<p>See <code><a href="articles/codeminer.html">vignette('codeminer')</a></code> for further details, including how to build a clinical codelist with R Shiny using <code>RunCodelistBuilder()</code>.</p>
+<span><span class="co">#&gt; # A tibble: 7 × 12</span></span>
+<span><span class="co">#&gt;   code  description     ICD10_CODE USAGE USAGE_UK QUALIFIERS GENDER_MASK MIN_AGE</span></span>
+<span><span class="co">#&gt;   &lt;chr&gt; &lt;chr&gt;           &lt;chr&gt;      &lt;chr&gt;    &lt;dbl&gt; &lt;chr&gt;            &lt;dbl&gt;   &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt; 1 I10X  Essential (pri… I10        DEFA…        3 &lt;NA&gt;                NA      NA</span></span>
+<span><span class="co">#&gt; 2 I11   Hypertensive h… I11        DEFA…        3 &lt;NA&gt;                NA      NA</span></span>
+<span><span class="co">#&gt; 3 I12   Hypertensive r… I12        DEFA…        3 &lt;NA&gt;                NA      NA</span></span>
+<span><span class="co">#&gt; 4 I13   Hypertensive h… I13        DEFA…        3 &lt;NA&gt;                NA      NA</span></span>
+<span><span class="co">#&gt; 5 O10   Pre-existing h… O10        DEFA…        3 &lt;NA&gt;                NA      NA</span></span>
+<span><span class="co">#&gt; 6 O11X  Pre-eclampsia … O11        DEFA…        3 &lt;NA&gt;                 1      15</span></span>
+<span><span class="co">#&gt; 7 P000  Fetus and newb… P00.0      DEFA…        3 &lt;NA&gt;                NA      NA</span></span>
+<span><span class="co">#&gt; # ℹ 4 more variables: MAX_AGE &lt;dbl&gt;, TREE_DESCRIPTION &lt;lgl&gt;, code_type &lt;chr&gt;,</span></span>
+<span><span class="co">#&gt; #   preferred_description &lt;lgl&gt;</span></span></code></pre></div>
+<p>See the main <a href="https://codeminer-io.github.io/codeminer/articles/codeminer.html">codeminer vignette</a> for further details.</p>
 </div>
 <div class="section level2">
 <h2 id="id_️-development">🏗️ Development<a class="anchor" aria-label="anchor" href="#id_%EF%B8%8F-development"></a>

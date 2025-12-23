@@ -9,7 +9,7 @@ description pattern.
 DESCRIPTION(
   pattern,
   code_type = getOption("codeminer.code_type"),
-  version = getOption("codeminer.lookup_version", default = "latest"),
+  lookup_version = getOption("codeminer.lookup_version", default = "latest"),
   ignore_case = TRUE,
   codes_only = FALSE,
   preferred_description_only = TRUE
@@ -32,7 +32,7 @@ DESCRIPTION(
   on how to add new lookup tables. This can also be configured through
   the `codeminer.code_type` option.
 
-- version:
+- lookup_version:
 
   character. Version of the lookup table to use. Default: `"latest"`.
   Can be configured through the `codeminer.lookup_version` option.
@@ -64,8 +64,9 @@ for codes that match the description, or a character vector of codes if
 ``` r
 # build dummy database
 create_dummy_database()
-#> Creating new database at /tmp/RtmpIG4lZV/file191025ea2aa0.duckdb
+#> Creating new database at /tmp/RtmpE2JCfn/file1c24696711b0.duckdb
 #> ✔ Lookup table icd10_v0 added successfully.
+#> ✔ Relationship table icd10_relationship_v0 added successfully.
 #> ✔ Lookup table read3_v0 added successfully.
 #> ✔ Mapping table read3_icd10_v0 added successfully.
 #> ✔ Dummy database ready to use!

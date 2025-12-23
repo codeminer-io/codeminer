@@ -1,8 +1,8 @@
 # Example ontology data
 
-An example ontology dataset consisting of a structured list of lookup
-and mapping tables, and their associated metadata across multiple
-versions.
+An example ontology dataset consisting of a structured list of lookup,
+mapping, and relationship tables, and their associated metadata across
+multiple versions.
 
 ## Usage
 
@@ -25,4 +25,11 @@ A list with the following structure:
 
 - `mapping_metadata` - Mapping metadata data frame
 
-Each category contains versions v1, v2, and v3.
+- `relationship_tables` - List of relationship data frames
+  (capital_letters_relationship)
+
+- `relationship_metadata` - Relationship metadata data frame
+
+Each category contains versions v1, v2, and v3. The relationship tables
+include both hierarchical relationships ("is a") and attribute
+relationships ("has attribute").

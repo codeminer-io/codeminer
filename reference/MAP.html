@@ -47,7 +47,8 @@
 <span>  <span class="va">codes</span>,</span>
 <span>  from <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"codeminer.map_from"</span><span class="op">)</span>,</span>
 <span>  to <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"codeminer.map_to"</span><span class="op">)</span>,</span>
-<span>  version <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"codeminer.map_version"</span>, default <span class="op">=</span> <span class="st">"latest"</span><span class="op">)</span></span>
+<span>  map_version <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"codeminer.map_version"</span>, default <span class="op">=</span> <span class="st">"latest"</span><span class="op">)</span>,</span>
+<span>  lookup_version <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"codeminer.lookup_version"</span>, default <span class="op">=</span> <span class="st">"latest"</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -67,8 +68,13 @@
 <dd><p>Coding system to map <code>codes</code> to.</p></dd>
 
 
-<dt id="arg-version">version<a class="anchor" aria-label="anchor" href="#arg-version"></a></dt>
+<dt id="arg-map-version">map_version<a class="anchor" aria-label="anchor" href="#arg-map-version"></a></dt>
 <dd><p>Version of the mapping table to use.</p></dd>
+
+
+<dt id="arg-lookup-version">lookup_version<a class="anchor" aria-label="anchor" href="#arg-lookup-version"></a></dt>
+<dd><p>character. Version of the lookup table to use. Default:
+<code>"latest"</code>. Can be configured through the <code>codeminer.lookup_version</code> option.</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -87,13 +93,8 @@ as most mapping tables only work one way.</p>
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
     <div class="dont-index"><p><code><a href="add_mapping_table.html">add_mapping_table()</a></code> for adding new mapping tables to the codeminer database.</p>
 <p>Other Clinical code lookups and mappings:
-<code><a href="CHILDREN.html">CHILDREN()</a></code>,
 <code><a href="CODES.html">CODES()</a></code>,
-<code><a href="GET_ATTRIBUTES.html">GET_ATTRIBUTES()</a></code>,
-<code><a href="HAS_ATTRIBUTES.html">HAS_ATTRIBUTES()</a></code>,
-<code><a href="default_col_filters.html">default_col_filters()</a></code>,
-<code><a href="get_children_sct.html">get_children_sct()</a></code>,
-<code><a href="get_parents_sct.html">get_parents_sct()</a></code></p></div>
+<code><a href="default_col_filters.html">default_col_filters()</a></code></p></div>
     </div>
 
     <div class="section level2">
@@ -101,8 +102,9 @@ as most mapping tables only work one way.</p>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># Set up a temporary dummy database</span></span></span>
 <span class="r-in"><span><span class="va">temp_db</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span>fileext <span class="op">=</span> <span class="st">".duckdb"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="create_dummy_database.html">create_dummy_database</a></span><span class="op">(</span><span class="va">temp_db</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Creating new database at <span style="color: #0000BB;">/tmp/RtmpIG4lZV/file19106282278b.duckdb</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Creating new database at <span style="color: #0000BB;">/tmp/RtmpE2JCfn/file1c245f5e2b85.duckdb</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Lookup table <span style="color: #00BB00;">icd10_v0</span> added successfully.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Relationship table <span style="color: #00BB00;">icd10_relationship_v0</span> added successfully.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Lookup table <span style="color: #00BB00;">read3_v0</span> added successfully.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Mapping table <span style="color: #00BB00;">read3_icd10_v0</span> added successfully.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Dummy database ready to use!</span>
