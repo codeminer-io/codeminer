@@ -1,6 +1,6 @@
-lookup_metadata_name <- "_lookup_metadata"
-mapping_metadata_name <- "_mapping_metadata"
-relationship_metadata_name <- "_relationship_metadata"
+lookup_metadata_name <- codeminer_metadata_table_names$lookup
+mapping_metadata_name <- codeminer_metadata_table_names$mapping
+relationship_metadata_name <- codeminer_metadata_table_names$relationship
 
 test_that("db_path() returns correct path based on environment variable", {
   custom_path <- "/tmp/test_db.duckdb"
