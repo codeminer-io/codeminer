@@ -50,10 +50,22 @@ read_ukb_resource_592 <- function(
     }
   }
 
+  if ("read_v2_icd10" %in% sheets) {
+    required <- c("icd10_lkp")
+    missing <- setdiff(required, sheets)
+    if (length(missing) > 0) {
+      sheets <- unique(c(sheets, missing))
+      cli::cli_inform(
+        "Adding {.field {missing}} (required for extending {.field read_v2_icd10})"
+      )
+    }
+  }
+
   # read selected sheets
   cli::cli_inform(
     "Reading {length(sheets)} selected table{?s} from UKB Resource 592"
   )
+
   result <- sheets |>
     purrr::set_names() |>
     purrr::map(
@@ -68,6 +80,9 @@ read_ukb_resource_592 <- function(
       .progress = TRUE
     )
 
+  # Force new line after progress bar
+  cli::cli_inform("")
+
   # Post-process: extend read_v2_drugs_bnf if all required tables are present
   if (
     all(
@@ -78,6 +93,14 @@ read_ukb_resource_592 <- function(
       "Extending {.field read_v2_drugs_bnf} with BNF hierarchy and descriptions"
     )
     result$read_v2_drugs_bnf <- extend_read_v2_drugs_bnf_from_ukb592(result)
+  }
+
+  # Post-process: extend read_v2_icd10 if all required tables are present
+  if (all(c("read_v2_icd10", "icd10_lkp") %in% names(result))) {
+    cli::cli_inform(
+      "Extending {.field read_v2_icd10} by expanding ICD-10 code ranges"
+    )
+    result$read_v2_icd10 <- extend_read_v2_icd10_from_ukb592(result)
   }
 
   result
@@ -638,6 +661,24 @@ process_read_ctv3_icd9 <- function(.df, ukb_version, ukb_source) {
 }
 
 process_read_ctv3_icd10 <- function(.df, ukb_version, ukb_source) {
+  # Remove 'D' and 'A' from the ends of ICD10 codes, and separate these into a
+  # separate column called `icd10_dagger_asterisk`. The 'D' and 'A' indicate
+  # whether the code is a 'dagger' or 'asterisk' respectively. However, these
+  # codes are listed without the appended 'D'/'A' in the `icd10_lkp` table.
+  .df <- .df |>
+    dplyr::mutate(
+      "icd10_dagger_asterisk" = stringr::str_extract(
+        .data[["icd10_code"]],
+        pattern = icd10_dxa_pattern()
+      )
+    ) |>
+    dplyr::mutate(
+      "icd10_code" = stringr::str_remove(
+        .data[["icd10_code"]],
+        pattern = icd10_dxa_pattern()
+      )
+    )
+
   list(
     mapping = list(
       table = .df,
@@ -773,6 +814,146 @@ extend_read_v2_drugs_bnf_from_ukb592 <- function(ukb592_result) {
 }
 
 
+#' Extend read_v2_icd10 mapping table by expanding ICD-10 code ranges
+#'
+#' Converts values in the `icd10_code` column to 'ALT_CODE' format ICD10 codes
+#' that are recognized in the `icd10_lkp` lookup table. This involves dividing
+#' cells containing more than one ICD10 code over multiple rows (e.g.
+#' 'A414+J038' becomes 2 rows), and removing appended 'D'/'A' characters (which
+#' indicate dagger/asterisk codes) to a separate column called
+#' `icd10_dagger_asterisk` (e.g.'A010D I398A' becomes 'A010' and 'I398' under
+#' `icd10_code`, with 'D' and 'A' recorded under `icd10_dagger_asterisk`).
+#'
+#' **NOTE:** A number of undivided 3 character ICD10 codes appear (incorrectly)
+#' without an 'X' appended in this mapping table. For example, 'A64X' appears
+#' (incorrectly) as 'A50-A64' in 2 rows. 'A65X' appears as 'A65-A69', 'A70X' as
+#' 'A70-A74', 'A89X' as 'A80-A89', 'A99X' as 'A92-A99' etc. This function
+#' appends 'X' to these codes to match how they appear in the `icd10_lkp` table.
+#'
+#' @param ukb592_result Named list of results from read_ukb_resource_592, must
+#'   contain `read_v2_icd10` and `icd10_lkp`.
+#'
+#' @return Extended mapping table with same structure as input but with
+#'   expanded and cleaned ICD-10 codes.
+#' @noRd
+extend_read_v2_icd10_from_ukb592 <- function(ukb592_result) {
+  # Extract the mapping table
+  read_v2_icd10 <- ukb592_result$read_v2_icd10$mapping$table
+
+  # Extract the lookup table
+  icd10_lkp <- ukb592_result$icd10_lkp$lookup$table
+
+  # replace spaces and '+' with commas
+  .df <- read_v2_icd10 |>
+    dplyr::mutate(
+      "icd10_code" = stringr::str_replace_all(
+        .data[["icd10_code"]],
+        pattern = "[\\s|\\+]",
+        replacement = ","
+      )
+    )
+
+  # split by comma, then unnest
+  .df <- .df |>
+    dplyr::mutate(
+      "icd10_code" = stringr::str_split(.data[["icd10_code"]], pattern = ",")
+    ) |>
+    tidyr::unnest(cols = "icd10_code")
+
+  # remove 'D' and 'A' final characters from ICD10 codes, and place in separate
+  # column `icd10_dagger_asterisk`
+  .df <- .df |>
+    dplyr::mutate(
+      "icd10_dagger_asterisk" = stringr::str_extract(
+        .data[["icd10_code"]],
+        pattern = icd10_dxa_pattern()
+      )
+    ) |>
+    dplyr::mutate(
+      "icd10_code" = stringr::str_remove(
+        .data[["icd10_code"]],
+        pattern = icd10_dxa_pattern()
+      )
+    )
+
+  # expand icd10 code ranges, which are flagged as '2' under `icd10_code_def`
+  # (e.g. 'E100-E109')
+  .df <- .df |>
+    tidyr::separate(
+      .data[["icd10_code"]],
+      into = c("start_icd10_code", "end_icd10_code"),
+      sep = "-",
+      remove = FALSE,
+      fill = "right"
+    ) |>
+    dplyr::mutate(
+      "start_icd10_code" = dplyr::if_else(
+        is.na(.data[["end_icd10_code"]]),
+        true = NA_character_,
+        false = .data[["start_icd10_code"]]
+      )
+    )
+
+  # strip any appended 'D/X/A' (last character(s) e.g. 'A89X' and 'A170D' become
+  # 'A89' and 'A170'. 'G01XA' would become 'G01', although note that this code
+  # does not appear together with a '-')
+  .df <- .df |>
+    dplyr::mutate(dplyr::across(
+      tidyselect::all_of(c(
+        "start_icd10_code",
+        "end_icd10_code"
+      )),
+      \(.x) {
+        stringr::str_remove(
+          .x,
+          pattern = icd10_dxa_pattern()
+        )
+      }
+    ))
+
+  # expand ranges
+  extended_table <- .df |>
+    dplyr::rowwise() |>
+    dplyr::mutate(
+      icd10_range_new = ifelse(
+        is.na(.data[["start_icd10_code"]]),
+        yes = list(NA_character_),
+        no = list(
+          expand_icd10_code_range(
+            start_icd10_code = .data[["start_icd10_code"]],
+            end_icd10_code = .data[["end_icd10_code"]],
+            icd10_lkp = icd10_lkp
+          )
+        )
+      )
+    ) |>
+    dplyr::ungroup() |>
+    tidyr::unnest(cols = "icd10_range_new") |>
+    dplyr::mutate(
+      "icd10_code" = ifelse(
+        is.na(.data[["icd10_range_new"]]),
+        yes = .data[["icd10_code"]],
+        no = .data[["icd10_range_new"]]
+      )
+    ) |>
+    dplyr::select(
+      -dplyr::all_of(c(
+        "start_icd10_code",
+        "end_icd10_code",
+        "icd10_range_new"
+      ))
+    )
+
+  # Return with same structure but updated table
+  list(
+    mapping = list(
+      table = extended_table,
+      metadata = ukb592_result$read_v2_icd10$mapping$metadata
+    )
+  )
+}
+
+
 #' Build Prefix-Based Code Hierarchy
 #'
 #' @description
@@ -831,4 +1012,77 @@ build_prefix_hierarchy_len <- function(codes) {
 
   all_pairs |>
     dplyr::mutate("type" = "is a")
+}
+
+#' Get a vector of ICD10 codes in ALT_CODE format for a specified start/end
+#' range of ICD10 codes
+#'
+#' Note that `start_icd10_code` and `end_icd10_code` must be of the same length,
+#' unless one ends with 'X'. For example, expanding the range 'A80-A81' is
+#' equivalent to expanding both 'A800-A809' and 'A810-A819'.
+#'
+#' @param start_icd10_code String
+#' @param end_icd10_code String
+#' @param icd10_lkp The ICD10 lookup table. Must have a `.rowid` column.
+#'
+#' @noRd
+#' @return A character vector of
+expand_icd10_code_range <- function(
+  start_icd10_code,
+  end_icd10_code,
+  icd10_lkp
+) {
+  # validate args
+  stopifnot(is.character(start_icd10_code))
+  stopifnot(is.character(end_icd10_code))
+
+  stopifnot(
+    stringr::str_length(stringr::str_remove(
+      start_icd10_code,
+      "X$"
+    )) ==
+      stringr::str_length(stringr::str_remove(
+        end_icd10_code,
+        "X$"
+      ))
+  )
+
+  stopifnot(all(c(start_icd10_code, end_icd10_code) %in% icd10_lkp$ALT_CODE))
+
+  # get start and end row indices
+  icd10_lkp <- icd10_lkp |>
+    dplyr::arrange(ALT_CODE) |>
+    tibble::rowid_to_column(".rowid")
+
+  start_rowid <- icd10_lkp |>
+    dplyr::filter(.data[["ALT_CODE"]] == .env$start_icd10_code) |>
+    dplyr::pull(.data[[".rowid"]])
+
+  end_rowid <- icd10_lkp |>
+    dplyr::filter(.data[["ALT_CODE"]] == .env$end_icd10_code) |>
+    dplyr::pull(.data[[".rowid"]])
+
+  # Create range of row index integers
+  icd10_lkp_rowids <- start_rowid:end_rowid
+
+  # filter for selected row index integers
+  result <- icd10_lkp |>
+    dplyr::filter(.data[[".rowid"]] %in% .env$icd10_lkp_rowids) |>
+    dplyr::pull(.data[["ALT_CODE"]])
+
+  # expand (e.g. for 'A80-A81', at this stage all 'A80' should be present
+  # ('A800-A809'), but for 'A81', only 'A81' wil be present - needs expanding
+  # to 'A801-A819')
+  result <- icd10_lkp |>
+    dplyr::filter(stringr::str_detect(
+      .data[["ALT_CODE"]],
+      pattern = stringr::str_c(paste0("^", result), sep = "", collapse = "|")
+    )) |>
+    dplyr::pull(.data[["ALT_CODE"]])
+
+  return(result)
+}
+
+icd10_dxa_pattern <- function() {
+  "[D|X|A]*$"
 }
