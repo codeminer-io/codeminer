@@ -20,10 +20,13 @@ reference:
     desc: Build a local database with lookup and mapping tables for various clinical coding systems.
   - contents:
       - get_ukb_resource_592
+      - read_ukb_resource_592
+      - add_ukb_resource_592
       - read_all_lkps_maps
       - build_all_lkps_maps
       - all_lkps_maps_to_db
       - build_database
+      - dummy_ukb_resource_592_path
       - create_dummy_database
       - add_lookup_table
       - lookup_metadata

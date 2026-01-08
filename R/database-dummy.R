@@ -39,6 +39,34 @@ create_dummy_database <- function(
   return(invisible(db_path))
 }
 
+#' Get path to dummy UK Biobank Resource 592 file
+#'
+#' @description Returns the file path to a subset of UK Biobank Resource 592
+#' (`all_lkps_maps_v4.xlsx`, [resource
+#' 592](https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592)) included in the
+#' package for testing and examples.
+#'
+#' This is a **subset** of the full UKB Resource 592 file, containing a reduced
+#' set of codes suitable for unit tests and documentation examples. For
+#' production use, download the full file using [get_ukb_resource_592()].
+#'
+#' @returns Character string with the path to the dummy Excel file in the
+#'   package's `extdata` directory.
+#'
+#' @seealso
+#' * [get_ukb_resource_592()] to download the full UKB Resource 592 file
+#' * [read_ukb_resource_592()] to read the file
+#'
+#' @export
+#' @examples
+#' # Get path to dummy file
+#' dummy_ukb_resource_592_path()
+#'
+#' # Use in read_ukb_resource_592()
+#' result <- read_ukb_resource_592(
+#'   path = dummy_ukb_resource_592_path(),
+#'   sheets = "icd10_lkp"
+#' )
 dummy_ukb_resource_592_path <- function() {
   system.file("extdata", "all_lkps_maps_v4.xlsx", package = "codeminer")
 }
