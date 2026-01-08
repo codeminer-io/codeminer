@@ -39,27 +39,7 @@ read_ukb_resource_592 <- function(
   )
 
   # Auto-include dependencies for tables that need extension
-  if ("read_v2_drugs_bnf" %in% sheets) {
-    required <- c("bnf_lkp", "read_v2_drugs_lkp")
-    missing <- setdiff(required, sheets)
-    if (length(missing) > 0) {
-      sheets <- unique(c(sheets, missing))
-      cli::cli_inform(
-        "Adding {.field {missing}} (required for extending {.field read_v2_drugs_bnf})"
-      )
-    }
-  }
-
-  if ("read_v2_icd10" %in% sheets) {
-    required <- c("icd10_lkp")
-    missing <- setdiff(required, sheets)
-    if (length(missing) > 0) {
-      sheets <- unique(c(sheets, missing))
-      cli::cli_inform(
-        "Adding {.field {missing}} (required for extending {.field read_v2_icd10})"
-      )
-    }
-  }
+  sheets <- add_ukb592_dependencies(sheets)
 
   # read selected sheets
   cli::cli_inform(
@@ -409,7 +389,12 @@ process_icd9_lkp <- function(.df, ukb_version, ukb_source) {
 }
 
 process_icd10_lkp <- function(.df, ukb_version, ukb_source) {
-  # Lookup - combine modifier cols with description col
+  # Some ICD-10 descriptions include a modifier e.g. "E10" = "Type 1 diabetes
+  # mellitus", whereas "E10.0" = "Type 1 diabetes mellitus with coma". "With
+  # coma" is contained in the modifier columns "MODIFIER-4". See 'S27' for an
+  # example code where additional description is contained in the "MODIFER-5"
+  # column. There are no codes with a modifier description in
+  # both "MODIFIER_4" and "MODIFIER_5".
   lookup <- .df |>
     dplyr::mutate(
       "DESCRIPTION" = dplyr::case_when(
@@ -461,9 +446,9 @@ process_icd10_lkp <- function(.df, ukb_version, ukb_source) {
 }
 
 process_icd9_icd10 <- function(.df, ukb_version, ukb_source) {
-  #' For ICD9 codes without an equivalent ICD10 code, the ICD10 code is recorded
-  #' as 'UNDEF', with `NA` for the description (and vice versa). This function
-  #' converts values of 'UNDEF' in the `ICD9` and `ICD10` columns to `NA`.
+  # For ICD9 codes without an equivalent ICD10 code, the ICD10 code is recorded
+  # as 'UNDEF', with `NA` for the description (and vice versa). This function
+  # converts values of 'UNDEF' in the `ICD9` and `ICD10` columns to `NA`.
 
   # convert 'UNDEF' ICD9/10 codes to `NA`
   mapping <- .df |>
@@ -673,6 +658,13 @@ process_read_ctv3_icd10 <- function(.df, ukb_version, ukb_source) {
       )
     ) |>
     dplyr::mutate(
+      "icd10_dagger_asterisk" = dplyr::if_else(
+        .data[["icd10_dagger_asterisk"]] == "",
+        NA,
+        .data[["icd10_dagger_asterisk"]]
+      )
+    ) |>
+    dplyr::mutate(
       "icd10_code" = stringr::str_remove(
         .data[["icd10_code"]],
         pattern = icd10_dxa_pattern()
@@ -861,12 +853,26 @@ extend_read_v2_icd10_from_ukb592 <- function(ukb592_result) {
     tidyr::unnest(cols = "icd10_code")
 
   # remove 'D' and 'A' final characters from ICD10 codes, and place in separate
-  # column `icd10_dagger_asterisk`
+  # column `icd10_dagger_asterisk`. Also remove 'X', which is appended to
+  # undivided codes e.g. 'A38X' becomes 'A38'
   .df <- .df |>
     dplyr::mutate(
       "icd10_dagger_asterisk" = stringr::str_extract(
         .data[["icd10_code"]],
         pattern = icd10_dxa_pattern()
+      )
+    ) |>
+    dplyr::mutate(
+      "icd10_dagger_asterisk" = stringr::str_remove(
+        .data[["icd10_dagger_asterisk"]],
+        pattern = "X"
+      )
+    ) |>
+    dplyr::mutate(
+      "icd10_dagger_asterisk" = dplyr::if_else(
+        .data[["icd10_dagger_asterisk"]] == "",
+        NA,
+        .data[["icd10_dagger_asterisk"]]
       )
     ) |>
     dplyr::mutate(
@@ -1081,6 +1087,46 @@ expand_icd10_code_range <- function(
     dplyr::pull(.data[["ALT_CODE"]])
 
   return(result)
+}
+
+#' Add required dependencies for UKB Resource 592 sheets
+#'
+#' Automatically includes dependency sheets required for extension processing.
+#' If a sheet requires other sheets for post-processing (e.g., read_v2_drugs_bnf
+#' needs bnf_lkp and read_v2_drugs_lkp), this function adds them to the sheets
+#' vector and optionally displays an informative message.
+#'
+#' @param sheets Character vector of sheet names to read
+#' @param inform Logical indicating whether to show CLI messages (default TRUE)
+#'
+#' @return Character vector with dependencies added (duplicates removed)
+#' @noRd
+add_ukb592_dependencies <- function(sheets, inform = TRUE) {
+  # Define dependencies for sheets that need extension
+  dependencies <- list(
+    read_v2_drugs_bnf = c("bnf_lkp", "read_v2_drugs_lkp"),
+    read_v2_icd10 = c("icd10_lkp")
+  )
+
+  # Check each sheet that has dependencies
+  for (sheet in names(dependencies)) {
+    if (sheet %in% sheets) {
+      required <- dependencies[[sheet]]
+      missing <- setdiff(required, sheets)
+
+      if (length(missing) > 0) {
+        sheets <- unique(c(sheets, missing))
+
+        if (inform) {
+          cli::cli_inform(
+            "Adding {.field {missing}} (required for extending {.field {sheet}})"
+          )
+        }
+      }
+    }
+  }
+
+  sheets
 }
 
 icd10_dxa_pattern <- function() {
