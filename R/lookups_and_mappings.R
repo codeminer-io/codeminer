@@ -142,7 +142,7 @@ all_lkps_maps_to_db <- function(
 #' \href{https://biobank.ctsu.ox.ac.uk/crystal/exinfo.cgi?src=accessing_data_guide}{here}).
 #'
 #' @param all_lkps_maps UK Biobank resource 592, as returned by
-#'   \code{\link{get_ukb_all_lkps_maps}}.
+#'   \code{\link{get_ukb_resource_592}}.
 #' @param ukb_codings The UK Biobank codings file, as returned by
 #'   \code{\link[ukbwranglr]{get_ukb_codings}}.
 #' @param bnf_lkp Optional: default is to obtain a BNF lookup from the
@@ -669,13 +669,13 @@ get_ukb_self_report_med_to_atc_map <- function(
 #' \strong{Note:} This is a large object (>450 MB)
 #'
 #' @param path Path to `all_lkps_maps_v4.xlsx`. By default, this is downloaded
-#'   from the UK Biobank website using [get_ukb_all_lkps_maps()].
+#'   from the UK Biobank website using [get_ukb_resource_592()].
 #'
 #' @return A named list of data frames.
 #' @export
 #' @examples
 #' read_all_lkps_maps(dummy_ukb_resource_592_path())
-read_all_lkps_maps <- function(path = get_ukb_all_lkps_maps()) {
+read_all_lkps_maps <- function(path = get_ukb_resource_592()) {
   tables <- read_excel_to_named_list(
     path = path,
     to_include = NULL,
