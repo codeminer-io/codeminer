@@ -44,5 +44,5 @@ Returns a data frame with clinical codes that match the provided description pat
 create_dummy_database()
 
 # lookup ICD10 code descriptions matching 'cyst'
-DESCRIPTION("cyst", code_type = "icd10")
+DESCRIPTION("cyst", code_type = "ICD-10")
 }

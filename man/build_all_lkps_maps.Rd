@@ -20,7 +20,7 @@ build_all_lkps_maps(
 }
 \arguments{
 \item{all_lkps_maps}{UK Biobank resource 592, as returned by
-\code{\link{get_ukb_all_lkps_maps}}.}
+\code{\link{get_ukb_resource_592}}.}
 
 \item{ukb_codings}{The UK Biobank codings file, as returned by
 \code{\link[ukbwranglr]{get_ukb_codings}}.}

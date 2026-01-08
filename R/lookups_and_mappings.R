@@ -142,7 +142,7 @@ all_lkps_maps_to_db <- function(
 #' \href{https://biobank.ctsu.ox.ac.uk/crystal/exinfo.cgi?src=accessing_data_guide}{here}).
 #'
 #' @param all_lkps_maps UK Biobank resource 592, as returned by
-#'   \code{\link{get_ukb_all_lkps_maps}}.
+#'   \code{\link{get_ukb_resource_592}}.
 #' @param ukb_codings The UK Biobank codings file, as returned by
 #'   \code{\link[ukbwranglr]{get_ukb_codings}}.
 #' @param bnf_lkp Optional: default is to obtain a BNF lookup from the
@@ -588,58 +588,6 @@ get_nhsbsa_snomed_bnf <- function(
   )
 }
 
-#' Get UK Biobank resource 592 directly from UKB
-#' website
-#'
-#' Downloads the UK Biobank code mappings file (\code{all_lkps_maps_v4.xlsx},
-#' \href{https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592}{resource 592})
-#' directly from the UKB website.
-#'
-#' \strong{Note:} This is a large object (>450 MB)
-#'
-#' @param dir_path Directory path to download to.
-#'
-#' @return File path to downloaded `all_lkps_maps_v4.xlsx`.
-#' @export
-#' @examples
-#' \dontrun{
-#' # download UKB resource 592, returning file path invisibly
-#' file_path <- get_ukb_all_lkps_maps()
-#'
-#' # view path to downloaded file
-#' file_path
-#' }
-get_ukb_all_lkps_maps <- function(dir_path = tempdir()) {
-  message("Getting UKB resource 592")
-  # name of resource 592 excel file
-  primarycare_codings <- "all_lkps_maps_v4.xlsx"
-
-  # filepaths in tempdir
-  primarycare_codings_zip_filepath <-
-    file.path(tempdir(), "primarycare_codings.zip")
-
-  # download primary care codings file to tempdir, if not already there
-  if (!file.exists(primarycare_codings_zip_filepath)) {
-    message("Downloading primarycare_codings.zip (UKB resource 592) to tempdir")
-    utils::download.file(
-      "https://biobank.ndph.ox.ac.uk/ukb/ukb/auxdata/primarycare_codings.zip",
-      primarycare_codings_zip_filepath,
-      mode = "wb"
-    )
-  }
-
-  # extract excel file only from zip
-  message("Extracting all_lkps_maps_v4.xlsx from zip file to tempdir")
-  utils::unzip(
-    primarycare_codings_zip_filepath,
-    files = primarycare_codings,
-    exdir = dir_path
-  )
-
-  # return file path
-  return(file.path(dir_path, primarycare_codings))
-}
-
 #' Get the BNF terminology from OpenPrescribing
 #'
 #' Downloads the full BNF via the OpenPrescribing API
@@ -721,13 +669,13 @@ get_ukb_self_report_med_to_atc_map <- function(
 #' \strong{Note:} This is a large object (>450 MB)
 #'
 #' @param path Path to `all_lkps_maps_v4.xlsx`. By default, this is downloaded
-#'   from the UK Biobank website using [get_ukb_all_lkps_maps()].
+#'   from the UK Biobank website using [get_ukb_resource_592()].
 #'
 #' @return A named list of data frames.
 #' @export
 #' @examples
-#' read_all_lkps_maps(dummy_all_lkps_maps_path())
-read_all_lkps_maps <- function(path = get_ukb_all_lkps_maps()) {
+#' read_all_lkps_maps(dummy_ukb_resource_592_path())
+read_all_lkps_maps <- function(path = get_ukb_resource_592()) {
   tables <- read_excel_to_named_list(
     path = path,
     to_include = NULL,

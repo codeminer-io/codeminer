@@ -25,10 +25,10 @@
 #' temp_db <- tempfile(fileext = ".duckdb")
 #' create_dummy_database(temp_db)
 #'
-#' MAP("X40J4", from = "read3", to = "icd10")
+#' MAP("X40J4", from = "Read 3", to = "ICD-10")
 #'
 #' # Return the mapping table itself
-#' MAP("all", from = "read3", to = "icd10")
+#' MAP("all", from = "Read 3", to = "ICD-10")
 MAP <- function(
   codes,
   from = getOption("codeminer.map_from"),

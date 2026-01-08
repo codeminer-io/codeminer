@@ -92,14 +92,14 @@ Codes may be explored with:
 ```{r CODES}
 CODES(
   codes = c("E10", "E11"),
-  code_type = "icd10"
+  code_type = "ICD-10"
 )
 ```
 
 - `DESCRIPTION():` search for codes that match a description
 
 ```{r DESCRIPTION}
-DESCRIPTION(pattern = "cyst", code_type = "icd10")
+DESCRIPTION(pattern = "cyst", code_type = "ICD-10")
 ```
 
 <!-- TODO: add in `CHILDREN()` again, once supported -->
@@ -107,6 +107,6 @@ DESCRIPTION(pattern = "cyst", code_type = "icd10")
 <!-- ```{r CHILDREN} -->
 <!-- CHILDREN( -->
 <!--   codes = "E10", -->
-<!--   code_type = "icd10" -->
+<!--   code_type = "ICD-10" -->
 <!-- ) -->
 <!-- ``` -->

@@ -166,7 +166,8 @@ required_mapping_metadata_columns <- function() {
     "to_code_type",
     "map_version",
     "from_col",
-    "to_col"
+    "to_col",
+    "map_source"
   )
 }
 

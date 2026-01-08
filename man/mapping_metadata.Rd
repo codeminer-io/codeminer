@@ -10,13 +10,16 @@ mapping_metadata(
   map_version = "v0",
   ...,
   from_col = "from",
-  to_col = "to"
+  to_col = "to",
+  map_source = NA_character_
 )
 }
 \arguments{
-\item{from_code_type}{The type of coding system for the source codes (e.g., ICD-10, SNOMED-CT)}
+\item{from_code_type}{The type of coding system for the source codes (e.g.,
+ICD-10, SNOMED-CT)}
 
-\item{to_code_type}{The type of coding system for the target codes (e.g., ICD-10, SNOMED-CT)}
+\item{to_code_type}{The type of coding system for the target codes (e.g.,
+ICD-10, SNOMED-CT)}
 
 \item{map_version}{The version of the mapping metadata (default: "v0")}
 
@@ -25,14 +28,17 @@ mapping_metadata(
 \item{from_col}{The column name for the source codes (default: "from")}
 
 \item{to_col}{The column name for the target codes (default: "to")}
+
+\item{map_source}{The source of the lookup metadata (default:
+\code{NA_character_})}
 }
 \value{
 A list containing the mapping metadata
 }
 \description{
 Generate the required metadata for a mapping table. This is mainly used to
-generate the necessary metadata when adding a new mapping table to the database
-with \code{\link[=add_mapping_table]{add_mapping_table()}}.
+generate the necessary metadata when adding a new mapping table to the
+database with \code{\link[=add_mapping_table]{add_mapping_table()}}.
 }
 \examples{
 mapping_metadata("ICD-10", "SNOMED-CT", map_version = "2023")

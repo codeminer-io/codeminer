@@ -57,7 +57,7 @@ missing_codes <- table_type <- table_meta <- NULL
 # Capture missing codes from waning using `withCallingHandlers()`
 withCallingHandlers(
   {
-    codes <- CODES(c("foo", "bar", "E10"), code_type = "icd10")
+    codes <- CODES(c("foo", "bar", "E10"), code_type = "ICD-10")
   },
   codeminer_missing_codes = function(w) {
     missing_codes <<- w$missing_codes

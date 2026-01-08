@@ -1,10 +1,10 @@
-create_dummy_database()
+suppressMessages(create_dummy_database())
 
 test_that("get_metadata_for_relationship() works correctly", {
   con <- connect_to_db()
 
   # Test valid code_type and version
-  meta <- get_metadata_for_relationship(con, "icd10", "v0")
+  meta <- get_metadata_for_relationship(con, "ICD-10", "UKB v4")
   expect_s3_class(meta, "data.frame")
   expect_equal(nrow(meta), 1)
   expect_true(all(
@@ -13,7 +13,7 @@ test_that("get_metadata_for_relationship() works correctly", {
   ))
 
   # Test latest version
-  meta_latest <- get_metadata_for_relationship(con, "icd10", "latest")
+  meta_latest <- get_metadata_for_relationship(con, "ICD-10", "latest")
   expect_s3_class(meta_latest, "data.frame")
   expect_equal(nrow(meta_latest), 1)
 })

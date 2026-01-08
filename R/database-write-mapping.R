@@ -74,15 +74,19 @@ add_mapping_table <- function(table, metadata) {
 #' Create mapping metadata
 #'
 #' Generate the required metadata for a mapping table. This is mainly used to
-#' generate the necessary metadata when adding a new mapping table to the database
-#' with [add_mapping_table()].
+#' generate the necessary metadata when adding a new mapping table to the
+#' database with [add_mapping_table()].
 #'
-#' @param from_code_type The type of coding system for the source codes (e.g., ICD-10, SNOMED-CT)
-#' @param to_code_type The type of coding system for the target codes (e.g., ICD-10, SNOMED-CT)
+#' @param from_code_type The type of coding system for the source codes (e.g.,
+#'   ICD-10, SNOMED-CT)
+#' @param to_code_type The type of coding system for the target codes (e.g.,
+#'   ICD-10, SNOMED-CT)
 #' @param map_version The version of the mapping metadata (default: "v0")
 #' @inheritParams rlang::args_dots_empty
 #' @param from_col The column name for the source codes (default: "from")
 #' @param to_col The column name for the target codes (default: "to")
+#' @param map_source The source of the lookup metadata (default:
+#'   `NA_character_`)
 #'
 #' @return A list containing the mapping metadata
 #'
@@ -96,7 +100,8 @@ mapping_metadata <- function(
   map_version = "v0",
   ...,
   from_col = "from",
-  to_col = "to"
+  to_col = "to",
+  map_source = NA_character_
 ) {
   rlang::check_dots_empty()
 
@@ -113,7 +118,8 @@ mapping_metadata <- function(
     to_code_type = to_code_type,
     map_version = map_version,
     from_col = from_col,
-    to_col = to_col
+    to_col = to_col,
+    map_source = map_source
   ))
 }
 

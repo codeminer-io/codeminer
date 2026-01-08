@@ -52,9 +52,9 @@ create_dummy_database(temp_db)
 # look up ICD10 codes
 CODES(
   codes = c("E10", "E11"),
-  code_type = "icd10"
+  code_type = "ICD-10"
 )
-CODES_LIKE("^E1", code_type = "icd10")
+CODES_LIKE("^E1", code_type = "ICD-10")
 }
 \seealso{
 \code{\link[=add_lookup_table]{add_lookup_table()}} for adding new lookup tables to the database.

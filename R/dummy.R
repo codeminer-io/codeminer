@@ -17,20 +17,6 @@ dummy_ukb_codings_path <- function() {
   system.file("extdata", "dummy_Codings.tsv", package = "codeminer")
 }
 
-#' Dummy UK Biobank resource 592 file path
-#'
-#' Returns the file path to a dummy [UK Biobank resource
-#' 592](https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592) excel spreadsheet.
-#'
-#' @return A string.
-#' @export
-#' @family Dummy data
-#' @examples
-#' dummy_all_lkps_maps_path()
-dummy_all_lkps_maps_path <- function() {
-  system.file("extdata", "dummy_all_lkps_maps_v3.xlsx", package = "codeminer")
-}
-
 #' Read dummy UK Biobank codings into R
 #'
 #' Reads a dummy [UK Biobank
@@ -62,7 +48,7 @@ read_ukb_codings_dummy <- function() {
 #' @examples
 #' read_all_lkps_maps_dummy()
 read_all_lkps_maps_dummy <- function() {
-  read_all_lkps_maps(path = dummy_all_lkps_maps_path())
+  read_all_lkps_maps(path = dummy_ukb_resource_592_path())
 }
 
 #' Create a dummy all_lkps_maps

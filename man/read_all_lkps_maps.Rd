@@ -4,11 +4,11 @@
 \alias{read_all_lkps_maps}
 \title{Read UK Biobank resource 592 into a named list}
 \usage{
-read_all_lkps_maps(path = get_ukb_all_lkps_maps())
+read_all_lkps_maps(path = get_ukb_resource_592())
 }
 \arguments{
 \item{path}{Path to \code{all_lkps_maps_v4.xlsx}. By default, this is downloaded
-from the UK Biobank website using \code{\link[=get_ukb_all_lkps_maps]{get_ukb_all_lkps_maps()}}.}
+from the UK Biobank website using \code{\link[=get_ukb_resource_592]{get_ukb_resource_592()}}.}
 }
 \value{
 A named list of data frames.
@@ -22,5 +22,5 @@ a named list of data frames.
 \strong{Note:} This is a large object (>450 MB)
 }
 \examples{
-read_all_lkps_maps(dummy_all_lkps_maps_path())
+read_all_lkps_maps(dummy_ukb_resource_592_path())
 }
