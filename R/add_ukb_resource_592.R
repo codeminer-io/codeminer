@@ -34,7 +34,7 @@ add_ukb_resource_592 <- function(
   cli::cli_inform("Adding tables to database")
   ukb_resource_592 |>
     purrr::iwalk(
-      \(ukb_sheet, sheet_name)
+      \(ukb_sheet, sheet_name) {
         ukb_sheet |>
           purrr::iwalk(\(ukb_table, table_type) {
             if (identical(table_type, "lookup")) {
@@ -60,6 +60,7 @@ add_ukb_resource_592 <- function(
               )
             }
           })
+      }
     )
 
   invisible(ukb_resource_592)

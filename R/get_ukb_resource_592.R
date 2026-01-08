@@ -39,7 +39,6 @@ get_ukb_resource_592 <- function(
 
   # Helper for conditional messaging
   msg <- function(...) if (!quiet) cli::cli_inform(...)
-  warn <- function(...) if (!quiet) cli::cli_warn(...)
 
   msg("Getting UKB resource 592")
 

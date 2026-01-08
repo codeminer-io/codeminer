@@ -232,12 +232,14 @@ test_that("`build_prefix_hierarchy_len()` creates correct hierarchies", {
   expect_equal(
     result,
     # fmt: skip
+    # nolint start
     tibble::tribble(
-                     ~from,    ~to,  ~type,
-                    "0101",   "01", "is a",
-                    "0201",   "02", "is a",
-                  "010101", "0101", "is a"
-                  )
+      ~from,    ~to,  ~type,
+      "0101",   "01", "is a",
+      "0201",   "02", "is a",
+      "010101", "0101", "is a"
+      )
+    # nolint end
   )
 })
 
@@ -285,18 +287,17 @@ test_that("`process_icd10_lkp()` removes 'X' suffix and combines modifiers", {
 # `process_bnf_lkp()` -----------------------------------------------------
 
 test_that("`process_bnf_lkp()` creates hierarchy correctly", {
-  # fmt: skip
   .df <- data.frame(
-        stringsAsFactors = FALSE,
-   BNF_Presentation_Code = c("010101000BBABA0"),
-        BNF_Presentation = c("Langdales_Cinnamon Tab"),
-             BNF_Product = c("Proprietary Co Prepn Bnf 0101010"),
-  BNF_Chemical_Substance = c("Other Antacid & Simeticone Preps"),
-        BNF_Subparagraph = c("Antacids and Simeticone"),
-           BNF_Paragraph = c("Antacids and Simeticone"),
-             BNF_Section = c("Dyspep&Gastro-Oesophageal Reflux Disease"),
-             BNF_Chapter = c("Gastro-Intestinal System")
-   )
+    stringsAsFactors = FALSE,
+    BNF_Presentation_Code = c("010101000BBABA0"),
+    BNF_Presentation = c("Langdales_Cinnamon Tab"),
+    BNF_Product = c("Proprietary Co Prepn Bnf 0101010"),
+    BNF_Chemical_Substance = c("Other Antacid & Simeticone Preps"),
+    BNF_Subparagraph = c("Antacids and Simeticone"),
+    BNF_Paragraph = c("Antacids and Simeticone"),
+    BNF_Section = c("Dyspep&Gastro-Oesophageal Reflux Disease"),
+    BNF_Chapter = c("Gastro-Intestinal System")
+  )
 
   result <- process_bnf_lkp(.df, "UKB v4", "test_source")
 
