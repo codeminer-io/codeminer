@@ -51,15 +51,37 @@ of data frames:
 ``` r
 # Create a temporary database with dummy data
 (db_path <- create_dummy_database())
-#> Creating new database at /tmp/RtmpFgjpkK/file21324a8f5777.duckdb
-#> ✔ Lookup table icd10_v0 added successfully.
-#> ✔ Relationship table icd10_relationship_v0 added successfully.
-#> ✔ Lookup table read3_v0 added successfully.
-#> ✔ Mapping table read3_icd10_v0 added successfully.
+#> Creating new database at /tmp/Rtmp1fov3a/file24944e063b9b.duckdb
+#> Reading 17 selected tables from UKB Resource 592
+#> 
+#> Extending read_v2_drugs_bnf with BNF hierarchy and descriptions
+#> Extending read_v2_icd10 by expanding ICD-10 code ranges
+#> Adding tables to database
+#> ✔ Lookup table BNF_UKB v4 added successfully.
+#> ✔ Relationship table BNF_relationship_UKB v4 added successfully.
+#> ✔ Lookup table DM+D_UKB v4 added successfully.
+#> ✔ Lookup table ICD-9_UKB v4 added successfully.
+#> ✔ Relationship table ICD-9_relationship_UKB v4 added successfully.
+#> ✔ Lookup table ICD-10_UKB v4 added successfully.
+#> ✔ Relationship table ICD-10_relationship_UKB v4 added successfully.
+#> ✔ Mapping table ICD-9_ICD-10_UKB v4 added successfully.
+#> ✔ Lookup table Read 2_UKB v4 added successfully.
+#> ✔ Relationship table Read 2_relationship_UKB v4 added successfully.
+#> ✔ Lookup table Read 2, drugs_UKB v4 added successfully.
+#> ✔ Mapping table Read 2, drugs_BNF_UKB v4 added successfully.
+#> ✔ Mapping table Read 2_ICD-9_UKB v4 added successfully.
+#> ✔ Mapping table Read 2_ICD-10_UKB v4 added successfully.
+#> ✔ Mapping table Read 2_OPCS4_UKB v4 added successfully.
+#> ✔ Mapping table Read 2_Read 3_UKB v4 added successfully.
+#> ✔ Lookup table Read 3_UKB v4 added successfully.
+#> ✔ Mapping table Read 3_ICD-9_UKB v4 added successfully.
+#> ✔ Mapping table Read 3_ICD-10_UKB v4 added successfully.
+#> ✔ Mapping table Read 3_OPCS4_UKB v4 added successfully.
+#> ✔ Mapping table Read 3_Read 2_UKB v4 added successfully.
 #> ✔ Dummy database ready to use!
-#> [1] "/tmp/RtmpFgjpkK/file21324a8f5777.duckdb"
+#> [1] "/tmp/Rtmp1fov3a/file24944e063b9b.duckdb"
 Sys.getenv("CODEMINER_DB_PATH")
-#> [1] "/tmp/RtmpFgjpkK/file21324a8f5777.duckdb"
+#> [1] "/tmp/Rtmp1fov3a/file24944e063b9b.duckdb"
 ```
 
 Setting the `CODEMINER_DB_PATH` environment variable ensures that all
@@ -83,9 +105,18 @@ can be inspected using the [DBI](https://dbi.r-dbi.org/) package.
 # connect to Duckdb database
 con <- DBI::dbConnect(duckdb::duckdb(), db_path, read_only = TRUE)
 DBI::dbListTables(con)
-#> [1] "_lookup_metadata"       "_mapping_metadata"      "_relationship_metadata"
-#> [4] "icd10_relationship_v0"  "icd10_v0"               "read3_icd10_v0"        
-#> [7] "read3_v0"
+#>  [1] "BNF_UKB v4"                 "BNF_relationship_UKB v4"   
+#>  [3] "DM+D_UKB v4"                "ICD-10_UKB v4"             
+#>  [5] "ICD-10_relationship_UKB v4" "ICD-9_ICD-10_UKB v4"       
+#>  [7] "ICD-9_UKB v4"               "ICD-9_relationship_UKB v4" 
+#>  [9] "Read 2, drugs_BNF_UKB v4"   "Read 2, drugs_UKB v4"      
+#> [11] "Read 2_ICD-10_UKB v4"       "Read 2_ICD-9_UKB v4"       
+#> [13] "Read 2_OPCS4_UKB v4"        "Read 2_Read 3_UKB v4"      
+#> [15] "Read 2_UKB v4"              "Read 2_relationship_UKB v4"
+#> [17] "Read 3_ICD-10_UKB v4"       "Read 3_ICD-9_UKB v4"       
+#> [19] "Read 3_OPCS4_UKB v4"        "Read 3_Read 2_UKB v4"      
+#> [21] "Read 3_UKB v4"              "_lookup_metadata"          
+#> [23] "_mapping_metadata"          "_relationship_metadata"
 
 # Close the connection when you're done
 DBI::dbDisconnect(con)
@@ -106,31 +137,31 @@ Codes may be explored with:
 ``` r
 CODES(
   codes = c("E10", "E11"),
-  code_type = "icd10"
+  code_type = "ICD-10"
 )
-#> ℹ Using 'v0' as latest version
-#> # A tibble: 2 × 12
-#>   code  description     ICD10_CODE USAGE USAGE_UK QUALIFIERS GENDER_MASK MIN_AGE
-#>   <chr> <chr>           <chr>      <chr>    <dbl> <chr>            <dbl>   <dbl>
-#> 1 E10   Type 1 diabete… E10        DEFA…        3 NA                  NA      NA
-#> 2 E11   Type 2 diabete… E11        DEFA…        3 NA                  NA      NA
-#> # ℹ 4 more variables: MAX_AGE <dbl>, TREE_DESCRIPTION <lgl>, code_type <chr>,
-#> #   preferred_description <lgl>
+#> ℹ Using 'UKB v4' as latest version
+#> # A tibble: 2 × 14
+#>   code  description   ICD10_CODE USAGE USAGE_UK MODIFIER_4 MODIFIER_5 QUALIFIERS
+#>   <chr> <chr>         <chr>      <chr> <chr>    <chr>      <chr>      <chr>     
+#> 1 E10   Type 1 diabe… E10        DEFA… 3        NA         NA         NA        
+#> 2 E11   Type 2 diabe… E11        DEFA… 3        NA         NA         NA        
+#> # ℹ 6 more variables: GENDER_MASK <chr>, MIN_AGE <chr>, MAX_AGE <chr>,
+#> #   TREE_DESCRIPTION <chr>, code_type <chr>, preferred_description <lgl>
 ```
 
 - `DESCRIPTION():` search for codes that match a description
 
 ``` r
-DESCRIPTION(pattern = "cyst", code_type = "icd10")
-#> ℹ Using 'v0' as latest version
-#> ℹ Using 'v0' as latest version
-#> # A tibble: 2 × 12
-#>   code  description     ICD10_CODE USAGE USAGE_UK QUALIFIERS GENDER_MASK MIN_AGE
-#>   <chr> <chr>           <chr>      <chr>    <dbl> <chr>            <dbl>   <dbl>
-#> 1 L721  Trichilemmal c… L72.1      DEFA…        3 NA                  NA      NA
-#> 2 N330  Tuberculous cy… N33.0      ASTE…        2 NA                  NA      NA
-#> # ℹ 4 more variables: MAX_AGE <dbl>, TREE_DESCRIPTION <lgl>, code_type <chr>,
-#> #   preferred_description <lgl>
+DESCRIPTION(pattern = "cyst", code_type = "ICD-10")
+#> ℹ Using 'UKB v4' as latest version
+#> ℹ Using 'UKB v4' as latest version
+#> # A tibble: 2 × 14
+#>   code  description   ICD10_CODE USAGE USAGE_UK MODIFIER_4 MODIFIER_5 QUALIFIERS
+#>   <chr> <chr>         <chr>      <chr> <chr>    <chr>      <chr>      <chr>     
+#> 1 L721  Trichilemmal… L72.1      DEFA… 3        NA         NA         NA        
+#> 2 N330  Tuberculous … N33.0      ASTE… 2        NA         NA         NA        
+#> # ℹ 6 more variables: GENDER_MASK <chr>, MIN_AGE <chr>, MAX_AGE <chr>,
+#> #   TREE_DESCRIPTION <chr>, code_type <chr>, preferred_description <lgl>
 ```
 
 Denny, Joshua C., Lisa Bastarache, and Dan M. Roden. 2016. “Phenome-Wide

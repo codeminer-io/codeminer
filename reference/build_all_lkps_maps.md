@@ -31,7 +31,7 @@ build_all_lkps_maps(
 - all_lkps_maps:
 
   UK Biobank resource 592, as returned by
-  [`get_ukb_all_lkps_maps`](https://codeminer-io.github.io/codeminer/reference/get_ukb_all_lkps_maps.md).
+  [`get_ukb_resource_592`](https://codeminer-io.github.io/codeminer/reference/get_ukb_resource_592.md).
 
 - ukb_codings:
 

@@ -14,6 +14,7 @@
 <url><loc>https://codeminer-io.github.io/codeminer/reference/add_lookup_table.html</loc></url>
 <url><loc>https://codeminer-io.github.io/codeminer/reference/add_mapping_table.html</loc></url>
 <url><loc>https://codeminer-io.github.io/codeminer/reference/add_relationship_table.html</loc></url>
+<url><loc>https://codeminer-io.github.io/codeminer/reference/add_ukb_resource_592.html</loc></url>
 <url><loc>https://codeminer-io.github.io/codeminer/reference/all_lkps_maps_to_db.html</loc></url>
 <url><loc>https://codeminer-io.github.io/codeminer/reference/attributes.html</loc></url>
 <url><loc>https://codeminer-io.github.io/codeminer/reference/build_all_lkps_maps.html</loc></url>
@@ -25,11 +26,11 @@
 <url><loc>https://codeminer-io.github.io/codeminer/reference/create_dummy_database.html</loc></url>
 <url><loc>https://codeminer-io.github.io/codeminer/reference/default_col_filters.html</loc></url>
 <url><loc>https://codeminer-io.github.io/codeminer/reference/dummy_all_lkps_maps_db.html</loc></url>
-<url><loc>https://codeminer-io.github.io/codeminer/reference/dummy_all_lkps_maps_path.html</loc></url>
 <url><loc>https://codeminer-io.github.io/codeminer/reference/dummy_clinical_events_tidy.html</loc></url>
 <url><loc>https://codeminer-io.github.io/codeminer/reference/dummy_icd10_phecode_map_path.html</loc></url>
 <url><loc>https://codeminer-io.github.io/codeminer/reference/dummy_phecode_lkp_path.html</loc></url>
 <url><loc>https://codeminer-io.github.io/codeminer/reference/dummy_ukb_codings_path.html</loc></url>
+<url><loc>https://codeminer-io.github.io/codeminer/reference/dummy_ukb_resource_592_path.html</loc></url>
 <url><loc>https://codeminer-io.github.io/codeminer/reference/example_ontology.html</loc></url>
 <url><loc>https://codeminer-io.github.io/codeminer/reference/get_bnf_from_open_prescribing.html</loc></url>
 <url><loc>https://codeminer-io.github.io/codeminer/reference/get_codeminer_metadata.html</loc></url>
@@ -40,7 +41,7 @@
 <url><loc>https://codeminer-io.github.io/codeminer/reference/get_phecode_definitions.html</loc></url>
 <url><loc>https://codeminer-io.github.io/codeminer/reference/get_phecode_icd10_map.html</loc></url>
 <url><loc>https://codeminer-io.github.io/codeminer/reference/get_phecode_icd9_map.html</loc></url>
-<url><loc>https://codeminer-io.github.io/codeminer/reference/get_ukb_all_lkps_maps.html</loc></url>
+<url><loc>https://codeminer-io.github.io/codeminer/reference/get_ukb_resource_592.html</loc></url>
 <url><loc>https://codeminer-io.github.io/codeminer/reference/get_ukb_self_report_med_to_atc_map.html</loc></url>
 <url><loc>https://codeminer-io.github.io/codeminer/reference/graph_closure.html</loc></url>
 <url><loc>https://codeminer-io.github.io/codeminer/reference/index.html</loc></url>
@@ -55,6 +56,7 @@
 <url><loc>https://codeminer-io.github.io/codeminer/reference/read_icd10_phecode_map_dummy.html</loc></url>
 <url><loc>https://codeminer-io.github.io/codeminer/reference/read_phecode_lkp_dummy.html</loc></url>
 <url><loc>https://codeminer-io.github.io/codeminer/reference/read_ukb_codings_dummy.html</loc></url>
+<url><loc>https://codeminer-io.github.io/codeminer/reference/read_ukb_resource_592.html</loc></url>
 <url><loc>https://codeminer-io.github.io/codeminer/reference/relationship_metadata.html</loc></url>
 <url><loc>https://codeminer-io.github.io/codeminer/reference/relationship_types.html</loc></url>
 <url><loc>https://codeminer-io.github.io/codeminer/reference/start_api.html</loc></url>

@@ -14,7 +14,8 @@ mapping_metadata(
   map_version = "v0",
   ...,
   from_col = "from",
-  to_col = "to"
+  to_col = "to",
+  map_source = NA_character_
 )
 ```
 
@@ -46,6 +47,10 @@ mapping_metadata(
 
   The column name for the target codes (default: "to")
 
+- map_source:
+
+  The source of the lookup metadata (default: `NA_character_`)
+
 ## Value
 
 A list containing the mapping metadata
@@ -75,5 +80,8 @@ mapping_metadata("ICD-10", "SNOMED-CT", map_version = "2023")
 #> 
 #> $to_col
 #> [1] "to"
+#> 
+#> $map_source
+#> [1] NA
 #> 
 ```

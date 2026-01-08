@@ -99,26 +99,48 @@ Other Code relationships:
 
 ``` r
 create_dummy_database()
-#> Creating new database at /tmp/RtmpE2JCfn/file1c241a7b1027.duckdb
-#> ✔ Lookup table icd10_v0 added successfully.
-#> ✔ Relationship table icd10_relationship_v0 added successfully.
-#> ✔ Lookup table read3_v0 added successfully.
-#> ✔ Mapping table read3_icd10_v0 added successfully.
+#> Creating new database at /tmp/RtmpRK6Py7/file1bd366436077.duckdb
+#> Reading 17 selected tables from UKB Resource 592
+#> 
+#> Extending read_v2_drugs_bnf with BNF hierarchy and descriptions
+#> Extending read_v2_icd10 by expanding ICD-10 code ranges
+#> Adding tables to database
+#> ✔ Lookup table BNF_UKB v4 added successfully.
+#> ✔ Relationship table BNF_relationship_UKB v4 added successfully.
+#> ✔ Lookup table DM+D_UKB v4 added successfully.
+#> ✔ Lookup table ICD-9_UKB v4 added successfully.
+#> ✔ Relationship table ICD-9_relationship_UKB v4 added successfully.
+#> ✔ Lookup table ICD-10_UKB v4 added successfully.
+#> ✔ Relationship table ICD-10_relationship_UKB v4 added successfully.
+#> ✔ Mapping table ICD-9_ICD-10_UKB v4 added successfully.
+#> ✔ Lookup table Read 2_UKB v4 added successfully.
+#> ✔ Relationship table Read 2_relationship_UKB v4 added successfully.
+#> ✔ Lookup table Read 2, drugs_UKB v4 added successfully.
+#> ✔ Mapping table Read 2, drugs_BNF_UKB v4 added successfully.
+#> ✔ Mapping table Read 2_ICD-9_UKB v4 added successfully.
+#> ✔ Mapping table Read 2_ICD-10_UKB v4 added successfully.
+#> ✔ Mapping table Read 2_OPCS4_UKB v4 added successfully.
+#> ✔ Mapping table Read 2_Read 3_UKB v4 added successfully.
+#> ✔ Lookup table Read 3_UKB v4 added successfully.
+#> ✔ Mapping table Read 3_ICD-9_UKB v4 added successfully.
+#> ✔ Mapping table Read 3_ICD-10_UKB v4 added successfully.
+#> ✔ Mapping table Read 3_OPCS4_UKB v4 added successfully.
+#> ✔ Mapping table Read 3_Read 2_UKB v4 added successfully.
 #> ✔ Dummy database ready to use!
-PARENTS(c("E10", "E11"), code_type = "icd10")
-#> Error in N_PARENTS(codes, depth = Inf, code_type = code_type, lookup_version = lookup_version,     relationship_version = relationship_version, codes_only = codes_only,     preferred_description_only = preferred_description_only): Code type 'icd10' not found in relationship metadata.
+PARENTS(c("E10", "E11"), code_type = "ICD-10")
+#> Error in N_PARENTS(codes, depth = Inf, code_type = code_type, lookup_version = lookup_version,     relationship_version = relationship_version, codes_only = codes_only,     preferred_description_only = preferred_description_only): Code type 'ICD-10' not found in relationship metadata.
 #> ℹ Did you add the relationship table with
 #>   `codeminer::add_relationship_table()`?
-CHILDREN(c("E10", "E11"), code_type = "icd10")
-#> Error in N_CHILDREN(codes, depth = Inf, code_type = code_type, lookup_version = lookup_version,     relationship_version = relationship_version, codes_only = codes_only,     preferred_description_only = preferred_description_only): Code type 'icd10' not found in relationship metadata.
+CHILDREN(c("E10", "E11"), code_type = "ICD-10")
+#> Error in N_CHILDREN(codes, depth = Inf, code_type = code_type, lookup_version = lookup_version,     relationship_version = relationship_version, codes_only = codes_only,     preferred_description_only = preferred_description_only): Code type 'ICD-10' not found in relationship metadata.
 #> ℹ Did you add the relationship table with
 #>   `codeminer::add_relationship_table()`?
-N_PARENTS(c("E10", "E11"), code_type = "icd10")
-#> Error in N_PARENTS(c("E10", "E11"), code_type = "icd10"): Code type 'icd10' not found in relationship metadata.
+N_PARENTS(c("E10", "E11"), code_type = "ICD-10")
+#> Error in N_PARENTS(c("E10", "E11"), code_type = "ICD-10"): Code type 'ICD-10' not found in relationship metadata.
 #> ℹ Did you add the relationship table with
 #>   `codeminer::add_relationship_table()`?
-N_CHILDREN(c("E10", "E11"), code_type = "icd10")
-#> Error in N_CHILDREN(c("E10", "E11"), code_type = "icd10"): Code type 'icd10' not found in relationship metadata.
+N_CHILDREN(c("E10", "E11"), code_type = "ICD-10")
+#> Error in N_CHILDREN(c("E10", "E11"), code_type = "ICD-10"): Code type 'ICD-10' not found in relationship metadata.
 #> ℹ Did you add the relationship table with
 #>   `codeminer::add_relationship_table()`?
 ```

@@ -32,24 +32,48 @@ various clinical codings systems. A dummy dataset is used here:
 ``` r
 library(codeminer)
 create_dummy_database()
-#> ℹ Creating new database at '/var/folders/9z/4rs_sqvj38n8b02wv8p4j77h0000gn/T//RtmppmCOJL/file16e0e4fff8db0.duckdb'
-#> ✔ Lookup table icd10_v0 added successfully.
-#> ✔ Lookup table read3_v0 added successfully.
-#> ✔ Mapping table read3_icd10_v0 added successfully.
+#> Creating new database at
+#> '/var/folders/zt/jltqykf54y3588fczjzp63ym0000gn/T//RtmpscvWXm/file105fb1aa82952.duckdb'
+#> Reading 17 selected tables from UKB Resource 592
+#> 
+#> Extending read_v2_drugs_bnf with BNF hierarchy and descriptions
+#> Extending read_v2_icd10 by expanding ICD-10 code ranges
+#> Adding tables to database
+#> ✔ Lookup table BNF_UKB v4 added successfully.
+#> ✔ Relationship table BNF_relationship_UKB v4 added successfully.
+#> ✔ Lookup table DM+D_UKB v4 added successfully.
+#> ✔ Lookup table ICD-9_UKB v4 added successfully.
+#> ✔ Relationship table ICD-9_relationship_UKB v4 added successfully.
+#> ✔ Lookup table ICD-10_UKB v4 added successfully.
+#> ✔ Relationship table ICD-10_relationship_UKB v4 added successfully.
+#> ✔ Mapping table ICD-9_ICD-10_UKB v4 added successfully.
+#> ✔ Lookup table Read 2_UKB v4 added successfully.
+#> ✔ Relationship table Read 2_relationship_UKB v4 added successfully.
+#> ✔ Lookup table Read 2, drugs_UKB v4 added successfully.
+#> ✔ Mapping table Read 2, drugs_BNF_UKB v4 added successfully.
+#> ✔ Mapping table Read 2_ICD-9_UKB v4 added successfully.
+#> ✔ Mapping table Read 2_ICD-10_UKB v4 added successfully.
+#> ✔ Mapping table Read 2_OPCS4_UKB v4 added successfully.
+#> ✔ Mapping table Read 2_Read 3_UKB v4 added successfully.
+#> ✔ Lookup table Read 3_UKB v4 added successfully.
+#> ✔ Mapping table Read 3_ICD-9_UKB v4 added successfully.
+#> ✔ Mapping table Read 3_ICD-10_UKB v4 added successfully.
+#> ✔ Mapping table Read 3_OPCS4_UKB v4 added successfully.
+#> ✔ Mapping table Read 3_Read 2_UKB v4 added successfully.
 #> ✔ Dummy database ready to use!
 ```
 
-Look up Read 2 codes for hypertension:
+Look up Read 3 codes for hypertension:
 
 ``` r
-htn_read3 <- DESCRIPTION("Hypertension", code_type = "read3")
-#> ℹ Using 'v0' as latest version
-#> ℹ Using 'v0' as latest version
+htn_read3 <- DESCRIPTION("Hypertension", code_type = "Read 3")
+#> ℹ Using 'UKB v4' as latest version
+#> ℹ Using 'UKB v4' as latest version
 htn_read3
 #> # A tibble: 1 × 5
 #>   code  description            preferred_description status code_type
 #>   <chr> <chr>                  <lgl>                 <chr>  <chr>    
-#> 1 XE0Uc Essential hypertension TRUE                  C      read3
+#> 1 XE0Uc Essential hypertension TRUE                  C      Read 3
 ```
 
 Map these to ICD10:
@@ -57,25 +81,25 @@ Map these to ICD10:
 ``` r
 htn_icd10 <- MAP(
   codes = htn_read3$code,
-  from = "read3",
-  to = "icd10"
+  from = "Read 3",
+  to = "ICD-10"
 )
-#> ℹ Using 'v0' as latest version
-#> ℹ Using 'v0' as latest version
+#> ℹ Using 'UKB v4' as latest version
+#> ℹ Using 'UKB v4' as latest version
 
 htn_icd10
-#> # A tibble: 7 × 12
-#>   code  description     ICD10_CODE USAGE USAGE_UK QUALIFIERS GENDER_MASK MIN_AGE
-#>   <chr> <chr>           <chr>      <chr>    <dbl> <chr>            <dbl>   <dbl>
-#> 1 I10X  Essential (pri… I10        DEFA…        3 <NA>                NA      NA
-#> 2 I11   Hypertensive h… I11        DEFA…        3 <NA>                NA      NA
-#> 3 I12   Hypertensive r… I12        DEFA…        3 <NA>                NA      NA
-#> 4 I13   Hypertensive h… I13        DEFA…        3 <NA>                NA      NA
-#> 5 O10   Pre-existing h… O10        DEFA…        3 <NA>                NA      NA
-#> 6 O11X  Pre-eclampsia … O11        DEFA…        3 <NA>                 1      15
-#> 7 P000  Fetus and newb… P00.0      DEFA…        3 <NA>                NA      NA
-#> # ℹ 4 more variables: MAX_AGE <dbl>, TREE_DESCRIPTION <lgl>, code_type <chr>,
-#> #   preferred_description <lgl>
+#> # A tibble: 7 × 14
+#>   code  description   ICD10_CODE USAGE USAGE_UK MODIFIER_4 MODIFIER_5 QUALIFIERS
+#>   <chr> <chr>         <chr>      <chr> <chr>    <chr>      <chr>      <chr>     
+#> 1 I10   Essential (p… I10        DEFA… 3        <NA>       <NA>       <NA>      
+#> 2 I11   Hypertensive… I11        DEFA… 3        <NA>       <NA>       <NA>      
+#> 3 I12   Hypertensive… I12        DEFA… 3        <NA>       <NA>       <NA>      
+#> 4 I13   Hypertensive… I13        DEFA… 3        <NA>       <NA>       <NA>      
+#> 5 O10   Pre-existing… O10        DEFA… 3        <NA>       <NA>       <NA>      
+#> 6 O11   Pre-eclampsi… O11        DEFA… 3        <NA>       <NA>       <NA>      
+#> 7 P000  Fetus and ne… P00.0      DEFA… 3        <NA>       <NA>       <NA>      
+#> # ℹ 6 more variables: GENDER_MASK <chr>, MIN_AGE <chr>, MAX_AGE <chr>,
+#> #   TREE_DESCRIPTION <chr>, code_type <chr>, preferred_description <lgl>
 ```
 
 See the main [codeminer

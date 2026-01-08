@@ -75,44 +75,68 @@
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/codeminer-io/codeminer" class="external-link">codeminer</a></span><span class="op">)</span></span>
 <span><span class="fu"><a href="reference/create_dummy_database.html">create_dummy_database</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; ℹ Creating new database at '/var/folders/9z/4rs_sqvj38n8b02wv8p4j77h0000gn/T//RtmppmCOJL/file16e0e4fff8db0.duckdb'</span></span>
-<span><span class="co">#&gt; ✔ Lookup table icd10_v0 added successfully.</span></span>
-<span><span class="co">#&gt; ✔ Lookup table read3_v0 added successfully.</span></span>
-<span><span class="co">#&gt; ✔ Mapping table read3_icd10_v0 added successfully.</span></span>
+<span><span class="co">#&gt; Creating new database at</span></span>
+<span><span class="co">#&gt; '/var/folders/zt/jltqykf54y3588fczjzp63ym0000gn/T//RtmpscvWXm/file105fb1aa82952.duckdb'</span></span>
+<span><span class="co">#&gt; Reading 17 selected tables from UKB Resource 592</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Extending read_v2_drugs_bnf with BNF hierarchy and descriptions</span></span>
+<span><span class="co">#&gt; Extending read_v2_icd10 by expanding ICD-10 code ranges</span></span>
+<span><span class="co">#&gt; Adding tables to database</span></span>
+<span><span class="co">#&gt; ✔ Lookup table BNF_UKB v4 added successfully.</span></span>
+<span><span class="co">#&gt; ✔ Relationship table BNF_relationship_UKB v4 added successfully.</span></span>
+<span><span class="co">#&gt; ✔ Lookup table DM+D_UKB v4 added successfully.</span></span>
+<span><span class="co">#&gt; ✔ Lookup table ICD-9_UKB v4 added successfully.</span></span>
+<span><span class="co">#&gt; ✔ Relationship table ICD-9_relationship_UKB v4 added successfully.</span></span>
+<span><span class="co">#&gt; ✔ Lookup table ICD-10_UKB v4 added successfully.</span></span>
+<span><span class="co">#&gt; ✔ Relationship table ICD-10_relationship_UKB v4 added successfully.</span></span>
+<span><span class="co">#&gt; ✔ Mapping table ICD-9_ICD-10_UKB v4 added successfully.</span></span>
+<span><span class="co">#&gt; ✔ Lookup table Read 2_UKB v4 added successfully.</span></span>
+<span><span class="co">#&gt; ✔ Relationship table Read 2_relationship_UKB v4 added successfully.</span></span>
+<span><span class="co">#&gt; ✔ Lookup table Read 2, drugs_UKB v4 added successfully.</span></span>
+<span><span class="co">#&gt; ✔ Mapping table Read 2, drugs_BNF_UKB v4 added successfully.</span></span>
+<span><span class="co">#&gt; ✔ Mapping table Read 2_ICD-9_UKB v4 added successfully.</span></span>
+<span><span class="co">#&gt; ✔ Mapping table Read 2_ICD-10_UKB v4 added successfully.</span></span>
+<span><span class="co">#&gt; ✔ Mapping table Read 2_OPCS4_UKB v4 added successfully.</span></span>
+<span><span class="co">#&gt; ✔ Mapping table Read 2_Read 3_UKB v4 added successfully.</span></span>
+<span><span class="co">#&gt; ✔ Lookup table Read 3_UKB v4 added successfully.</span></span>
+<span><span class="co">#&gt; ✔ Mapping table Read 3_ICD-9_UKB v4 added successfully.</span></span>
+<span><span class="co">#&gt; ✔ Mapping table Read 3_ICD-10_UKB v4 added successfully.</span></span>
+<span><span class="co">#&gt; ✔ Mapping table Read 3_OPCS4_UKB v4 added successfully.</span></span>
+<span><span class="co">#&gt; ✔ Mapping table Read 3_Read 2_UKB v4 added successfully.</span></span>
 <span><span class="co">#&gt; ✔ Dummy database ready to use!</span></span></code></pre></div>
-<p>Look up Read 2 codes for hypertension:</p>
+<p>Look up Read 3 codes for hypertension:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">htn_read3</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/DESCRIPTION.html">DESCRIPTION</a></span><span class="op">(</span><span class="st">"Hypertension"</span>, code_type <span class="op">=</span> <span class="st">"read3"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; ℹ Using 'v0' as latest version</span></span>
-<span><span class="co">#&gt; ℹ Using 'v0' as latest version</span></span>
+<code class="sourceCode R"><span><span class="va">htn_read3</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/DESCRIPTION.html">DESCRIPTION</a></span><span class="op">(</span><span class="st">"Hypertension"</span>, code_type <span class="op">=</span> <span class="st">"Read 3"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; ℹ Using 'UKB v4' as latest version</span></span>
+<span><span class="co">#&gt; ℹ Using 'UKB v4' as latest version</span></span>
 <span><span class="va">htn_read3</span></span>
 <span><span class="co">#&gt; # A tibble: 1 × 5</span></span>
 <span><span class="co">#&gt;   code  description            preferred_description status code_type</span></span>
 <span><span class="co">#&gt;   &lt;chr&gt; &lt;chr&gt;                  &lt;lgl&gt;                 &lt;chr&gt;  &lt;chr&gt;    </span></span>
-<span><span class="co">#&gt; 1 XE0Uc Essential hypertension TRUE                  C      read3</span></span></code></pre></div>
+<span><span class="co">#&gt; 1 XE0Uc Essential hypertension TRUE                  C      Read 3</span></span></code></pre></div>
 <p>Map these to ICD10:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">htn_icd10</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/MAP.html">MAP</a></span><span class="op">(</span></span>
 <span>  codes <span class="op">=</span> <span class="va">htn_read3</span><span class="op">$</span><span class="va">code</span>,</span>
-<span>  from <span class="op">=</span> <span class="st">"read3"</span>,</span>
-<span>  to <span class="op">=</span> <span class="st">"icd10"</span></span>
+<span>  from <span class="op">=</span> <span class="st">"Read 3"</span>,</span>
+<span>  to <span class="op">=</span> <span class="st">"ICD-10"</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt; ℹ Using 'v0' as latest version</span></span>
-<span><span class="co">#&gt; ℹ Using 'v0' as latest version</span></span>
+<span><span class="co">#&gt; ℹ Using 'UKB v4' as latest version</span></span>
+<span><span class="co">#&gt; ℹ Using 'UKB v4' as latest version</span></span>
 <span></span>
 <span><span class="va">htn_icd10</span></span>
-<span><span class="co">#&gt; # A tibble: 7 × 12</span></span>
-<span><span class="co">#&gt;   code  description     ICD10_CODE USAGE USAGE_UK QUALIFIERS GENDER_MASK MIN_AGE</span></span>
-<span><span class="co">#&gt;   &lt;chr&gt; &lt;chr&gt;           &lt;chr&gt;      &lt;chr&gt;    &lt;dbl&gt; &lt;chr&gt;            &lt;dbl&gt;   &lt;dbl&gt;</span></span>
-<span><span class="co">#&gt; 1 I10X  Essential (pri… I10        DEFA…        3 &lt;NA&gt;                NA      NA</span></span>
-<span><span class="co">#&gt; 2 I11   Hypertensive h… I11        DEFA…        3 &lt;NA&gt;                NA      NA</span></span>
-<span><span class="co">#&gt; 3 I12   Hypertensive r… I12        DEFA…        3 &lt;NA&gt;                NA      NA</span></span>
-<span><span class="co">#&gt; 4 I13   Hypertensive h… I13        DEFA…        3 &lt;NA&gt;                NA      NA</span></span>
-<span><span class="co">#&gt; 5 O10   Pre-existing h… O10        DEFA…        3 &lt;NA&gt;                NA      NA</span></span>
-<span><span class="co">#&gt; 6 O11X  Pre-eclampsia … O11        DEFA…        3 &lt;NA&gt;                 1      15</span></span>
-<span><span class="co">#&gt; 7 P000  Fetus and newb… P00.0      DEFA…        3 &lt;NA&gt;                NA      NA</span></span>
-<span><span class="co">#&gt; # ℹ 4 more variables: MAX_AGE &lt;dbl&gt;, TREE_DESCRIPTION &lt;lgl&gt;, code_type &lt;chr&gt;,</span></span>
-<span><span class="co">#&gt; #   preferred_description &lt;lgl&gt;</span></span></code></pre></div>
+<span><span class="co">#&gt; # A tibble: 7 × 14</span></span>
+<span><span class="co">#&gt;   code  description   ICD10_CODE USAGE USAGE_UK MODIFIER_4 MODIFIER_5 QUALIFIERS</span></span>
+<span><span class="co">#&gt;   &lt;chr&gt; &lt;chr&gt;         &lt;chr&gt;      &lt;chr&gt; &lt;chr&gt;    &lt;chr&gt;      &lt;chr&gt;      &lt;chr&gt;     </span></span>
+<span><span class="co">#&gt; 1 I10   Essential (p… I10        DEFA… 3        &lt;NA&gt;       &lt;NA&gt;       &lt;NA&gt;      </span></span>
+<span><span class="co">#&gt; 2 I11   Hypertensive… I11        DEFA… 3        &lt;NA&gt;       &lt;NA&gt;       &lt;NA&gt;      </span></span>
+<span><span class="co">#&gt; 3 I12   Hypertensive… I12        DEFA… 3        &lt;NA&gt;       &lt;NA&gt;       &lt;NA&gt;      </span></span>
+<span><span class="co">#&gt; 4 I13   Hypertensive… I13        DEFA… 3        &lt;NA&gt;       &lt;NA&gt;       &lt;NA&gt;      </span></span>
+<span><span class="co">#&gt; 5 O10   Pre-existing… O10        DEFA… 3        &lt;NA&gt;       &lt;NA&gt;       &lt;NA&gt;      </span></span>
+<span><span class="co">#&gt; 6 O11   Pre-eclampsi… O11        DEFA… 3        &lt;NA&gt;       &lt;NA&gt;       &lt;NA&gt;      </span></span>
+<span><span class="co">#&gt; 7 P000  Fetus and ne… P00.0      DEFA… 3        &lt;NA&gt;       &lt;NA&gt;       &lt;NA&gt;      </span></span>
+<span><span class="co">#&gt; # ℹ 6 more variables: GENDER_MASK &lt;chr&gt;, MIN_AGE &lt;chr&gt;, MAX_AGE &lt;chr&gt;,</span></span>
+<span><span class="co">#&gt; #   TREE_DESCRIPTION &lt;chr&gt;, code_type &lt;chr&gt;, preferred_description &lt;lgl&gt;</span></span></code></pre></div>
 <p>See the main <a href="https://codeminer-io.github.io/codeminer/articles/codeminer.html">codeminer vignette</a> for further details.</p>
 </div>
 <div class="section level2">

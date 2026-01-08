@@ -7,7 +7,7 @@ a named list of data frames.
 ## Usage
 
 ``` r
-read_all_lkps_maps(path = get_ukb_all_lkps_maps())
+read_all_lkps_maps(path = get_ukb_resource_592())
 ```
 
 ## Arguments
@@ -16,7 +16,7 @@ read_all_lkps_maps(path = get_ukb_all_lkps_maps())
 
   Path to `all_lkps_maps_v4.xlsx`. By default, this is downloaded from
   the UK Biobank website using
-  [`get_ukb_all_lkps_maps()`](https://codeminer-io.github.io/codeminer/reference/get_ukb_all_lkps_maps.md).
+  [`get_ukb_resource_592()`](https://codeminer-io.github.io/codeminer/reference/get_ukb_resource_592.md).
 
 ## Value
 
@@ -29,7 +29,7 @@ A named list of data frames.
 ## Examples
 
 ``` r
-read_all_lkps_maps(dummy_all_lkps_maps_path())
+read_all_lkps_maps(dummy_ukb_resource_592_path())
 #> $metadata_all_lkps_maps
 #> # A tibble: 18 × 1
 #>    metadata                                                      

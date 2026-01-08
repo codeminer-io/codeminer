@@ -33,8 +33,12 @@ coding systems.
 Build a local database with lookup and mapping tables for various
 clinical coding systems.
 
-- [`get_ukb_all_lkps_maps()`](https://codeminer-io.github.io/codeminer/reference/get_ukb_all_lkps_maps.md)
-  : Get UK Biobank resource 592 directly from UKB website
+- [`get_ukb_resource_592()`](https://codeminer-io.github.io/codeminer/reference/get_ukb_resource_592.md)
+  : Get UK Biobank resource 592 directly from UK Biobank website
+- [`read_ukb_resource_592()`](https://codeminer-io.github.io/codeminer/reference/read_ukb_resource_592.md)
+  : Read UK Biobank Resource 592 clinical code mappings
+- [`add_ukb_resource_592()`](https://codeminer-io.github.io/codeminer/reference/add_ukb_resource_592.md)
+  : Add UK Biobank Resource 592 tables to CodeMiner database
 - [`read_all_lkps_maps()`](https://codeminer-io.github.io/codeminer/reference/read_all_lkps_maps.md)
   : Read UK Biobank resource 592 into a named list
 - [`build_all_lkps_maps()`](https://codeminer-io.github.io/codeminer/reference/build_all_lkps_maps.md)
@@ -43,6 +47,8 @@ clinical coding systems.
   : Build a Duckdb database of clinical code look up and mapping tables
 - [`build_database()`](https://codeminer-io.github.io/codeminer/reference/build_database.md)
   : Build the Codeminer database
+- [`dummy_ukb_resource_592_path()`](https://codeminer-io.github.io/codeminer/reference/dummy_ukb_resource_592_path.md)
+  : Get path to dummy UK Biobank Resource 592 file
 - [`create_dummy_database()`](https://codeminer-io.github.io/codeminer/reference/create_dummy_database.md)
   : Create a dummy database
 - [`add_lookup_table()`](https://codeminer-io.github.io/codeminer/reference/add_lookup_table.md)
@@ -76,8 +82,6 @@ Dummy data for tests.
   : Read dummy UK Biobank codings into R
 - [`dummy_all_lkps_maps_db()`](https://codeminer-io.github.io/codeminer/reference/dummy_all_lkps_maps_db.md)
   : Set up a dummy all_lkps_maps database
-- [`dummy_all_lkps_maps_path()`](https://codeminer-io.github.io/codeminer/reference/dummy_all_lkps_maps_path.md)
-  : Dummy UK Biobank resource 592 file path
 - [`dummy_clinical_events_tidy()`](https://codeminer-io.github.io/codeminer/reference/dummy_clinical_events_tidy.md)
   : Dummy UK Biobank clinical events, tidied
 - [`dummy_icd10_phecode_map_path()`](https://codeminer-io.github.io/codeminer/reference/dummy_icd10_phecode_map_path.md)
@@ -86,6 +90,8 @@ Dummy data for tests.
   : Dummy Phecode definitions file path
 - [`dummy_ukb_codings_path()`](https://codeminer-io.github.io/codeminer/reference/dummy_ukb_codings_path.md)
   : Dummy UK Biobank codings file path
+- [`dummy_ukb_resource_592_path()`](https://codeminer-io.github.io/codeminer/reference/dummy_ukb_resource_592_path.md)
+  : Get path to dummy UK Biobank Resource 592 file
 - [`example_ontology`](https://codeminer-io.github.io/codeminer/reference/example_ontology.md)
   : Example ontology data
 

@@ -13,11 +13,33 @@ library(dplyr)
 #>     intersect, setdiff, setequal, union
 
 create_dummy_database()
-#> Creating new database at /tmp/RtmpuQLQoo/file219e436c4df1.duckdb
-#> ✔ Lookup table icd10_v0 added successfully.
-#> ✔ Relationship table icd10_relationship_v0 added successfully.
-#> ✔ Lookup table read3_v0 added successfully.
-#> ✔ Mapping table read3_icd10_v0 added successfully.
+#> Creating new database at /tmp/RtmpC4nd4P/file25667868b039.duckdb
+#> Reading 17 selected tables from UKB Resource 592
+#> 
+#> Extending read_v2_drugs_bnf with BNF hierarchy and descriptions
+#> Extending read_v2_icd10 by expanding ICD-10 code ranges
+#> Adding tables to database
+#> ✔ Lookup table BNF_UKB v4 added successfully.
+#> ✔ Relationship table BNF_relationship_UKB v4 added successfully.
+#> ✔ Lookup table DM+D_UKB v4 added successfully.
+#> ✔ Lookup table ICD-9_UKB v4 added successfully.
+#> ✔ Relationship table ICD-9_relationship_UKB v4 added successfully.
+#> ✔ Lookup table ICD-10_UKB v4 added successfully.
+#> ✔ Relationship table ICD-10_relationship_UKB v4 added successfully.
+#> ✔ Mapping table ICD-9_ICD-10_UKB v4 added successfully.
+#> ✔ Lookup table Read 2_UKB v4 added successfully.
+#> ✔ Relationship table Read 2_relationship_UKB v4 added successfully.
+#> ✔ Lookup table Read 2, drugs_UKB v4 added successfully.
+#> ✔ Mapping table Read 2, drugs_BNF_UKB v4 added successfully.
+#> ✔ Mapping table Read 2_ICD-9_UKB v4 added successfully.
+#> ✔ Mapping table Read 2_ICD-10_UKB v4 added successfully.
+#> ✔ Mapping table Read 2_OPCS4_UKB v4 added successfully.
+#> ✔ Mapping table Read 2_Read 3_UKB v4 added successfully.
+#> ✔ Lookup table Read 3_UKB v4 added successfully.
+#> ✔ Mapping table Read 3_ICD-9_UKB v4 added successfully.
+#> ✔ Mapping table Read 3_ICD-10_UKB v4 added successfully.
+#> ✔ Mapping table Read 3_OPCS4_UKB v4 added successfully.
+#> ✔ Mapping table Read 3_Read 2_UKB v4 added successfully.
 #> ✔ Dummy database ready to use!
 ```
 
@@ -27,36 +49,41 @@ Use [`MAP()`](https://codeminer-io.github.io/codeminer/reference/MAP.md)
 to map a vector of codes from one clinical coding system to another:
 
 ``` r
-MAP(codes = "X40J4", from = "read3", to = "icd10", map_version = "v0")
-#> ℹ Using 'v0' as latest version
-#> # A tibble: 2 × 12
-#>   code  description     ICD10_CODE USAGE USAGE_UK QUALIFIERS GENDER_MASK MIN_AGE
-#>   <chr> <chr>           <chr>      <chr>    <dbl> <chr>            <dbl>   <dbl>
-#> 1 E10   Type 1 diabete… E10        DEFA…        3 NA                  NA      NA
-#> 2 E109  Type 1 diabete… E10.9      DEFA…        3 NA                  NA      NA
-#> # ℹ 4 more variables: MAX_AGE <dbl>, TREE_DESCRIPTION <lgl>, code_type <chr>,
-#> #   preferred_description <lgl>
+MAP(codes = "X40J4", from = "Read 3", to = "ICD-10")
+#> ℹ Using 'UKB v4' as latest version
+#> ℹ Using 'UKB v4' as latest version
+#> ℹ Using 'UKB v4' as latest version
+#> Warning: ! The following codes were not found in the lookup table:
+#> • `O240`
+#> # A tibble: 2 × 14
+#>   code  description   ICD10_CODE USAGE USAGE_UK MODIFIER_4 MODIFIER_5 QUALIFIERS
+#>   <chr> <chr>         <chr>      <chr> <chr>    <chr>      <chr>      <chr>     
+#> 1 E10   Type 1 diabe… E10        DEFA… 3        NA         NA         NA        
+#> 2 E109  Type 1 diabe… E10.9      DEFA… 3        Without c… NA         NA        
+#> # ℹ 6 more variables: GENDER_MASK <chr>, MIN_AGE <chr>, MAX_AGE <chr>,
+#> #   TREE_DESCRIPTION <chr>, code_type <chr>, preferred_description <lgl>
 ```
 
 Use `MAP("all")` to return the entire mapping table:
 
 ``` r
-MAP("all", from = "read3", to = "icd10")
-#> ℹ Using 'v0' as latest version
-#> # A tibble: 24 × 7
+MAP("all", from = "Read 3", to = "ICD-10")
+#> ℹ Using 'UKB v4' as latest version
+#> # A tibble: 36 × 8
 #>    from  to    mapping_status refine_flag add_code_flag element_num block_num
-#>    <chr> <chr> <chr>          <chr>       <chr>               <dbl>     <dbl>
-#>  1 X40J4 E109  D              C           P                       0         0
-#>  2 X40J4 E10   A              M           P                       0         0
-#>  3 C10.. E149  D              C           C                       0         0
-#>  4 C10.. E14   A              M           P                       0         0
-#>  5 C10.. E109  R              C           C                       0         0
-#>  6 C10.. E119  R              C           C                       0         0
-#>  7 C10.. E129  R              C           C                       0         0
-#>  8 C10.. E139  R              C           C                       0         0
-#>  9 C10.. O249  R              C           C                       0         0
-#> 10 C10.. P700  R              C           C                       0         0
-#> # ℹ 14 more rows
+#>    <chr> <chr> <chr>          <chr>       <chr>         <chr>       <chr>    
+#>  1 X40J4 E109  D              C           P             0           0        
+#>  2 X40J4 E10   A              M           P             0           0        
+#>  3 X40J4 O240  R              C           C             0           0        
+#>  4 C10.. E149  D              C           C             0           0        
+#>  5 C10.. E14   A              M           P             0           0        
+#>  6 C10.. E109  R              C           C             0           0        
+#>  7 C10.. E119  R              C           C             0           0        
+#>  8 C10.. E129  R              C           C             0           0        
+#>  9 C10.. E139  R              C           C             0           0        
+#> 10 C10.. O249  R              C           C             0           0        
+#> # ℹ 26 more rows
+#> # ℹ 1 more variable: icd10_dagger_asterisk <chr>
 ```
 
 ## Filters
@@ -68,17 +95,18 @@ mapping.[¹](#fn1) For example, the Read 3 to ICD10 mapping table
 includes `mapping_status` and `refine_flag` columns:
 
 ``` r
-MAP("all", from = "read3", to = "icd10") |>
+MAP("all", from = "Read 3", to = "ICD-10") |>
   filter(from == "XaIP9")
-#> ℹ Using 'v0' as latest version
-#> # A tibble: 5 × 7
+#> ℹ Using 'UKB v4' as latest version
+#> # A tibble: 5 × 8
 #>   from  to    mapping_status refine_flag add_code_flag element_num block_num
-#>   <chr> <chr> <chr>          <chr>       <chr>               <dbl>     <dbl>
-#> 1 XaIP9 L721  D              C           C                       0         0
-#> 2 XaIP9 H028  R              C           C                       0         0
-#> 3 XaIP9 N508  R              C           C                       0         0
-#> 4 XaIP9 N608  R              C           C                       0         0
-#> 5 XaIP9 N948  R              C           C                       0         0
+#>   <chr> <chr> <chr>          <chr>       <chr>         <chr>       <chr>    
+#> 1 XaIP9 L721  D              C           C             0           0        
+#> 2 XaIP9 H028  R              C           C             0           0        
+#> 3 XaIP9 N508  R              C           C             0           0        
+#> 4 XaIP9 N608  R              C           C             0           0        
+#> 5 XaIP9 N948  R              C           C             0           0        
+#> # ℹ 1 more variable: icd10_dagger_asterisk <chr>
 ```
 
 It is important to decide which mappings to include. For example, if no
@@ -87,17 +115,17 @@ map to a number of ICD10 codes, some of which are sex-specific (‘N508’
 and ‘N948’):
 
 ``` r
-MAP("XaIP9", from = "read3", to = "icd10") |>
+MAP("XaIP9", from = "Read 3", to = "ICD-10") |>
   filter(!is.na(GENDER_MASK))
-#> ℹ Using 'v0' as latest version
-#> ℹ Using 'v0' as latest version
-#> # A tibble: 2 × 12
-#>   code  description     ICD10_CODE USAGE USAGE_UK QUALIFIERS GENDER_MASK MIN_AGE
-#>   <chr> <chr>           <chr>      <chr>    <dbl> <chr>            <dbl>   <dbl>
-#> 1 N508  Other specifie… N50.8      DEFA…        3 NA                   2      NA
-#> 2 N948  Other specifie… N94.8      DEFA…        3 NA                   1      NA
-#> # ℹ 4 more variables: MAX_AGE <dbl>, TREE_DESCRIPTION <lgl>, code_type <chr>,
-#> #   preferred_description <lgl>
+#> ℹ Using 'UKB v4' as latest version
+#> ℹ Using 'UKB v4' as latest version
+#> # A tibble: 2 × 14
+#>   code  description   ICD10_CODE USAGE USAGE_UK MODIFIER_4 MODIFIER_5 QUALIFIERS
+#>   <chr> <chr>         <chr>      <chr> <chr>    <chr>      <chr>      <chr>     
+#> 1 N508  Other specif… N50.8      DEFA… 3        NA         NA         NA        
+#> 2 N948  Other specif… N94.8      DEFA… 3        NA         NA         NA        
+#> # ℹ 6 more variables: GENDER_MASK <chr>, MIN_AGE <chr>, MAX_AGE <chr>,
+#> #   TREE_DESCRIPTION <chr>, code_type <chr>, preferred_description <lgl>
 ```
 
 ------------------------------------------------------------------------

@@ -85,11 +85,33 @@ Other Code relationships:
 
 ``` r
 create_dummy_database()
-#> Creating new database at /tmp/RtmpE2JCfn/file1c2425e84c56.duckdb
-#> ✔ Lookup table icd10_v0 added successfully.
-#> ✔ Relationship table icd10_relationship_v0 added successfully.
-#> ✔ Lookup table read3_v0 added successfully.
-#> ✔ Mapping table read3_icd10_v0 added successfully.
+#> Creating new database at /tmp/RtmpRK6Py7/file1bd350d8160d.duckdb
+#> Reading 17 selected tables from UKB Resource 592
+#> 
+#> Extending read_v2_drugs_bnf with BNF hierarchy and descriptions
+#> Extending read_v2_icd10 by expanding ICD-10 code ranges
+#> Adding tables to database
+#> ✔ Lookup table BNF_UKB v4 added successfully.
+#> ✔ Relationship table BNF_relationship_UKB v4 added successfully.
+#> ✔ Lookup table DM+D_UKB v4 added successfully.
+#> ✔ Lookup table ICD-9_UKB v4 added successfully.
+#> ✔ Relationship table ICD-9_relationship_UKB v4 added successfully.
+#> ✔ Lookup table ICD-10_UKB v4 added successfully.
+#> ✔ Relationship table ICD-10_relationship_UKB v4 added successfully.
+#> ✔ Mapping table ICD-9_ICD-10_UKB v4 added successfully.
+#> ✔ Lookup table Read 2_UKB v4 added successfully.
+#> ✔ Relationship table Read 2_relationship_UKB v4 added successfully.
+#> ✔ Lookup table Read 2, drugs_UKB v4 added successfully.
+#> ✔ Mapping table Read 2, drugs_BNF_UKB v4 added successfully.
+#> ✔ Mapping table Read 2_ICD-9_UKB v4 added successfully.
+#> ✔ Mapping table Read 2_ICD-10_UKB v4 added successfully.
+#> ✔ Mapping table Read 2_OPCS4_UKB v4 added successfully.
+#> ✔ Mapping table Read 2_Read 3_UKB v4 added successfully.
+#> ✔ Lookup table Read 3_UKB v4 added successfully.
+#> ✔ Mapping table Read 3_ICD-9_UKB v4 added successfully.
+#> ✔ Mapping table Read 3_ICD-10_UKB v4 added successfully.
+#> ✔ Mapping table Read 3_OPCS4_UKB v4 added successfully.
+#> ✔ Mapping table Read 3_Read 2_UKB v4 added successfully.
 #> ✔ Dummy database ready to use!
 # ATTRIBUTES_FOR returns attributes for codes
 # HAS_ATTRIBUTES returns codes that have the specified attributes

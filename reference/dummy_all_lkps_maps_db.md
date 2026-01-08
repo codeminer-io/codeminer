@@ -22,7 +22,6 @@ Returns the `db_path` invisibly
 
 Other Dummy data:
 [`build_all_lkps_maps_dummy()`](https://codeminer-io.github.io/codeminer/reference/build_all_lkps_maps_dummy.md),
-[`dummy_all_lkps_maps_path()`](https://codeminer-io.github.io/codeminer/reference/dummy_all_lkps_maps_path.md),
 [`dummy_clinical_events_tidy()`](https://codeminer-io.github.io/codeminer/reference/dummy_clinical_events_tidy.md),
 [`dummy_icd10_phecode_map_path()`](https://codeminer-io.github.io/codeminer/reference/dummy_icd10_phecode_map_path.md),
 [`dummy_phecode_lkp_path()`](https://codeminer-io.github.io/codeminer/reference/dummy_phecode_lkp_path.md),
@@ -36,7 +35,7 @@ Other Dummy data:
 
 ``` r
 dummy_all_lkps_maps_db()
-#> Writing lookup and mapping tables to Duckdb database at /tmp/RtmpE2JCfn/file1c241476ff2.db
+#> Writing lookup and mapping tables to Duckdb database at /tmp/RtmpRK6Py7/file1bd33c3085bc.db
 #> metadata_all_lkps_maps
 #> bnf_lkp
 #> dmd_lkp
@@ -63,5 +62,5 @@ dummy_all_lkps_maps_db()
 #> phecode_lkp
 #> icd10_phecode
 #> metadata_codeminer
-#> Success! Connect to database with `con <- DBI::dbConnect(duckdb::duckdb(), '/tmp/RtmpE2JCfn/file1c241476ff2.db', read_only = TRUE)`, then access all tables with `all_lkps_maps <- ukbwranglr::db_tables_to_list(con)`
+#> Success! Connect to database with `con <- DBI::dbConnect(duckdb::duckdb(), '/tmp/RtmpRK6Py7/file1bd33c3085bc.db', read_only = TRUE)`, then access all tables with `all_lkps_maps <- ukbwranglr::db_tables_to_list(con)`
 ```
