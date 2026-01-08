@@ -80,10 +80,10 @@ ancestors/descendants).
 }
 \examples{
 create_dummy_database()
-PARENTS(c("E10", "E11"), code_type = "icd10")
-CHILDREN(c("E10", "E11"), code_type = "icd10")
-N_PARENTS(c("E10", "E11"), code_type = "icd10")
-N_CHILDREN(c("E10", "E11"), code_type = "icd10")
+PARENTS(c("E10", "E11"), code_type = "ICD-10")
+CHILDREN(c("E10", "E11"), code_type = "ICD-10")
+N_PARENTS(c("E10", "E11"), code_type = "ICD-10")
+N_CHILDREN(c("E10", "E11"), code_type = "ICD-10")
 }
 \seealso{
 Other Code relationships: 
