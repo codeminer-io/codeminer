@@ -1,11 +1,11 @@
 ## Set up dummy database
-create_dummy_database()
+suppressMessages(create_dummy_database())
 
 test_that("CODES() returns the expected data format", {
   test_codes <- c("A028", "U838", "E12", "E106", "O109")
-  test_type <- "icd10"
+  test_type <- "ICD-10"
 
-  result <- CODES(test_codes, code_type = test_type, lookup_version = "v0")
+  result <- CODES(test_codes, code_type = test_type, lookup_version = "UKB v4")
 
   expect_s3_class(result, "data.frame")
   expect_true(all(c("code", "description", "code_type") %in% names(result)))
@@ -15,7 +15,7 @@ test_that("CODES() returns the expected data format", {
 
 test_that("CODES works with the codeminer.code_type option", {
   test_codes <- c("A39", "E149", "M142", "E146", "E141")
-  test_type <- "icd10"
+  test_type <- "ICD-10"
 
   result <- withr::with_options(
     list(codeminer.code_type = test_type),
@@ -26,19 +26,18 @@ test_that("CODES works with the codeminer.code_type option", {
 })
 
 test_that("CODES allows querying all codes", {
-  test_type <- "icd10"
-  expected_rows <- nrow(dummy_icd10_lookup())
-
+  test_type <- "ICD-10"
+  expected_rows <- nrow(DESCRIPTION(".", "ICD-10", "UKB v4"))
   result <- CODES("all", code_type = test_type)
   expect_s3_class(result, "data.frame")
   expect_equal(nrow(result), expected_rows)
 })
 
 test_that("CODES handles versions correctly", {
-  test_type <- "icd10"
-  test_version <- "v2"
+  test_type <- "ICD-10"
+  test_version <- "UKB v5"
 
-  # add test table as new version of icd10
+  # add test table as new version of ICD-10
   test_table <- data.frame(
     code = c("a", "b", "c"),
     description = c("letter a", "letter b", "letter c")
@@ -68,14 +67,14 @@ test_that("CODES handles versions correctly", {
 test_that("CODES warns about missing codes", {
   test_codes <- c("foo", "bar")
   expect_warning(
-    CODES(test_codes, "icd10"),
+    CODES(test_codes, "ICD-10"),
     class = "codeminer_missing_codes"
   )
 })
 
 test_that("CODES fails for wrong argument types", {
   expect_error(
-    CODES("all", code_type = c("icd10", "icd11", "icd12")),
+    CODES("all", code_type = c("ICD-10", "icd11", "icd12")),
     "`code_type` must be a string"
   )
 })
@@ -89,8 +88,8 @@ test_that("CODES fails for missing code_type", {
 
 test_that("CODES fails for wrong lookup_version", {
   expect_error(
-    CODES("all", code_type = "icd10", lookup_version = "nope"),
-    "No lookup metadata found for 'icd10' version 'nope'"
+    CODES("all", code_type = "ICD-10", lookup_version = "nope"),
+    "No lookup metadata found for 'ICD-10' version 'nope'"
   )
 })
 
@@ -98,7 +97,7 @@ test_that("CODES can return multiple descriptions for the same code", {
   test_code <- "X40J4"
   result <- CODES(
     test_code,
-    code_type = "read3",
+    code_type = "Read 3",
     preferred_description_only = FALSE
   )
   expect_equal(nrow(result), 5)
@@ -109,7 +108,7 @@ test_that("CODES can return only the preferred description", {
   test_code <- "X40J4"
   result <- CODES(
     test_code,
-    code_type = "read3",
+    code_type = "Read 3",
     preferred_description_only = TRUE
   )
   expect_equal(nrow(result), 1)
@@ -130,8 +129,8 @@ test_that("CODES_LIKE can handle regular expressions", {
   test_pattern <- "^A00"
   result <- CODES_LIKE(
     test_pattern,
-    code_type = "icd10",
-    lookup_version = "v0"
+    code_type = "ICD-10",
+    lookup_version = "UKB v4"
   )
   expect_equal(nrow(result), 4)
   expect_true(all(stringr::str_detect(result$code, test_pattern)))

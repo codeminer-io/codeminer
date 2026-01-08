@@ -1,13 +1,13 @@
-create_dummy_database()
+suppressMessages(create_dummy_database())
 
 test_that("CHILDREN() and PARENTS() return the expected data format", {
   test_codes <- c("E10", "E11")
-  test_type <- "icd10"
+  test_type <- "ICD-10"
 
   children_result <- CHILDREN(
     test_codes,
     code_type = test_type,
-    lookup_version = "v0"
+    lookup_version = "UKB v4"
   )
   expect_s3_class(children_result, "data.frame")
   expect_true(all(
@@ -19,7 +19,7 @@ test_that("CHILDREN() and PARENTS() return the expected data format", {
   parents_result <- PARENTS(
     test_codes,
     code_type = test_type,
-    lookup_version = "v0"
+    lookup_version = "UKB v4"
   )
   expect_s3_class(parents_result, "data.frame")
   expect_true(all(
@@ -31,7 +31,7 @@ test_that("CHILDREN() and PARENTS() return the expected data format", {
 
 test_that("CHILDREN() and PARENTS() work with codes_only = TRUE", {
   test_codes <- c("E10", "E11")
-  test_type <- "icd10"
+  test_type <- "ICD-10"
 
   children_result <- CHILDREN(
     test_codes,
@@ -160,7 +160,7 @@ test_that("N_CHILDREN() and N_PARENTS() respect depth parameter", {
 
 test_that("CHILDREN() and N_CHILDREN() with depth=Inf return same results", {
   test_codes <- c("E10")
-  test_type <- "icd10"
+  test_type <- "ICD-10"
 
   children_inf <- CHILDREN(test_codes, code_type = test_type, codes_only = TRUE)
   n_children_inf <- N_CHILDREN(
@@ -175,7 +175,7 @@ test_that("CHILDREN() and N_CHILDREN() with depth=Inf return same results", {
 
 test_that("PARENTS() and N_PARENTS() with depth=Inf return same results", {
   test_codes <- c("E10")
-  test_type <- "icd10"
+  test_type <- "ICD-10"
 
   parents_inf <- PARENTS(test_codes, code_type = test_type, codes_only = TRUE)
   n_parents_inf <- N_PARENTS(
@@ -190,7 +190,7 @@ test_that("PARENTS() and N_PARENTS() with depth=Inf return same results", {
 
 test_that("CHILDREN() works with the codeminer.code_type option", {
   test_codes <- c("E10", "E11")
-  test_type <- "icd10"
+  test_type <- "ICD-10"
 
   result <- withr::with_options(
     list(codeminer.code_type = test_type),
@@ -203,8 +203,8 @@ test_that("CHILDREN() works with the codeminer.code_type option", {
 
 test_that("CHILDREN() handles versions correctly", {
   test_codes <- c("E10")
-  test_type <- "icd10"
-  test_version <- "v0"
+  test_type <- "ICD-10"
+  test_version <- "UKB v4"
 
   result_v0 <- CHILDREN(
     test_codes,
@@ -223,8 +223,8 @@ test_that("CHILDREN() handles versions correctly", {
 })
 
 test_that("CHILDREN() uses correct latest version", {
-  test_type <- "icd10"
-  test_version <- "v2"
+  test_type <- "ICD-10"
+  test_version <- "UKB v5"
 
   # Add test relationship table as new version
   test_relationship_table <- data.frame(
@@ -271,12 +271,12 @@ test_that("CHILDREN() uses correct latest version", {
 
 test_that("CHILDREN() fails for wrong argument types", {
   expect_error(
-    CHILDREN("E10", code_type = c("icd10", "icd11")),
+    CHILDREN("E10", code_type = c("ICD-10", "icd11")),
     "`code_type` must be a string"
   )
 
   expect_error(
-    CHILDREN(123, code_type = "icd10"),
+    CHILDREN(123, code_type = "ICD-10"),
     "`codes` must be a character vector"
   )
 })
@@ -290,7 +290,7 @@ test_that("CHILDREN() fails for missing code_type", {
 
 test_that("CHILDREN() fails for wrong version", {
   expect_error(
-    CHILDREN("E10", code_type = "icd10", relationship_version = "nope"),
+    CHILDREN("E10", code_type = "ICD-10", relationship_version = "nope"),
     "No relationship metadata found"
   )
 })
@@ -299,7 +299,7 @@ test_that("CHILDREN() warns about missing codes", {
   test_codes <- c("foo", "bar")
   expect_warning(
     with_mocked_bindings(
-      CHILDREN(test_codes, "icd10"),
+      CHILDREN(test_codes, "ICD-10"),
 
       # 2 codeminer_missing_codes warnings are raised, one for CHILDREN() and one for
       # CODES(). Here we are only testing CHILDREN(), so CODES() is mocked
@@ -313,31 +313,31 @@ test_that("CHILDREN() and PARENTS() return empty result for invalid codes", {
   test_codes <- c("nonexistent1", "nonexistent2")
 
   suppressMessages(suppressWarnings(
-    children_df <- CHILDREN(test_codes, "icd10", codes_only = FALSE)
+    children_df <- CHILDREN(test_codes, "ICD-10", codes_only = FALSE)
   ))
   expect_s3_class(children_df, "data.frame")
   expect_equal(nrow(children_df), 0)
 
   suppressMessages(suppressWarnings(
-    children_vec <- CHILDREN(test_codes, "icd10", codes_only = TRUE)
+    children_vec <- CHILDREN(test_codes, "ICD-10", codes_only = TRUE)
   ))
   expect_type(children_vec, "character")
   expect_equal(length(children_vec), 0)
 
   suppressMessages(suppressWarnings(
-    parents_df <- PARENTS(test_codes, "icd10", codes_only = FALSE)
+    parents_df <- PARENTS(test_codes, "ICD-10", codes_only = FALSE)
   ))
   expect_s3_class(parents_df, "data.frame")
   expect_equal(nrow(parents_df), 0)
 
   suppressMessages(suppressWarnings(
-    parents_vec <- PARENTS(test_codes, "icd10", codes_only = TRUE)
+    parents_vec <- PARENTS(test_codes, "ICD-10", codes_only = TRUE)
   ))
   expect_type(parents_vec, "character")
   expect_equal(length(parents_vec), 0)
 })
 
 test_that("CHILDREN() handles empty input", {
-  expect_warning(result <- CHILDREN(character(0), "icd10"))
+  expect_warning(result <- CHILDREN(character(0), "ICD-10"))
   expect_equal(nrow(result), 0)
 })

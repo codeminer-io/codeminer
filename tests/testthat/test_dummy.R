@@ -2,7 +2,7 @@
 
 test_that("Functions that return a path to dummy data work", {
   dummy_file_paths_class <- list(
-    dummy_all_lkps_maps_path(),
+    dummy_ukb_resource_592_path(),
     dummy_ukb_codings_path(),
     dummy_phecode_lkp_path(),
     dummy_icd10_phecode_map_path()
