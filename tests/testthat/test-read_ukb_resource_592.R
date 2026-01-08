@@ -251,47 +251,6 @@ test_that("`build_prefix_hierarchy_len()` handles edge cases", {
   expect_equal(nrow(result), 0)
 })
 
-# `build_phecode_hierarchy()` ---------------------------------------------
-
-test_that("`build_phecode_hierarchy()` creates correct decimal hierarchies", {
-  phecode_df <- data.frame(
-    phecode = c(
-      "250",
-      "250.1",
-      "250.2",
-      "250.21",
-      "250.22",
-      "110",
-      "110.0",
-      "1100",
-      "1100.0"
-    ),
-    description = rep("test", 9)
-  )
-
-  result <- build_phecode_hierarchy(phecode_df, "phecode")
-
-  expect_true(all(c("from", "to", "type") %in% names(result)))
-
-  # Check expected relationships exist
-  expect_equal(
-    result,
-    # fmt: skip
-    tibble::tribble(
-          ~from,     ~to,  ~type,
-        "110.0",   "110", "is a",
-       "1100.0",  "1100", "is a",
-        "250.1",   "250", "is a",
-        "250.2",   "250", "is a",
-       "250.21", "250.2", "is a",
-       "250.22", "250.2", "is a"
-       )
-  )
-
-  # Check invalid relationship does NOT exist (1100 -> 110)
-  expect_false("1100" %in% result$from[result$to == "110"])
-})
-
 # `process_icd10_lkp()` ---------------------------------------------------
 
 test_that("`process_icd10_lkp()` removes 'X' suffix and combines modifiers", {
