@@ -26,13 +26,13 @@ create_dummy_database()
 Use `MAP()` to map a vector of codes from one clinical coding system to another:
 
 ```{r MAP}
-MAP(codes = "X40J4", from = "read3", to = "icd10", map_version = "v0")
+MAP(codes = "X40J4", from = "Read 3", to = "ICD-10")
 ```
 
 Use `MAP("all")` to return the entire mapping table:
 
 ```{r}
-MAP("all", from = "read3", to = "icd10")
+MAP("all", from = "Read 3", to = "ICD-10")
 ```
 
 # Filters
@@ -42,7 +42,7 @@ list multiple possible code mappings, with a separate column indicating the type
 to ICD10 mapping table includes `mapping_status` and `refine_flag` columns:
 
 ```{r}
-MAP("all", from = "read3", to = "icd10") |>
+MAP("all", from = "Read 3", to = "ICD-10") |>
   filter(from == "XaIP9")
 ```
 
@@ -52,6 +52,6 @@ for further details.
 It is important to decide which mappings to include. For example, if no filters are applied then the Read 3 code for sebaceous cyst 'XaIP9' will map to a number of ICD10 codes, some of which are sex-specific ('N508' and 'N948'):
 
 ```{r}
-MAP("XaIP9", from = "read3", to = "icd10") |>
+MAP("XaIP9", from = "Read 3", to = "ICD-10") |>
   filter(!is.na(GENDER_MASK))
 ```

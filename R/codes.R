@@ -23,7 +23,7 @@
 #' # look up ICD10 codes
 #' CODES(
 #'   codes = c("E10", "E11"),
-#'   code_type = "icd10"
+#'   code_type = "ICD-10"
 #' )
 CODES <- function(
   codes,
@@ -120,7 +120,7 @@ check_version <- function(version, call = rlang::caller_env()) {
 #' @export
 #' @rdname CODES
 #' @examples
-#' CODES_LIKE("^E1", code_type = "icd10")
+#' CODES_LIKE("^E1", code_type = "ICD-10")
 CODES_LIKE <- function(
   pattern,
   code_type = getOption("codeminer.code_type"),

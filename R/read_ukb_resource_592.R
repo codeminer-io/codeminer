@@ -988,7 +988,7 @@ extend_read_v2_icd10_from_ukb592 <- function(ukb592_result) {
 #' @noRd
 build_prefix_hierarchy_len <- function(codes) {
   codes <- tibble::tibble(code = unique(codes)) |>
-    dplyr::mutate(len = nchar(code))
+    dplyr::mutate("len" = nchar(.data$code))
 
   lens <- sort(unique(codes$len))
 
@@ -1057,7 +1057,7 @@ expand_icd10_code_range <- function(
 
   # get start and end row indices
   icd10_lkp <- icd10_lkp |>
-    dplyr::arrange(ALT_CODE) |>
+    dplyr::arrange(.data$ALT_CODE) |>
     tibble::rowid_to_column(".rowid")
 
   start_rowid <- icd10_lkp |>
