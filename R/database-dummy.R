@@ -33,18 +33,7 @@ create_dummy_database <- function(
   )
   build_database(overwrite = TRUE)
 
-  add_lookup_table(dummy_icd10_lookup(), dummy_icd10_metadata())
-  add_relationship_table(
-    dummy_icd10_relationship(),
-    dummy_icd10_relationship_metadata()
-  )
-
-  add_lookup_table(dummy_read3_lookup(), dummy_read3_metadata())
-
-  add_mapping_table(
-    dummy_read3_icd10_mapping(),
-    dummy_read3_icd10_mapping_metadata()
-  )
+  add_ukb_resource_592(path = dummy_ukb_resource_592_path())
 
   codeminer_inform(c("v" = "Dummy database ready to use!"))
   return(invisible(db_path))
