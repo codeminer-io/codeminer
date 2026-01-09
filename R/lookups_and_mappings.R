@@ -90,11 +90,7 @@ all_lkps_maps_to_db <- function(
         )
       )
     } else if (
-<<<<<<< HEAD
       overwrite &&
-=======
-      overwrite & # nolint
->>>>>>> 085864a (adds single nolint for R/lookups_and_mappings.R which will be removed but just to remove warnings from ci)
         !rlang::is_empty(tables_already_present_in_db)
     ) {
       warning(
