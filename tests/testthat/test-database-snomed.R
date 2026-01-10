@@ -2,11 +2,12 @@ create_dummy_database()
 
 withr::local_options(
   # Silence logs generated with cli
-  cli.default_handler = function(...) {}
+  cli.default_handler = function(...) {
+  }
 )
 
-test_that("read_snomed_ct_uk_monolith() with dummy_snomed_data_path() returns appropriate tables", {
-  snomedct <- read_snomed_ct_uk_monolith(dummy_snomed_data_path())
+test_that("read_snomed_ct_uk_monolith() with dummy_snomed_ct_uk_monolith_path() returns appropriate tables", {
+  snomedct <- read_snomed_ct_uk_monolith(dummy_snomed_ct_uk_monolith_path())
 
   expect_equal(
     names(snomedct$sct_lookup),

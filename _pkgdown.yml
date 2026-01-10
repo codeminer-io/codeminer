@@ -45,7 +45,6 @@ reference:
       - ends_with("dummy")
       - starts_with("dummy")
       - example_ontology
-      - dummy_snomed_data_path
 
   - title: Utilities
     desc: Miscellaneous utility functions.

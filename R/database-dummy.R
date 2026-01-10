@@ -72,21 +72,37 @@ dummy_ukb_resource_592_path <- function() {
 }
 
 
-#' Get full path to the SNOMED CT Monolith RF2 file
+#' Get full path to the dummy SNOMED CT GPS RF2 files
 #'
-#' This function returns the full path to the file
-#' `SnomedCT_MonolithRF2_PRODUCTION_00000000T000000Z`
-#' inside the `snomed_item_1799_uk_sct2mo` folder of the `codeminer` package.
+#' @description
+#' This function returns the full path to the dummy SNOMED CT GPS dataset
+#' included in the `codeminer` package for testing and examples.
 #'
-#' @return A character string with the full path to the SNOMED file.
-#' If the file does not exist, an empty string is returned.
-#' @examples
-#' dummy_snomed_data_path()
+#' The dummy dataset is based on the SNOMED CT GPS (General Practitioner Subset)
+#' release and contains a minimal set of concepts, descriptions, relationships,
+#' and mappings suitable for unit tests and documentation examples.
+#'
+#' @section Data Source and License:
+#'
+#' * **Source**: SNOMED International GPS (General Practice Subset) Release
+#' * **URL**: <https://www.snomed.org/gps>
+#' * **License**: Creative Commons Attribution 4.0 International (CC BY 4.0)
+#' * **Modifications**: This dummy dataset is a subset of the GPS release with additional
+#' mock concepts, descriptions, relationships, and mappings added for testing purposes.
+#' Made-up codes follow the pattern `000xxx000` (e.g., `000001000`) and made-up
+#' descriptions are marked with tildes (e.g., `~description~`).
+#'
+#' @return A character string with the full path to the dummy SNOMED CT GPS folder.
+#'
+#' @seealso [read_snomed_ct_uk_monolith()] to read SNOMED CT data
+#'
 #' @export
-dummy_snomed_data_path <- function() {
+#' @examples
+#' dummy_snomed_ct_uk_monolith_path()
+dummy_snomed_ct_uk_monolith_path <- function() {
   system.file(
     "extdata",
-    "snomed_item_1799_uk_sct2mo/SnomedCT_MonolithRF2_PRODUCTION_00000000T000000Z",
+    "SnomedCT_GPS_PRODUCTION_20251015T120000Z",
     package = "codeminer"
   )
 }

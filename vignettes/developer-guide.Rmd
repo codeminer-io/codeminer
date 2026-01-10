@@ -146,7 +146,7 @@ Use this code to verify referential integrity:
 library(codeminer)
 
 # Read dummy data
-snomed <- read_snomed_ct_uk_monolith(dummy_snomed_data_path())
+snomed <- read_snomed_ct_uk_monolith(dummy_snomed_ct_uk_monolith_path())
 
 # Extract unique concept IDs from each table
 concepts <- unique(snomed$sct_lookup$conceptId)
