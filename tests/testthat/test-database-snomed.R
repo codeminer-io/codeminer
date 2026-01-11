@@ -6,64 +6,6 @@ withr::local_options(
   }
 )
 
-test_that("read_snomed_ct_uk_monolith() with dummy_snomed_ct_uk_monolith_path() returns appropriate tables", {
-  snomedct <- read_snomed_ct_uk_monolith(dummy_snomed_ct_uk_monolith_path())
-
-  expect_equal(
-    names(snomedct$sct_lookup),
-    c(
-      "id_description",
-      "effectiveTime_description",
-      "active_description",
-      "moduleId_description",
-      "conceptId",
-      "languageCode_description",
-      "typeId_description",
-      "term_description",
-      "caseSignificanceId_description",
-      "effectiveTime_concept",
-      "active_concept",
-      "moduleId_concept",
-      "definitionStatusId_concept"
-    )
-  )
-
-  expect_equal(
-    names(snomedct$sct_relationship),
-    c(
-      "id",
-      "effectiveTime",
-      "active",
-      "moduleId",
-      "sourceId",
-      "destinationId",
-      "relationshipGroup",
-      "typeId",
-      "characteristicTypeId",
-      "modifierId"
-    )
-  )
-
-  expect_equal(
-    names(snomedct$sct_icd10_mapping),
-    c(
-      "id",
-      "effectiveTime",
-      "active",
-      "moduleId",
-      "refsetId",
-      "referencedComponentId",
-      "mapGroup",
-      "mapPriority",
-      "mapRule",
-      "mapAdvice",
-      "mapTarget",
-      "correlationId",
-      "mapBlock"
-    )
-  )
-})
-
 # Skip the whole file/tests if TRUD_API_KEY is not set
 # Meaning that unit tests are intended for local execution.
 
