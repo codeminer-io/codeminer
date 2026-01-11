@@ -22,7 +22,7 @@ and mappings suitable for unit tests and documentation examples.
 \itemize{
 \item \strong{Source}: SNOMED International GPS (General Practice Subset) Release
 \item \strong{URL}: \url{https://www.snomed.org/gps}
-\item \strong{License}: \href{https://creativecommons.org/licenses/by/4.0/}{Creative Commons Attribution 4.0 International (CC BY 4.0)}
+\item \strong{License}: Creative Commons Attribution 4.0 International (CC BY 4.0)
 \item \strong{Modifications}: This dummy dataset is a subset of the GPS release with additional
 mock concepts, descriptions, relationships, and mappings added for testing purposes.
 Made-up codes follow the pattern \verb{000xxx000} (e.g., \code{000001000}) and made-up
