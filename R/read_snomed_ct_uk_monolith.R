@@ -155,7 +155,7 @@ read_snomed_ct_uk_monolith <- function(
         dt_conc,
         by = c("conceptId_description" = "id_concept")
       ) |>
-      dplyr::rename(conceptId = .data$conceptId_description)
+      dplyr::rename("conceptId" = dplyr::all_of("conceptId_description"))
 
     sct_lookup_metadata <- lookup_metadata(
       code_type = "sct",
@@ -257,7 +257,6 @@ read_snomed_ct_uk_monolith <- function(
   }
 
   # 4. Return ---------------------------------------------------------------
-  cli::cli_progress_done()
 
   result
 }

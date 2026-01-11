@@ -78,6 +78,10 @@ dummy_ukb_resource_592_path <- function() {
 #' This function returns the full path to the dummy SNOMED CT GPS dataset
 #' included in the `codeminer` package for testing and examples.
 #'
+#' The dummy dataset is stored as a zip file within the package and is
+#' extracted to a temporary directory on first use. The extracted path is
+#' cached for the duration of the R session.
+#'
 #' The dummy dataset is based on the SNOMED CT GPS (General Practitioner Subset)
 #' release and contains a minimal set of concepts, descriptions, relationships,
 #' and mappings suitable for unit tests and documentation examples.
@@ -100,9 +104,33 @@ dummy_ukb_resource_592_path <- function() {
 #' @examples
 #' dummy_snomed_ct_uk_monolith_path()
 dummy_snomed_ct_uk_monolith_path <- function() {
-  system.file(
-    "extdata",
-    "SnomedCT_GPS_PRODUCTION_20251015T120000Z",
-    package = "codeminer"
-  )
+  # Return cached path if already extracted
+  if (
+    !is.null(.codeminer_cache$snomed_path) &&
+      dir.exists(.codeminer_cache$snomed_path)
+  ) {
+    return(.codeminer_cache$snomed_path)
+  }
+
+  # Get path to zip file in package
+  zip_path <- system.file("extdata", "snomed_gps.zip", package = "codeminer")
+
+  if (zip_path == "") {
+    cli::cli_abort("Could not find snomed_gps.zip in package extdata")
+  }
+
+  # Extract to tempdir
+  extract_dir <- file.path(tempdir(), "codeminer_snomed_gps")
+  if (!dir.exists(extract_dir)) {
+    dir.create(extract_dir, recursive = TRUE)
+  }
+
+  utils::unzip(zip_path, exdir = extract_dir, overwrite = TRUE)
+
+  # The zip contains SnomedCT_GPS_PRODUCTION directory
+  target_dir <- file.path(extract_dir, "SnomedCT_GPS_PRODUCTION")
+
+  # Cache and return
+  .codeminer_cache$snomed_path <- target_dir
+  target_dir
 }

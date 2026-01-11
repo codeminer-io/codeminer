@@ -26,11 +26,13 @@ This guide provides technical details for developers contributing to codeminer, 
 
 ### Overview
 
-The codeminer package includes a dummy SNOMED CT dataset for testing and documentation purposes. This dataset is located at:
+The codeminer package includes a dummy SNOMED CT dataset for testing and documentation purposes. This dataset is stored as a zip file at:
 
 ```
-inst/extdata/SnomedCT_GPS_PRODUCTION_20251015T120000Z/
+inst/extdata/snomed_gps.zip
 ```
+
+The zip file contains a `SnomedCT_GPS_PRODUCTION_20251015T120000Z/` directory which is extracted on first use by `dummy_snomed_ct_uk_monolith_path()`. This approach avoids R CMD check warnings about non-portable file paths (the RF2 format uses deeply nested directory structures with long path names).
 
 The dummy dataset follows the SNOMED CT RF2 (Release Format 2) structure and is based on the **SNOMED International GPS (General Practice Subset) Release**. It contains a minimal but comprehensive set of concepts, descriptions, relationships, and mappings designed to test all major codeminer functions.
 

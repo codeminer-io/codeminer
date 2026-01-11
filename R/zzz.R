@@ -1,3 +1,6 @@
+# Package-level cache environment for session state
+.codeminer_cache <- new.env(parent = emptyenv())
+
 .onLoad <- function(libname, pkgname) {
   all_pkg_opts <- list(
     codeminer.col_filters = default_col_filters()

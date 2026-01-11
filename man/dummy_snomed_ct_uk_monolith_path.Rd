@@ -13,6 +13,10 @@ A character string with the full path to the dummy SNOMED CT GPS folder.
 This function returns the full path to the dummy SNOMED CT GPS dataset
 included in the \code{codeminer} package for testing and examples.
 
+The dummy dataset is stored as a zip file within the package and is
+extracted to a temporary directory on first use. The extracted path is
+cached for the duration of the R session.
+
 The dummy dataset is based on the SNOMED CT GPS (General Practitioner Subset)
 release and contains a minimal set of concepts, descriptions, relationships,
 and mappings suitable for unit tests and documentation examples.
