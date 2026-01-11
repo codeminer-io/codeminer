@@ -7,8 +7,10 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-```{r, include = FALSE}
-knitr::opts_chunk$set(
+```{r, include = FALSE}5. **Maintain referential integrity**: Ensure all mapped concepts and relationship participants have entries in the concept and description tables
+6. **Note on map refsets**: Both ICD-10 (`refsetId` = `999002271000000101`) and OPCS-4 (`refsetId` = `999002321000000109`) mappings are stored in the same file (`der2_iisssccRefset_GPSExtendedMapSnapshot_INT_20250701.txt`), differentiated by their `refsetId` values
+7. **Update documentation**: Review and update this developer guide vignette to reflect any structural changes to the dummy dataset
+8. **Test**: Run the validation script above to verify integrityitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
 )
@@ -57,13 +59,36 @@ The dummy dataset includes the following files in RF2 format:
 
 #### Terminology Files (`Snapshot/Terminology/`)
 
-1. **sct2_Concept_GPSSnapshot_INT_20250701.txt** - Core concepts (15 concepts)
-2. **sct2_Description_GPSSnapshot-en_INT_20250701.txt** - Descriptions (30 descriptions: FSN + PT for each concept)
+1. **sct2_Concept_GPSSnapshot_INT_20250701.txt** - Core concepts (18 concepts)
+2. **sct2_Description_GPSSnapshot-en_INT_20250701.txt** - Descriptions (36 descriptions: FSN + PT for each concept)
 3. **sct2_Relationship_GPSSnapshot_INT_20250701.txt** - Relationships (14 relationships)
 
 #### Reference Set Files (`Snapshot/Refset/`)
 
-4. **Map/der2_iisssccRefset_GPSExtendedMapSnapshot_INT_20250701.txt** - ICD-10 mappings (6 mappings)
+4. **Map/der2_iisssccRefset_GPSExtendedMapSnapshot_INT_20250701.txt** - ICD-10 and OPCS-4 mappings (9 mappings: 6 ICD-10, 3 OPCS-4)
+
+### Test Concepts Overview
+
+The dummy dataset includes concepts from the following clinical domains:
+
+**Disorders (ICD-10 mapped)**:
+- Multiple sclerosis and subtypes (24700007, 426373005, 425500002)
+- Optic neuritis (66760008)
+- Made-up: Optic neuritis due to MS (000001000)
+- Chronic pharyngitis (140004)
+
+**Procedures (OPCS-4 mapped)**:
+- Total thyroidectomy (24443003)
+- Total colectomy (26390003)
+- Cardiac pacing (18590009)
+
+**Products and Substances**:
+- Bisoprolol products (774880006, 318604001, 318590006)
+- Made-up: Bisoprolol substance (000002000)
+
+**Attributes**:
+- Has active ingredient (127489000)
+- Due to (42752001)
 
 ### Test Concepts Hierarchy
 
@@ -101,7 +126,7 @@ The dummy dataset is designed to test:
 
 1. **CODES()** - Lookup codes and descriptions
 2. **DESCRIPTION()** - Search by description text
-3. **MAP()** - Map SNOMED CT to ICD-10
+3. **MAP()** - Map SNOMED CT to ICD-10 or OPCS-4
 4. **CHILDREN()** / **PARENTS()** - Navigate hierarchical relationships
 5. **N_CHILDREN()** / **N_PARENTS()** - Navigate with depth control
 6. **RELATIONSHIP_TYPES_FROM()** / **RELATIONSHIP_TYPES_TO()** - Query relationship types
@@ -115,9 +140,11 @@ Key test scenarios:
 - Attribute relationships (drugs contain substances, diseases caused by other diseases)
 - SNOMED -> ICD-10 mappings
 
-### ICD-10 Mappings
+### Clinical Code Mappings
 
 The dataset includes these mappings:
+
+#### ICD-10 Mappings
 
 | SNOMED CT Concept | ICD-10 Code |
 |-------------------|-------------|
@@ -128,13 +155,21 @@ The dataset includes these mappings:
 | ~Optic neuritis due to MS~ (000001000) | H46 |
 | Chronic pharyngitis (140004) | J312 |
 
+#### OPCS-4 Mappings
+
+| SNOMED CT Concept | OPCS-4 Code |
+|-------------------|-------------|
+| Total thyroidectomy (24443003) | B08 |
+| Total colectomy (26390003) | H05 |
+| Cardiac pacing (18590009) | K60 |
+
 ### Referential Integrity
 
 The dummy dataset maintains referential integrity across files:
 
 **Concept Table -> Description Table**: Every concept in `sct2_Concept_GPSSnapshot_INT_20250701.txt` must have at least one description (typically both FSN and PT) in `sct2_Description_GPSSnapshot-en_INT_20250701.txt`.
 
-**Map Table -> Concept/Description Tables**: Every SNOMED CT code referenced in the mapping table (`referencedComponentId` column in `der2_iisssccRefset_GPSExtendedMapSnapshot_INT_20250701.txt`) must exist in both the concept and description tables.
+**Map Table -> Concept/Description Tables**: Every SNOMED CT code referenced in the mapping table (`referencedComponentId` column in `der2_iisssccRefset_GPSExtendedMapSnapshot_INT_20250701.txt`) must exist in both the concept and description tables. This applies to both ICD-10 mappings (`refsetId` = `999002271000000101`) and OPCS-4 mappings (`refsetId` = `999002321000000109`).
 
 **Relationship Table -> Concept Table**: Both `sourceId` and `destinationId` in relationship entries should reference valid concepts (though `destinationId` may reference concepts not in our minimal set, like `116680003` for "Is a").
 
@@ -178,6 +213,7 @@ cat("Total concepts:", length(concepts), "\n")
 cat("Total descriptions:", nrow(snomed$sct_lookup), "\n")
 cat("Total relationships:", nrow(snomed$sct_relationship), "\n")
 cat("Total ICD-10 mappings:", nrow(snomed$sct_icd10_mapping), "\n")
+cat("Total OPCS-4 mappings:", nrow(snomed$sct_opcs4_mapping), "\n")
 ```
 ````
 
@@ -219,7 +255,8 @@ When adding new entries, use these standard SNOMED CT values:
 - `modifierId`: `900000000000451002` (some)
 - `refsetId`: `900000000000509007` (US English)
 - `acceptabilityId`: `900000000000548007` (preferred)
-- ICD-10 map `refsetId`: `999002271000000101` (UK Extension)
+- ICD-10 map `refsetId`: `999002271000000101` (UK Extension ICD-10 map)
+- OPCS-4 map `refsetId`: `999002321000000109` (UK Extension OPCS-4 map)
 - `correlationId`: `447561005` (SNOMED CT to target code correlation not specified)
 
 ### Acknowledgments
