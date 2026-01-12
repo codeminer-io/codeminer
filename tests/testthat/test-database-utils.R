@@ -1,5 +1,5 @@
 local_build_temp_database()
-con <- connect_to_db()
+con <- connect_to_db(read_only = FALSE)
 
 test_that("table_exists() returns TRUE for existing table", {
   expect_true(table_exists(con, "_lookup_metadata"))
@@ -19,7 +19,7 @@ test_that("check_database() succeeds with valid database", {
 
 test_that("check_database() fails when metadata tables are missing", {
   local_temp_database()
-  con_empty <- connect_to_db()
+  con_empty <- connect_to_db(read_only = FALSE)
 
   expect_error(
     check_database(con_empty),

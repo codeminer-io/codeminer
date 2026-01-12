@@ -29,7 +29,7 @@ build_database <- function(overwrite = FALSE) {
     codeminer_inform("Creating new database at {.file {db_path()}}")
   }
 
-  con <- connect_to_db()
+  con <- connect_to_db(read_only = FALSE)
 
   if (db_exists && overwrite) {
     codeminer_inform("Removing existing tables from database")
@@ -189,8 +189,8 @@ required_relationship_metadata_columns <- function() {
 
 # Helper function to connect to the database
 # .envir = parent.frame() ensures the connection is closed when the caller exits.
-connect_to_db <- function(..., .envir = parent.frame()) {
-  con <- DBI::dbConnect(duckdb::duckdb(), db_path())
+connect_to_db <- function(..., read_only = TRUE, .envir = parent.frame()) {
+  con <- DBI::dbConnect(duckdb::duckdb(), db_path(), read_only = read_only)
   withr::defer(DBI::dbDisconnect(con), envir = .envir)
   return(con)
 }

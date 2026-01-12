@@ -41,7 +41,7 @@ add_mapping_table <- function(table, metadata) {
   table <- as.data.frame(table)
   metadata <- as.data.frame(metadata)
 
-  con <- connect_to_db()
+  con <- connect_to_db(read_only = FALSE)
   check_database(con)
 
   meta_added <- add_metadata_table(con, metadata, type = "mapping")
