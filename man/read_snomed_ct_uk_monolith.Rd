@@ -14,9 +14,14 @@ read_snomed_ct_uk_monolith(
 )
 }
 \arguments{
-\item{path}{A character string giving the path to the unzipped SNOMED CT UK
-Monolith Edition directory. This directory must contain the subdirectories
-\code{Snapshot/Terminology} and \code{Snapshot/Refset}.}
+\item{path}{A character string giving the path to the SNOMED CT UK Monolith
+Edition. This can be either:
+\itemize{
+\item A \strong{zip file} (e.g., from \code{\link[=get_snomed_ct_uk_monolith]{get_snomed_ct_uk_monolith()}}) - will be
+extracted to a temporary directory on-demand
+\item An \strong{unzipped directory} containing the subdirectories
+\code{Snapshot/Terminology} and \code{Snapshot/Refset}
+}}
 
 \item{tables}{Character vector of table names to read. Available tables are:
 \itemize{
@@ -28,8 +33,8 @@ Monolith Edition directory. This directory must contain the subdirectories
 By default, all tables are read.}
 
 \item{version}{Character string specifying the version label for the SNOMED
-CT release. If not provided, it will be derived from the folder name by
-appending \code{.zip} (matching the TRUD download filename format).}
+CT release. If not provided, it will be derived from the zip filename or
+folder name.}
 
 \item{source}{Character string specifying the source URL or description.
 Defaults to the NHS TRUD website.}
@@ -73,12 +78,16 @@ For more information on the SNOMED CT UK Monolith Edition, see the \href{https:/
 }
 \examples{
 \dontrun{
-# Read all tables from a local SNOMED CT UK Monolith Edition
+# Read from a zip file (extracts on-demand)
+snomed_zip <- get_snomed_ct_uk_monolith()
+snomed <- read_snomed_ct_uk_monolith(snomed_zip)
+
+# Read from an already-extracted directory
 snomed <- read_snomed_ct_uk_monolith("~/SNOMEDCT_Release_UK")
 
 # Read only specific tables
 snomed <- read_snomed_ct_uk_monolith(
-  path = "~/SNOMEDCT_Release_UK",
+  path = snomed_zip,
   tables = c("sct_lookup", "sct_icd10")
 )
 
