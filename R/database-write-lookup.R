@@ -56,7 +56,7 @@ add_lookup_table <- function(table, metadata) {
     )
   }
 
-  con <- connect_to_db()
+  con <- connect_to_db(read_only = FALSE)
   check_database(con)
 
   meta_added <- add_metadata_table(con, metadata, type = "lookup")

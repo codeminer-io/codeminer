@@ -24,7 +24,7 @@ test_that("db_path() returns correct path based on environment variable", {
 test_that("connect_to_db() creates a valid DuckDB connection", {
   local_temp_database()
 
-  con <- connect_to_db()
+  con <- connect_to_db(read_only = FALSE)
   expect_s4_class(con, "duckdb_connection")
 
   # Verify connection works
@@ -75,7 +75,7 @@ test_that("build_database() is idempotent", {
 
 test_that("create_lookup_metadata_table() respects overwrite parameter", {
   local_temp_database()
-  con <- connect_to_db()
+  con <- connect_to_db(read_only = FALSE)
 
   # Create table first time
   create_lookup_metadata_table(con, overwrite = FALSE)
@@ -111,7 +111,7 @@ test_that("create_lookup_metadata_table() respects overwrite parameter", {
 
 test_that("create_mapping_metadata_table() respects overwrite parameter", {
   local_temp_database()
-  con <- connect_to_db()
+  con <- connect_to_db(read_only = FALSE)
 
   # Create table and insert data
   create_mapping_metadata_table(con, overwrite = FALSE)
