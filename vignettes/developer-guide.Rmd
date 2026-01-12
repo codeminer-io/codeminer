@@ -7,10 +7,8 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-```{r, include = FALSE}5. **Maintain referential integrity**: Ensure all mapped concepts and relationship participants have entries in the concept and description tables
-6. **Note on map refsets**: Both ICD-10 (`refsetId` = `999002271000000101`) and OPCS-4 (`refsetId` = `999002321000000109`) mappings are stored in the same file (`der2_iisssccRefset_GPSExtendedMapSnapshot_INT_20250701.txt`), differentiated by their `refsetId` values
-7. **Update documentation**: Review and update this developer guide vignette to reflect any structural changes to the dummy dataset
-8. **Test**: Run the validation script above to verify integrityitr::opts_chunk$set(
+```{r, include = FALSE}
+knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
 )
