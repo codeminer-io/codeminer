@@ -22,6 +22,9 @@ reference:
       - get_ukb_resource_592
       - read_ukb_resource_592
       - add_ukb_resource_592
+      - get_snomed_ct_uk_monolith
+      - read_snomed_ct_uk_monolith
+      - add_snomed_ct_uk_monolith
       - read_all_lkps_maps
       - build_all_lkps_maps
       - all_lkps_maps_to_db

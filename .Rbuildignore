@@ -18,3 +18,5 @@ _build_all_lkps_maps_db.R
 ^docs$
 ^pkgdown$
 ^\.lintr$
+^[.]?air[.]toml$
+^.*_snaps$

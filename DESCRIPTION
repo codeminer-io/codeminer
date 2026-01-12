@@ -58,7 +58,8 @@ Suggests:
     knitr,
     plumber,
     rmarkdown,
-    testthat (>= 3.0.0)
+    testthat (>= 3.0.0),
+    trud
 Remotes:
     github::rmgpanw/ukbwranglr,
     github::PheWAS/PheWAS

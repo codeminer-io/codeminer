@@ -70,3 +70,67 @@ create_dummy_database <- function(
 dummy_ukb_resource_592_path <- function() {
   system.file("extdata", "all_lkps_maps_v4.xlsx", package = "codeminer")
 }
+
+
+#' Get full path to the dummy SNOMED CT GPS RF2 files
+#'
+#' @description
+#' This function returns the full path to the dummy SNOMED CT GPS dataset
+#' included in the `codeminer` package for testing and examples.
+#'
+#' The dummy dataset is stored as a zip file within the package and is
+#' extracted to a temporary directory on first use. The extracted path is
+#' cached for the duration of the R session.
+#'
+#' The dummy dataset is based on the SNOMED CT GPS (General Practitioner Subset)
+#' release and contains a minimal set of concepts, descriptions, relationships,
+#' and mappings suitable for unit tests and documentation examples.
+#'
+#' @section Data Source and License:
+#'
+#' * **Source**: SNOMED International GPS (General Practice Subset) Release
+#' * **URL**: <https://www.snomed.org/gps>
+#' * **License**: Creative Commons Attribution 4.0 International (CC BY 4.0)
+#' * **Modifications**: This dummy dataset is a subset of the GPS release with additional
+#' mock concepts, descriptions, relationships, and mappings added for testing purposes.
+#' Made-up codes follow the pattern `000xxx000` (e.g., `000001000`) and made-up
+#' descriptions are marked with tildes (e.g., `~description~`).
+#'
+#' @return A character string with the full path to the dummy SNOMED CT GPS folder.
+#'
+#' @seealso [read_snomed_ct_uk_monolith()] to read SNOMED CT data
+#'
+#' @export
+#' @examples
+#' dummy_snomed_ct_uk_monolith_path()
+dummy_snomed_ct_uk_monolith_path <- function() {
+  # Return cached path if already extracted
+  if (
+    !is.null(.codeminer_cache$snomed_path) &&
+      dir.exists(.codeminer_cache$snomed_path)
+  ) {
+    return(.codeminer_cache$snomed_path)
+  }
+
+  # Get path to zip file in package
+  zip_path <- system.file("extdata", "snomed_gps.zip", package = "codeminer")
+
+  if (zip_path == "") {
+    cli::cli_abort("Could not find snomed_gps.zip in package extdata")
+  }
+
+  # Extract to tempdir
+  extract_dir <- file.path(tempdir(), "codeminer_snomed_gps")
+  if (!dir.exists(extract_dir)) {
+    dir.create(extract_dir, recursive = TRUE)
+  }
+
+  utils::unzip(zip_path, exdir = extract_dir, overwrite = TRUE)
+
+  # The zip contains SnomedCT_GPS_PRODUCTION directory
+  target_dir <- file.path(extract_dir, "SnomedCT_GPS_PRODUCTION")
+
+  # Cache and return
+  .codeminer_cache$snomed_path <- target_dir
+  target_dir
+}
