@@ -21,7 +21,8 @@ that it is not possible to overwrite an existing relationship table."></head><bo
 <li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/MAP.html">Mapping between clinical coding systems</a></li>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/developer-guide.html">Developer Guide</a></li>
+    <li><a class="dropdown-item" href="../articles/MAP.html">Mapping between clinical coding systems</a></li>
   </ul></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json"></form></li>
@@ -100,7 +101,7 @@ given <code>code_type</code>.</p>
 <span class="r-in"><span><span class="co"># Using a temporary database</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/Sys.setenv.html" class="external-link">Sys.setenv</a></span><span class="op">(</span>CODEMINER_DB_PATH <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="build_database.html">build_database</a></span><span class="op">(</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Creating new database at <span style="color: #0000BB;">/tmp/RtmpRK6Py7/file1bd35ba8bf17</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Creating new database at <span style="color: #0000BB;">/tmp/RtmpLBgdnU/file1c65588586fd</span></span>
 <span class="r-in"><span><span class="fu">add_relationship_table</span><span class="op">(</span></span></span>
 <span class="r-in"><span>  <span class="va">relationship_table</span>,</span></span>
 <span class="r-in"><span>  <span class="fu"><a href="relationship_metadata.html">relationship_metadata</a></span><span class="op">(</span></span></span>

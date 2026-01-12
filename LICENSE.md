@@ -20,3 +20,11 @@ IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
 CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
 TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+------------------------------------------------------------------------
+
+DATA LICENSING NOTE The demonstration data located in ‘inst/extdata’ is
+licensed separately from the package code:
+
+1.  SNOMED CT GPS Data: Licensed under Creative Commons Attribution 4.0
+    International (CC BY 4.0). Source: SNOMED International.

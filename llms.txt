@@ -203,6 +203,12 @@ clinical coding systems.
   : Read UK Biobank Resource 592 clinical code mappings
 - [`add_ukb_resource_592()`](https://codeminer-io.github.io/codeminer/reference/add_ukb_resource_592.md)
   : Add UK Biobank Resource 592 tables to CodeMiner database
+- [`get_snomed_ct_uk_monolith()`](https://codeminer-io.github.io/codeminer/reference/get_snomed_ct_uk_monolith.md)
+  : Get SNOMED CT UK Monolith Edition from NHS TRUD
+- [`read_snomed_ct_uk_monolith()`](https://codeminer-io.github.io/codeminer/reference/read_snomed_ct_uk_monolith.md)
+  : Read the SNOMED CT UK Monolith Edition into R
+- [`add_snomed_ct_uk_monolith()`](https://codeminer-io.github.io/codeminer/reference/add_snomed_ct_uk_monolith.md)
+  : Add SNOMED CT UK Monolith tables to CodeMiner database
 - [`read_all_lkps_maps()`](https://codeminer-io.github.io/codeminer/reference/read_all_lkps_maps.md)
   : Read UK Biobank resource 592 into a named list
 - [`build_all_lkps_maps()`](https://codeminer-io.github.io/codeminer/reference/build_all_lkps_maps.md)
@@ -252,6 +258,8 @@ Dummy data for tests.
   : Dummy Phecode Map 1.2 with ICD-10 codes (beta) file path
 - [`dummy_phecode_lkp_path()`](https://codeminer-io.github.io/codeminer/reference/dummy_phecode_lkp_path.md)
   : Dummy Phecode definitions file path
+- [`dummy_snomed_ct_uk_monolith_path()`](https://codeminer-io.github.io/codeminer/reference/dummy_snomed_ct_uk_monolith_path.md)
+  : Get full path to the dummy SNOMED CT GPS RF2 files
 - [`dummy_ukb_codings_path()`](https://codeminer-io.github.io/codeminer/reference/dummy_ukb_codings_path.md)
   : Dummy UK Biobank codings file path
 - [`dummy_ukb_resource_592_path()`](https://codeminer-io.github.io/codeminer/reference/dummy_ukb_resource_592_path.md)
@@ -308,5 +316,7 @@ Miscellaneous utility functions.
 
 - [Introduction to
   codeminer](https://codeminer-io.github.io/codeminer/articles/codeminer.md):
+- [Developer
+  Guide](https://codeminer-io.github.io/codeminer/articles/developer-guide.md):
 - [Mapping between clinical coding
   systems](https://codeminer-io.github.io/codeminer/articles/MAP.md):
