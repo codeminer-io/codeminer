@@ -73,7 +73,7 @@ Other Clinical code lookups and mappings:
 # Set up a temporary dummy database
 temp_db <- tempfile(fileext = ".duckdb")
 create_dummy_database(temp_db)
-#> Creating new database at /tmp/RtmpLBgdnU/file1c651a3d47d0.duckdb
+#> Creating new database at /tmp/RtmpC7qugX/file1bbec1b067.duckdb
 #> Reading 17 selected tables from UKB Resource 592
 #> 
 #> Extending read_v2_drugs_bnf with BNF hierarchy and descriptions

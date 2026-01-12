@@ -13,7 +13,7 @@ library(dplyr)
 #>     intersect, setdiff, setequal, union
 
 create_dummy_database()
-#> Creating new database at /tmp/RtmpKoaWeh/file26675e0dc311.duckdb
+#> Creating new database at /tmp/Rtmp3VTaTz/file25c22bda14d.duckdb
 #> Reading 17 selected tables from UKB Resource 592
 #> 
 #> Extending read_v2_drugs_bnf with BNF hierarchy and descriptions

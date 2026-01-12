@@ -51,7 +51,7 @@ of data frames:
 ``` r
 # Create a temporary database with dummy data
 (db_path <- create_dummy_database())
-#> Creating new database at /tmp/RtmpszDzzg/file255c61a70f6.duckdb
+#> Creating new database at /tmp/RtmpgnDlIa/file24b677398309.duckdb
 #> Reading 17 selected tables from UKB Resource 592
 #> 
 #> Extending read_v2_drugs_bnf with BNF hierarchy and descriptions
@@ -79,9 +79,9 @@ of data frames:
 #> ✔ Mapping table Read 3_OPCS4_UKB v4 added successfully.
 #> ✔ Mapping table Read 3_Read 2_UKB v4 added successfully.
 #> ✔ Dummy database ready to use!
-#> [1] "/tmp/RtmpszDzzg/file255c61a70f6.duckdb"
+#> [1] "/tmp/RtmpgnDlIa/file24b677398309.duckdb"
 Sys.getenv("CODEMINER_DB_PATH")
-#> [1] "/tmp/RtmpszDzzg/file255c61a70f6.duckdb"
+#> [1] "/tmp/RtmpgnDlIa/file24b677398309.duckdb"
 ```
 
 Setting the `CODEMINER_DB_PATH` environment variable ensures that all

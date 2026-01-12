@@ -66,7 +66,7 @@ failed.
 # Set up a temporary dummy database
 temp_db <- tempfile(fileext = ".duckdb")
 create_dummy_database(temp_db)
-#> Creating new database at /tmp/RtmpLBgdnU/file1c6539a101b0.duckdb
+#> Creating new database at /tmp/RtmpC7qugX/file1bbe55bd6f7c.duckdb
 #> Reading 17 selected tables from UKB Resource 592
 #> 
 #> Extending read_v2_drugs_bnf with BNF hierarchy and descriptions

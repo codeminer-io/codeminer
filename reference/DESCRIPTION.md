@@ -64,7 +64,7 @@ for codes that match the description, or a character vector of codes if
 ``` r
 # build dummy database
 create_dummy_database()
-#> Creating new database at /tmp/RtmpLBgdnU/file1c652562832f.duckdb
+#> Creating new database at /tmp/RtmpC7qugX/file1bbe17f31370.duckdb
 #> Reading 17 selected tables from UKB Resource 592
 #> 
 #> Extending read_v2_drugs_bnf with BNF hierarchy and descriptions
