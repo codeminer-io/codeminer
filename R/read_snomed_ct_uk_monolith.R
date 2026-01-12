@@ -10,9 +10,12 @@
 #' For more information on the SNOMED CT UK Monolith Edition, see the [NHS TRUD
 #' website](https://isd.digital.nhs.uk/trud/users/guest/filters/2/categories/26/items/1799/releases).
 #'
-#' @param path A character string giving the path to the unzipped SNOMED CT UK
-#'   Monolith Edition directory. This directory must contain the subdirectories
-#'   `Snapshot/Terminology` and `Snapshot/Refset`.
+#' @param path A character string giving the path to the SNOMED CT UK Monolith
+#'   Edition. This can be either:
+#'   * A **zip file** (e.g., from [get_snomed_ct_uk_monolith()]) - will be
+#'     extracted to a temporary directory on-demand
+#'   * An **unzipped directory** containing the subdirectories
+#'     `Snapshot/Terminology` and `Snapshot/Refset`
 #' @param tables Character vector of table names to read. Available tables are:
 #'   * Lookup table: `"sct_lookup"`
 #'   * Relationship table: `"sct_relationship"`
@@ -20,8 +23,8 @@
 #'
 #'   By default, all tables are read.
 #' @param version Character string specifying the version label for the SNOMED
-#'   CT release. If not provided, it will be derived from the folder name by
-#'   appending `.zip` (matching the TRUD download filename format).
+#'   CT release. If not provided, it will be derived from the zip filename or
+#'   folder name.
 #' @param source Character string specifying the source URL or description.
 #'   Defaults to the NHS TRUD website.
 #' @param .icd10_refset_id Character string. The SNOMED CT Concept ID
@@ -48,12 +51,16 @@
 #'
 #' @examples
 #' \dontrun{
-#' # Read all tables from a local SNOMED CT UK Monolith Edition
+#' # Read from a zip file (extracts on-demand)
+#' snomed_zip <- get_snomed_ct_uk_monolith()
+#' snomed <- read_snomed_ct_uk_monolith(snomed_zip)
+#'
+#' # Read from an already-extracted directory
 #' snomed <- read_snomed_ct_uk_monolith("~/SNOMEDCT_Release_UK")
 #'
 #' # Read only specific tables
 #' snomed <- read_snomed_ct_uk_monolith(
-#'   path = "~/SNOMEDCT_Release_UK",
+#'   path = snomed_zip,
 #'   tables = c("sct_lookup", "sct_icd10")
 #' )
 #'
@@ -77,8 +84,8 @@ read_snomed_ct_uk_monolith <- function(
   .opcs4_refset_id = "999002321000000109"
 ) {
   # 1. Validation -----------------------------------------------------------
-  if (!dir.exists(path)) {
-    cli::cli_abort("Directory does not exist: {.path {path}}")
+  if (!file.exists(path) && !dir.exists(path)) {
+    cli::cli_abort("Path does not exist: {.path {path}}")
   }
 
   # Validate tables argument
@@ -87,6 +94,52 @@ read_snomed_ct_uk_monolith <- function(
     values = c("sct_lookup", "sct_relationship", "sct_icd10", "sct_opcs4"),
     multiple = TRUE
   )
+
+  # Handle zip file input - extract on-demand
+  if (
+    file.exists(path) &&
+      !dir.exists(path) &&
+      grepl("\\.zip$", path, ignore.case = TRUE)
+  ) {
+    cli::cli_inform("Extracting SNOMED CT from zip file...")
+
+    # Derive version from zip filename if not provided
+    if (is.null(version)) {
+      version <- basename(path)
+    }
+
+    # Extract to temp directory
+    extract_dir <- file.path(tempdir(), "codeminer_snomed_extract")
+    if (!dir.exists(extract_dir)) {
+      dir.create(extract_dir, recursive = TRUE)
+    }
+
+    utils::unzip(path, exdir = extract_dir, overwrite = TRUE)
+
+    # Find the extracted directory (should be the only subdirectory)
+    extracted_dirs <- list.dirs(
+      extract_dir,
+      recursive = FALSE,
+      full.names = TRUE
+    )
+
+    if (length(extracted_dirs) == 0) {
+      cli::cli_abort(c(
+        "x" = "No directory found in extracted zip",
+        "i" = "The zip file should contain a single top-level directory"
+      ))
+    }
+
+    if (length(extracted_dirs) > 1) {
+      cli::cli_abort(c(
+        "x" = "Multiple directories found in extracted zip",
+        "i" = "Expected a single top-level directory, found: {.file {basename(extracted_dirs)}}"
+      ))
+    }
+
+    path <- extracted_dirs[[1]]
+    cli::cli_inform("Using extracted directory: {.path {basename(path)}}")
+  }
 
   cli::cli_inform("Checking directory...")
   # Define critical subdirectories

@@ -87,7 +87,7 @@ test_that("read_snomed_ct_uk_monolith() filters mappings correctly", {
 test_that("read_snomed_ct_uk_monolith() errors on non-existent path", {
   expect_error(
     read_snomed_ct_uk_monolith("/nonexistent/path"),
-    "Directory does not exist"
+    "Path does not exist"
   )
 })
 
@@ -101,6 +101,52 @@ test_that("read_snomed_ct_uk_monolith() errors on missing subdirectories", {
     suppressMessages(read_snomed_ct_uk_monolith(tmp)),
     "required subdirectories are missing"
   )
+})
+
+# Zip file input tests ----------------------------------------------------
+
+test_that("read_snomed_ct_uk_monolith() accepts zip file input", {
+  # Get the package zip file directly
+  zip_path <- system.file("extdata", "snomed_gps.zip", package = "codeminer")
+
+  result <- suppressMessages(
+    read_snomed_ct_uk_monolith(zip_path, tables = "sct_lookup")
+  )
+
+  expect_true("sct_lookup" %in% names(result))
+  expect_s3_class(result$sct_lookup$lookup$table, "data.frame")
+  expect_gt(nrow(result$sct_lookup$lookup$table), 0)
+})
+
+test_that("read_snomed_ct_uk_monolith() derives version from zip filename", {
+  zip_path <- system.file("extdata", "snomed_gps.zip", package = "codeminer")
+
+  result <- suppressMessages(
+    read_snomed_ct_uk_monolith(zip_path, tables = "sct_lookup")
+  )
+
+  expect_equal(
+    result$sct_lookup$lookup$metadata$lookup_version,
+    "snomed_gps.zip"
+  )
+})
+
+test_that("read_snomed_ct_uk_monolith() extracts all tables from zip", {
+  zip_path <- system.file("extdata", "snomed_gps.zip", package = "codeminer")
+
+  result <- suppressMessages(read_snomed_ct_uk_monolith(zip_path))
+
+  expect_equal(
+    names(result),
+    c("sct_lookup", "sct_relationship", "sct_icd10", "sct_opcs4")
+  )
+
+  # Check all tables have data
+
+  expect_gt(nrow(result$sct_lookup$lookup$table), 0)
+  expect_gt(nrow(result$sct_relationship$relationship$table), 0)
+  expect_gt(nrow(result$sct_icd10$mapping$table), 0)
+  expect_gt(nrow(result$sct_opcs4$mapping$table), 0)
 })
 
 # Parameter variation tests -----------------------------------------------
