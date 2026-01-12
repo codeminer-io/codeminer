@@ -44,7 +44,7 @@ test_that("read_snomed_ct_uk_monolith() returns correct structure", {
   expect_s3_class(result$sct_lookup$lookup$table, "data.frame")
 
   # Check metadata has expected fields
-  expect_equal(result$sct_lookup$lookup$metadata$code_type, "sct")
+  expect_equal(result$sct_lookup$lookup$metadata$code_type, "SNOMED CT")
 })
 
 test_that("read_snomed_ct_uk_monolith() tables argument works", {

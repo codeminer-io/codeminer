@@ -83,6 +83,11 @@ read_snomed_ct_uk_monolith <- function(
   .icd10_refset_id = "999002271000000101",
   .opcs4_refset_id = "999002321000000109"
 ) {
+  # Constants
+  snomed_code_type <- "SNOMED CT"
+  icd10_code_type <- "ICD-10"
+  opcs4_code_type <- "OPCS4"
+
   # 1. Validation -----------------------------------------------------------
   if (!file.exists(path) && !dir.exists(path)) {
     cli::cli_abort("Path does not exist: {.path {path}}")
@@ -211,7 +216,7 @@ read_snomed_ct_uk_monolith <- function(
       dplyr::rename("conceptId" = dplyr::all_of("conceptId_description"))
 
     sct_lookup_metadata <- lookup_metadata(
-      code_type = "sct",
+      code_type = snomed_code_type,
       lookup_version = version,
       lookup_code_col = "conceptId",
       lookup_description_col = "term_description",
@@ -234,7 +239,7 @@ read_snomed_ct_uk_monolith <- function(
     sct_relationship_table <- fread_sct(path_rel)
 
     sct_relationship_metadata <- relationship_metadata(
-      code_type = "sct",
+      code_type = snomed_code_type,
       relationship_version = version,
       from_col = "sourceId",
       to_col = "destinationId",
@@ -268,8 +273,8 @@ read_snomed_ct_uk_monolith <- function(
       )
 
     sct_icd10_metadata <- mapping_metadata(
-      from_code_type = "sct",
-      to_code_type = "icd10",
+      from_code_type = snomed_code_type,
+      to_code_type = icd10_code_type,
       map_version = version,
       from_col = "referencedComponentId",
       to_col = "mapTarget",
@@ -293,8 +298,8 @@ read_snomed_ct_uk_monolith <- function(
       )
 
     sct_opcs4_metadata <- mapping_metadata(
-      from_code_type = "sct",
-      to_code_type = "opcs4",
+      from_code_type = snomed_code_type,
+      to_code_type = opcs4_code_type,
       map_version = version,
       from_col = "referencedComponentId",
       to_col = "mapTarget",
