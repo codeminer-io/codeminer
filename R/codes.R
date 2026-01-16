@@ -63,6 +63,9 @@ CODES <- function(
       result <- dplyr::filter(result, .data$preferred_description)
     }
 
+    # Select only standard columns
+    result <- dplyr::select(result, dplyr::all_of(codelist_cols()))
+
     return(as_codelist(result))
   }
 
@@ -73,11 +76,11 @@ CODES <- function(
 
   # Empty input case
   if (length(codes_vec) == 0) {
-    return(as_codelist(tibble::tibble(
-      code = character(),
-      description = character(),
-      code_type = character()
-    )))
+    empty_cols <- setNames(
+      replicate(3, character(), simplify = FALSE),
+      codelist_cols()
+    )
+    return(as_codelist(tibble::as_tibble(empty_cols)))
   }
 
   # Validate remaining parameters
@@ -105,6 +108,9 @@ CODES <- function(
   if (preferred_description_only) {
     result <- dplyr::filter(result, .data$preferred_description)
   }
+
+  # Select only standard columns
+  result <- dplyr::select(result, dplyr::all_of(codelist_cols()))
 
   return(as_codelist(result))
 }

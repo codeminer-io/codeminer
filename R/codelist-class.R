@@ -1,3 +1,12 @@
+#' Standard codelist column names
+#'
+#' @return Character vector of standard column names: code, description, code_type
+#' @keywords internal
+#' @noRd
+codelist_cols <- function() {
+  c("code", "description", "code_type")
+}
+
 #' Lightweight class for codelists
 #'
 #' @param x A data frame to convert to a codelist
@@ -6,10 +15,10 @@
 #' @noRd
 as_codelist <- function(x) {
   stopifnot(is.data.frame(x))
-  structure(
-    tibble::as_tibble(x),
-    class = c("codeminer_codelist", class(tibble::as_tibble(x)))
-  )
+
+  tb <- tibble::as_tibble(x)
+  class(tb) <- c("codeminer_codelist", class(tb))
+  tb
 }
 
 #' Validate codelist data frame
@@ -23,7 +32,7 @@ as_codelist <- function(x) {
 #' @noRd
 validate_codeminer_codelist <- function(df, call = rlang::caller_env()) {
   # Check required columns exist
-  required_cols <- c("code", "description", "code_type")
+  required_cols <- codelist_cols()
   missing_cols <- setdiff(required_cols, names(df))
 
   if (length(missing_cols) > 0) {
