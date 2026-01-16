@@ -193,7 +193,6 @@ graph_closure_codes <- function(
   code_type,
   lookup_version,
   relationship_version,
-  codes_only,
   preferred_description_only,
   direction,
   rel_type = from_meta("child_parent_relationship_code"),
@@ -202,8 +201,21 @@ graph_closure_codes <- function(
   empty_warning = "No valid codes found.",
   call = rlang::caller_env()
 ) {
-  check_codes(codes)
-  check_code_type(code_type)
+  # Prepare input (handles character/||/codelist)
+  prepared <- prepare_codes_input(
+    codes,
+    code_type,
+    arg_name = "codes",
+    call = call
+  )
+  codes_vec <- prepared$codes
+
+  # Use codelist code_type if provided
+  if (!is.null(prepared$code_type)) {
+    code_type <- prepared$code_type
+  }
+
+  check_code_type(code_type, call = call)
 
   con <- connect_to_db()
   meta <- get_metadata_for_relationship(
@@ -224,8 +236,8 @@ graph_closure_codes <- function(
   available_codes <- rel_table |>
     dplyr::filter(
       .data[[meta$from_col]] %in%
-        .env$codes |
-        .data[[meta$to_col]] %in% .env$codes
+        .env$codes_vec |
+        .data[[meta$to_col]] %in% .env$codes_vec
     ) |>
     dplyr::select(dplyr::all_of(c(meta$from_col, meta$to_col))) |>
     tidyr::pivot_longer(dplyr::everything()) |>
@@ -233,7 +245,7 @@ graph_closure_codes <- function(
     dplyr::distinct() |>
     dplyr::pull(dplyr::all_of("value"))
 
-  missing_codes <- setdiff(codes, available_codes)
+  missing_codes <- setdiff(codes_vec, available_codes)
 
   if (length(missing_codes) > 0) {
     missing_codes_warning(
@@ -244,7 +256,7 @@ graph_closure_codes <- function(
   }
 
   result_codes <- graph_closure(
-    nodes = codes,
+    nodes = codes_vec,
     relationship_tbl = rel_table,
     from_colname = meta$from_col,
     to_colname = meta$to_col,
@@ -257,12 +269,16 @@ graph_closure_codes <- function(
 
   # Include self (graph_closure handles this, but we also add original codes)
   if (include_self) {
-    result_codes <- c(codes, result_codes) |> unique()
+    result_codes <- c(codes_vec, result_codes) |> unique()
   }
 
   if (length(result_codes) == 0) {
     codeminer_warn(empty_warning)
-    return(if (codes_only) character(0) else data.frame())
+    return(as_codelist(tibble::tibble(
+      code = character(),
+      description = character(),
+      code_type = character()
+    )))
   }
 
   result <- CODES(
@@ -272,9 +288,6 @@ graph_closure_codes <- function(
     preferred_description_only = preferred_description_only
   )
 
-  if (codes_only) {
-    return(unique(result$code))
-  }
   return(result)
 }
 

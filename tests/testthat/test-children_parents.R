@@ -29,25 +29,23 @@ test_that("CHILDREN() and PARENTS() return the expected data format", {
   expect_identical(unique(parents_result$code_type), test_type)
 })
 
-test_that("CHILDREN() and PARENTS() work with codes_only = TRUE", {
+test_that("CHILDREN() and PARENTS() work with code extraction", {
   test_codes <- c("E10", "E11")
   test_type <- "ICD-10"
 
   children_result <- CHILDREN(
     test_codes,
-    code_type = test_type,
-    codes_only = TRUE
+    code_type = test_type
   )
-  expect_type(children_result, "character")
-  expect_true(length(children_result) >= length(test_codes))
+  expect_type(children_result$code, "character")
+  expect_true(length(children_result$code) >= length(test_codes))
 
   parents_result <- PARENTS(
     test_codes,
-    code_type = test_type,
-    codes_only = TRUE
+    code_type = test_type
   )
-  expect_type(parents_result, "character")
-  expect_true(length(parents_result) >= length(test_codes))
+  expect_type(parents_result$code, "character")
+  expect_true(length(parents_result$code) >= length(test_codes))
 })
 
 test_that("CHILDREN() and PARENTS() return all hierarchy descendants/ancestors and ignore non-is_a relationships", {
@@ -72,19 +70,18 @@ test_that("CHILDREN() and PARENTS() return all hierarchy descendants/ancestors a
   )
   add_relationship_table(dummy_relationships, relationship_metadata(test_type))
 
-  children_result <- CHILDREN("parent", code_type = "dummy", codes_only = TRUE)
+  children_result <- CHILDREN("parent", code_type = "dummy")
   expect_identical(
-    sort(children_result),
+    sort(children_result$code),
     c("child1", "child2", "grandchild", "parent")
   )
 
   parents_result <- PARENTS(
     "grandchild",
-    code_type = "dummy",
-    codes_only = TRUE
+    code_type = "dummy"
   )
   expect_identical(
-    sort(parents_result),
+    sort(parents_result$code),
     c("child1", "grandchild", "parent")
   )
 })
@@ -109,83 +106,81 @@ test_that("N_CHILDREN() and N_PARENTS() respect depth parameter", {
   children_1 <- N_CHILDREN(
     "root",
     depth = 1,
-    code_type = test_type,
-    codes_only = TRUE
+    code_type = test_type
   )
-  expect_identical(sort(children_1), c("level1", "root"))
+  expect_identical(sort(children_1$code), c("level1", "root"))
 
   # depth = 2 should return up to 2 levels
   children_2 <- N_CHILDREN(
     "root",
     depth = 2,
-    code_type = test_type,
-    codes_only = TRUE
+    code_type = test_type
   )
-  expect_identical(sort(children_2), c("level1", "level2", "root"))
+  expect_identical(sort(children_2$code), c("level1", "level2", "root"))
 
   # depth = Inf should return all
   children_all <- N_CHILDREN(
     "root",
     depth = Inf,
-    code_type = test_type,
-    codes_only = TRUE
+    code_type = test_type
   )
-  expect_identical(sort(children_all), c("level1", "level2", "level3", "root"))
+  expect_identical(
+    sort(children_all$code),
+    c("level1", "level2", "level3", "root")
+  )
 
   # Test parents with depth
   parents_1 <- N_PARENTS(
     "level3",
     depth = 1,
-    code_type = test_type,
-    codes_only = TRUE
+    code_type = test_type
   )
-  expect_identical(sort(parents_1), c("level2", "level3"))
+  expect_identical(sort(parents_1$code), c("level2", "level3"))
 
   parents_2 <- N_PARENTS(
     "level3",
     depth = 2,
-    code_type = test_type,
-    codes_only = TRUE
+    code_type = test_type
   )
-  expect_identical(sort(parents_2), c("level1", "level2", "level3"))
+  expect_identical(sort(parents_2$code), c("level1", "level2", "level3"))
 
   parents_all <- N_PARENTS(
     "level3",
     depth = Inf,
-    code_type = test_type,
-    codes_only = TRUE
+    code_type = test_type
   )
-  expect_identical(sort(parents_all), c("level1", "level2", "level3", "root"))
+  expect_identical(
+    sort(parents_all$code),
+    c("level1", "level2", "level3", "root")
+  )
 })
 
 test_that("CHILDREN() and N_CHILDREN() with depth=Inf return same results", {
   test_codes <- c("E10")
   test_type <- "ICD-10"
 
-  children_inf <- CHILDREN(test_codes, code_type = test_type, codes_only = TRUE)
+  children_inf <- CHILDREN(test_codes, code_type = test_type)
   n_children_inf <- N_CHILDREN(
     test_codes,
     depth = Inf,
-    code_type = test_type,
-    codes_only = TRUE
+    code_type = test_type
   )
 
-  expect_identical(children_inf, n_children_inf)
+  expect_identical(children_inf$code, n_children_inf$code)
 })
 
 test_that("PARENTS() and N_PARENTS() with depth=Inf return same results", {
   test_codes <- c("E10")
   test_type <- "ICD-10"
 
-  parents_inf <- PARENTS(test_codes, code_type = test_type, codes_only = TRUE)
+  parents_inf <- PARENTS(test_codes, code_type = test_type)
   n_parents_inf <- N_PARENTS(
     test_codes,
     depth = Inf,
-    code_type = test_type,
-    codes_only = TRUE
+    code_type = test_type
   )
 
-  expect_identical(parents_inf, n_parents_inf)
+  expect_identical(parents_inf$code, n_parents_inf$code)
 })
 
 test_that("CHILDREN() works with the codeminer.code_type option", {
@@ -255,18 +250,16 @@ test_that("CHILDREN() uses correct latest version", {
   v2_result <- CHILDREN(
     "PARENT_A",
     code_type = test_type,
-    lookup_version = test_version,
-    codes_only = TRUE
+    lookup_version = test_version
   )
-  expect_identical(v2_result, c("A", "PARENT_A"))
+  expect_identical(v2_result$code, c("A", "PARENT_A"))
 
   latest_result <- CHILDREN(
     "PARENT_A",
     code_type = test_type,
-    lookup_version = "latest",
-    codes_only = TRUE
+    lookup_version = "latest"
   )
-  expect_identical(latest_result, v2_result)
+  expect_identical(latest_result$code, v2_result$code)
 })
 
 test_that("CHILDREN() fails for wrong argument types", {
@@ -313,28 +306,28 @@ test_that("CHILDREN() and PARENTS() return empty result for invalid codes", {
   test_codes <- c("nonexistent1", "nonexistent2")
 
   suppressMessages(suppressWarnings(
-    children_df <- CHILDREN(test_codes, "ICD-10", codes_only = FALSE)
+    children_df <- CHILDREN(test_codes, "ICD-10")
   ))
   expect_s3_class(children_df, "data.frame")
   expect_equal(nrow(children_df), 0)
 
   suppressMessages(suppressWarnings(
-    children_vec <- CHILDREN(test_codes, "ICD-10", codes_only = TRUE)
+    children_vec <- CHILDREN(test_codes, "ICD-10")
   ))
-  expect_type(children_vec, "character")
-  expect_equal(length(children_vec), 0)
+  expect_type(children_vec$code, "character")
+  expect_equal(length(children_vec$code), 0)
 
   suppressMessages(suppressWarnings(
-    parents_df <- PARENTS(test_codes, "ICD-10", codes_only = FALSE)
+    parents_df <- PARENTS(test_codes, "ICD-10")
   ))
   expect_s3_class(parents_df, "data.frame")
   expect_equal(nrow(parents_df), 0)
 
   suppressMessages(suppressWarnings(
-    parents_vec <- PARENTS(test_codes, "ICD-10", codes_only = TRUE)
+    parents_vec <- PARENTS(test_codes, "ICD-10")
   ))
-  expect_type(parents_vec, "character")
-  expect_equal(length(parents_vec), 0)
+  expect_type(parents_vec$code, "character")
+  expect_equal(length(parents_vec$code), 0)
 })
 
 test_that("CHILDREN() handles empty input", {

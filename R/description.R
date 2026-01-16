@@ -1,16 +1,13 @@
 #' Search for codes that match a description
 #'
-#' Returns a data frame with clinical codes that match the provided description pattern.
+#' Returns a codelist with clinical codes that match the provided description pattern.
 #'
 #' @param pattern The description to search for. See [stringr::str_detect()] for details.
 #' @param ignore_case If `TRUE` (default), ignore case in `description`.
-#' @param codes_only `logical`. If `TRUE`, return a character vector of
-#'   \emph{unique} codes. If `FALSE` (default), return a data frame of all
-#'   results including code descriptions (useful for manual validation).
+#' @param preferred_description_only `logical`. If `TRUE` (default), return only preferred descriptions.
 #' @inheritParams CODES
 #'
-#' @return The result of [CODES()] for codes that match the description, or a character vector of codes if
-#'   `codes_only` is `TRUE`.
+#' @return A `codeminer_codelist` with codes that match the description.
 #'
 #' @export
 #' @examples
@@ -24,14 +21,12 @@ DESCRIPTION <- function(
   code_type = getOption("codeminer.code_type"),
   lookup_version = getOption("codeminer.lookup_version", default = "latest"),
   ignore_case = TRUE,
-  codes_only = FALSE,
   preferred_description_only = TRUE
 ) {
   check_pattern(pattern)
   check_code_type(code_type)
   check_version(lookup_version)
   check_logical_scalar(ignore_case, "ignore_case")
-  check_logical_scalar(codes_only, "codes_only")
   check_logical_scalar(preferred_description_only, "preferred_description_only")
 
   con <- connect_to_db()
@@ -74,8 +69,5 @@ DESCRIPTION <- function(
     preferred_description_only = preferred_description_only
   )
 
-  if (codes_only) {
-    return(result$code)
-  }
   return(result)
 }

@@ -26,7 +26,15 @@ RELATIONSHIP_TYPES_FROM <- function(
     default = "latest"
   )
 ) {
-  check_codes(codes)
+  # Prepare input (handles character/||/codelist)
+  prepared <- prepare_codes_input(codes, code_type, arg_name = "codes")
+  codes_vec <- prepared$codes
+
+  # Use codelist code_type if provided
+  if (!is.null(prepared$code_type)) {
+    code_type <- prepared$code_type
+  }
+
   check_code_type(code_type)
   check_version(relationship_version)
 
@@ -41,7 +49,7 @@ RELATIONSHIP_TYPES_FROM <- function(
 
   # Get relationship types where codes are in the 'from' column
   result <- rel_table |>
-    dplyr::filter(.data[[meta$from_col]] %in% .env$codes) |>
+    dplyr::filter(.data[[meta$from_col]] %in% .env$codes_vec) |>
     dplyr::select(dplyr::all_of(meta$type_col)) |>
     dplyr::distinct() |>
     dplyr::collect() |>
@@ -49,12 +57,12 @@ RELATIONSHIP_TYPES_FROM <- function(
 
   # Warning if no codes found
   available_codes <- rel_table |>
-    dplyr::filter(.data[[meta$from_col]] %in% .env$codes) |>
+    dplyr::filter(.data[[meta$from_col]] %in% .env$codes_vec) |>
     dplyr::select(dplyr::all_of(meta$from_col)) |>
     dplyr::distinct() |>
     dplyr::pull(dplyr::all_of(meta$from_col))
 
-  missing_codes <- setdiff(codes, available_codes)
+  missing_codes <- setdiff(codes_vec, available_codes)
   if (length(missing_codes) > 0) {
     missing_codes_warning(
       missing_codes,
@@ -67,9 +75,19 @@ RELATIONSHIP_TYPES_FROM <- function(
     codeminer_warn(
       "No relationship types found originating from the specified codes."
     )
+    return(as_codelist(tibble::tibble(
+      code = character(),
+      description = character(),
+      code_type = character()
+    )))
   }
 
-  result
+  # Return as codelist (relationship types are metadata, not codes in lookup table)
+  as_codelist(tibble::tibble(
+    code = result,
+    description = result, # For relationship types, code and description are the same
+    code_type = code_type
+  ))
 }
 
 #' @rdname relationship_types
@@ -82,7 +100,15 @@ RELATIONSHIP_TYPES_TO <- function(
     default = "latest"
   )
 ) {
-  check_codes(codes)
+  # Prepare input (handles character/||/codelist)
+  prepared <- prepare_codes_input(codes, code_type, arg_name = "codes")
+  codes_vec <- prepared$codes
+
+  # Use codelist code_type if provided
+  if (!is.null(prepared$code_type)) {
+    code_type <- prepared$code_type
+  }
+
   check_code_type(code_type)
   check_version(relationship_version)
 
@@ -97,7 +123,7 @@ RELATIONSHIP_TYPES_TO <- function(
 
   # Get relationship types where codes are in the 'to' column
   result <- rel_table |>
-    dplyr::filter(.data[[meta$to_col]] %in% .env$codes) |>
+    dplyr::filter(.data[[meta$to_col]] %in% .env$codes_vec) |>
     dplyr::select(dplyr::all_of(meta$type_col)) |>
     dplyr::distinct() |>
     dplyr::collect() |>
@@ -105,12 +131,12 @@ RELATIONSHIP_TYPES_TO <- function(
 
   # Warning if no codes found
   available_codes <- rel_table |>
-    dplyr::filter(.data[[meta$to_col]] %in% .env$codes) |>
+    dplyr::filter(.data[[meta$to_col]] %in% .env$codes_vec) |>
     dplyr::select(dplyr::all_of(meta$to_col)) |>
     dplyr::distinct() |>
     dplyr::pull(dplyr::all_of(meta$to_col))
 
-  missing_codes <- setdiff(codes, available_codes)
+  missing_codes <- setdiff(codes_vec, available_codes)
   if (length(missing_codes) > 0) {
     missing_codes_warning(
       missing_codes,
@@ -123,7 +149,17 @@ RELATIONSHIP_TYPES_TO <- function(
     codeminer_warn(
       "No relationship types found pointing to the specified codes."
     )
+    return(as_codelist(tibble::tibble(
+      code = character(),
+      description = character(),
+      code_type = character()
+    )))
   }
 
-  result
+  # Return as codelist (relationship types are metadata, not codes in lookup table)
+  as_codelist(tibble::tibble(
+    code = result,
+    description = result, # For relationship types, code and description are the same
+    code_type = code_type
+  ))
 }

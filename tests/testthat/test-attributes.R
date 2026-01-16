@@ -25,16 +25,15 @@ test_that("ATTRIBUTES_FOR() and HAS_ATTRIBUTES() return the expected data format
   expect_identical(unique(result$code_type), test_type)
   expect_identical(result$code, "alpha_code")
 
-  # With `codes_only = TRUE`
-  result_codes_only <- ATTRIBUTES_FOR(
+  # Test codes extraction
+  result_codes <- ATTRIBUTES_FOR(
     "B",
     code_type = test_type,
-    codes_only = TRUE,
     relationship_types = "has attribute"
   )
-  expect_type(result_codes_only, "character")
-  expect_identical(result_codes_only, "beta_code")
-  expect_false("B" %in% result_codes_only)
+  expect_type(result_codes$code, "character")
+  expect_identical(result_codes$code, "beta_code")
+  expect_false("B" %in% result_codes$code)
 
   # HAS_ATTRIBUTES tests - alpha_code is an attribute of A
   has_result <- HAS_ATTRIBUTES("alpha_code", code_type = test_type)
@@ -44,12 +43,11 @@ test_that("ATTRIBUTES_FOR() and HAS_ATTRIBUTES() return the expected data format
 
   has_result_codes <- HAS_ATTRIBUTES(
     "beta_code",
-    code_type = test_type,
-    codes_only = TRUE
+    code_type = test_type
   )
-  expect_type(has_result_codes, "character")
-  expect_identical(has_result_codes, "B")
-  expect_false("beta_code" %in% has_result_codes)
+  expect_type(has_result_codes$code, "character")
+  expect_identical(has_result_codes$code, "B")
+  expect_false("beta_code" %in% has_result_codes$code)
 })
 
 test_that("ATTRIBUTES_FOR() and HAS_ATTRIBUTES() filter by relationship_types", {
@@ -72,28 +70,25 @@ test_that("ATTRIBUTES_FOR() and HAS_ATTRIBUTES() filter by relationship_types", 
   result <- ATTRIBUTES_FOR(
     "code1",
     relationship_types = "has attribute",
-    code_type = test_type,
-    codes_only = TRUE
+    code_type = test_type
   )
-  expect_identical(sort(result), c("attr1", "attr3"))
+  expect_identical(sort(result$code), c("attr1", "attr3"))
 
   # Filter for only "has property"
   result2 <- ATTRIBUTES_FOR(
     "code1",
     relationship_types = "has property",
-    code_type = test_type,
-    codes_only = TRUE
+    code_type = test_type
   )
-  expect_identical(result2, "attr2")
+  expect_identical(result2$code, "attr2")
 
   # HAS_ATTRIBUTES with filter
   has_result <- HAS_ATTRIBUTES(
     "attr2",
     relationship_types = "has property",
-    code_type = test_type,
-    codes_only = TRUE
+    code_type = test_type
   )
-  expect_identical(has_result, "code1")
+  expect_identical(has_result$code, "code1")
 })
 
 test_that("ATTRIBUTES_FOR() only returns immediate attributes (max_depth = 1)", {
@@ -112,10 +107,10 @@ test_that("ATTRIBUTES_FOR() only returns immediate attributes (max_depth = 1)", 
   )
   add_relationship_table(dummy_relationships, relationship_metadata(test_type))
 
-  result <- ATTRIBUTES_FOR("code1", code_type = test_type, codes_only = TRUE)
+  result <- ATTRIBUTES_FOR("code1", code_type = test_type)
 
   # Should only return attr1, not attr2 (which is an attribute of attr1)
-  expect_identical(result, "attr1")
+  expect_identical(result$code, "attr1")
 })
 
 test_that("ATTRIBUTES_FOR() and HAS_ATTRIBUTES() return empty for codes with no relationships", {
@@ -138,8 +133,7 @@ test_that("ATTRIBUTES_FOR() and HAS_ATTRIBUTES() return empty for codes with no 
   suppressWarnings(
     result_df <- ATTRIBUTES_FOR(
       "code_no_attr",
-      code_type = test_type,
-      codes_only = FALSE
+      code_type = test_type
     )
   )
   expect_s3_class(result_df, "data.frame")
@@ -148,19 +142,17 @@ test_that("ATTRIBUTES_FOR() and HAS_ATTRIBUTES() return empty for codes with no 
   suppressWarnings(
     result_vec <- ATTRIBUTES_FOR(
       "code_no_attr",
-      code_type = test_type,
-      codes_only = TRUE
+      code_type = test_type
     )
   )
-  expect_type(result_vec, "character")
-  expect_equal(length(result_vec), 0)
+  expect_type(result_vec$code, "character")
+  expect_equal(length(result_vec$code), 0)
 
   # HAS_ATTRIBUTES
   suppressWarnings(
     has_df <- HAS_ATTRIBUTES(
       "attr_unused",
-      code_type = test_type,
-      codes_only = FALSE
+      code_type = test_type
     )
   )
   expect_s3_class(has_df, "data.frame")
@@ -169,12 +161,11 @@ test_that("ATTRIBUTES_FOR() and HAS_ATTRIBUTES() return empty for codes with no 
   suppressWarnings(
     has_vec <- HAS_ATTRIBUTES(
       "attr_unused",
-      code_type = test_type,
-      codes_only = TRUE
+      code_type = test_type
     )
   )
-  expect_type(has_vec, "character")
-  expect_equal(length(has_vec), 0)
+  expect_type(has_vec$code, "character")
+  expect_equal(length(has_vec$code), 0)
 })
 
 test_that("ATTRIBUTES_FOR() works with multiple codes", {
@@ -195,9 +186,8 @@ test_that("ATTRIBUTES_FOR() works with multiple codes", {
 
   result <- ATTRIBUTES_FOR(
     c("code1", "code2"),
-    code_type = test_type,
-    codes_only = TRUE
+    code_type = test_type
   )
 
-  expect_identical(sort(result), c("attr1", "attr2", "attr3"))
+  expect_identical(sort(result$code), c("attr1", "attr2", "attr3"))
 })

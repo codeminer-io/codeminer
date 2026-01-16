@@ -32,15 +32,11 @@ ATTRIBUTES_FOR <- function(
     "codeminer.relationship_version",
     default = "latest"
   ),
-  codes_only = FALSE,
   preferred_description_only = TRUE
 ) {
-  check_codes(codes)
   check_relationship_types(relationship_types)
-  check_code_type(code_type)
   check_version(lookup_version)
   check_version(relationship_version)
-  check_logical_scalar(codes_only, "codes_only")
   check_logical_scalar(preferred_description_only, "preferred_description_only")
 
   graph_closure_codes(
@@ -48,7 +44,6 @@ ATTRIBUTES_FOR <- function(
     code_type = code_type,
     lookup_version = lookup_version,
     relationship_version = relationship_version,
-    codes_only = codes_only,
     preferred_description_only = preferred_description_only,
     direction = "out",
     rel_type = relationship_types,
@@ -69,15 +64,11 @@ HAS_ATTRIBUTES <- function(
     "codeminer.relationship_version",
     default = "latest"
   ),
-  codes_only = FALSE,
   preferred_description_only = TRUE
 ) {
-  check_codes(attribute_codes)
   check_relationship_types(relationship_types)
-  check_code_type(code_type)
   check_version(lookup_version)
   check_version(relationship_version)
-  check_logical_scalar(codes_only, "codes_only")
   check_logical_scalar(preferred_description_only, "preferred_description_only")
 
   graph_closure_codes(
@@ -85,7 +76,6 @@ HAS_ATTRIBUTES <- function(
     code_type = code_type,
     lookup_version = lookup_version,
     relationship_version = relationship_version,
-    codes_only = codes_only,
     preferred_description_only = preferred_description_only,
     direction = "in",
     rel_type = relationship_types,

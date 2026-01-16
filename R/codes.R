@@ -1,9 +1,13 @@
 #' Look up descriptions for clinical codes
 #'
-#' Returns a data frame including descriptions for the codes of interest
+#' Returns a codelist with descriptions for the codes of interest.
+#' Supports flexible input: character vectors, `||` separated strings, or data frames.
 #'
-#' @param codes character. Vector of codes to lookup. If passing `"all"`, returns all codes.
+#' @param codes Character vector, `||` separated string, or data frame with code/description/code_type columns.
+#'   Special values: `"all"` returns all codes; empty input returns empty codelist.
+#'   Comments can be added with `<< >>` syntax: `"E10 << Type 1 diabetes >>"`.
 #' @param code_type character. Type of clinical code system to be searched.
+#'   Optional if `codes` is a data frame with code_type column.
 #'   Depends on what is available in the lookup tables. See [add_lookup_table()]
 #'   on how to add new lookup tables. This can also be configured through the `codeminer.code_type` option.
 #' @param lookup_version character. Version of the lookup table to use. Default:
@@ -11,7 +15,7 @@
 #' @param preferred_description_only logical. If `TRUE`, only returns the preferred description for each code.
 #'   Default: `FALSE`.
 #'
-#' @return A `data.frame` containing the codes and their descriptions
+#' @return A `codeminer_codelist` object (tibble) containing the codes and their descriptions
 #' @export
 #' @family Clinical code lookups and mappings
 #' @seealso [add_lookup_table()] for adding new lookup tables to the database.
@@ -20,33 +24,76 @@
 #' temp_db <- tempfile(fileext = ".duckdb")
 #' create_dummy_database(temp_db)
 #'
-#' # look up ICD10 codes
-#' CODES(
-#'   codes = c("E10", "E11"),
-#'   code_type = "ICD-10"
+#' # Character vector
+#' CODES(c("E10", "E11"), code_type = "ICD-10")
+#'
+#' # With comments
+#' CODES("E10 << Type 1 diabetes >>", code_type = "ICD-10")
+#'
+#' # || separated string
+#' CODES("E10 || E11", code_type = "ICD-10")
+#'
+#' # Data frame input
+#' df <- data.frame(
+#'   code = c("E10", "E11"),
+#'   description = c("Type 1", "Type 2"),
+#'   code_type = c("ICD-10", "ICD-10")
 #' )
+#' CODES(df)
 CODES <- function(
   codes,
   code_type = getOption("codeminer.code_type"),
   lookup_version = getOption("codeminer.lookup_version", default = "latest"),
   preferred_description_only = TRUE
 ) {
-  check_lookup_args(codes, code_type, lookup_version)
+  # Validate logical parameter
+  check_logical_scalar(preferred_description_only, "preferred_description_only")
+
+  # Handle special case: "all"
+  if (is.character(codes) && length(codes) == 1 && identical(codes, "all")) {
+    check_code_type(code_type)
+    check_version(lookup_version)
+
+    con <- connect_to_db()
+    check_database(con)
+    lookup_table <- get_lookup_table(con, code_type, lookup_version)
+    result <- dplyr::collect(lookup_table)
+
+    if (preferred_description_only) {
+      result <- dplyr::filter(result, .data$preferred_description)
+    }
+
+    return(as_codelist(result))
+  }
+
+  # Prepare input using helper (handles character/||/data frame)
+  prepared <- prepare_codes_input(codes, code_type, arg_name = "codes")
+  codes_vec <- prepared$codes
+  code_type <- prepared$code_type
+
+  # Empty input case
+  if (length(codes_vec) == 0) {
+    return(as_codelist(tibble::tibble(
+      code = character(),
+      description = character(),
+      code_type = character()
+    )))
+  }
+
+  # Validate remaining parameters
+  check_code_type(code_type)
+  check_version(lookup_version)
 
   con <- connect_to_db()
   check_database(con)
 
   lookup_table <- get_lookup_table(con, code_type, lookup_version)
 
-  if (identical(codes, "all")) {
-    return(dplyr::collect(lookup_table))
-  }
-
   result <- lookup_table |>
-    dplyr::filter(.data[["code"]] %in% .env$codes) |>
+    dplyr::filter(.data[["code"]] %in% .env$codes_vec) |>
     dplyr::collect()
 
-  missing_codes <- setdiff(codes, result[["code"]])
+  missing_codes <- setdiff(codes_vec, result[["code"]])
   if (length(missing_codes) > 0) {
     missing_codes_warning(
       missing_codes,
@@ -59,32 +106,10 @@ CODES <- function(
     result <- dplyr::filter(result, .data$preferred_description)
   }
 
-  return(result)
+  return(as_codelist(result))
 }
 
 # Argument validation helpers
-check_lookup_args <- function(
-  codes,
-  code_type,
-  lookup_version,
-  call = rlang::caller_env()
-) {
-  check_codes(codes, call)
-  check_code_type(code_type, call)
-  check_version(lookup_version, call)
-}
-
-check_codes <- function(codes, call = rlang::caller_env()) {
-  if (!rlang::is_character(codes)) {
-    codeminer_abort(
-      "{.arg codes} must be a character vector, not {typeof(codes)}",
-      call = call
-    )
-  }
-
-  unique(codes)
-}
-
 check_code_type <- function(code_type, call = rlang::caller_env()) {
   code_type_expr <- rlang::enquo(code_type)
 
@@ -179,7 +204,10 @@ CODES_LIKE <- function(
   lookup_version = getOption("codeminer.lookup_version", default = "latest"),
   preferred_description_only = TRUE
 ) {
-  check_lookup_args(pattern, code_type, lookup_version)
+  check_pattern(pattern)
+  check_code_type(code_type)
+  check_version(lookup_version)
+  check_logical_scalar(preferred_description_only, "preferred_description_only")
 
   con <- connect_to_db()
   check_database(con)

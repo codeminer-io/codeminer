@@ -19,21 +19,21 @@ test_that("RELATIONSHIP_TYPES_FROM() and RELATIONSHIP_TYPES_TO() return expected
   # RELATIONSHIP_TYPES_FROM
   # B has "is a" relationship to A, and "has attribute" relationship to beta_code
   types_from_b <- RELATIONSHIP_TYPES_FROM("B", code_type = test_type)
-  expect_type(types_from_b, "character")
-  expect_identical(sort(types_from_b), c("has attribute", "is a"))
+  expect_type(types_from_b$code, "character")
+  expect_identical(sort(types_from_b$code), c("has attribute", "is a"))
 
   # A only has "has attribute" relationship
   types_from_a <- RELATIONSHIP_TYPES_FROM("A", code_type = test_type)
-  expect_identical(types_from_a, "has attribute")
+  expect_identical(types_from_a$code, "has attribute")
 
   # RELATIONSHIP_TYPES_TO
   # A is the target of "is a" relationships from B, C, D
   types_to_a <- RELATIONSHIP_TYPES_TO("A", code_type = test_type)
-  expect_identical(types_to_a, "is a")
+  expect_identical(types_to_a$code, "is a")
 
   # alpha_code is target of "has attribute" from A
   types_to_alpha <- RELATIONSHIP_TYPES_TO("alpha_code", code_type = test_type)
-  expect_identical(types_to_alpha, "has attribute")
+  expect_identical(types_to_alpha$code, "has attribute")
 })
 
 test_that("RELATIONSHIP_TYPES_FROM() and RELATIONSHIP_TYPES_TO() handle multiple codes", {
@@ -57,11 +57,11 @@ test_that("RELATIONSHIP_TYPES_FROM() and RELATIONSHIP_TYPES_TO() handle multiple
     c("code1", "code2"),
     code_type = test_type
   )
-  expect_identical(sort(types_from), c("type_a", "type_b", "type_c"))
+  expect_identical(sort(types_from$code), c("type_a", "type_b", "type_c"))
 
   # Multiple codes in TO
   types_to <- RELATIONSHIP_TYPES_TO(c("attr1", "attr2"), code_type = test_type)
-  expect_identical(sort(types_to), c("type_a", "type_b", "type_c"))
+  expect_identical(sort(types_to$code), c("type_a", "type_b", "type_c"))
 })
 
 test_that("RELATIONSHIP_TYPES_FROM() and RELATIONSHIP_TYPES_TO() warn for missing codes", {

@@ -41,7 +41,6 @@ CHILDREN <- function(
     "codeminer.relationship_version",
     default = "latest"
   ),
-  codes_only = FALSE,
   preferred_description_only = TRUE
 ) {
   N_CHILDREN(
@@ -50,7 +49,6 @@ CHILDREN <- function(
     code_type = code_type,
     lookup_version = lookup_version,
     relationship_version = relationship_version,
-    codes_only = codes_only,
     preferred_description_only = preferred_description_only
   )
 }
@@ -65,7 +63,6 @@ PARENTS <- function(
     "codeminer.relationship_version",
     default = "latest"
   ),
-  codes_only = FALSE,
   preferred_description_only = TRUE
 ) {
   N_PARENTS(
@@ -74,7 +71,6 @@ PARENTS <- function(
     code_type = code_type,
     lookup_version = lookup_version,
     relationship_version = relationship_version,
-    codes_only = codes_only,
     preferred_description_only = preferred_description_only
   )
 }
@@ -90,15 +86,11 @@ N_CHILDREN <- function(
     "codeminer.relationship_version",
     default = "latest"
   ),
-  codes_only = FALSE,
   preferred_description_only = TRUE
 ) {
-  check_codes(codes)
   check_depth(depth)
-  check_code_type(code_type)
   check_version(lookup_version)
   check_version(relationship_version)
-  check_logical_scalar(codes_only, "codes_only")
   check_logical_scalar(preferred_description_only, "preferred_description_only")
 
   graph_closure_codes(
@@ -106,7 +98,6 @@ N_CHILDREN <- function(
     code_type = code_type,
     lookup_version = lookup_version,
     relationship_version = relationship_version,
-    codes_only = codes_only,
     preferred_description_only = preferred_description_only,
     direction = "in",
     rel_type = from_meta("child_parent_relationship_code"),
@@ -127,15 +118,11 @@ N_PARENTS <- function(
     "codeminer.relationship_version",
     default = "latest"
   ),
-  codes_only = FALSE,
   preferred_description_only = TRUE
 ) {
-  check_codes(codes)
   check_depth(depth)
-  check_code_type(code_type)
   check_version(lookup_version)
   check_version(relationship_version)
-  check_logical_scalar(codes_only, "codes_only")
   check_logical_scalar(preferred_description_only, "preferred_description_only")
 
   graph_closure_codes(
@@ -143,7 +130,6 @@ N_PARENTS <- function(
     code_type = code_type,
     lookup_version = lookup_version,
     relationship_version = relationship_version,
-    codes_only = codes_only,
     preferred_description_only = preferred_description_only,
     direction = "out",
     rel_type = from_meta("child_parent_relationship_code"),
