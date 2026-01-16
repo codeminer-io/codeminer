@@ -12,7 +12,6 @@ ATTRIBUTES_FOR(
   code_type = getOption("codeminer.code_type"),
   lookup_version = getOption("codeminer.lookup_version", default = "latest"),
   relationship_version = getOption("codeminer.relationship_version", default = "latest"),
-  codes_only = FALSE,
   preferred_description_only = TRUE
 )
 
@@ -22,7 +21,6 @@ HAS_ATTRIBUTES(
   code_type = getOption("codeminer.code_type"),
   lookup_version = getOption("codeminer.lookup_version", default = "latest"),
   relationship_version = getOption("codeminer.relationship_version", default = "latest"),
-  codes_only = FALSE,
   preferred_description_only = TRUE
 )
 }
@@ -37,9 +35,6 @@ If \code{NULL} (default), all relationship types are included.}
 \item{lookup_version}{Lookup table version (character).}
 
 \item{relationship_version}{Relationship table version (character).}
-
-\item{codes_only}{Logical. If \code{TRUE}, return only unique codes. If \code{FALSE},
-return a data frame with code and description.}
 
 \item{preferred_description_only}{Logical. If \code{TRUE}, return only preferred
 descriptions.}

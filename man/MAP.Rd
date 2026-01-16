@@ -13,9 +13,10 @@ MAP(
 )
 }
 \arguments{
-\item{codes}{A character vector of codes to be mapped. If passing \code{"all"}, all mapped codes will be returned.}
+\item{codes}{Character vector, \code{||} separated string, or data frame with codes to be mapped.
+Special value: \code{"all"} returns all mapped codes.}
 
-\item{from}{Coding system that \code{codes} belong to.}
+\item{from}{Coding system that \code{codes} belong to. Optional if \code{codes} is a codelist with code_type.}
 
 \item{to}{Coding system to map \code{codes} to.}
 
@@ -25,7 +26,7 @@ MAP(
 \code{"latest"}. Can be configured through the \code{codeminer.lookup_version} option.}
 }
 \value{
-A \code{data.frame} of the mapped codes with their descriptions, as returned by \code{\link[=CODES]{CODES()}}.
+A \code{codeminer_codelist} of the mapped codes with their descriptions.
 
 If using \code{codes = "all"}, returns the mapping table as a \code{data.frame} with columns:
 \itemize{
@@ -46,7 +47,19 @@ as most mapping tables only work one way.
 temp_db <- tempfile(fileext = ".duckdb")
 create_dummy_database(temp_db)
 
+# Character vector
 MAP("X40J4", from = "Read 3", to = "ICD-10")
+
+# || separated
+MAP("X40J4 || X40J5", from = "Read 3", to = "ICD-10")
+
+# Data frame input (from is optional)
+df <- data.frame(
+  code = c("X40J4", "X40J5"),
+  description = c("Desc 1", "Desc 2"),
+  code_type = c("Read 3", "Read 3")
+)
+MAP(df, to = "ICD-10")
 
 # Return the mapping table itself
 MAP("all", from = "Read 3", to = "ICD-10")

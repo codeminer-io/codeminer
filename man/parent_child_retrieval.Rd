@@ -13,7 +13,6 @@ CHILDREN(
   code_type = getOption("codeminer.code_type"),
   lookup_version = getOption("codeminer.lookup_version", default = "latest"),
   relationship_version = getOption("codeminer.relationship_version", default = "latest"),
-  codes_only = FALSE,
   preferred_description_only = TRUE
 )
 
@@ -22,7 +21,6 @@ PARENTS(
   code_type = getOption("codeminer.code_type"),
   lookup_version = getOption("codeminer.lookup_version", default = "latest"),
   relationship_version = getOption("codeminer.relationship_version", default = "latest"),
-  codes_only = FALSE,
   preferred_description_only = TRUE
 )
 
@@ -32,7 +30,6 @@ N_CHILDREN(
   code_type = getOption("codeminer.code_type"),
   lookup_version = getOption("codeminer.lookup_version", default = "latest"),
   relationship_version = getOption("codeminer.relationship_version", default = "latest"),
-  codes_only = FALSE,
   preferred_description_only = TRUE
 )
 
@@ -42,7 +39,6 @@ N_PARENTS(
   code_type = getOption("codeminer.code_type"),
   lookup_version = getOption("codeminer.lookup_version", default = "latest"),
   relationship_version = getOption("codeminer.relationship_version", default = "latest"),
-  codes_only = FALSE,
   preferred_description_only = TRUE
 )
 }
@@ -55,15 +51,15 @@ N_PARENTS(
 
 \item{relationship_version}{Relationship table version (character).}
 
-\item{codes_only}{Logical. If \code{TRUE}, return only unique codes. If \code{FALSE},
-return a data frame with code and description.}
-
 \item{preferred_description_only}{Logical. If \code{TRUE}, return only preferred
 descriptions.}
 
 \item{depth}{Integer. Maximum number of steps to traverse. Use \code{Inf} for
 transitive closure (all ancestors/descendants). Only used by \code{N_PARENTS()}
 and \code{N_CHILDREN()}.}
+
+\item{codes_only}{Logical. If \code{TRUE}, return only unique codes. If \code{FALSE},
+return a data frame with code and description.}
 }
 \value{
 A data frame of codes and descriptions, or a character vector if

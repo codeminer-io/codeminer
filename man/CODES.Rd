@@ -20,9 +20,12 @@ CODES_LIKE(
 )
 }
 \arguments{
-\item{codes}{character. Vector of codes to lookup. If passing \code{"all"}, returns all codes.}
+\item{codes}{Character vector, \code{||} separated string, or data frame with code/description/code_type columns.
+Special values: \code{"all"} returns all codes; empty input returns empty codelist.
+Comments can be added with \verb{<< >>} syntax: \code{"E10 << Type 1 diabetes >>"}.}
 
 \item{code_type}{character. Type of clinical code system to be searched.
+Optional if \code{codes} is a data frame with code_type column.
 Depends on what is available in the lookup tables. See \code{\link[=add_lookup_table]{add_lookup_table()}}
 on how to add new lookup tables. This can also be configured through the \code{codeminer.code_type} option.}
 
@@ -35,10 +38,11 @@ Default: \code{FALSE}.}
 \item{pattern}{a regular expression to search for}
 }
 \value{
-A \code{data.frame} containing the codes and their descriptions
+A \code{codeminer_codelist} object (tibble) containing the codes and their descriptions
 }
 \description{
-Returns a data frame including descriptions for the codes of interest
+Returns a codelist with descriptions for the codes of interest.
+Supports flexible input: character vectors, \code{||} separated strings, or data frames.
 }
 \details{
 \code{CODES_LIKE} searches for codes that match a given regular expression.
@@ -49,11 +53,22 @@ The matching is case-insensitive.
 temp_db <- tempfile(fileext = ".duckdb")
 create_dummy_database(temp_db)
 
-# look up ICD10 codes
-CODES(
-  codes = c("E10", "E11"),
-  code_type = "ICD-10"
+# Character vector
+CODES(c("E10", "E11"), code_type = "ICD-10")
+
+# With comments
+CODES("E10 << Type 1 diabetes >>", code_type = "ICD-10")
+
+# || separated string
+CODES("E10 || E11", code_type = "ICD-10")
+
+# Data frame input
+df <- data.frame(
+  code = c("E10", "E11"),
+  description = c("Type 1", "Type 2"),
+  code_type = c("ICD-10", "ICD-10")
 )
+CODES(df)
 CODES_LIKE("^E1", code_type = "ICD-10")
 }
 \seealso{

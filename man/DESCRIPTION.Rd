@@ -9,7 +9,6 @@ DESCRIPTION(
   code_type = getOption("codeminer.code_type"),
   lookup_version = getOption("codeminer.lookup_version", default = "latest"),
   ignore_case = TRUE,
-  codes_only = FALSE,
   preferred_description_only = TRUE
 )
 }
@@ -17,6 +16,7 @@ DESCRIPTION(
 \item{pattern}{The description to search for. See \code{\link[stringr:str_detect]{stringr::str_detect()}} for details.}
 
 \item{code_type}{character. Type of clinical code system to be searched.
+Optional if \code{codes} is a data frame with code_type column.
 Depends on what is available in the lookup tables. See \code{\link[=add_lookup_table]{add_lookup_table()}}
 on how to add new lookup tables. This can also be configured through the \code{codeminer.code_type} option.}
 
@@ -25,19 +25,13 @@ on how to add new lookup tables. This can also be configured through the \code{c
 
 \item{ignore_case}{If \code{TRUE} (default), ignore case in \code{description}.}
 
-\item{codes_only}{\code{logical}. If \code{TRUE}, return a character vector of
-\emph{unique} codes. If \code{FALSE} (default), return a data frame of all
-results including code descriptions (useful for manual validation).}
-
-\item{preferred_description_only}{logical. If \code{TRUE}, only returns the preferred description for each code.
-Default: \code{FALSE}.}
+\item{preferred_description_only}{\code{logical}. If \code{TRUE} (default), return only preferred descriptions.}
 }
 \value{
-The result of \code{\link[=CODES]{CODES()}} for codes that match the description, or a character vector of codes if
-\code{codes_only} is \code{TRUE}.
+A \code{codeminer_codelist} with codes that match the description.
 }
 \description{
-Returns a data frame with clinical codes that match the provided description pattern.
+Returns a codelist with clinical codes that match the provided description pattern.
 }
 \examples{
 # build dummy database
