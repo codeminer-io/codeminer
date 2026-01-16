@@ -27,11 +27,12 @@ DESCRIPTION <- function(
   codes_only = FALSE,
   preferred_description_only = TRUE
 ) {
-  if (!rlang::is_string(pattern)) {
-    codeminer_abort(
-      "{.arg pattern} must be a length 1 string, not {typeof(pattern)} with length {length(pattern)}"
-    )
-  }
+  check_pattern(pattern)
+  check_code_type(code_type)
+  check_version(lookup_version)
+  check_logical_scalar(ignore_case, "ignore_case")
+  check_logical_scalar(codes_only, "codes_only")
+  check_logical_scalar(preferred_description_only, "preferred_description_only")
 
   con <- connect_to_db()
   lkp_table <- get_lookup_table(

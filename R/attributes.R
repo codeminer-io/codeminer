@@ -35,6 +35,14 @@ ATTRIBUTES_FOR <- function(
   codes_only = FALSE,
   preferred_description_only = TRUE
 ) {
+  check_codes(codes)
+  check_relationship_types(relationship_types)
+  check_code_type(code_type)
+  check_version(lookup_version)
+  check_version(relationship_version)
+  check_logical_scalar(codes_only, "codes_only")
+  check_logical_scalar(preferred_description_only, "preferred_description_only")
+
   graph_closure_codes(
     codes = codes,
     code_type = code_type,
@@ -64,6 +72,14 @@ HAS_ATTRIBUTES <- function(
   codes_only = FALSE,
   preferred_description_only = TRUE
 ) {
+  check_codes(attribute_codes)
+  check_relationship_types(relationship_types)
+  check_code_type(code_type)
+  check_version(lookup_version)
+  check_version(relationship_version)
+  check_logical_scalar(codes_only, "codes_only")
+  check_logical_scalar(preferred_description_only, "preferred_description_only")
+
   graph_closure_codes(
     codes = attribute_codes,
     code_type = code_type,

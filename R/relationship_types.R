@@ -28,6 +28,7 @@ RELATIONSHIP_TYPES_FROM <- function(
 ) {
   check_codes(codes)
   check_code_type(code_type)
+  check_version(relationship_version)
 
   con <- connect_to_db()
   meta <- get_metadata_for_relationship(
@@ -83,6 +84,7 @@ RELATIONSHIP_TYPES_TO <- function(
 ) {
   check_codes(codes)
   check_code_type(code_type)
+  check_version(relationship_version)
 
   con <- connect_to_db()
   meta <- get_metadata_for_relationship(

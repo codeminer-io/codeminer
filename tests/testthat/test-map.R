@@ -22,11 +22,11 @@ test_that("MAP() returns the expected data format", {
 test_that("MAP fails for wrong argument types", {
   expect_error(
     MAP("foo", from = c("ICD-10", "icd11", "icd12"), to = "Read 3"),
-    "`from` must have length 1"
+    "`from` must be a string"
   )
   expect_error(
     MAP("foo", from = "Read 3", to = c("ICD-10", "icd11", "icd12")),
-    "`to` must have length 1"
+    "`to` must be a string"
   )
 })
 

@@ -86,9 +86,14 @@ check_codes <- function(codes, call = rlang::caller_env()) {
 }
 
 check_code_type <- function(code_type, call = rlang::caller_env()) {
+  code_type_expr <- rlang::enquo(code_type)
+
+  # nolint next: object_usage_linter.
+  code_type_name <- rlang::as_label(code_type_expr)
+
   if (!rlang::is_string(code_type)) {
     codeminer_abort(
-      "{.arg code_type} must be a string, not {typeof(code_type)} with length {length(code_type)}",
+      "{.arg {code_type_name}} must be a string, not {typeof(code_type)} with length {length(code_type)}",
       call = call
     )
   }
@@ -106,6 +111,53 @@ check_version <- function(version, call = rlang::caller_env()) {
         "x" = "{.arg {version_name}} must have length 1, not {length(version)}"
       ),
       ,
+      call = call
+    )
+  }
+}
+
+check_logical_scalar <- function(arg, arg_name, call = rlang::caller_env()) {
+  if (!rlang::is_scalar_logical(arg)) {
+    codeminer_abort(
+      "{.arg {arg_name}} must be TRUE or FALSE, not {typeof(arg)} with length {length(arg)}",
+      call = call
+    )
+  }
+}
+
+check_depth <- function(depth, call = rlang::caller_env()) {
+  if (!rlang::is_scalar_integerish(depth) && !identical(depth, Inf)) {
+    codeminer_abort(
+      "{.arg depth} must be a positive integer or Inf, not {typeof(depth)}",
+      call = call
+    )
+  }
+  if (is.finite(depth) && depth < 1) {
+    codeminer_abort(
+      "{.arg depth} must be at least 1, not {depth}",
+      call = call
+    )
+  }
+}
+
+check_relationship_types <- function(
+  relationship_types,
+  call = rlang::caller_env()
+) {
+  if (
+    !is.null(relationship_types) && !rlang::is_character(relationship_types)
+  ) {
+    codeminer_abort(
+      "{.arg relationship_types} must be NULL or a character vector, not {typeof(relationship_types)}",
+      call = call
+    )
+  }
+}
+
+check_pattern <- function(pattern, call = rlang::caller_env()) {
+  if (!rlang::is_string(pattern)) {
+    codeminer_abort(
+      "{.arg pattern} must be a length 1 string, not {typeof(pattern)} with length {length(pattern)}",
       call = call
     )
   }

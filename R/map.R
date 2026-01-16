@@ -164,17 +164,13 @@ check_mapping_args <- function(
   call = rlang::caller_env()
 ) {
   check_codes(codes, call = call)
+  check_code_type(from, call = call)
+  check_code_type(to, call = call)
   check_version(map_version, call = call)
 
-  if (length(from) != 1) {
+  if (identical(from, to)) {
     codeminer_abort(
-      "{.arg from} must have length 1, not {length(from)}",
-      call = call
-    )
-  }
-  if (length(to) != 1) {
-    codeminer_abort(
-      "{.arg to} must have length 1, not {length(to)}",
+      "{.arg from} and {.arg to} must be different code types",
       call = call
     )
   }
