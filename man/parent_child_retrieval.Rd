@@ -57,13 +57,9 @@ descriptions.}
 \item{depth}{Integer. Maximum number of steps to traverse. Use \code{Inf} for
 transitive closure (all ancestors/descendants). Only used by \code{N_PARENTS()}
 and \code{N_CHILDREN()}.}
-
-\item{codes_only}{Logical. If \code{TRUE}, return only unique codes. If \code{FALSE},
-return a data frame with code and description.}
 }
 \value{
-A data frame of codes and descriptions, or a character vector if
-\code{codes_only = TRUE}.
+A data frame of codes and descriptions.
 }
 \description{
 Returns immediate or transitive parent or child codes for the given codes by

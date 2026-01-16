@@ -12,8 +12,7 @@
 #'   If `NULL` (default), all relationship types are included.
 #' @inheritParams CHILDREN
 #' @family Code relationships
-#' @return A data frame of codes and descriptions, or a character vector if
-#'   `codes_only = TRUE`.
+#' @return A data frame of codes and descriptions
 #' @name attributes
 #' @examples
 #' create_dummy_database()

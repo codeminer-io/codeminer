@@ -76,7 +76,7 @@ CODES <- function(
 
   # Empty input case
   if (length(codes_vec) == 0) {
-    empty_cols <- setNames(
+    empty_cols <- stats::setNames(
       replicate(3, character(), simplify = FALSE),
       codelist_cols()
     )

@@ -42,8 +42,7 @@ descriptions.}
 \item{attribute_codes}{Character vector of attribute codes to search for.}
 }
 \value{
-A data frame of codes and descriptions, or a character vector if
-\code{codes_only = TRUE}.
+A data frame of codes and descriptions
 }
 \description{
 These functions traverse the relationship graph to find attributes for codes

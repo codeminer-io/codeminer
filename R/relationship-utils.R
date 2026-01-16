@@ -172,7 +172,6 @@ graph_closure <- function(
 #' @param code_type Code type (character).
 #' @param lookup_version Lookup table version (character).
 #' @param relationship_version Relationship table version (character).
-#' @param codes_only Logical. If `TRUE`, return only unique codes.
 #' @param preferred_description_only Logical. If `TRUE`, return only preferred
 #'   descriptions.
 #' @param direction Either `"out"` or `"in"`.
@@ -184,8 +183,7 @@ graph_closure <- function(
 #' @param max_depth Maximum traversal depth (integer).
 #' @param empty_warning Warning message when no codes are found (character).
 #'
-#' @return A data frame with code information, or a character vector if
-#'   `codes_only = TRUE`.
+#' @return A data frame with code information.
 #' @keywords internal
 #' @noRd
 graph_closure_codes <- function(

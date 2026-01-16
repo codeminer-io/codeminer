@@ -14,13 +14,10 @@
 #' @param code_type Code type (character).
 #' @param lookup_version Lookup table version (character).
 #' @param relationship_version Relationship table version (character).
-#' @param codes_only Logical. If `TRUE`, return only unique codes. If `FALSE`,
-#'   return a data frame with code and description.
 #' @param preferred_description_only Logical. If `TRUE`, return only preferred
 #'   descriptions.
 #'
-#' @return A data frame of codes and descriptions, or a character vector if
-#'   `codes_only = TRUE`.
+#' @return A data frame of codes and descriptions.
 #' @family Code relationships
 #' @name parent_child_retrieval
 #' @examples
