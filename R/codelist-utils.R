@@ -65,6 +65,7 @@ collect_codes_input <- function(
     } else {
       # Validate it has required columns
       if (!all(c("code", "code_type") %in% names(df))) {
+        # nolint next: object_usage_linter.
         missing_cols <- setdiff(c("code", "code_type"), names(df))
         codeminer_abort(
           c(
@@ -109,12 +110,14 @@ collect_codes_input <- function(
 
   if (!all(is_char)) {
     not_char <- which(!is_char)
+    # nolint next: object_usage_linter.
     not_char_classes <- vapply(
       args[not_char],
       \(x) paste(class(x), collapse = "/"),
       character(1)
     )
 
+    # nolint next: object_usage_linter.
     arg_labels <- if (length(not_char) == 1) {
       paste0("Argument ", not_char)
     } else {
@@ -221,12 +224,14 @@ prepare_codes_input <- function(
       is_char <- vapply(codes, is.character, logical(1))
       if (!all(is_char)) {
         not_char <- which(!is_char)
+        # nolint next: object_usage_linter.
         not_char_classes <- vapply(
           codes[not_char],
           function(x) paste(class(x), collapse = "/"),
           character(1)
         )
 
+        # nolint next: object_usage_linter.
         arg_labels <- if (length(not_char) == 1) {
           paste0("Argument ", not_char)
         } else {

@@ -51,6 +51,7 @@ validate_codeminer_codelist <- function(df, call = rlang::caller_env()) {
   non_char <- names(col_types)[col_types != "character"]
 
   if (length(non_char) > 0) {
+    # nolint next: object_usage_linter.
     non_char_types <- col_types[non_char]
     codeminer_abort(
       c(
