@@ -105,6 +105,7 @@ validate_codeminer_codelist <- function(df, call = rlang::caller_env()) {
 #' @param x A codeminer_codelist object
 #' @param ... Additional arguments passed to print
 #' @export
+#' @keywords internal
 print.codeminer_codelist <- function(x, ...) {
   cli::cli_text("{.cls codeminer_codelist}: {nrow(x)} code{?s}")
   if (nrow(x) > 0 && "code_type" %in% names(x)) {
