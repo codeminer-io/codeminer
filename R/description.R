@@ -1,10 +1,13 @@
 #' Search for codes that match a description
 #'
-#' Returns a codelist with clinical codes that match the provided description pattern.
+#' Returns a codelist with clinical codes that match the provided description
+#' pattern.
 #'
-#' @param pattern The description to search for. See [stringr::str_detect()] for details.
+#' @param pattern The description to search for. See [stringr::str_detect()] for
+#'   details.
 #' @param ignore_case If `TRUE` (default), ignore case in `description`.
-#' @param preferred_description_only `logical`. If `TRUE` (default), return only preferred descriptions.
+#' @param preferred_description_only `logical`. If `TRUE` (default), return only
+#'   preferred descriptions.
 #' @inheritParams CODES
 #'
 #' @return A `codeminer_codelist` with codes that match the description.
@@ -15,16 +18,16 @@
 #' create_dummy_database()
 #'
 #' # lookup ICD10 code descriptions matching 'cyst'
-#' DESCRIPTION("cyst", code_type = "ICD-10")
+#' DESCRIPTION("cyst", type = "ICD-10")
 DESCRIPTION <- function(
   pattern,
-  code_type = getOption("codeminer.code_type"),
+  type = getOption("codeminer.code_type"),
   lookup_version = getOption("codeminer.lookup_version", default = "latest"),
   ignore_case = TRUE,
   preferred_description_only = TRUE
 ) {
   check_pattern(pattern)
-  check_code_type(code_type)
+  check_code_type(type)
   check_version(lookup_version)
   check_logical_scalar(ignore_case, "ignore_case")
   check_logical_scalar(preferred_description_only, "preferred_description_only")
@@ -32,7 +35,7 @@ DESCRIPTION <- function(
   con <- connect_to_db()
   lkp_table <- get_lookup_table(
     con,
-    code_type = code_type,
+    code_type = type,
     lookup_version = lookup_version
   )
   code_col <- "code"
@@ -64,7 +67,7 @@ DESCRIPTION <- function(
 
   result <- CODES(
     codes,
-    code_type = code_type,
+    type = type,
     lookup_version = lookup_version,
     preferred_description_only = preferred_description_only
   )

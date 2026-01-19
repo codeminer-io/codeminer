@@ -1,7 +1,7 @@
 #' Get relationship types for codes
 #'
-#' These functions return the distinct relationship types that originate from
-#' or point to the supplied codes.
+#' These functions return the distinct relationship types that originate from or
+#' point to the supplied codes.
 #'
 #' - `RELATIONSHIP_TYPES_FROM()` returns relationship types originating from codes
 #' - `RELATIONSHIP_TYPES_TO()` returns relationship types pointing to codes
@@ -19,29 +19,29 @@ NULL
 #' @rdname relationship_types
 #' @export
 RELATIONSHIP_TYPES_FROM <- function(
-  codes,
-  code_type = getOption("codeminer.code_type"),
+  ...,
+  type = getOption("codeminer.code_type"),
   relationship_version = getOption(
     "codeminer.relationship_version",
     default = "latest"
   )
 ) {
-  # Prepare input (handles character/||/codelist)
-  prepared <- prepare_codes_input(codes, code_type, arg_name = "codes")
-  codes_vec <- prepared$codes
+  # Collect and validate codes input
+  collected <- collect_codes_input(..., type = type)
+  codes_vec <- collected$codes
 
   # Use codelist code_type if provided
-  if (!is.null(prepared$code_type)) {
-    code_type <- prepared$code_type
+  if (!is.null(collected$code_type)) {
+    type <- collected$code_type
   }
 
-  check_code_type(code_type)
+  check_code_type(type)
   check_version(relationship_version)
 
   con <- connect_to_db()
   meta <- get_metadata_for_relationship(
     con,
-    code_type,
+    type,
     relationship_version,
     call = rlang::caller_env()
   )
@@ -86,36 +86,36 @@ RELATIONSHIP_TYPES_FROM <- function(
   as_codelist(tibble::tibble(
     code = result,
     description = result, # For relationship types, code and description are the same
-    code_type = code_type
+    code_type = type
   ))
 }
 
 #' @rdname relationship_types
 #' @export
 RELATIONSHIP_TYPES_TO <- function(
-  codes,
-  code_type = getOption("codeminer.code_type"),
+  ...,
+  type = getOption("codeminer.code_type"),
   relationship_version = getOption(
     "codeminer.relationship_version",
     default = "latest"
   )
 ) {
-  # Prepare input (handles character/||/codelist)
-  prepared <- prepare_codes_input(codes, code_type, arg_name = "codes")
-  codes_vec <- prepared$codes
+  # Collect and validate codes input
+  collected <- collect_codes_input(..., type = type)
+  codes_vec <- collected$codes
 
   # Use codelist code_type if provided
-  if (!is.null(prepared$code_type)) {
-    code_type <- prepared$code_type
+  if (!is.null(collected$code_type)) {
+    type <- collected$code_type
   }
 
-  check_code_type(code_type)
+  check_code_type(type)
   check_version(relationship_version)
 
   con <- connect_to_db()
   meta <- get_metadata_for_relationship(
     con,
-    code_type,
+    type,
     relationship_version,
     call = rlang::caller_env()
   )
@@ -160,6 +160,6 @@ RELATIONSHIP_TYPES_TO <- function(
   as_codelist(tibble::tibble(
     code = result,
     description = result, # For relationship types, code and description are the same
-    code_type = code_type
+    code_type = type
   ))
 }
