@@ -53,7 +53,11 @@ test_that("prepare_codes_input works with codelist", {
 })
 
 test_that("prepare_codes_input works with data frame with code_type column", {
-  df <- data.frame(code = c("E10", "E11"), description = c("T1", "T2"), code_type = "ICD-10")
+  df <- data.frame(
+    code = c("E10", "E11"),
+    description = c("T1", "T2"),
+    code_type = "ICD-10"
+  )
   result <- prepare_codes_input(df)
   expect_equal(result$codes, c("E10", "E11"))
   expect_equal(result$code_type, "ICD-10")
@@ -74,4 +78,3 @@ test_that("prepare_codes_input errors with conflicting code_types", {
   result2 <- prepare_codes_input(df2)
   expect_equal(result2$code_type, "ICD-9")
 })
-
