@@ -135,3 +135,27 @@ test_that("CODES_LIKE can handle regular expressions", {
   expect_equal(nrow(result), 4)
   expect_true(all(stringr::str_detect(result$code, test_pattern)))
 })
+
+test_that("CODES returns codelist as-is when passed a codelist", {
+  # Create a codelist using codes that exist in dummy database (UKB v4)
+  original <- CODES("A028", "E12", type = "ICD-10", lookup_version = "UKB v4")
+
+  # Pass it back to CODES
+  result <- CODES(original)
+
+  expect_identical(result, original)
+})
+
+test_that("CODES validates type when returning codelist as-is", {
+  # Create a codelist with ICD-10
+  cl <- CODES("A028", type = "ICD-10", lookup_version = "UKB v4")
+
+  # Should work with matching type
+  expect_silent(CODES(cl, type = "ICD-10"))
+
+  # Should error with conflicting type
+  expect_error(
+    CODES(cl, type = "Read 3"),
+    "Conflicting.*type"
+  )
+})

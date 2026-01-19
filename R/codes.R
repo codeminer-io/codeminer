@@ -76,7 +76,7 @@ CODES <- function(
     df_code_type <- unique(df$code_type)
     type_missing <- is.null(type) || identical(type, "")
 
-    if (!type_missing && df_code_type != type) {
+    if (!type_missing && !is.na(df_code_type) && df_code_type != type) {
       codeminer_abort(
         c(
           "Conflicting {.arg type} values.",
