@@ -30,7 +30,8 @@ N_CHILDREN(
   type = getOption("codeminer.code_type"),
   lookup_version = getOption("codeminer.lookup_version", default = "latest"),
   relationship_version = getOption("codeminer.relationship_version", default = "latest"),
-  preferred_description_only = TRUE
+  preferred_description_only = TRUE,
+  call = rlang::caller_env()
 )
 
 N_PARENTS(
@@ -39,7 +40,8 @@ N_PARENTS(
   type = getOption("codeminer.code_type"),
   lookup_version = getOption("codeminer.lookup_version", default = "latest"),
   relationship_version = getOption("codeminer.relationship_version", default = "latest"),
-  preferred_description_only = TRUE
+  preferred_description_only = TRUE,
+  call = rlang::caller_env()
 )
 }
 \arguments{
@@ -57,6 +59,10 @@ descriptions.}
 \item{depth}{Integer. Maximum number of steps to traverse. Use \code{Inf} for
 transitive closure (all ancestors/descendants). Only used by \code{N_PARENTS()}
 and \code{N_CHILDREN()}.}
+
+\item{call}{\strong{For internal use only.} The execution environment of a
+currently running function. Used for error reporting. Users should not
+need to set this parameter.}
 }
 \value{
 A data frame of codes and descriptions.

@@ -16,6 +16,9 @@
 #' @param relationship_version Relationship table version (character).
 #' @param preferred_description_only Logical. If `TRUE`, return only preferred
 #'   descriptions.
+#' @param call **For internal use only.** The execution environment of a
+#'   currently running function. Used for error reporting. Users should not
+#'   need to set this parameter.
 #'
 #' @return A data frame of codes and descriptions.
 #' @family Code relationships
@@ -46,7 +49,8 @@ CHILDREN <- function(
     type = type,
     lookup_version = lookup_version,
     relationship_version = relationship_version,
-    preferred_description_only = preferred_description_only
+    preferred_description_only = preferred_description_only,
+    call = rlang::caller_env()
   )
 }
 
@@ -68,7 +72,8 @@ PARENTS <- function(
     type = type,
     lookup_version = lookup_version,
     relationship_version = relationship_version,
-    preferred_description_only = preferred_description_only
+    preferred_description_only = preferred_description_only,
+    call = rlang::caller_env()
   )
 }
 
@@ -83,7 +88,8 @@ N_CHILDREN <- function(
     "codeminer.relationship_version",
     default = "latest"
   ),
-  preferred_description_only = TRUE
+  preferred_description_only = TRUE,
+  call = rlang::caller_env()
 ) {
   check_depth(depth)
   check_version(lookup_version)
@@ -91,11 +97,7 @@ N_CHILDREN <- function(
   check_logical_scalar(preferred_description_only, "preferred_description_only")
 
   # Collect and validate input
-  collected <- collect_codes_input(
-    ...,
-    type = type,
-    call = rlang::current_env()
-  )
+  collected <- collect_codes_input(..., type = type, call = call)
   codes_vec <- collected$codes
 
   # Use codelist code_type if provided
@@ -128,7 +130,8 @@ N_PARENTS <- function(
     "codeminer.relationship_version",
     default = "latest"
   ),
-  preferred_description_only = TRUE
+  preferred_description_only = TRUE,
+  call = rlang::caller_env()
 ) {
   check_depth(depth)
   check_version(lookup_version)
@@ -136,11 +139,7 @@ N_PARENTS <- function(
   check_logical_scalar(preferred_description_only, "preferred_description_only")
 
   # Collect and validate input
-  collected <- collect_codes_input(
-    ...,
-    type = type,
-    call = rlang::current_env()
-  )
+  collected <- collect_codes_input(..., type = type, call = call)
   codes_vec <- collected$codes
 
   # Use codelist code_type if provided
