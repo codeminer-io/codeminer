@@ -7,21 +7,21 @@
 \title{Get relationship types for codes}
 \usage{
 RELATIONSHIP_TYPES_FROM(
-  codes,
-  code_type = getOption("codeminer.code_type"),
+  ...,
+  type = getOption("codeminer.code_type"),
   relationship_version = getOption("codeminer.relationship_version", default = "latest")
 )
 
 RELATIONSHIP_TYPES_TO(
-  codes,
-  code_type = getOption("codeminer.code_type"),
+  ...,
+  type = getOption("codeminer.code_type"),
   relationship_version = getOption("codeminer.relationship_version", default = "latest")
 )
 }
 \arguments{
-\item{codes}{Character vector of codes to start from.}
+\item{...}{Codes to start from. Supports flexible input like \code{\link[=CODES]{CODES()}}.}
 
-\item{code_type}{Code type (character).}
+\item{type}{Code type (character).}
 
 \item{relationship_version}{Relationship table version (character).}
 }
@@ -29,8 +29,8 @@ RELATIONSHIP_TYPES_TO(
 A character vector of distinct relationship types.
 }
 \description{
-These functions return the distinct relationship types that originate from
-or point to the supplied codes.
+These functions return the distinct relationship types that originate from or
+point to the supplied codes.
 }
 \details{
 \itemize{

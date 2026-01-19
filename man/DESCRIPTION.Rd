@@ -6,37 +6,42 @@
 \usage{
 DESCRIPTION(
   pattern,
-  code_type = getOption("codeminer.code_type"),
+  type = getOption("codeminer.code_type"),
   lookup_version = getOption("codeminer.lookup_version", default = "latest"),
   ignore_case = TRUE,
   preferred_description_only = TRUE
 )
 }
 \arguments{
-\item{pattern}{The description to search for. See \code{\link[stringr:str_detect]{stringr::str_detect()}} for details.}
+\item{pattern}{The description to search for. See \code{\link[stringr:str_detect]{stringr::str_detect()}} for
+details.}
 
-\item{code_type}{character. Type of clinical code system to be searched.
-Optional if \code{codes} is a data frame with code_type column.
-Depends on what is available in the lookup tables. See \code{\link[=add_lookup_table]{add_lookup_table()}}
-on how to add new lookup tables. This can also be configured through the \code{codeminer.code_type} option.}
+\item{type}{character. Type of clinical code system to be searched. Optional
+if input is a data frame with code_type column. Depends on what is
+available in the lookup tables. See \code{\link[=add_lookup_table]{add_lookup_table()}} on how to add new
+lookup tables. This can also be configured through the
+\code{codeminer.code_type} option.}
 
 \item{lookup_version}{character. Version of the lookup table to use. Default:
-\code{"latest"}. Can be configured through the \code{codeminer.lookup_version} option.}
+\code{"latest"}. Can be configured through the \code{codeminer.lookup_version}
+option.}
 
 \item{ignore_case}{If \code{TRUE} (default), ignore case in \code{description}.}
 
-\item{preferred_description_only}{\code{logical}. If \code{TRUE} (default), return only preferred descriptions.}
+\item{preferred_description_only}{\code{logical}. If \code{TRUE} (default), return only
+preferred descriptions.}
 }
 \value{
 A \code{codeminer_codelist} with codes that match the description.
 }
 \description{
-Returns a codelist with clinical codes that match the provided description pattern.
+Returns a codelist with clinical codes that match the provided description
+pattern.
 }
 \examples{
 # build dummy database
 create_dummy_database()
 
 # lookup ICD10 code descriptions matching 'cyst'
-DESCRIPTION("cyst", code_type = "ICD-10")
+DESCRIPTION("cyst", type = "ICD-10")
 }

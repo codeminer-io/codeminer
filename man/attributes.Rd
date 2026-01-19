@@ -7,39 +7,37 @@
 \title{Get attributes or codes with attributes}
 \usage{
 ATTRIBUTES_FOR(
-  codes,
-  relationship_types = NULL,
-  code_type = getOption("codeminer.code_type"),
+  ...,
+  type = getOption("codeminer.code_type"),
   lookup_version = getOption("codeminer.lookup_version", default = "latest"),
   relationship_version = getOption("codeminer.relationship_version", default = "latest"),
+  relationship_types = NULL,
   preferred_description_only = TRUE
 )
 
 HAS_ATTRIBUTES(
-  attribute_codes,
-  relationship_types = NULL,
-  code_type = getOption("codeminer.code_type"),
+  ...,
+  type = getOption("codeminer.code_type"),
   lookup_version = getOption("codeminer.lookup_version", default = "latest"),
   relationship_version = getOption("codeminer.relationship_version", default = "latest"),
+  relationship_types = NULL,
   preferred_description_only = TRUE
 )
 }
 \arguments{
-\item{codes}{Character vector of codes to start from.}
+\item{...}{Codes to start from. Supports flexible input like \code{\link[=CODES]{CODES()}}.}
 
-\item{relationship_types}{Character vector of relationship types to filter by.
-If \code{NULL} (default), all relationship types are included.}
-
-\item{code_type}{Code type (character).}
+\item{type}{Code type (character).}
 
 \item{lookup_version}{Lookup table version (character).}
 
 \item{relationship_version}{Relationship table version (character).}
 
+\item{relationship_types}{Character vector of relationship types to filter
+by. If \code{NULL} (default), all relationship types are included.}
+
 \item{preferred_description_only}{Logical. If \code{TRUE}, return only preferred
 descriptions.}
-
-\item{attribute_codes}{Character vector of attribute codes to search for.}
 }
 \value{
 A data frame of codes and descriptions
@@ -51,7 +49,7 @@ or codes that have specific attributes.
 \details{
 \itemize{
 \item \code{ATTRIBUTES_FOR()} returns attribute codes for the supplied codes
-\item \code{HAS_ATTRIBUTES()} returns codes that have the supplied attribute codes
+\item \code{HAS_ATTRIBUTES()} returns codes that have the specified attribute codes
 }
 }
 \examples{

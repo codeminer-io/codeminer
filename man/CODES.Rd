@@ -6,61 +6,77 @@
 \title{Look up descriptions for clinical codes}
 \usage{
 CODES(
-  codes,
-  code_type = getOption("codeminer.code_type"),
+  ...,
+  type = getOption("codeminer.code_type"),
   lookup_version = getOption("codeminer.lookup_version", default = "latest"),
   preferred_description_only = TRUE
 )
 
 CODES_LIKE(
   pattern,
-  code_type = getOption("codeminer.code_type"),
+  type = getOption("codeminer.code_type"),
   lookup_version = getOption("codeminer.lookup_version", default = "latest"),
   preferred_description_only = TRUE
 )
 }
 \arguments{
-\item{codes}{Character vector, \code{||} separated string, or data frame with code/description/code_type columns.
-Special values: \code{"all"} returns all codes; empty input returns empty codelist.
+\item{...}{Codes to look up. Can be:
+\itemize{
+\item Character vectors: \code{CODES("E10", "E11", type = "ICD-10")}
+\item \code{||} separated strings: \code{CODES("E10 || E11", type = "ICD-10")}
+\item Data frame with code/description/code_type columns: \code{CODES(my_df)}
+\item Mixed: \code{CODES("E10", my_vector, "E13 || E14", type = "ICD-10")}
+}
+
+Special values: \code{"all"} returns all codes; empty input returns empty
+codelist.
+
 Comments can be added with \verb{<< >>} syntax: \code{"E10 << Type 1 diabetes >>"}.}
 
-\item{code_type}{character. Type of clinical code system to be searched.
-Optional if \code{codes} is a data frame with code_type column.
-Depends on what is available in the lookup tables. See \code{\link[=add_lookup_table]{add_lookup_table()}}
-on how to add new lookup tables. This can also be configured through the \code{codeminer.code_type} option.}
+\item{type}{character. Type of clinical code system to be searched. Optional
+if input is a data frame with code_type column. Depends on what is
+available in the lookup tables. See \code{\link[=add_lookup_table]{add_lookup_table()}} on how to add new
+lookup tables. This can also be configured through the
+\code{codeminer.code_type} option.}
 
 \item{lookup_version}{character. Version of the lookup table to use. Default:
-\code{"latest"}. Can be configured through the \code{codeminer.lookup_version} option.}
+\code{"latest"}. Can be configured through the \code{codeminer.lookup_version}
+option.}
 
-\item{preferred_description_only}{logical. If \code{TRUE}, only returns the preferred description for each code.
-Default: \code{FALSE}.}
+\item{preferred_description_only}{logical. If \code{TRUE}, only returns the
+preferred description for each code. Default: \code{FALSE}.}
 
 \item{pattern}{a regular expression to search for}
 }
 \value{
-A \code{codeminer_codelist} object (tibble) containing the codes and their descriptions
+A \code{codeminer_codelist} object (tibble) containing the codes and their
+descriptions
 }
 \description{
-Returns a codelist with descriptions for the codes of interest.
-Supports flexible input: character vectors, \code{||} separated strings, or data frames.
+Returns a codelist with descriptions for the codes of interest. Supports
+flexible input: character vectors, \code{||} separated strings, or data frames.
 }
 \details{
-\code{CODES_LIKE} searches for codes that match a given regular expression.
-The matching is case-insensitive.
+\code{CODES_LIKE} searches for codes that match a given regular
+expression. The matching is case-insensitive.
 }
 \examples{
 # Set up a temporary dummy database
 temp_db <- tempfile(fileext = ".duckdb")
 create_dummy_database(temp_db)
 
-# Character vector
-CODES(c("E10", "E11"), code_type = "ICD-10")
+# Multiple arguments
+CODES("E10", "E11", type = "ICD-10")
 
 # With comments
-CODES("E10 << Type 1 diabetes >>", code_type = "ICD-10")
+CODES("E10 << Type 1 diabetes >>", type = "ICD-10")
 
 # || separated string
-CODES("E10 || E11", code_type = "ICD-10")
+CODES("E10 || E11", type = "ICD-10")
+
+# Splice operator
+my_codes <- c("E10", "E11")
+CODES(!!!my_codes, type = "ICD-10")
 
 # Data frame input
 df <- data.frame(
@@ -69,7 +85,7 @@ df <- data.frame(
   code_type = c("ICD-10", "ICD-10")
 )
 CODES(df)
-CODES_LIKE("^E1", code_type = "ICD-10")
+CODES_LIKE("^E1", type = "ICD-10")
 }
 \seealso{
 \code{\link[=add_lookup_table]{add_lookup_table()}} for adding new lookup tables to the database.

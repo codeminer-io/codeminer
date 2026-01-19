@@ -5,7 +5,7 @@
 \title{Map clinical codes from one coding system to another}
 \usage{
 MAP(
-  codes,
+  ...,
   from = getOption("codeminer.map_from"),
   to = getOption("codeminer.map_to"),
   map_version = getOption("codeminer.map_version", default = "latest"),
@@ -13,22 +13,25 @@ MAP(
 )
 }
 \arguments{
-\item{codes}{Character vector, \code{||} separated string, or data frame with codes to be mapped.
-Special value: \code{"all"} returns all mapped codes.}
+\item{...}{Codes to map. Supports flexible input like \code{\link[=CODES]{CODES()}}. Special
+value: \code{"all"} returns all mapped codes.}
 
-\item{from}{Coding system that \code{codes} belong to. Optional if \code{codes} is a codelist with code_type.}
+\item{from}{Coding system that \code{...} codes belong to. Optional if input is a
+codelist with code_type.}
 
-\item{to}{Coding system to map \code{codes} to.}
+\item{to}{Coding system to map codes to.}
 
 \item{map_version}{Version of the mapping table to use.}
 
 \item{lookup_version}{character. Version of the lookup table to use. Default:
-\code{"latest"}. Can be configured through the \code{codeminer.lookup_version} option.}
+\code{"latest"}. Can be configured through the \code{codeminer.lookup_version}
+option.}
 }
 \value{
 A \code{codeminer_codelist} of the mapped codes with their descriptions.
 
-If using \code{codes = "all"}, returns the mapping table as a \code{data.frame} with columns:
+If using \code{codes = "all"}, returns the mapping table as a \code{data.frame} with
+columns:
 \itemize{
 \item \code{from}: the codes from the source code system
 \item \code{to}: the mapped codes from the destination system
@@ -38,17 +41,21 @@ If using \code{codes = "all"}, returns the mapping table as a \code{data.frame} 
 Map clinical codes from one coding system to another
 }
 \details{
-If no mapping table matching the \code{from -> to} direction is found, but there is a table for \code{to -> from},
-\code{MAP()} will return the reverse mapping with a warning. Note that this is not guaranteed to be correct,
-as most mapping tables only work one way.
+If no mapping table matching the \code{from -> to} direction is found,
+but there is a table for \code{to -> from}, \code{MAP()} will return the reverse
+mapping with a warning. Note that this is not guaranteed to be correct, as
+most mapping tables only work one way.
 }
 \examples{
 # Set up a temporary dummy database
 temp_db <- tempfile(fileext = ".duckdb")
 create_dummy_database(temp_db)
 
-# Character vector
+# Single code
 MAP("X40J4", from = "Read 3", to = "ICD-10")
+
+# Multiple codes
+MAP("X40J4", "X40J5", from = "Read 3", to = "ICD-10")
 
 # || separated
 MAP("X40J4 || X40J5", from = "Read 3", to = "ICD-10")
@@ -65,7 +72,8 @@ MAP(df, to = "ICD-10")
 MAP("all", from = "Read 3", to = "ICD-10")
 }
 \seealso{
-\code{\link[=add_mapping_table]{add_mapping_table()}} for adding new mapping tables to the codeminer database.
+\code{\link[=add_mapping_table]{add_mapping_table()}} for adding new mapping tables to the codeminer
+database.
 
 Other Clinical code lookups and mappings: 
 \code{\link{CODES}()},

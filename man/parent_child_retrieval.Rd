@@ -9,43 +9,43 @@
 \title{Retrieve parent or child codes}
 \usage{
 CHILDREN(
-  codes,
-  code_type = getOption("codeminer.code_type"),
+  ...,
+  type = getOption("codeminer.code_type"),
   lookup_version = getOption("codeminer.lookup_version", default = "latest"),
   relationship_version = getOption("codeminer.relationship_version", default = "latest"),
   preferred_description_only = TRUE
 )
 
 PARENTS(
-  codes,
-  code_type = getOption("codeminer.code_type"),
+  ...,
+  type = getOption("codeminer.code_type"),
   lookup_version = getOption("codeminer.lookup_version", default = "latest"),
   relationship_version = getOption("codeminer.relationship_version", default = "latest"),
   preferred_description_only = TRUE
 )
 
 N_CHILDREN(
-  codes,
+  ...,
   depth = 1,
-  code_type = getOption("codeminer.code_type"),
+  type = getOption("codeminer.code_type"),
   lookup_version = getOption("codeminer.lookup_version", default = "latest"),
   relationship_version = getOption("codeminer.relationship_version", default = "latest"),
   preferred_description_only = TRUE
 )
 
 N_PARENTS(
-  codes,
+  ...,
   depth = 1,
-  code_type = getOption("codeminer.code_type"),
+  type = getOption("codeminer.code_type"),
   lookup_version = getOption("codeminer.lookup_version", default = "latest"),
   relationship_version = getOption("codeminer.relationship_version", default = "latest"),
   preferred_description_only = TRUE
 )
 }
 \arguments{
-\item{codes}{Character vector of codes to start from.}
+\item{...}{Codes to start from. Supports flexible input like \code{\link[=CODES]{CODES()}}.}
 
-\item{code_type}{Code type (character).}
+\item{type}{Code type (character).}
 
 \item{lookup_version}{Lookup table version (character).}
 
@@ -72,10 +72,10 @@ ancestors/descendants).
 }
 \examples{
 create_dummy_database()
-PARENTS(c("E10", "E11"), code_type = "ICD-10")
-CHILDREN(c("E10", "E11"), code_type = "ICD-10")
-N_PARENTS(c("E10", "E11"), code_type = "ICD-10")
-N_CHILDREN(c("E10", "E11"), code_type = "ICD-10")
+PARENTS("E10", "E11", type = "ICD-10")
+CHILDREN("E10", "E11", type = "ICD-10")
+N_PARENTS("E10", "E11", type = "ICD-10")
+N_CHILDREN("E10", "E11", type = "ICD-10")
 }
 \seealso{
 Other Code relationships: 
