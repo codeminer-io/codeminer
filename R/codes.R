@@ -63,48 +63,35 @@ CODES <- function(
   # Validate logical parameter
   check_logical_scalar(preferred_description_only, "preferred_description_only")
 
-  # Collect all inputs using rlang::list2() to support !!! splicing
+  # Special handling: if single data frame input that's already a codelist, return as-is
   args <- rlang::list2(...)
-
-  # Empty input case
-  if (length(args) == 0) {
-    empty_cols <- stats::setNames(
-      replicate(3, character(), simplify = FALSE),
-      codelist_cols()
-    )
-    return(as_codelist(tibble::as_tibble(empty_cols)))
-  }
-
-  # Special handling for single data frame - return as-is if already a codelist
-  if (length(args) == 1 && is.data.frame(args[[1]])) {
+  if (
+    length(args) == 1 &&
+      is.data.frame(args[[1]]) &&
+      inherits(args[[1]], "codeminer_codelist")
+  ) {
     df <- args[[1]]
 
-    # Validate and get the code_type from df
-    df_code_type <- validate_codeminer_codelist(df)
-
-    # Handle type matching logic
+    # Validate type matches if provided
+    df_code_type <- unique(df$code_type)
     type_missing <- is.null(type) || identical(type, "")
 
     if (!type_missing && df_code_type != type) {
-      codeminer_abort(c(
-        "Conflicting {.arg type} values.",
-        "x" = "Data frame has: {.val {df_code_type}}",
-        "x" = "Argument specifies: {.val {type}}",
-        "i" = "Both must match, or omit the {.arg type} argument to use the data frame value."
-      ))
+      codeminer_abort(
+        c(
+          "Conflicting {.arg type} values.",
+          "x" = "Data frame has: {.val {df_code_type}}",
+          "x" = "Argument specifies: {.val {type}}",
+          "i" = "Both must match, or omit the {.arg type} argument to use the data frame value."
+        ),
+        call = rlang::current_env()
+      )
     }
 
-    # If already a codelist, return as-is, otherwise convert
-    if (inherits(df, "codeminer_codelist")) {
-      return(df)
-    }
-
-    # Select standard columns and return
-    result <- dplyr::select(df, dplyr::all_of(codelist_cols()))
-    return(as_codelist(result))
+    return(df)
   }
 
-  # Use helper to collect and validate codes
+  # Use helper to collect and validate all other inputs
   collected <- collect_codes_input(
     ...,
     type = type,
