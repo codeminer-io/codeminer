@@ -1,20 +1,22 @@
 # Look up descriptions for clinical codes
 
-Returns a data frame including descriptions for the codes of interest
+Returns a codelist with descriptions for the codes of interest. Supports
+flexible input: character vectors, `||` separated strings, or data
+frames.
 
 ## Usage
 
 ``` r
 CODES(
-  codes,
-  code_type = getOption("codeminer.code_type"),
+  ...,
+  type = getOption("codeminer.code_type"),
   lookup_version = getOption("codeminer.lookup_version", default = "latest"),
   preferred_description_only = TRUE
 )
 
 CODES_LIKE(
   pattern,
-  code_type = getOption("codeminer.code_type"),
+  type = getOption("codeminer.code_type"),
   lookup_version = getOption("codeminer.lookup_version", default = "latest"),
   preferred_description_only = TRUE
 )
@@ -22,15 +24,29 @@ CODES_LIKE(
 
 ## Arguments
 
-- codes:
+- ...:
 
-  character. Vector of codes to lookup. If passing `"all"`, returns all
-  codes.
+  Codes to look up. Can be:
 
-- code_type:
+  - Character vectors: `CODES("E10", "E11", type = "ICD-10")`
 
-  character. Type of clinical code system to be searched. Depends on
-  what is available in the lookup tables. See
+  - `||` separated strings: `CODES("E10 || E11", type = "ICD-10")`
+
+  - Data frame with code/description/code_type columns: `CODES(my_df)`
+
+  - Mixed: `CODES("E10", my_vector, "E13 || E14", type = "ICD-10")`
+
+  Special values: `"all"` returns all codes; empty input returns empty
+  codelist.
+
+  Comments can be added with `<< >>` syntax:
+  `"E10 << Type 1 diabetes >>"`.
+
+- type:
+
+  character. Type of clinical code system to be searched. Optional if
+  input is a data frame with code_type column. Depends on what is
+  available in the lookup tables. See
   [`add_lookup_table()`](https://codeminer-io.github.io/codeminer/reference/add_lookup_table.md)
   on how to add new lookup tables. This can also be configured through
   the `codeminer.code_type` option.
@@ -51,7 +67,8 @@ CODES_LIKE(
 
 ## Value
 
-A `data.frame` containing the codes and their descriptions
+A `codeminer_codelist` object (tibble) containing the codes and their
+descriptions
 
 ## Details
 
@@ -73,7 +90,7 @@ Other Clinical code lookups and mappings:
 # Set up a temporary dummy database
 temp_db <- tempfile(fileext = ".duckdb")
 create_dummy_database(temp_db)
-#> Creating new database at /tmp/RtmpR3vBPA/file1def48560de9.duckdb
+#> Creating new database at /tmp/RtmpMbNoIX/file1bff1e0f689c.duckdb
 #> Reading 17 selected tables from UKB Resource 592
 #> 
 #> Extending read_v2_drugs_bnf with BNF hierarchy and descriptions
@@ -102,14 +119,37 @@ create_dummy_database(temp_db)
 #> ✔ Mapping table Read 3_Read 2_UKB v4 added successfully.
 #> ✔ Dummy database ready to use!
 
-# look up ICD10 codes
-CODES(
-  codes = c("E10", "E11"),
-  code_type = "ICD-10"
-)
+# Multiple arguments
+CODES("E10", "E11", type = "ICD-10")
 #> Warning: cannot open file '/home/runner/.local/share/codeminer/ontology.duckdb': No such file or directory
 #> Error in file(con, "w"): cannot open the connection
-CODES_LIKE("^E1", code_type = "ICD-10")
+
+# With comments
+CODES("E10 << Type 1 diabetes >>", type = "ICD-10")
+#> Warning: cannot open file '/home/runner/.local/share/codeminer/ontology.duckdb': No such file or directory
+#> Error in file(con, "w"): cannot open the connection
+
+# || separated string
+CODES("E10 || E11", type = "ICD-10")
+#> Warning: cannot open file '/home/runner/.local/share/codeminer/ontology.duckdb': No such file or directory
+#> Error in file(con, "w"): cannot open the connection
+
+# Splice operator
+my_codes <- c("E10", "E11")
+CODES(!!!my_codes, type = "ICD-10")
+#> Warning: cannot open file '/home/runner/.local/share/codeminer/ontology.duckdb': No such file or directory
+#> Error in file(con, "w"): cannot open the connection
+
+# Data frame input
+df <- data.frame(
+  code = c("E10", "E11"),
+  description = c("Type 1", "Type 2"),
+  code_type = c("ICD-10", "ICD-10")
+)
+CODES(df)
+#> Warning: cannot open file '/home/runner/.local/share/codeminer/ontology.duckdb': No such file or directory
+#> Error in file(con, "w"): cannot open the connection
+CODES_LIKE("^E1", type = "ICD-10")
 #> Warning: cannot open file '/home/runner/.local/share/codeminer/ontology.duckdb': No such file or directory
 #> Error in file(con, "w"): cannot open the connection
 ```

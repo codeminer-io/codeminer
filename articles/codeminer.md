@@ -51,7 +51,7 @@ of data frames:
 ``` r
 # Create a temporary database with dummy data
 (db_path <- create_dummy_database())
-#> Creating new database at /tmp/RtmpwdChps/file271c2c9bc881.duckdb
+#> Creating new database at /tmp/Rtmp3HEnpK/file251fbb85c9b.duckdb
 #> Reading 17 selected tables from UKB Resource 592
 #> 
 #> Extending read_v2_drugs_bnf with BNF hierarchy and descriptions
@@ -79,9 +79,9 @@ of data frames:
 #> ✔ Mapping table Read 3_OPCS4_UKB v4 added successfully.
 #> ✔ Mapping table Read 3_Read 2_UKB v4 added successfully.
 #> ✔ Dummy database ready to use!
-#> [1] "/tmp/RtmpwdChps/file271c2c9bc881.duckdb"
+#> [1] "/tmp/Rtmp3HEnpK/file251fbb85c9b.duckdb"
 Sys.getenv("CODEMINER_DB_PATH")
-#> [1] "/tmp/RtmpwdChps/file271c2c9bc881.duckdb"
+#> [1] "/tmp/Rtmp3HEnpK/file251fbb85c9b.duckdb"
 ```
 
 Setting the `CODEMINER_DB_PATH` environment variable ensures that all
@@ -137,31 +137,33 @@ Codes may be explored with:
 ``` r
 CODES(
   codes = c("E10", "E11"),
-  code_type = "ICD-10"
+  type = "ICD-10"
 )
 #> ℹ Using 'UKB v4' as latest version
-#> # A tibble: 2 × 14
-#>   code  description   ICD10_CODE USAGE USAGE_UK MODIFIER_4 MODIFIER_5 QUALIFIERS
-#>   <chr> <chr>         <chr>      <chr> <chr>    <chr>      <chr>      <chr>     
-#> 1 E10   Type 1 diabe… E10        DEFA… 3        NA         NA         NA        
-#> 2 E11   Type 2 diabe… E11        DEFA… 3        NA         NA         NA        
-#> # ℹ 6 more variables: GENDER_MASK <chr>, MIN_AGE <chr>, MAX_AGE <chr>,
-#> #   TREE_DESCRIPTION <chr>, code_type <chr>, preferred_description <lgl>
+#> <codeminer_codelist>: 2 codes
+#> 
+#> Code type: "ICD-10"
+#> # A tibble: 2 × 3
+#>   code  description              code_type
+#>   <chr> <chr>                    <chr>    
+#> 1 E10   Type 1 diabetes mellitus ICD-10   
+#> 2 E11   Type 2 diabetes mellitus ICD-10
 ```
 
 - `DESCRIPTION():` search for codes that match a description
 
 ``` r
-DESCRIPTION(pattern = "cyst", code_type = "ICD-10")
+DESCRIPTION(pattern = "cyst", type = "ICD-10")
 #> ℹ Using 'UKB v4' as latest version
 #> ℹ Using 'UKB v4' as latest version
-#> # A tibble: 2 × 14
-#>   code  description   ICD10_CODE USAGE USAGE_UK MODIFIER_4 MODIFIER_5 QUALIFIERS
-#>   <chr> <chr>         <chr>      <chr> <chr>    <chr>      <chr>      <chr>     
-#> 1 L721  Trichilemmal… L72.1      DEFA… 3        NA         NA         NA        
-#> 2 N330  Tuberculous … N33.0      ASTE… 2        NA         NA         NA        
-#> # ℹ 6 more variables: GENDER_MASK <chr>, MIN_AGE <chr>, MAX_AGE <chr>,
-#> #   TREE_DESCRIPTION <chr>, code_type <chr>, preferred_description <lgl>
+#> <codeminer_codelist>: 2 codes
+#> 
+#> Code type: "ICD-10"
+#> # A tibble: 2 × 3
+#>   code  description          code_type
+#>   <chr> <chr>                <chr>    
+#> 1 L721  Trichilemmal cyst    ICD-10   
+#> 2 N330  Tuberculous cystitis ICD-10
 ```
 
 Denny, Joshua C., Lisa Bastarache, and Dan M. Roden. 2016. “Phenome-Wide

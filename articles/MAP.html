@@ -79,7 +79,7 @@
 <span><span class="co">#&gt;     intersect, setdiff, setequal, union</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/create_dummy_database.html">create_dummy_database</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Creating new database at <span style="color: #0000BB;">/tmp/RtmpGm64Rz/file28267c836c28.duckdb</span></span></span>
+<span><span class="co">#&gt; Creating new database at <span style="color: #0000BB;">/tmp/Rtmp0eAZ8s/file2629fca07fa.duckdb</span></span></span>
 <span><span class="co">#&gt; Reading 17 selected tables from UKB Resource 592</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Extending <span style="color: #00BB00;">read_v2_drugs_bnf</span> with BNF hierarchy and descriptions</span></span>
@@ -119,13 +119,13 @@ coding system to another:</p>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Using 'UKB v4' as latest version</span></span>
 <span><span class="co">#&gt; Warning: <span style="color: #BBBB00;">!</span> The following codes were not found in the lookup table:</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">•</span> `O240`</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 2 × 14</span></span></span>
-<span><span class="co">#&gt;   code  description   ICD10_CODE USAGE USAGE_UK MODIFIER_4 MODIFIER_5 QUALIFIERS</span></span>
-<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> E10   Type 1 diabe… E10        DEFA… 3        <span style="color: #BB0000;">NA</span>         <span style="color: #BB0000;">NA</span>         <span style="color: #BB0000;">NA</span>        </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> E109  Type 1 diabe… E10.9      DEFA… 3        Without c… <span style="color: #BB0000;">NA</span>         <span style="color: #BB0000;">NA</span>        </span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 6 more variables: GENDER_MASK &lt;chr&gt;, MIN_AGE &lt;chr&gt;, MAX_AGE &lt;chr&gt;,</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;">#   TREE_DESCRIPTION &lt;chr&gt;, code_type &lt;chr&gt;, preferred_description &lt;lgl&gt;</span></span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #0000BB;">&lt;codeminer_codelist&gt;</span>: 2 codes</span></span>
+<span><span class="co">#&gt; Code type: <span style="color: #0000BB;">"ICD-10"</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 2 × 3</span></span></span>
+<span><span class="co">#&gt;   code  description                                    code_type</span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                                          <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> E10   Type 1 diabetes mellitus                       ICD-10   </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> E109  Type 1 diabetes mellitus Without complications ICD-10</span></span></code></pre></div>
 <p>Use <code>MAP("all")</code> to return the entire mapping table:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/MAP.html">MAP</a></span><span class="op">(</span><span class="st">"all"</span>, from <span class="op">=</span> <span class="st">"Read 3"</span>, to <span class="op">=</span> <span class="st">"ICD-10"</span><span class="op">)</span></span>
@@ -173,17 +173,20 @@ no filters are applied then the Read 3 code for sebaceous cyst ‘XaIP9’
 will map to a number of ICD10 codes, some of which are sex-specific
 (‘N508’ and ‘N948’):</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/MAP.html">MAP</a></span><span class="op">(</span><span class="st">"XaIP9"</span>, from <span class="op">=</span> <span class="st">"Read 3"</span>, to <span class="op">=</span> <span class="st">"ICD-10"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">GENDER_MASK</span><span class="op">)</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/MAP.html">MAP</a></span><span class="op">(</span><span class="st">"XaIP9"</span>, from <span class="op">=</span> <span class="st">"Read 3"</span>, to <span class="op">=</span> <span class="st">"ICD-10"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Using 'UKB v4' as latest version</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Using 'UKB v4' as latest version</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 2 × 14</span></span></span>
-<span><span class="co">#&gt;   code  description   ICD10_CODE USAGE USAGE_UK MODIFIER_4 MODIFIER_5 QUALIFIERS</span></span>
-<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> N508  Other specif… N50.8      DEFA… 3        <span style="color: #BB0000;">NA</span>         <span style="color: #BB0000;">NA</span>         <span style="color: #BB0000;">NA</span>        </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> N948  Other specif… N94.8      DEFA… 3        <span style="color: #BB0000;">NA</span>         <span style="color: #BB0000;">NA</span>         <span style="color: #BB0000;">NA</span>        </span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 6 more variables: GENDER_MASK &lt;chr&gt;, MIN_AGE &lt;chr&gt;, MAX_AGE &lt;chr&gt;,</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;">#   TREE_DESCRIPTION &lt;chr&gt;, code_type &lt;chr&gt;, preferred_description &lt;lgl&gt;</span></span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #0000BB;">&lt;codeminer_codelist&gt;</span>: 5 codes</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Code type: <span style="color: #0000BB;">"ICD-10"</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 5 × 3</span></span></span>
+<span><span class="co">#&gt;   code  description                                                    code_type</span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                                                          <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> H028  Other specified disorders of eyelid                            ICD-10   </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> L721  Trichilemmal cyst                                              ICD-10   </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> N508  Other specified disorders of male genital organs               ICD-10   </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> N608  Other benign mammary dysplasias                                ICD-10   </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> N948  Other specified conditions associated with female genital org… ICD-10</span></span></code></pre></div>
 </div>
 
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

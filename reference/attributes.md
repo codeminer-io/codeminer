@@ -7,38 +7,32 @@ codes or codes that have specific attributes.
 
 ``` r
 ATTRIBUTES_FOR(
-  codes,
-  relationship_types = NULL,
-  code_type = getOption("codeminer.code_type"),
+  ...,
+  type = getOption("codeminer.code_type"),
   lookup_version = getOption("codeminer.lookup_version", default = "latest"),
   relationship_version = getOption("codeminer.relationship_version", default = "latest"),
-  codes_only = FALSE,
+  relationship_types = NULL,
   preferred_description_only = TRUE
 )
 
 HAS_ATTRIBUTES(
-  attribute_codes,
-  relationship_types = NULL,
-  code_type = getOption("codeminer.code_type"),
+  ...,
+  type = getOption("codeminer.code_type"),
   lookup_version = getOption("codeminer.lookup_version", default = "latest"),
   relationship_version = getOption("codeminer.relationship_version", default = "latest"),
-  codes_only = FALSE,
+  relationship_types = NULL,
   preferred_description_only = TRUE
 )
 ```
 
 ## Arguments
 
-- codes:
+- ...:
 
-  Character vector of codes to start from.
+  Codes to start from. Supports flexible input like
+  [`CODES()`](https://codeminer-io.github.io/codeminer/reference/CODES.md).
 
-- relationship_types:
-
-  Character vector of relationship types to filter by. If `NULL`
-  (default), all relationship types are included.
-
-- code_type:
+- type:
 
   Code type (character).
 
@@ -50,29 +44,24 @@ HAS_ATTRIBUTES(
 
   Relationship table version (character).
 
-- codes_only:
+- relationship_types:
 
-  Logical. If `TRUE`, return only unique codes. If `FALSE`, return a
-  data frame with code and description.
+  Character vector of relationship types to filter by. If `NULL`
+  (default), all relationship types are included.
 
 - preferred_description_only:
 
   Logical. If `TRUE`, return only preferred descriptions.
 
-- attribute_codes:
-
-  Character vector of attribute codes to search for.
-
 ## Value
 
-A data frame of codes and descriptions, or a character vector if
-`codes_only = TRUE`.
+A data frame of codes and descriptions
 
 ## Details
 
 - `ATTRIBUTES_FOR()` returns attribute codes for the supplied codes
 
-- `HAS_ATTRIBUTES()` returns codes that have the supplied attribute
+- `HAS_ATTRIBUTES()` returns codes that have the specified attribute
   codes
 
 ## See also
@@ -85,7 +74,7 @@ Other Code relationships:
 
 ``` r
 create_dummy_database()
-#> Creating new database at /tmp/RtmpR3vBPA/file1def3961b034.duckdb
+#> Creating new database at /tmp/RtmpMbNoIX/file1bff1ddc6fd2.duckdb
 #> Reading 17 selected tables from UKB Resource 592
 #> 
 #> Extending read_v2_drugs_bnf with BNF hierarchy and descriptions

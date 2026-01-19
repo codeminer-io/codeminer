@@ -66,7 +66,7 @@ failed.
 # Set up a temporary dummy database
 temp_db <- tempfile(fileext = ".duckdb")
 create_dummy_database(temp_db)
-#> Creating new database at /tmp/RtmpR3vBPA/file1def13b5785a.duckdb
+#> Creating new database at /tmp/RtmpMbNoIX/file1bff520be757.duckdb
 #> Reading 17 selected tables from UKB Resource 592
 #> 
 #> Extending read_v2_drugs_bnf with BNF hierarchy and descriptions
@@ -99,7 +99,7 @@ missing_codes <- table_type <- table_meta <- NULL
 # Capture missing codes from waning using `withCallingHandlers()`
 withCallingHandlers(
   {
-    codes <- CODES(c("foo", "bar", "E10"), code_type = "ICD-10")
+    codes <- CODES(c("foo", "bar", "E10"), type = "ICD-10")
   },
   codeminer_missing_codes = function(w) {
     missing_codes <<- w$missing_codes
@@ -108,7 +108,7 @@ withCallingHandlers(
     invokeRestart("muffleWarning")
   }
 )
-#> Error in CODES(c("foo", "bar", "E10"), code_type = "ICD-10"): Code type 'ICD-10' not found in lookup metadata.
+#> Error in CODES(c("foo", "bar", "E10"), type = "ICD-10"): Code type 'ICD-10' not found in lookup metadata.
 #> ℹ Did you add the lookup table with `codeminer::add_lookup_table()`?
 
 # Recognised codes

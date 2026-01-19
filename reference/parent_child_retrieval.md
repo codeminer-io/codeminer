@@ -7,51 +7,50 @@ codes by traversing the relationship graph.
 
 ``` r
 CHILDREN(
-  codes,
-  code_type = getOption("codeminer.code_type"),
+  ...,
+  type = getOption("codeminer.code_type"),
   lookup_version = getOption("codeminer.lookup_version", default = "latest"),
   relationship_version = getOption("codeminer.relationship_version", default = "latest"),
-  codes_only = FALSE,
   preferred_description_only = TRUE
 )
 
 PARENTS(
-  codes,
-  code_type = getOption("codeminer.code_type"),
+  ...,
+  type = getOption("codeminer.code_type"),
   lookup_version = getOption("codeminer.lookup_version", default = "latest"),
   relationship_version = getOption("codeminer.relationship_version", default = "latest"),
-  codes_only = FALSE,
   preferred_description_only = TRUE
 )
 
 N_CHILDREN(
-  codes,
+  ...,
   depth = 1,
-  code_type = getOption("codeminer.code_type"),
+  type = getOption("codeminer.code_type"),
   lookup_version = getOption("codeminer.lookup_version", default = "latest"),
   relationship_version = getOption("codeminer.relationship_version", default = "latest"),
-  codes_only = FALSE,
-  preferred_description_only = TRUE
+  preferred_description_only = TRUE,
+  call = rlang::caller_env()
 )
 
 N_PARENTS(
-  codes,
+  ...,
   depth = 1,
-  code_type = getOption("codeminer.code_type"),
+  type = getOption("codeminer.code_type"),
   lookup_version = getOption("codeminer.lookup_version", default = "latest"),
   relationship_version = getOption("codeminer.relationship_version", default = "latest"),
-  codes_only = FALSE,
-  preferred_description_only = TRUE
+  preferred_description_only = TRUE,
+  call = rlang::caller_env()
 )
 ```
 
 ## Arguments
 
-- codes:
+- ...:
 
-  Character vector of codes to start from.
+  Codes to start from. Supports flexible input like
+  [`CODES()`](https://codeminer-io.github.io/codeminer/reference/CODES.md).
 
-- code_type:
+- type:
 
   Code type (character).
 
@@ -63,11 +62,6 @@ N_PARENTS(
 
   Relationship table version (character).
 
-- codes_only:
-
-  Logical. If `TRUE`, return only unique codes. If `FALSE`, return a
-  data frame with code and description.
-
 - preferred_description_only:
 
   Logical. If `TRUE`, return only preferred descriptions.
@@ -78,10 +72,15 @@ N_PARENTS(
   closure (all ancestors/descendants). Only used by `N_PARENTS()` and
   `N_CHILDREN()`.
 
+- call:
+
+  **For internal use only.** The execution environment of a currently
+  running function. Used for error reporting. Users should not need to
+  set this parameter.
+
 ## Value
 
-A data frame of codes and descriptions, or a character vector if
-`codes_only = TRUE`.
+A data frame of codes and descriptions.
 
 ## Details
 
@@ -99,7 +98,7 @@ Other Code relationships:
 
 ``` r
 create_dummy_database()
-#> Creating new database at /tmp/RtmpR3vBPA/file1def17587ccb.duckdb
+#> Creating new database at /tmp/RtmpMbNoIX/file1bff1a862350.duckdb
 #> Reading 17 selected tables from UKB Resource 592
 #> 
 #> Extending read_v2_drugs_bnf with BNF hierarchy and descriptions
@@ -127,20 +126,20 @@ create_dummy_database()
 #> ✔ Mapping table Read 3_OPCS4_UKB v4 added successfully.
 #> ✔ Mapping table Read 3_Read 2_UKB v4 added successfully.
 #> ✔ Dummy database ready to use!
-PARENTS(c("E10", "E11"), code_type = "ICD-10")
-#> Error in N_PARENTS(codes, depth = Inf, code_type = code_type, lookup_version = lookup_version,     relationship_version = relationship_version, codes_only = codes_only,     preferred_description_only = preferred_description_only): Code type 'ICD-10' not found in relationship metadata.
+PARENTS("E10", "E11", type = "ICD-10")
+#> Error in N_PARENTS(..., depth = Inf, type = type, lookup_version = lookup_version,     relationship_version = relationship_version, preferred_description_only = preferred_description_only,     call = rlang::caller_env()): Code type 'ICD-10' not found in relationship metadata.
 #> ℹ Did you add the relationship table with
 #>   `codeminer::add_relationship_table()`?
-CHILDREN(c("E10", "E11"), code_type = "ICD-10")
-#> Error in N_CHILDREN(codes, depth = Inf, code_type = code_type, lookup_version = lookup_version,     relationship_version = relationship_version, codes_only = codes_only,     preferred_description_only = preferred_description_only): Code type 'ICD-10' not found in relationship metadata.
+CHILDREN("E10", "E11", type = "ICD-10")
+#> Error in N_CHILDREN(..., depth = Inf, type = type, lookup_version = lookup_version,     relationship_version = relationship_version, preferred_description_only = preferred_description_only,     call = rlang::caller_env()): Code type 'ICD-10' not found in relationship metadata.
 #> ℹ Did you add the relationship table with
 #>   `codeminer::add_relationship_table()`?
-N_PARENTS(c("E10", "E11"), code_type = "ICD-10")
-#> Error in N_PARENTS(c("E10", "E11"), code_type = "ICD-10"): Code type 'ICD-10' not found in relationship metadata.
+N_PARENTS("E10", "E11", type = "ICD-10")
+#> Error in N_PARENTS("E10", "E11", type = "ICD-10"): Code type 'ICD-10' not found in relationship metadata.
 #> ℹ Did you add the relationship table with
 #>   `codeminer::add_relationship_table()`?
-N_CHILDREN(c("E10", "E11"), code_type = "ICD-10")
-#> Error in N_CHILDREN(c("E10", "E11"), code_type = "ICD-10"): Code type 'ICD-10' not found in relationship metadata.
+N_CHILDREN("E10", "E11", type = "ICD-10")
+#> Error in N_CHILDREN("E10", "E11", type = "ICD-10"): Code type 'ICD-10' not found in relationship metadata.
 #> ℹ Did you add the relationship table with
 #>   `codeminer::add_relationship_table()`?
 ```

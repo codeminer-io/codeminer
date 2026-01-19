@@ -6,7 +6,7 @@ Map clinical codes from one coding system to another
 
 ``` r
 MAP(
-  codes,
+  ...,
   from = getOption("codeminer.map_from"),
   to = getOption("codeminer.map_to"),
   map_version = getOption("codeminer.map_version", default = "latest"),
@@ -16,18 +16,20 @@ MAP(
 
 ## Arguments
 
-- codes:
+- ...:
 
-  A character vector of codes to be mapped. If passing `"all"`, all
-  mapped codes will be returned.
+  Codes to map. Supports flexible input like
+  [`CODES()`](https://codeminer-io.github.io/codeminer/reference/CODES.md).
+  Special value: `"all"` returns all mapped codes.
 
 - from:
 
-  Coding system that `codes` belong to.
+  Coding system that `...` codes belong to. Optional if input is a
+  codelist with code_type.
 
 - to:
 
-  Coding system to map `codes` to.
+  Coding system to map codes to.
 
 - map_version:
 
@@ -40,9 +42,7 @@ MAP(
 
 ## Value
 
-A `data.frame` of the mapped codes with their descriptions, as returned
-by
-[`CODES()`](https://codeminer-io.github.io/codeminer/reference/CODES.md).
+A `codeminer_codelist` of the mapped codes with their descriptions.
 
 If using `codes = "all"`, returns the mapping table as a `data.frame`
 with columns:
@@ -73,7 +73,7 @@ Other Clinical code lookups and mappings:
 # Set up a temporary dummy database
 temp_db <- tempfile(fileext = ".duckdb")
 create_dummy_database(temp_db)
-#> Creating new database at /tmp/RtmpR3vBPA/file1def63e33365.duckdb
+#> Creating new database at /tmp/RtmpMbNoIX/file1bff2705f0aa.duckdb
 #> Reading 17 selected tables from UKB Resource 592
 #> 
 #> Extending read_v2_drugs_bnf with BNF hierarchy and descriptions
@@ -102,7 +102,28 @@ create_dummy_database(temp_db)
 #> ✔ Mapping table Read 3_Read 2_UKB v4 added successfully.
 #> ✔ Dummy database ready to use!
 
+# Single code
 MAP("X40J4", from = "Read 3", to = "ICD-10")
+#> Warning: cannot open file '/home/runner/.local/share/codeminer/ontology.duckdb': No such file or directory
+#> Error in file(con, "w"): cannot open the connection
+
+# Multiple codes
+MAP("X40J4", "X40J5", from = "Read 3", to = "ICD-10")
+#> Warning: cannot open file '/home/runner/.local/share/codeminer/ontology.duckdb': No such file or directory
+#> Error in file(con, "w"): cannot open the connection
+
+# || separated
+MAP("X40J4 || X40J5", from = "Read 3", to = "ICD-10")
+#> Warning: cannot open file '/home/runner/.local/share/codeminer/ontology.duckdb': No such file or directory
+#> Error in file(con, "w"): cannot open the connection
+
+# Data frame input (from is optional)
+df <- data.frame(
+  code = c("X40J4", "X40J5"),
+  description = c("Desc 1", "Desc 2"),
+  code_type = c("Read 3", "Read 3")
+)
+MAP(df, to = "ICD-10")
 #> Warning: cannot open file '/home/runner/.local/share/codeminer/ontology.duckdb': No such file or directory
 #> Error in file(con, "w"): cannot open the connection
 

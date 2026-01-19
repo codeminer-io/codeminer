@@ -1,6 +1,6 @@
 # Search for codes that match a description
 
-Returns a data frame with clinical codes that match the provided
+Returns a codelist with clinical codes that match the provided
 description pattern.
 
 ## Usage
@@ -8,10 +8,9 @@ description pattern.
 ``` r
 DESCRIPTION(
   pattern,
-  code_type = getOption("codeminer.code_type"),
+  type = getOption("codeminer.code_type"),
   lookup_version = getOption("codeminer.lookup_version", default = "latest"),
   ignore_case = TRUE,
-  codes_only = FALSE,
   preferred_description_only = TRUE
 )
 ```
@@ -24,10 +23,11 @@ DESCRIPTION(
   [`stringr::str_detect()`](https://stringr.tidyverse.org/reference/str_detect.html)
   for details.
 
-- code_type:
+- type:
 
-  character. Type of clinical code system to be searched. Depends on
-  what is available in the lookup tables. See
+  character. Type of clinical code system to be searched. Optional if
+  input is a data frame with code_type column. Depends on what is
+  available in the lookup tables. See
   [`add_lookup_table()`](https://codeminer-io.github.io/codeminer/reference/add_lookup_table.md)
   on how to add new lookup tables. This can also be configured through
   the `codeminer.code_type` option.
@@ -41,30 +41,20 @@ DESCRIPTION(
 
   If `TRUE` (default), ignore case in `description`.
 
-- codes_only:
-
-  `logical`. If `TRUE`, return a character vector of *unique* codes. If
-  `FALSE` (default), return a data frame of all results including code
-  descriptions (useful for manual validation).
-
 - preferred_description_only:
 
-  logical. If `TRUE`, only returns the preferred description for each
-  code. Default: `FALSE`.
+  `logical`. If `TRUE` (default), return only preferred descriptions.
 
 ## Value
 
-The result of
-[`CODES()`](https://codeminer-io.github.io/codeminer/reference/CODES.md)
-for codes that match the description, or a character vector of codes if
-`codes_only` is `TRUE`.
+A `codeminer_codelist` with codes that match the description.
 
 ## Examples
 
 ``` r
 # build dummy database
 create_dummy_database()
-#> Creating new database at /tmp/RtmpR3vBPA/file1def704b519d.duckdb
+#> Creating new database at /tmp/RtmpMbNoIX/file1bff7aaeefe0.duckdb
 #> Reading 17 selected tables from UKB Resource 592
 #> 
 #> Extending read_v2_drugs_bnf with BNF hierarchy and descriptions
@@ -94,7 +84,7 @@ create_dummy_database()
 #> ✔ Dummy database ready to use!
 
 # lookup ICD10 code descriptions matching 'cyst'
-DESCRIPTION("cyst", code_type = "ICD-10")
+DESCRIPTION("cyst", type = "ICD-10")
 #> Warning: cannot open file '/home/runner/.local/share/codeminer/ontology.duckdb': No such file or directory
 #> Error in file(con, "w"): cannot open the connection
 ```

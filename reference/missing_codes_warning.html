@@ -109,7 +109,7 @@ warning, while still preserving full context about where the lookup failed.</p>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># Set up a temporary dummy database</span></span></span>
 <span class="r-in"><span><span class="va">temp_db</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span>fileext <span class="op">=</span> <span class="st">".duckdb"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="create_dummy_database.html">create_dummy_database</a></span><span class="op">(</span><span class="va">temp_db</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Creating new database at <span style="color: #0000BB;">/tmp/RtmpR3vBPA/file1def13b5785a.duckdb</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Creating new database at <span style="color: #0000BB;">/tmp/RtmpMbNoIX/file1bff520be757.duckdb</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Reading 17 selected tables from UKB Resource 592</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Extending <span style="color: #00BB00;">read_v2_drugs_bnf</span> with BNF hierarchy and descriptions</span>
@@ -142,7 +142,7 @@ warning, while still preserving full context about where the lookup failed.</p>
 <span class="r-in"><span><span class="co"># Capture missing codes from waning using `withCallingHandlers()`</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/conditions.html" class="external-link">withCallingHandlers</a></span><span class="op">(</span></span></span>
 <span class="r-in"><span>  <span class="op">{</span></span></span>
-<span class="r-in"><span>    <span class="va">codes</span> <span class="op">&lt;-</span> <span class="fu"><a href="CODES.html">CODES</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"foo"</span>, <span class="st">"bar"</span>, <span class="st">"E10"</span><span class="op">)</span>, code_type <span class="op">=</span> <span class="st">"ICD-10"</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    <span class="va">codes</span> <span class="op">&lt;-</span> <span class="fu"><a href="CODES.html">CODES</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"foo"</span>, <span class="st">"bar"</span>, <span class="st">"E10"</span><span class="op">)</span>, type <span class="op">=</span> <span class="st">"ICD-10"</span><span class="op">)</span></span></span>
 <span class="r-in"><span>  <span class="op">}</span>,</span></span>
 <span class="r-in"><span>  codeminer_missing_codes <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">w</span><span class="op">)</span> <span class="op">{</span></span></span>
 <span class="r-in"><span>    <span class="va">missing_codes</span> <span class="op">&lt;&lt;-</span> <span class="va">w</span><span class="op">$</span><span class="va">missing_codes</span></span></span>
@@ -151,7 +151,7 @@ warning, while still preserving full context about where the lookup failed.</p>
 <span class="r-in"><span>    <span class="fu"><a href="https://rdrr.io/r/base/conditions.html" class="external-link">invokeRestart</a></span><span class="op">(</span><span class="st">"muffleWarning"</span><span class="op">)</span></span></span>
 <span class="r-in"><span>  <span class="op">}</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in CODES(c("foo", "bar", "E10"), code_type = "ICD-10"):</span> Code type 'ICD-10' not found in lookup metadata.</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in CODES(c("foo", "bar", "E10"), type = "ICD-10"):</span> Code type 'ICD-10' not found in lookup metadata.</span>
 <span class="r-err co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Did you add the lookup table with `codeminer::add_lookup_table()`?</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Recognised codes</span></span></span>

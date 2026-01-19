@@ -7,25 +7,26 @@ from or point to the supplied codes.
 
 ``` r
 RELATIONSHIP_TYPES_FROM(
-  codes,
-  code_type = getOption("codeminer.code_type"),
+  ...,
+  type = getOption("codeminer.code_type"),
   relationship_version = getOption("codeminer.relationship_version", default = "latest")
 )
 
 RELATIONSHIP_TYPES_TO(
-  codes,
-  code_type = getOption("codeminer.code_type"),
+  ...,
+  type = getOption("codeminer.code_type"),
   relationship_version = getOption("codeminer.relationship_version", default = "latest")
 )
 ```
 
 ## Arguments
 
-- codes:
+- ...:
 
-  Character vector of codes to start from.
+  Codes to start from. Supports flexible input like
+  [`CODES()`](https://codeminer-io.github.io/codeminer/reference/CODES.md).
 
-- code_type:
+- type:
 
   Code type (character).
 
@@ -54,7 +55,7 @@ Other Code relationships:
 
 ``` r
 create_dummy_database()
-#> Creating new database at /tmp/RtmpR3vBPA/file1def4e14af15.duckdb
+#> Creating new database at /tmp/RtmpMbNoIX/file1bff1d99b9b7.duckdb
 #> Reading 17 selected tables from UKB Resource 592
 #> 
 #> Extending read_v2_drugs_bnf with BNF hierarchy and descriptions

@@ -13,7 +13,7 @@ library(dplyr)
 #>     intersect, setdiff, setequal, union
 
 create_dummy_database()
-#> Creating new database at /tmp/RtmpGm64Rz/file28267c836c28.duckdb
+#> Creating new database at /tmp/Rtmp0eAZ8s/file2629fca07fa.duckdb
 #> Reading 17 selected tables from UKB Resource 592
 #> 
 #> Extending read_v2_drugs_bnf with BNF hierarchy and descriptions
@@ -55,13 +55,13 @@ MAP(codes = "X40J4", from = "Read 3", to = "ICD-10")
 #> ℹ Using 'UKB v4' as latest version
 #> Warning: ! The following codes were not found in the lookup table:
 #> • `O240`
-#> # A tibble: 2 × 14
-#>   code  description   ICD10_CODE USAGE USAGE_UK MODIFIER_4 MODIFIER_5 QUALIFIERS
-#>   <chr> <chr>         <chr>      <chr> <chr>    <chr>      <chr>      <chr>     
-#> 1 E10   Type 1 diabe… E10        DEFA… 3        NA         NA         NA        
-#> 2 E109  Type 1 diabe… E10.9      DEFA… 3        Without c… NA         NA        
-#> # ℹ 6 more variables: GENDER_MASK <chr>, MIN_AGE <chr>, MAX_AGE <chr>,
-#> #   TREE_DESCRIPTION <chr>, code_type <chr>, preferred_description <lgl>
+#> <codeminer_codelist>: 2 codes
+#> Code type: "ICD-10"
+#> # A tibble: 2 × 3
+#>   code  description                                    code_type
+#>   <chr> <chr>                                          <chr>    
+#> 1 E10   Type 1 diabetes mellitus                       ICD-10   
+#> 2 E109  Type 1 diabetes mellitus Without complications ICD-10
 ```
 
 Use `MAP("all")` to return the entire mapping table:
@@ -115,17 +115,20 @@ map to a number of ICD10 codes, some of which are sex-specific (‘N508’
 and ‘N948’):
 
 ``` r
-MAP("XaIP9", from = "Read 3", to = "ICD-10") |>
-  filter(!is.na(GENDER_MASK))
+MAP("XaIP9", from = "Read 3", to = "ICD-10")
 #> ℹ Using 'UKB v4' as latest version
 #> ℹ Using 'UKB v4' as latest version
-#> # A tibble: 2 × 14
-#>   code  description   ICD10_CODE USAGE USAGE_UK MODIFIER_4 MODIFIER_5 QUALIFIERS
-#>   <chr> <chr>         <chr>      <chr> <chr>    <chr>      <chr>      <chr>     
-#> 1 N508  Other specif… N50.8      DEFA… 3        NA         NA         NA        
-#> 2 N948  Other specif… N94.8      DEFA… 3        NA         NA         NA        
-#> # ℹ 6 more variables: GENDER_MASK <chr>, MIN_AGE <chr>, MAX_AGE <chr>,
-#> #   TREE_DESCRIPTION <chr>, code_type <chr>, preferred_description <lgl>
+#> <codeminer_codelist>: 5 codes
+#> 
+#> Code type: "ICD-10"
+#> # A tibble: 5 × 3
+#>   code  description                                                    code_type
+#>   <chr> <chr>                                                          <chr>    
+#> 1 H028  Other specified disorders of eyelid                            ICD-10   
+#> 2 L721  Trichilemmal cyst                                              ICD-10   
+#> 3 N508  Other specified disorders of male genital organs               ICD-10   
+#> 4 N608  Other benign mammary dysplasias                                ICD-10   
+#> 5 N948  Other specified conditions associated with female genital org… ICD-10
 ```
 
 ------------------------------------------------------------------------

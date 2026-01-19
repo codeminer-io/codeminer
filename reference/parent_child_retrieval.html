@@ -48,41 +48,39 @@ traversing the relationship graph.</p>
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">CHILDREN</span><span class="op">(</span></span>
-<span>  <span class="va">codes</span>,</span>
-<span>  code_type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"codeminer.code_type"</span><span class="op">)</span>,</span>
+<span>  <span class="va">...</span>,</span>
+<span>  type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"codeminer.code_type"</span><span class="op">)</span>,</span>
 <span>  lookup_version <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"codeminer.lookup_version"</span>, default <span class="op">=</span> <span class="st">"latest"</span><span class="op">)</span>,</span>
 <span>  relationship_version <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"codeminer.relationship_version"</span>, default <span class="op">=</span> <span class="st">"latest"</span><span class="op">)</span>,</span>
-<span>  codes_only <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  preferred_description_only <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">PARENTS</span><span class="op">(</span></span>
-<span>  <span class="va">codes</span>,</span>
-<span>  code_type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"codeminer.code_type"</span><span class="op">)</span>,</span>
+<span>  <span class="va">...</span>,</span>
+<span>  type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"codeminer.code_type"</span><span class="op">)</span>,</span>
 <span>  lookup_version <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"codeminer.lookup_version"</span>, default <span class="op">=</span> <span class="st">"latest"</span><span class="op">)</span>,</span>
 <span>  relationship_version <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"codeminer.relationship_version"</span>, default <span class="op">=</span> <span class="st">"latest"</span><span class="op">)</span>,</span>
-<span>  codes_only <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  preferred_description_only <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">N_CHILDREN</span><span class="op">(</span></span>
-<span>  <span class="va">codes</span>,</span>
+<span>  <span class="va">...</span>,</span>
 <span>  depth <span class="op">=</span> <span class="fl">1</span>,</span>
-<span>  code_type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"codeminer.code_type"</span><span class="op">)</span>,</span>
+<span>  type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"codeminer.code_type"</span><span class="op">)</span>,</span>
 <span>  lookup_version <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"codeminer.lookup_version"</span>, default <span class="op">=</span> <span class="st">"latest"</span><span class="op">)</span>,</span>
 <span>  relationship_version <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"codeminer.relationship_version"</span>, default <span class="op">=</span> <span class="st">"latest"</span><span class="op">)</span>,</span>
-<span>  codes_only <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  preferred_description_only <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span>  preferred_description_only <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  call <span class="op">=</span> <span class="fu">rlang</span><span class="fu">::</span><span class="fu"><a href="https://rlang.r-lib.org/reference/stack.html" class="external-link">caller_env</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">N_PARENTS</span><span class="op">(</span></span>
-<span>  <span class="va">codes</span>,</span>
+<span>  <span class="va">...</span>,</span>
 <span>  depth <span class="op">=</span> <span class="fl">1</span>,</span>
-<span>  code_type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"codeminer.code_type"</span><span class="op">)</span>,</span>
+<span>  type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"codeminer.code_type"</span><span class="op">)</span>,</span>
 <span>  lookup_version <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"codeminer.lookup_version"</span>, default <span class="op">=</span> <span class="st">"latest"</span><span class="op">)</span>,</span>
 <span>  relationship_version <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"codeminer.relationship_version"</span>, default <span class="op">=</span> <span class="st">"latest"</span><span class="op">)</span>,</span>
-<span>  codes_only <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  preferred_description_only <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span>  preferred_description_only <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  call <span class="op">=</span> <span class="fu">rlang</span><span class="fu">::</span><span class="fu"><a href="https://rlang.r-lib.org/reference/stack.html" class="external-link">caller_env</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -90,11 +88,11 @@ traversing the relationship graph.</p>
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
 
 
-<dl><dt id="arg-codes">codes<a class="anchor" aria-label="anchor" href="#arg-codes"></a></dt>
-<dd><p>Character vector of codes to start from.</p></dd>
+<dl><dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
+<dd><p>Codes to start from. Supports flexible input like <code><a href="CODES.html">CODES()</a></code>.</p></dd>
 
 
-<dt id="arg-code-type">code_type<a class="anchor" aria-label="anchor" href="#arg-code-type"></a></dt>
+<dt id="arg-type">type<a class="anchor" aria-label="anchor" href="#arg-type"></a></dt>
 <dd><p>Code type (character).</p></dd>
 
 
@@ -104,11 +102,6 @@ traversing the relationship graph.</p>
 
 <dt id="arg-relationship-version">relationship_version<a class="anchor" aria-label="anchor" href="#arg-relationship-version"></a></dt>
 <dd><p>Relationship table version (character).</p></dd>
-
-
-<dt id="arg-codes-only">codes_only<a class="anchor" aria-label="anchor" href="#arg-codes-only"></a></dt>
-<dd><p>Logical. If <code>TRUE</code>, return only unique codes. If <code>FALSE</code>,
-return a data frame with code and description.</p></dd>
 
 
 <dt id="arg-preferred-description-only">preferred_description_only<a class="anchor" aria-label="anchor" href="#arg-preferred-description-only"></a></dt>
@@ -121,11 +114,16 @@ descriptions.</p></dd>
 transitive closure (all ancestors/descendants). Only used by <code>N_PARENTS()</code>
 and <code>N_CHILDREN()</code>.</p></dd>
 
+
+<dt id="arg-call">call<a class="anchor" aria-label="anchor" href="#arg-call"></a></dt>
+<dd><p><strong>For internal use only.</strong> The execution environment of a
+currently running function. Used for error reporting. Users should not
+need to set this parameter.</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>A data frame of codes and descriptions, or a character vector if
-<code>codes_only = TRUE</code>.</p>
+    <p>A data frame of codes and descriptions.</p>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
@@ -143,7 +141,7 @@ ancestors/descendants).</p>
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="create_dummy_database.html">create_dummy_database</a></span><span class="op">(</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Creating new database at <span style="color: #0000BB;">/tmp/RtmpR3vBPA/file1def17587ccb.duckdb</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Creating new database at <span style="color: #0000BB;">/tmp/RtmpMbNoIX/file1bff1a862350.duckdb</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Reading 17 selected tables from UKB Resource 592</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Extending <span style="color: #00BB00;">read_v2_drugs_bnf</span> with BNF hierarchy and descriptions</span>
@@ -171,20 +169,20 @@ ancestors/descendants).</p>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Mapping table <span style="color: #00BB00;">Read 3_OPCS4_UKB v4</span> added successfully.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Mapping table <span style="color: #00BB00;">Read 3_Read 2_UKB v4</span> added successfully.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Dummy database ready to use!</span>
-<span class="r-in"><span><span class="fu">PARENTS</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"E10"</span>, <span class="st">"E11"</span><span class="op">)</span>, code_type <span class="op">=</span> <span class="st">"ICD-10"</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in N_PARENTS(codes, depth = Inf, code_type = code_type, lookup_version = lookup_version,     relationship_version = relationship_version, codes_only = codes_only,     preferred_description_only = preferred_description_only):</span> Code type 'ICD-10' not found in relationship metadata.</span>
+<span class="r-in"><span><span class="fu">PARENTS</span><span class="op">(</span><span class="st">"E10"</span>, <span class="st">"E11"</span>, type <span class="op">=</span> <span class="st">"ICD-10"</span><span class="op">)</span></span></span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in N_PARENTS(..., depth = Inf, type = type, lookup_version = lookup_version,     relationship_version = relationship_version, preferred_description_only = preferred_description_only,     call = rlang::caller_env()):</span> Code type 'ICD-10' not found in relationship metadata.</span>
 <span class="r-err co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Did you add the relationship table with</span>
 <span class="r-err co"><span class="r-pr">#&gt;</span>   `codeminer::add_relationship_table()`?</span>
-<span class="r-in"><span><span class="fu">CHILDREN</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"E10"</span>, <span class="st">"E11"</span><span class="op">)</span>, code_type <span class="op">=</span> <span class="st">"ICD-10"</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in N_CHILDREN(codes, depth = Inf, code_type = code_type, lookup_version = lookup_version,     relationship_version = relationship_version, codes_only = codes_only,     preferred_description_only = preferred_description_only):</span> Code type 'ICD-10' not found in relationship metadata.</span>
+<span class="r-in"><span><span class="fu">CHILDREN</span><span class="op">(</span><span class="st">"E10"</span>, <span class="st">"E11"</span>, type <span class="op">=</span> <span class="st">"ICD-10"</span><span class="op">)</span></span></span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in N_CHILDREN(..., depth = Inf, type = type, lookup_version = lookup_version,     relationship_version = relationship_version, preferred_description_only = preferred_description_only,     call = rlang::caller_env()):</span> Code type 'ICD-10' not found in relationship metadata.</span>
 <span class="r-err co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Did you add the relationship table with</span>
 <span class="r-err co"><span class="r-pr">#&gt;</span>   `codeminer::add_relationship_table()`?</span>
-<span class="r-in"><span><span class="fu">N_PARENTS</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"E10"</span>, <span class="st">"E11"</span><span class="op">)</span>, code_type <span class="op">=</span> <span class="st">"ICD-10"</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in N_PARENTS(c("E10", "E11"), code_type = "ICD-10"):</span> Code type 'ICD-10' not found in relationship metadata.</span>
+<span class="r-in"><span><span class="fu">N_PARENTS</span><span class="op">(</span><span class="st">"E10"</span>, <span class="st">"E11"</span>, type <span class="op">=</span> <span class="st">"ICD-10"</span><span class="op">)</span></span></span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in N_PARENTS("E10", "E11", type = "ICD-10"):</span> Code type 'ICD-10' not found in relationship metadata.</span>
 <span class="r-err co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Did you add the relationship table with</span>
 <span class="r-err co"><span class="r-pr">#&gt;</span>   `codeminer::add_relationship_table()`?</span>
-<span class="r-in"><span><span class="fu">N_CHILDREN</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"E10"</span>, <span class="st">"E11"</span><span class="op">)</span>, code_type <span class="op">=</span> <span class="st">"ICD-10"</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in N_CHILDREN(c("E10", "E11"), code_type = "ICD-10"):</span> Code type 'ICD-10' not found in relationship metadata.</span>
+<span class="r-in"><span><span class="fu">N_CHILDREN</span><span class="op">(</span><span class="st">"E10"</span>, <span class="st">"E11"</span>, type <span class="op">=</span> <span class="st">"ICD-10"</span><span class="op">)</span></span></span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in N_CHILDREN("E10", "E11", type = "ICD-10"):</span> Code type 'ICD-10' not found in relationship metadata.</span>
 <span class="r-err co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Did you add the relationship table with</span>
 <span class="r-err co"><span class="r-pr">#&gt;</span>   `codeminer::add_relationship_table()`?</span>
 </code></pre></div>
