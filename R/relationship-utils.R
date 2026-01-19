@@ -172,7 +172,6 @@ graph_closure <- function(
 #' @param code_type Code type (character).
 #' @param lookup_version Lookup table version (character).
 #' @param relationship_version Relationship table version (character).
-#' @param codes_only Logical. If `TRUE`, return only unique codes.
 #' @param preferred_description_only Logical. If `TRUE`, return only preferred
 #'   descriptions.
 #' @param direction Either `"out"` or `"in"`.
@@ -184,8 +183,7 @@ graph_closure <- function(
 #' @param max_depth Maximum traversal depth (integer).
 #' @param empty_warning Warning message when no codes are found (character).
 #'
-#' @return A data frame with code information, or a character vector if
-#'   `codes_only = TRUE`.
+#' @return A data frame with code information.
 #' @keywords internal
 #' @noRd
 graph_closure_codes <- function(
@@ -193,7 +191,6 @@ graph_closure_codes <- function(
   code_type,
   lookup_version,
   relationship_version,
-  codes_only,
   preferred_description_only,
   direction,
   rel_type = from_meta("child_parent_relationship_code"),
@@ -202,8 +199,7 @@ graph_closure_codes <- function(
   empty_warning = "No valid codes found.",
   call = rlang::caller_env()
 ) {
-  check_codes(codes)
-  check_code_type(code_type)
+  check_code_type(code_type, call = call)
 
   con <- connect_to_db()
   meta <- get_metadata_for_relationship(
@@ -262,19 +258,20 @@ graph_closure_codes <- function(
 
   if (length(result_codes) == 0) {
     codeminer_warn(empty_warning)
-    return(if (codes_only) character(0) else data.frame())
+    return(as_codelist(tibble::tibble(
+      code = character(),
+      description = character(),
+      code_type = character()
+    )))
   }
 
   result <- CODES(
-    codes = result_codes,
-    code_type = code_type,
+    result_codes,
+    type = code_type,
     lookup_version = lookup_version,
     preferred_description_only = preferred_description_only
   )
 
-  if (codes_only) {
-    return(unique(result$code))
-  }
   return(result)
 }
 

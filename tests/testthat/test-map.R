@@ -22,11 +22,11 @@ test_that("MAP() returns the expected data format", {
 test_that("MAP fails for wrong argument types", {
   expect_error(
     MAP("foo", from = c("ICD-10", "icd11", "icd12"), to = "Read 3"),
-    "`from` must have length 1"
+    "`from` must be a string"
   )
   expect_error(
     MAP("foo", from = "Read 3", to = c("ICD-10", "icd11", "icd12")),
-    "`to` must have length 1"
+    "`to` must be a string"
   )
 })
 
@@ -65,7 +65,7 @@ test_that("MAP() swaps `to` and `from` if necessary and warns", {
   test_to <- "Read 3"
 
   expect_warning(
-    result <- MAP(test_codes, test_from, test_to),
+    result <- MAP(test_codes, from = test_from, to = test_to),
     "No explicit mapping table found"
   )
   expect_identical(unique(result$code_type), test_to)

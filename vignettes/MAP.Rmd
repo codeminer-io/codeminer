@@ -52,6 +52,5 @@ for further details.
 It is important to decide which mappings to include. For example, if no filters are applied then the Read 3 code for sebaceous cyst 'XaIP9' will map to a number of ICD10 codes, some of which are sex-specific ('N508' and 'N948'):
 
 ```{r}
-MAP("XaIP9", from = "Read 3", to = "ICD-10") |>
-  filter(!is.na(GENDER_MASK))
+MAP("XaIP9", from = "Read 3", to = "ICD-10")
 ```

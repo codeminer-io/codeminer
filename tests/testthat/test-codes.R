@@ -5,7 +5,7 @@ test_that("CODES() returns the expected data format", {
   test_codes <- c("A028", "U838", "E12", "E106", "O109")
   test_type <- "ICD-10"
 
-  result <- CODES(test_codes, code_type = test_type, lookup_version = "UKB v4")
+  result <- CODES(test_codes, type = test_type, lookup_version = "UKB v4")
 
   expect_s3_class(result, "data.frame")
   expect_true(all(c("code", "description", "code_type") %in% names(result)))
@@ -28,7 +28,7 @@ test_that("CODES works with the codeminer.code_type option", {
 test_that("CODES allows querying all codes", {
   test_type <- "ICD-10"
   expected_rows <- nrow(DESCRIPTION(".", "ICD-10", "UKB v4"))
-  result <- CODES("all", code_type = test_type)
+  result <- CODES("all", type = test_type)
   expect_s3_class(result, "data.frame")
   expect_equal(nrow(result), expected_rows)
 })
@@ -49,7 +49,7 @@ test_that("CODES handles versions correctly", {
 
   v2_result <- CODES(
     "all",
-    code_type = test_type,
+    type = test_type,
     lookup_version = test_version
   )
   expect_identical(v2_result$code, test_table$code)
@@ -58,7 +58,7 @@ test_that("CODES handles versions correctly", {
 
   latest_result <- CODES(
     "all",
-    code_type = test_type,
+    type = test_type,
     lookup_version = "latest"
   )
   expect_identical(latest_result, v2_result)
@@ -67,28 +67,28 @@ test_that("CODES handles versions correctly", {
 test_that("CODES warns about missing codes", {
   test_codes <- c("foo", "bar")
   expect_warning(
-    CODES(test_codes, "ICD-10"),
+    CODES(test_codes, type = "ICD-10"),
     class = "codeminer_missing_codes"
   )
 })
 
 test_that("CODES fails for wrong argument types", {
   expect_error(
-    CODES("all", code_type = c("ICD-10", "icd11", "icd12")),
-    "`code_type` must be a string"
+    CODES("all", type = c("ICD-10", "icd11", "icd12")),
+    "`type` must be a string"
   )
 })
 
-test_that("CODES fails for missing code_type", {
+test_that("CODES fails for missing type", {
   expect_error(
-    CODES("all", code_type = "idontexist"),
+    CODES("all", type = "idontexist"),
     "Code type 'idontexist' not found"
   )
 })
 
 test_that("CODES fails for wrong lookup_version", {
   expect_error(
-    CODES("all", code_type = "ICD-10", lookup_version = "nope"),
+    CODES("all", type = "ICD-10", lookup_version = "nope"),
     "No lookup metadata found for 'ICD-10' version 'nope'"
   )
 })
@@ -97,7 +97,7 @@ test_that("CODES can return multiple descriptions for the same code", {
   test_code <- "X40J4"
   result <- CODES(
     test_code,
-    code_type = "Read 3",
+    type = "Read 3",
     preferred_description_only = FALSE
   )
   expect_equal(nrow(result), 5)
@@ -108,7 +108,7 @@ test_that("CODES can return only the preferred description", {
   test_code <- "X40J4"
   result <- CODES(
     test_code,
-    code_type = "Read 3",
+    type = "Read 3",
     preferred_description_only = TRUE
   )
   expect_equal(nrow(result), 1)
@@ -129,9 +129,33 @@ test_that("CODES_LIKE can handle regular expressions", {
   test_pattern <- "^A00"
   result <- CODES_LIKE(
     test_pattern,
-    code_type = "ICD-10",
+    type = "ICD-10",
     lookup_version = "UKB v4"
   )
   expect_equal(nrow(result), 4)
   expect_true(all(stringr::str_detect(result$code, test_pattern)))
+})
+
+test_that("CODES returns codelist as-is when passed a codelist", {
+  # Create a codelist using codes that exist in dummy database (UKB v4)
+  original <- CODES("A028", "E12", type = "ICD-10", lookup_version = "UKB v4")
+
+  # Pass it back to CODES
+  result <- CODES(original)
+
+  expect_identical(result, original)
+})
+
+test_that("CODES validates type when returning codelist as-is", {
+  # Create a codelist with ICD-10
+  cl <- CODES("A028", type = "ICD-10", lookup_version = "UKB v4")
+
+  # Should work with matching type
+  expect_silent(CODES(cl, type = "ICD-10"))
+
+  # Should error with conflicting type
+  expect_error(
+    CODES(cl, type = "Read 3"),
+    "Conflicting.*type"
+  )
 })

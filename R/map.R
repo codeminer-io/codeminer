@@ -1,65 +1,117 @@
 #' Map clinical codes from one coding system to another
 #'
-#' @param codes A character vector of codes to be mapped. If passing `"all"`, all mapped codes will be returned.
-#' @param from Coding system that `codes` belong to.
-#' @param to Coding system to map `codes` to.
+#' @param ... Codes to map. Supports flexible input like [CODES()]. Special
+#'   value: `"all"` returns all mapped codes.
+#' @param from Coding system that `...` codes belong to. Optional if input is a
+#'   codelist with code_type.
+#' @param to Coding system to map codes to.
 #' @param map_version Version of the mapping table to use.
 #' @inheritParams CODES
 #'
-#' @details
-#' If no mapping table matching the `from -> to` direction is found, but there is a table for `to -> from`,
-#' `MAP()` will return the reverse mapping with a warning. Note that this is not guaranteed to be correct,
-#' as most mapping tables only work one way.
+#' @details If no mapping table matching the `from -> to` direction is found,
+#' but there is a table for `to -> from`, `MAP()` will return the reverse
+#' mapping with a warning. Note that this is not guaranteed to be correct, as
+#' most mapping tables only work one way.
 #'
-#' @return A `data.frame` of the mapped codes with their descriptions, as returned by [CODES()].
+#' @return A `codeminer_codelist` of the mapped codes with their descriptions.
 #'
-#'   If using `codes = "all"`, returns the mapping table as a `data.frame` with columns:
+#'   If using `codes = "all"`, returns the mapping table as a `data.frame` with
+#'   columns:
 #'   - `from`: the codes from the source code system
 #'   - `to`: the mapped codes from the destination system
 #'
 #' @export
 #' @family Clinical code lookups and mappings
-#' @seealso [add_mapping_table()] for adding new mapping tables to the codeminer database.
+#' @seealso [add_mapping_table()] for adding new mapping tables to the codeminer
+#'   database.
 #' @examples
 #' # Set up a temporary dummy database
 #' temp_db <- tempfile(fileext = ".duckdb")
 #' create_dummy_database(temp_db)
 #'
+#' # Single code
 #' MAP("X40J4", from = "Read 3", to = "ICD-10")
+#'
+#' # Multiple codes
+#' MAP("X40J4", "X40J5", from = "Read 3", to = "ICD-10")
+#'
+#' # || separated
+#' MAP("X40J4 || X40J5", from = "Read 3", to = "ICD-10")
+#'
+#' # Data frame input (from is optional)
+#' df <- data.frame(
+#'   code = c("X40J4", "X40J5"),
+#'   description = c("Desc 1", "Desc 2"),
+#'   code_type = c("Read 3", "Read 3")
+#' )
+#' MAP(df, to = "ICD-10")
 #'
 #' # Return the mapping table itself
 #' MAP("all", from = "Read 3", to = "ICD-10")
 MAP <- function(
-  codes,
+  ...,
   from = getOption("codeminer.map_from"),
   to = getOption("codeminer.map_to"),
   map_version = getOption("codeminer.map_version", default = "latest"),
   lookup_version = getOption("codeminer.lookup_version", default = "latest")
 ) {
-  check_mapping_args(
-    codes = codes,
-    from = from,
-    to = to,
-    map_version = map_version
+  # Collect and validate input
+  collected <- collect_codes_input(
+    ...,
+    type = from,
+    call = rlang::current_env()
   )
+  codes_vec <- collected$codes
+
+  # If input was codelist, use its code_type as from
+  if (!is.null(collected$code_type)) {
+    from <- collected$code_type
+  }
+
+  # Handle special case: "all"
+  if (length(codes_vec) == 1 && identical(codes_vec, "all")) {
+    check_code_type(from, call = rlang::current_env())
+    check_code_type(to, call = rlang::current_env())
+    check_version(map_version, call = rlang::current_env())
+
+    if (identical(from, to)) {
+      codeminer_abort(
+        "{.arg from} and {.arg to} must be different code types",
+        call = rlang::current_env()
+      )
+    }
+
+    con <- connect_to_db()
+    check_database(con)
+    mapping_table <- get_mapping_table(con, from, to, map_version)
+    return(dplyr::collect(mapping_table))
+  }
+
+  # Validate parameters
+  check_code_type(from, call = rlang::current_env())
+  check_code_type(to, call = rlang::current_env())
+  check_version(map_version, call = rlang::current_env())
+
+  if (identical(from, to)) {
+    codeminer_abort(
+      "{.arg from} and {.arg to} must be different code types",
+      call = rlang::current_env()
+    )
+  }
 
   con <- connect_to_db()
   check_database(con)
 
   mapping_table <- get_mapping_table(con, from, to, map_version)
 
-  if (identical(codes, "all")) {
-    return(dplyr::collect(mapping_table))
-  }
-
   mapping <- dplyr::filter(
     mapping_table,
-    .data$from %in% .env$codes,
+    .data$from %in% .env$codes_vec,
     !is.na(.data$to)
   ) |>
     dplyr::collect()
 
-  missing_codes <- setdiff(codes, mapping$from)
+  missing_codes <- setdiff(codes_vec, mapping$from)
   if (length(missing_codes) > 0) {
     missing_codes_warning(
       missing_codes,
@@ -68,7 +120,7 @@ MAP <- function(
     )
   }
   mapped_codes <- unique(mapping$to)
-  return(CODES(mapped_codes, code_type = to, lookup_version = lookup_version))
+  return(CODES(mapped_codes, type = to, lookup_version = lookup_version))
 }
 
 #' Get the mapping table for the given from and to types in standardised format
@@ -154,28 +206,4 @@ get_metadata_for_mapping <- function(
 
   stopifnot(nrow(this_meta) == 1) # expect a unique mapping table
   return(this_meta)
-}
-
-check_mapping_args <- function(
-  codes,
-  from,
-  to,
-  map_version,
-  call = rlang::caller_env()
-) {
-  check_codes(codes, call = call)
-  check_version(map_version, call = call)
-
-  if (length(from) != 1) {
-    codeminer_abort(
-      "{.arg from} must have length 1, not {length(from)}",
-      call = call
-    )
-  }
-  if (length(to) != 1) {
-    codeminer_abort(
-      "{.arg to} must have length 1, not {length(to)}",
-      call = call
-    )
-  }
 }

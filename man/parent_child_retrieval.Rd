@@ -9,54 +9,49 @@
 \title{Retrieve parent or child codes}
 \usage{
 CHILDREN(
-  codes,
-  code_type = getOption("codeminer.code_type"),
+  ...,
+  type = getOption("codeminer.code_type"),
   lookup_version = getOption("codeminer.lookup_version", default = "latest"),
   relationship_version = getOption("codeminer.relationship_version", default = "latest"),
-  codes_only = FALSE,
   preferred_description_only = TRUE
 )
 
 PARENTS(
-  codes,
-  code_type = getOption("codeminer.code_type"),
+  ...,
+  type = getOption("codeminer.code_type"),
   lookup_version = getOption("codeminer.lookup_version", default = "latest"),
   relationship_version = getOption("codeminer.relationship_version", default = "latest"),
-  codes_only = FALSE,
   preferred_description_only = TRUE
 )
 
 N_CHILDREN(
-  codes,
+  ...,
   depth = 1,
-  code_type = getOption("codeminer.code_type"),
+  type = getOption("codeminer.code_type"),
   lookup_version = getOption("codeminer.lookup_version", default = "latest"),
   relationship_version = getOption("codeminer.relationship_version", default = "latest"),
-  codes_only = FALSE,
-  preferred_description_only = TRUE
+  preferred_description_only = TRUE,
+  call = rlang::caller_env()
 )
 
 N_PARENTS(
-  codes,
+  ...,
   depth = 1,
-  code_type = getOption("codeminer.code_type"),
+  type = getOption("codeminer.code_type"),
   lookup_version = getOption("codeminer.lookup_version", default = "latest"),
   relationship_version = getOption("codeminer.relationship_version", default = "latest"),
-  codes_only = FALSE,
-  preferred_description_only = TRUE
+  preferred_description_only = TRUE,
+  call = rlang::caller_env()
 )
 }
 \arguments{
-\item{codes}{Character vector of codes to start from.}
+\item{...}{Codes to start from. Supports flexible input like \code{\link[=CODES]{CODES()}}.}
 
-\item{code_type}{Code type (character).}
+\item{type}{Code type (character).}
 
 \item{lookup_version}{Lookup table version (character).}
 
 \item{relationship_version}{Relationship table version (character).}
-
-\item{codes_only}{Logical. If \code{TRUE}, return only unique codes. If \code{FALSE},
-return a data frame with code and description.}
 
 \item{preferred_description_only}{Logical. If \code{TRUE}, return only preferred
 descriptions.}
@@ -64,10 +59,13 @@ descriptions.}
 \item{depth}{Integer. Maximum number of steps to traverse. Use \code{Inf} for
 transitive closure (all ancestors/descendants). Only used by \code{N_PARENTS()}
 and \code{N_CHILDREN()}.}
+
+\item{call}{\strong{For internal use only.} The execution environment of a
+currently running function. Used for error reporting. Users should not
+need to set this parameter.}
 }
 \value{
-A data frame of codes and descriptions, or a character vector if
-\code{codes_only = TRUE}.
+A data frame of codes and descriptions.
 }
 \description{
 Returns immediate or transitive parent or child codes for the given codes by
@@ -80,10 +78,10 @@ ancestors/descendants).
 }
 \examples{
 create_dummy_database()
-PARENTS(c("E10", "E11"), code_type = "ICD-10")
-CHILDREN(c("E10", "E11"), code_type = "ICD-10")
-N_PARENTS(c("E10", "E11"), code_type = "ICD-10")
-N_CHILDREN(c("E10", "E11"), code_type = "ICD-10")
+PARENTS("E10", "E11", type = "ICD-10")
+CHILDREN("E10", "E11", type = "ICD-10")
+N_PARENTS("E10", "E11", type = "ICD-10")
+N_CHILDREN("E10", "E11", type = "ICD-10")
 }
 \seealso{
 Other Code relationships: 
