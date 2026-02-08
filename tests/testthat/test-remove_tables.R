@@ -3,8 +3,14 @@
 test_that("remove_lookup_table() removes data table and metadata", {
   local_build_temp_database()
 
-  test_table <- data.frame(code = c("A", "B"), description = c("A desc", "B desc"))
-  add_lookup_table(test_table, lookup_metadata("rm_test", lookup_version = "v1"))
+  test_table <- data.frame(
+    code = c("A", "B"),
+    description = c("A desc", "B desc")
+  )
+  add_lookup_table(
+    test_table,
+    lookup_metadata("rm_test", lookup_version = "v1")
+  )
 
   con <- connect_to_db()
   expect_true(table_exists(con, "rm_test_v1"))
@@ -31,12 +37,18 @@ test_that("remove_lookup_table() allows re-adding after removal", {
   local_build_temp_database()
 
   test_table <- data.frame(code = "X", description = "X desc")
-  add_lookup_table(test_table, lookup_metadata("readd_test", lookup_version = "v1"))
+  add_lookup_table(
+    test_table,
+    lookup_metadata("readd_test", lookup_version = "v1")
+  )
   remove_lookup_table("readd_test", "v1")
 
   # Re-add the same table
   expect_no_error(
-    add_lookup_table(test_table, lookup_metadata("readd_test", lookup_version = "v1"))
+    add_lookup_table(
+      test_table,
+      lookup_metadata("readd_test", lookup_version = "v1")
+    )
   )
 
   con <- connect_to_db()
@@ -49,17 +61,24 @@ test_that("remove_mapping_table() removes data table and metadata", {
   local_build_temp_database()
 
   test_table <- data.frame(from = c("A", "B"), to = c("1", "2"))
-  add_mapping_table(test_table, mapping_metadata("rm_from", "rm_to", map_version = "v1"))
+  add_mapping_table(
+    test_table,
+    mapping_metadata("rm_from", "rm_to", map_version = "v1")
+  )
 
   con <- connect_to_db()
   expect_true(table_exists(con, "rm_from_rm_to_v1"))
-  expect_true("rm_from_rm_to_v1" %in% get_mapping_metadata(con)$mapping_table_name)
+  expect_true(
+    "rm_from_rm_to_v1" %in% get_mapping_metadata(con)$mapping_table_name
+  )
 
   remove_mapping_table("rm_from", "rm_to", "v1")
 
   con <- connect_to_db()
   expect_false(table_exists(con, "rm_from_rm_to_v1"))
-  expect_false("rm_from_rm_to_v1" %in% get_mapping_metadata(con)$mapping_table_name)
+  expect_false(
+    "rm_from_rm_to_v1" %in% get_mapping_metadata(con)$mapping_table_name
+  )
 })
 
 test_that("remove_mapping_table() errors for non-existent table", {
@@ -75,11 +94,17 @@ test_that("remove_mapping_table() allows re-adding after removal", {
   local_build_temp_database()
 
   test_table <- data.frame(from = "X", to = "1")
-  add_mapping_table(test_table, mapping_metadata("readd_from", "readd_to", map_version = "v1"))
+  add_mapping_table(
+    test_table,
+    mapping_metadata("readd_from", "readd_to", map_version = "v1")
+  )
   remove_mapping_table("readd_from", "readd_to", "v1")
 
   expect_no_error(
-    add_mapping_table(test_table, mapping_metadata("readd_from", "readd_to", map_version = "v1"))
+    add_mapping_table(
+      test_table,
+      mapping_metadata("readd_from", "readd_to", map_version = "v1")
+    )
   )
 
   con <- connect_to_db()
@@ -100,7 +125,8 @@ test_that("remove_relationship_table() removes data table and metadata", {
   con <- connect_to_db()
   expect_true(table_exists(con, "rm_rel_relationship_v1"))
   expect_true(
-    "rm_rel_relationship_v1" %in% get_relationship_metadata(con)$relationship_table_name
+    "rm_rel_relationship_v1" %in%
+      get_relationship_metadata(con)$relationship_table_name
   )
 
   remove_relationship_table("rm_rel", "v1")
@@ -108,7 +134,8 @@ test_that("remove_relationship_table() removes data table and metadata", {
   con <- connect_to_db()
   expect_false(table_exists(con, "rm_rel_relationship_v1"))
   expect_false(
-    "rm_rel_relationship_v1" %in% get_relationship_metadata(con)$relationship_table_name
+    "rm_rel_relationship_v1" %in%
+      get_relationship_metadata(con)$relationship_table_name
   )
 })
 

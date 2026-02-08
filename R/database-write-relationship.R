@@ -106,7 +106,12 @@ add_relationship_table <- function(table, metadata) {
 #' @seealso [add_relationship_table()], [relationship_metadata()]
 #' @export
 remove_relationship_table <- function(code_type, relationship_version) {
-  table_name <- paste(code_type, "relationship", relationship_version, sep = "_")
+  table_name <- paste(
+    code_type,
+    "relationship",
+    relationship_version,
+    sep = "_"
+  )
 
   con <- connect_to_db(read_only = FALSE)
   check_database(con)
