@@ -142,7 +142,7 @@ test_that("get_lookup_metadata() returns all added entries", {
 })
 
 test_that("get_lookup_metadata() works without explicit connection", {
-  # Should use default connection from connect_to_db()
+  local_build_temp_database()
   expect_no_error(result <- get_lookup_metadata())
   expect_s3_class(result, "data.frame")
 })
@@ -168,7 +168,7 @@ test_that("get_mapping_metadata() returns all added entries", {
 })
 
 test_that("get_mapping_metadata() works without explicit connection", {
-  # Should use default connection from connect_to_db()
+  local_build_temp_database()
   expect_no_error(result <- get_mapping_metadata())
   expect_s3_class(result, "data.frame")
 })
@@ -200,7 +200,7 @@ test_that("get_relationship_metadata() returns all added entries", {
 })
 
 test_that("get_relationship_metadata() works without explicit connection", {
-  # Should use default connection from connect_to_db()
+  local_build_temp_database()
   expect_no_error(result <- get_relationship_metadata())
   expect_s3_class(result, "data.frame")
 })
@@ -213,6 +213,7 @@ test_that("read_table_from_db() fails for non-existent table", {
 })
 
 test_that("get_codeminer_metadata() returns all metadata as a list by default", {
+  local_build_temp_database()
   result <- get_codeminer_metadata()
 
   expect_type(result, "list")
@@ -223,6 +224,7 @@ test_that("get_codeminer_metadata() returns all metadata as a list by default", 
 })
 
 test_that("get_codeminer_metadata() returns a data frame for single type", {
+  local_build_temp_database()
   result_lookup <- get_codeminer_metadata("lookup")
   result_mapping <- get_codeminer_metadata("mapping")
   result_relationship <- get_codeminer_metadata("relationship")
@@ -237,6 +239,7 @@ test_that("get_codeminer_metadata() returns a data frame for single type", {
 })
 
 test_that("get_codeminer_metadata() returns a list for multiple types", {
+  local_build_temp_database()
   result <- get_codeminer_metadata(c("lookup", "mapping"))
 
   expect_type(result, "list")
