@@ -14,7 +14,7 @@ CODEMINER_ALIAS_EXTRA <- "user_db"
 #' in `main`.
 #'
 #' If called with no arguments, uses the default database path from
-#' [db_path()].
+#' the `CODEMINER_DB_PATH` environment variable (or `rappdirs` default).
 #'
 #' @param main Path to the main (read-only) DuckDB database file.
 #'   Defaults to the path from `CODEMINER_DB_PATH` env var or

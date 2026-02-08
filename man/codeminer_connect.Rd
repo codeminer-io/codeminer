@@ -27,7 +27,7 @@ in \code{main}.
 }
 \details{
 If called with no arguments, uses the default database path from
-\code{\link[=db_path]{db_path()}}.
+the \code{CODEMINER_DB_PATH} environment variable (or \code{rappdirs} default).
 }
 \seealso{
 \code{\link[=codeminer_disconnect]{codeminer_disconnect()}}, \code{\link[=codeminer_status]{codeminer_status()}}
