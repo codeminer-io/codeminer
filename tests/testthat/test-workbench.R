@@ -69,7 +69,9 @@ test_that("main database is attached as READ_ONLY", {
     DBI::dbExecute(
       .codeminer_env$con,
       paste0(
-        "CREATE TABLE ", CODEMINER_ALIAS_MAIN, "._test_write (x INTEGER)"
+        "CREATE TABLE ",
+        CODEMINER_ALIAS_MAIN,
+        "._test_write (x INTEGER)"
       )
     )
   )
@@ -110,7 +112,8 @@ test_that("search_path prioritises extra over main", {
   # Explicitly qualified queries should reach their respective databases
   query <- paste0(
     "SELECT source FROM ",
-    CODEMINER_ALIAS_MAIN, "._test_priority"
+    CODEMINER_ALIAS_MAIN,
+    "._test_priority"
   )
   res_main <- DBI::dbGetQuery(.codeminer_env$con, query)
   expect_equal(res_main$source, "main")

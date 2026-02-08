@@ -3,7 +3,9 @@
 # against the temp file. The workbench is disconnected on scope exit.
 local_temp_database <- function(..., .envir = parent.frame()) {
   # Disconnect any existing workbench first
-  if (exists("con", envir = .codeminer_env) && DBI::dbIsValid(.codeminer_env$con)) {
+  if (
+    exists("con", envir = .codeminer_env) && DBI::dbIsValid(.codeminer_env$con)
+  ) {
     codeminer_disconnect()
   }
 

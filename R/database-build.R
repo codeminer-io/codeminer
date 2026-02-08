@@ -218,25 +218,28 @@ connect_to_db <- function(..., read_only = TRUE, .envir = parent.frame()) {
       )
     )
     .codeminer_env$db_paths$main <- NULL
-    withr::defer({
-      # Only re-ATTACH if workbench is still active and core is still
-      # detached. Another code path (e.g. auto-init) may have already
-      # reconnected.
-      wb_alive <- exists("con", envir = .codeminer_env) &&
-        DBI::dbIsValid(.codeminer_env$con)
-      if (wb_alive && is.null(.codeminer_env$db_paths$main)) {
-        DBI::dbExecute(
-          .codeminer_env$con,
-          glue::glue_sql(
-            "ATTACH {target_path} AS {`CODEMINER_ALIAS_MAIN`} (READ_ONLY)",
-            .con = .codeminer_env$con
+    withr::defer(
+      {
+        # Only re-ATTACH if workbench is still active and core is still
+        # detached. Another code path (e.g. auto-init) may have already
+        # reconnected.
+        wb_alive <- exists("con", envir = .codeminer_env) &&
+          DBI::dbIsValid(.codeminer_env$con)
+        if (wb_alive && is.null(.codeminer_env$db_paths$main)) {
+          DBI::dbExecute(
+            .codeminer_env$con,
+            glue::glue_sql(
+              "ATTACH {target_path} AS {`CODEMINER_ALIAS_MAIN`} (READ_ONLY)",
+              .con = .codeminer_env$con
+            )
           )
-        )
-        .codeminer_env$db_paths$main <- target_path
-        codeminer_set_search_path()
-        codeminer_refresh_cache()
-      }
-    }, envir = .envir)
+          .codeminer_env$db_paths$main <- target_path
+          codeminer_set_search_path()
+          codeminer_refresh_cache()
+        }
+      },
+      envir = .envir
+    )
   }
 
   con <- DBI::dbConnect(duckdb::duckdb(), target_path, read_only = FALSE)

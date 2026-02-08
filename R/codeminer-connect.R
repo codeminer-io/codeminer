@@ -29,7 +29,9 @@ CODEMINER_ALIAS_EXTRA <- "user_db"
 #' @seealso [codeminer_disconnect()], [codeminer_status()]
 codeminer_connect <- function(main = NULL, extra = NULL) {
   main_was_explicit <- !is.null(main)
-  if (is.null(main)) main <- db_path()
+  if (is.null(main)) {
+    main <- db_path()
+  }
 
   if (!main_was_explicit) {
     codeminer_inform(c(
@@ -42,7 +44,9 @@ codeminer_connect <- function(main = NULL, extra = NULL) {
   }
 
   # Tear down existing workbench if one exists
-  if (exists("con", envir = .codeminer_env) && DBI::dbIsValid(.codeminer_env$con)) {
+  if (
+    exists("con", envir = .codeminer_env) && DBI::dbIsValid(.codeminer_env$con)
+  ) {
     DBI::dbDisconnect(.codeminer_env$con, shutdown = TRUE)
   }
 
@@ -95,7 +99,9 @@ codeminer_connect <- function(main = NULL, extra = NULL) {
 #' @export
 #' @family Workbench management
 codeminer_disconnect <- function() {
-  if (exists("con", envir = .codeminer_env) && DBI::dbIsValid(.codeminer_env$con)) {
+  if (
+    exists("con", envir = .codeminer_env) && DBI::dbIsValid(.codeminer_env$con)
+  ) {
     DBI::dbDisconnect(.codeminer_env$con, shutdown = TRUE)
   }
   for (field in c("con", "db_paths", "metadata", "active_versions")) {
@@ -136,7 +142,10 @@ codeminer_status <- function() {
     msgs <- c(msgs, "i" = "Pinned versions:")
     for (type in names(pins)) {
       for (key in names(pins[[type]])) {
-        msgs <- c(msgs, " " = "  {type}: {.val {key}} = {.val {pins[[type]][[key]]}}")
+        msgs <- c(
+          msgs,
+          " " = "  {type}: {.val {key}} = {.val {pins[[type]][[key]]}}"
+        )
       }
     }
   }
@@ -163,7 +172,10 @@ codeminer_refresh_cache <- function() {
 
   # Read metadata from each attached database
   # extra is iterated first so it takes priority when combined
-  for (db_name in intersect(c("extra", "main"), names(.codeminer_env$db_paths))) {
+  for (db_name in intersect(
+    c("extra", "main"),
+    names(.codeminer_env$db_paths)
+  )) {
     schema <- alias_map[[db_name]]
     for (type in c("lookup", "mapping", "relationship")) {
       tbl_name <- codeminer_metadata_table_names[[type]]
@@ -176,7 +188,8 @@ codeminer_refresh_cache <- function() {
         if (nrow(meta_df) > 0) {
           meta_df$.schema <- schema
           .codeminer_env$metadata[[type]] <- dplyr::bind_rows(
-            .codeminer_env$metadata[[type]], meta_df
+            .codeminer_env$metadata[[type]],
+            meta_df
           )
         }
       }
@@ -278,13 +291,21 @@ codeminer_set_version <- function(
   mapping = NULL
 ) {
   if (is.null(lookup) && is.null(relationship) && is.null(mapping)) {
-    codeminer_abort("At least one of {.arg lookup}, {.arg relationship}, or {.arg mapping} must be provided.")
+    codeminer_abort(
+      "At least one of {.arg lookup}, {.arg relationship}, or {.arg mapping} must be provided."
+    )
   }
 
   # Trim whitespace from keys and values (users may copy-paste from configs)
-  if (!is.null(lookup)) lookup <- trim_pins(lookup)
-  if (!is.null(relationship)) relationship <- trim_pins(relationship)
-  if (!is.null(mapping)) mapping <- trim_pins(mapping)
+  if (!is.null(lookup)) {
+    lookup <- trim_pins(lookup)
+  }
+  if (!is.null(relationship)) {
+    relationship <- trim_pins(relationship)
+  }
+  if (!is.null(mapping)) {
+    mapping <- trim_pins(mapping)
+  }
 
   # Reject "latest" as a pin value — it's the sentinel we're overriding
   all_pins <- c(lookup, relationship, mapping)
@@ -303,20 +324,28 @@ codeminer_set_version <- function(
   if (!is.null(lookup)) {
     validate_version_pins(lookup, "lookup", "lookup_version", "code_type")
     .codeminer_env$active_versions$lookup <- merge_pins(
-      .codeminer_env$active_versions$lookup, lookup
+      .codeminer_env$active_versions$lookup,
+      lookup
     )
   }
   if (!is.null(relationship)) {
-    validate_version_pins(relationship, "relationship", "relationship_version", "code_type")
+    validate_version_pins(
+      relationship,
+      "relationship",
+      "relationship_version",
+      "code_type"
+    )
     .codeminer_env$active_versions$relationship <- merge_pins(
-      .codeminer_env$active_versions$relationship, relationship
+      .codeminer_env$active_versions$relationship,
+      relationship
     )
   }
   if (!is.null(mapping)) {
     mapping <- normalize_mapping_keys(mapping)
     validate_version_pins(mapping, "mapping", "map_version", NULL)
     .codeminer_env$active_versions$mapping <- merge_pins(
-      .codeminer_env$active_versions$mapping, mapping
+      .codeminer_env$active_versions$mapping,
+      mapping
     )
   }
 
@@ -400,7 +429,9 @@ validate_version_pins <- function(
 
   # Cross-check against cached metadata (skip if metadata not available)
   meta <- .codeminer_env$metadata[[type]]
-  if (is.null(meta)) return(invisible())
+  if (is.null(meta)) {
+    return(invisible())
+  }
 
   for (i in seq_along(pins)) {
     key <- names(pins)[[i]]
@@ -439,10 +470,15 @@ trim_pins <- function(pins) {
 #' converts to the canonical form used internally by `get_metadata_for_mapping()`.
 #' @noRd
 normalize_mapping_keys <- function(pins) {
-  new_names <- vapply(names(pins), function(key) {
-    parts <- trimws(strsplit(key, ">", fixed = TRUE)[[1]])
-    paste(parts, collapse = " > ")
-  }, character(1), USE.NAMES = FALSE)
+  new_names <- vapply(
+    names(pins),
+    function(key) {
+      parts <- trimws(strsplit(key, ">", fixed = TRUE)[[1]])
+      paste(parts, collapse = " > ")
+    },
+    character(1),
+    USE.NAMES = FALSE
+  )
   names(pins) <- new_names
   pins
 }
@@ -450,7 +486,9 @@ normalize_mapping_keys <- function(pins) {
 #' Merge new pins into existing pins (overwrite by name)
 #' @noRd
 merge_pins <- function(existing, new_pins) {
-  if (is.null(existing)) return(new_pins)
+  if (is.null(existing)) {
+    return(new_pins)
+  }
   # New pins overwrite existing ones with the same name
   existing[names(new_pins)] <- new_pins
   existing

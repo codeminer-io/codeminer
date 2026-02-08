@@ -12,7 +12,9 @@
 #' @return A DBI connection object.
 #' @noRd
 get_db_con <- function(con = NULL) {
-  if (!is.null(con)) return(con)
+  if (!is.null(con)) {
+    return(con)
+  }
 
   needs_connect <-
     !exists("con", envir = .codeminer_env) ||
@@ -51,7 +53,9 @@ get_db_con <- function(con = NULL) {
 }
 
 .onUnload <- function(libpath) {
-  if (exists("con", envir = .codeminer_env) && DBI::dbIsValid(.codeminer_env$con)) {
+  if (
+    exists("con", envir = .codeminer_env) && DBI::dbIsValid(.codeminer_env$con)
+  ) {
     DBI::dbDisconnect(.codeminer_env$con, shutdown = TRUE)
   }
 }
