@@ -6,7 +6,10 @@ the codeminer database.
 ## Usage
 
 ``` r
-get_codeminer_metadata(type = c("lookup", "mapping", "relationship"))
+get_codeminer_metadata(
+  type = c("lookup", "mapping", "relationship"),
+  con = NULL
+)
 ```
 
 ## Arguments
@@ -17,6 +20,11 @@ get_codeminer_metadata(type = c("lookup", "mapping", "relationship"))
   all metadata types. Otherwise, returns a data frame for the specified
   type. Must be one of "lookup", "mapping" or "relationship".
 
+- con:
+
+  Optional DBI connection. If `NULL` (default), uses the workbench
+  connection.
+
 ## Value
 
 If a single type is requested, a data frame. If multiple types are
@@ -26,7 +34,7 @@ requested, a named list of data frames.
 
 ``` r
 create_dummy_database()
-#> Creating new database at /tmp/RtmpMbNoIX/file1bff59452.duckdb
+#> Creating new database at /tmp/RtmpDQc1MV/file1c5e13879078.duckdb
 #> Reading 17 selected tables from UKB Resource 592
 #> 
 #> Extending read_v2_drugs_bnf with BNF hierarchy and descriptions
@@ -55,42 +63,27 @@ create_dummy_database()
 #> ✔ Mapping table Read 3_Read 2_UKB v4 added successfully.
 #> ✔ Dummy database ready to use!
 get_codeminer_metadata()
-#> $lookup
-#> [1] lookup_table_name               code_type                      
-#> [3] lookup_version                  lookup_code_col                
-#> [5] lookup_description_col          lookup_source                  
-#> [7] preferred_description_col       preferred_description_indicator
-#> <0 rows> (or 0-length row.names)
+#> Error in dbSendQuery(conn, statement, ...): Catalog Error: Table with name _lookup_metadata does not exist!
+#> Did you mean "duckdb_databases"?
 #> 
-#> $mapping
-#> [1] mapping_table_name from_code_type     to_code_type       map_version       
-#> [5] from_col           to_col             map_source        
-#> <0 rows> (or 0-length row.names)
-#> 
-#> $relationship
-#> [1] relationship_table_name        code_type                     
-#> [3] relationship_version           from_col                      
-#> [5] to_col                         type_col                      
-#> [7] child_parent_relationship_code relationship_source           
-#> <0 rows> (or 0-length row.names)
-#> 
+#> LINE 1: SELECT * FROM _lookup_metadata
+#>                       ^
+#> ℹ Context: rapi_prepare
+#> ℹ Error type: CATALOG
 get_codeminer_metadata("lookup")
-#> [1] lookup_table_name               code_type                      
-#> [3] lookup_version                  lookup_code_col                
-#> [5] lookup_description_col          lookup_source                  
-#> [7] preferred_description_col       preferred_description_indicator
-#> <0 rows> (or 0-length row.names)
+#> Error in dbSendQuery(conn, statement, ...): Catalog Error: Table with name _lookup_metadata does not exist!
+#> Did you mean "duckdb_databases"?
+#> 
+#> LINE 1: SELECT * FROM _lookup_metadata
+#>                       ^
+#> ℹ Context: rapi_prepare
+#> ℹ Error type: CATALOG
 get_codeminer_metadata(c("lookup", "mapping"))
-#> $lookup
-#> [1] lookup_table_name               code_type                      
-#> [3] lookup_version                  lookup_code_col                
-#> [5] lookup_description_col          lookup_source                  
-#> [7] preferred_description_col       preferred_description_indicator
-#> <0 rows> (or 0-length row.names)
+#> Error in dbSendQuery(conn, statement, ...): Catalog Error: Table with name _lookup_metadata does not exist!
+#> Did you mean "duckdb_databases"?
 #> 
-#> $mapping
-#> [1] mapping_table_name from_code_type     to_code_type       map_version       
-#> [5] from_col           to_col             map_source        
-#> <0 rows> (or 0-length row.names)
-#> 
+#> LINE 1: SELECT * FROM _lookup_metadata
+#>                       ^
+#> ℹ Context: rapi_prepare
+#> ℹ Error type: CATALOG
 ```

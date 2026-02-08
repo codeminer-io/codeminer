@@ -54,7 +54,7 @@ A `codeminer_codelist` with codes that match the description.
 ``` r
 # build dummy database
 create_dummy_database()
-#> Creating new database at /tmp/RtmpMbNoIX/file1bff7aaeefe0.duckdb
+#> Creating new database at /tmp/RtmpDQc1MV/file1c5e2f535bf5.duckdb
 #> Reading 17 selected tables from UKB Resource 592
 #> 
 #> Extending read_v2_drugs_bnf with BNF hierarchy and descriptions
@@ -85,6 +85,11 @@ create_dummy_database()
 
 # lookup ICD10 code descriptions matching 'cyst'
 DESCRIPTION("cyst", type = "ICD-10")
-#> Warning: cannot open file '/home/runner/.local/share/codeminer/ontology.duckdb': No such file or directory
-#> Error in file(con, "w"): cannot open the connection
+#> Error in dbSendQuery(conn, statement, ...): Catalog Error: Table with name _lookup_metadata does not exist!
+#> Did you mean "duckdb_databases"?
+#> 
+#> LINE 1: SELECT * FROM _lookup_metadata
+#>                       ^
+#> ℹ Context: rapi_prepare
+#> ℹ Error type: CATALOG
 ```

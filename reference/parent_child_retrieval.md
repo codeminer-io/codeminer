@@ -98,7 +98,7 @@ Other Code relationships:
 
 ``` r
 create_dummy_database()
-#> Creating new database at /tmp/RtmpMbNoIX/file1bff1a862350.duckdb
+#> Creating new database at /tmp/RtmpDQc1MV/file1c5e6cd4c709.duckdb
 #> Reading 17 selected tables from UKB Resource 592
 #> 
 #> Extending read_v2_drugs_bnf with BNF hierarchy and descriptions
@@ -127,19 +127,35 @@ create_dummy_database()
 #> ✔ Mapping table Read 3_Read 2_UKB v4 added successfully.
 #> ✔ Dummy database ready to use!
 PARENTS("E10", "E11", type = "ICD-10")
-#> Error in N_PARENTS(..., depth = Inf, type = type, lookup_version = lookup_version,     relationship_version = relationship_version, preferred_description_only = preferred_description_only,     call = rlang::caller_env()): Code type 'ICD-10' not found in relationship metadata.
-#> ℹ Did you add the relationship table with
-#>   `codeminer::add_relationship_table()`?
+#> Error in dbSendQuery(conn, statement, ...): Catalog Error: Table with name _relationship_metadata does not exist!
+#> Did you mean "sqlite_temp_schema"?
+#> 
+#> LINE 1: SELECT * FROM _relationship_metadata
+#>                       ^
+#> ℹ Context: rapi_prepare
+#> ℹ Error type: CATALOG
 CHILDREN("E10", "E11", type = "ICD-10")
-#> Error in N_CHILDREN(..., depth = Inf, type = type, lookup_version = lookup_version,     relationship_version = relationship_version, preferred_description_only = preferred_description_only,     call = rlang::caller_env()): Code type 'ICD-10' not found in relationship metadata.
-#> ℹ Did you add the relationship table with
-#>   `codeminer::add_relationship_table()`?
+#> Error in dbSendQuery(conn, statement, ...): Catalog Error: Table with name _relationship_metadata does not exist!
+#> Did you mean "sqlite_temp_schema"?
+#> 
+#> LINE 1: SELECT * FROM _relationship_metadata
+#>                       ^
+#> ℹ Context: rapi_prepare
+#> ℹ Error type: CATALOG
 N_PARENTS("E10", "E11", type = "ICD-10")
-#> Error in N_PARENTS("E10", "E11", type = "ICD-10"): Code type 'ICD-10' not found in relationship metadata.
-#> ℹ Did you add the relationship table with
-#>   `codeminer::add_relationship_table()`?
+#> Error in dbSendQuery(conn, statement, ...): Catalog Error: Table with name _relationship_metadata does not exist!
+#> Did you mean "sqlite_temp_schema"?
+#> 
+#> LINE 1: SELECT * FROM _relationship_metadata
+#>                       ^
+#> ℹ Context: rapi_prepare
+#> ℹ Error type: CATALOG
 N_CHILDREN("E10", "E11", type = "ICD-10")
-#> Error in N_CHILDREN("E10", "E11", type = "ICD-10"): Code type 'ICD-10' not found in relationship metadata.
-#> ℹ Did you add the relationship table with
-#>   `codeminer::add_relationship_table()`?
+#> Error in dbSendQuery(conn, statement, ...): Catalog Error: Table with name _relationship_metadata does not exist!
+#> Did you mean "sqlite_temp_schema"?
+#> 
+#> LINE 1: SELECT * FROM _relationship_metadata
+#>                       ^
+#> ℹ Context: rapi_prepare
+#> ℹ Error type: CATALOG
 ```

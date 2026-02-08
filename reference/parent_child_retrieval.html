@@ -141,7 +141,7 @@ ancestors/descendants).</p>
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="create_dummy_database.html">create_dummy_database</a></span><span class="op">(</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Creating new database at <span style="color: #0000BB;">/tmp/RtmpMbNoIX/file1bff1a862350.duckdb</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Creating new database at <span style="color: #0000BB;">/tmp/RtmpDQc1MV/file1c5e6cd4c709.duckdb</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Reading 17 selected tables from UKB Resource 592</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Extending <span style="color: #00BB00;">read_v2_drugs_bnf</span> with BNF hierarchy and descriptions</span>
@@ -170,21 +170,37 @@ ancestors/descendants).</p>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Mapping table <span style="color: #00BB00;">Read 3_Read 2_UKB v4</span> added successfully.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Dummy database ready to use!</span>
 <span class="r-in"><span><span class="fu">PARENTS</span><span class="op">(</span><span class="st">"E10"</span>, <span class="st">"E11"</span>, type <span class="op">=</span> <span class="st">"ICD-10"</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in N_PARENTS(..., depth = Inf, type = type, lookup_version = lookup_version,     relationship_version = relationship_version, preferred_description_only = preferred_description_only,     call = rlang::caller_env()):</span> Code type 'ICD-10' not found in relationship metadata.</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Did you add the relationship table with</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span>   `codeminer::add_relationship_table()`?</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in dbSendQuery(conn, statement, ...):</span> Catalog Error: Table with name _relationship_metadata does not exist!</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> Did you mean "sqlite_temp_schema"?</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> LINE 1: SELECT * FROM _relationship_metadata</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span>                       ^</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">ℹ</span> Context: rapi_prepare</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">ℹ</span> Error type: CATALOG</span>
 <span class="r-in"><span><span class="fu">CHILDREN</span><span class="op">(</span><span class="st">"E10"</span>, <span class="st">"E11"</span>, type <span class="op">=</span> <span class="st">"ICD-10"</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in N_CHILDREN(..., depth = Inf, type = type, lookup_version = lookup_version,     relationship_version = relationship_version, preferred_description_only = preferred_description_only,     call = rlang::caller_env()):</span> Code type 'ICD-10' not found in relationship metadata.</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Did you add the relationship table with</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span>   `codeminer::add_relationship_table()`?</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in dbSendQuery(conn, statement, ...):</span> Catalog Error: Table with name _relationship_metadata does not exist!</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> Did you mean "sqlite_temp_schema"?</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> LINE 1: SELECT * FROM _relationship_metadata</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span>                       ^</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">ℹ</span> Context: rapi_prepare</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">ℹ</span> Error type: CATALOG</span>
 <span class="r-in"><span><span class="fu">N_PARENTS</span><span class="op">(</span><span class="st">"E10"</span>, <span class="st">"E11"</span>, type <span class="op">=</span> <span class="st">"ICD-10"</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in N_PARENTS("E10", "E11", type = "ICD-10"):</span> Code type 'ICD-10' not found in relationship metadata.</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Did you add the relationship table with</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span>   `codeminer::add_relationship_table()`?</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in dbSendQuery(conn, statement, ...):</span> Catalog Error: Table with name _relationship_metadata does not exist!</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> Did you mean "sqlite_temp_schema"?</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> LINE 1: SELECT * FROM _relationship_metadata</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span>                       ^</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">ℹ</span> Context: rapi_prepare</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">ℹ</span> Error type: CATALOG</span>
 <span class="r-in"><span><span class="fu">N_CHILDREN</span><span class="op">(</span><span class="st">"E10"</span>, <span class="st">"E11"</span>, type <span class="op">=</span> <span class="st">"ICD-10"</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in N_CHILDREN("E10", "E11", type = "ICD-10"):</span> Code type 'ICD-10' not found in relationship metadata.</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Did you add the relationship table with</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span>   `codeminer::add_relationship_table()`?</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in dbSendQuery(conn, statement, ...):</span> Catalog Error: Table with name _relationship_metadata does not exist!</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> Did you mean "sqlite_temp_schema"?</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> LINE 1: SELECT * FROM _relationship_metadata</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span>                       ^</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">ℹ</span> Context: rapi_prepare</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">ℹ</span> Error type: CATALOG</span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

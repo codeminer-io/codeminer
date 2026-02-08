@@ -90,7 +90,7 @@ Other Clinical code lookups and mappings:
 # Set up a temporary dummy database
 temp_db <- tempfile(fileext = ".duckdb")
 create_dummy_database(temp_db)
-#> Creating new database at /tmp/RtmpMbNoIX/file1bff1e0f689c.duckdb
+#> Creating new database at /tmp/RtmpDQc1MV/file1c5e75222696.duckdb
 #> Reading 17 selected tables from UKB Resource 592
 #> 
 #> Extending read_v2_drugs_bnf with BNF hierarchy and descriptions
@@ -121,24 +121,46 @@ create_dummy_database(temp_db)
 
 # Multiple arguments
 CODES("E10", "E11", type = "ICD-10")
-#> Warning: cannot open file '/home/runner/.local/share/codeminer/ontology.duckdb': No such file or directory
-#> Error in file(con, "w"): cannot open the connection
+#> ℹ Using database at ~/.local/share/codeminer/ontology.duckdb
+#> ℹ Set `CODEMINER_DB_PATH` or use `codeminer_connect()` to change this.
+#> Error in dbSendQuery(conn, statement, ...): Catalog Error: Table with name _lookup_metadata does not exist!
+#> Did you mean "duckdb_databases"?
+#> 
+#> LINE 1: SELECT * FROM _lookup_metadata
+#>                       ^
+#> ℹ Context: rapi_prepare
+#> ℹ Error type: CATALOG
 
 # With comments
 CODES("E10 << Type 1 diabetes >>", type = "ICD-10")
-#> Warning: cannot open file '/home/runner/.local/share/codeminer/ontology.duckdb': No such file or directory
-#> Error in file(con, "w"): cannot open the connection
+#> Error in dbSendQuery(conn, statement, ...): Catalog Error: Table with name _lookup_metadata does not exist!
+#> Did you mean "duckdb_databases"?
+#> 
+#> LINE 1: SELECT * FROM _lookup_metadata
+#>                       ^
+#> ℹ Context: rapi_prepare
+#> ℹ Error type: CATALOG
 
 # || separated string
 CODES("E10 || E11", type = "ICD-10")
-#> Warning: cannot open file '/home/runner/.local/share/codeminer/ontology.duckdb': No such file or directory
-#> Error in file(con, "w"): cannot open the connection
+#> Error in dbSendQuery(conn, statement, ...): Catalog Error: Table with name _lookup_metadata does not exist!
+#> Did you mean "duckdb_databases"?
+#> 
+#> LINE 1: SELECT * FROM _lookup_metadata
+#>                       ^
+#> ℹ Context: rapi_prepare
+#> ℹ Error type: CATALOG
 
 # Splice operator
 my_codes <- c("E10", "E11")
 CODES(!!!my_codes, type = "ICD-10")
-#> Warning: cannot open file '/home/runner/.local/share/codeminer/ontology.duckdb': No such file or directory
-#> Error in file(con, "w"): cannot open the connection
+#> Error in dbSendQuery(conn, statement, ...): Catalog Error: Table with name _lookup_metadata does not exist!
+#> Did you mean "duckdb_databases"?
+#> 
+#> LINE 1: SELECT * FROM _lookup_metadata
+#>                       ^
+#> ℹ Context: rapi_prepare
+#> ℹ Error type: CATALOG
 
 # Data frame input
 df <- data.frame(
@@ -147,9 +169,19 @@ df <- data.frame(
   code_type = c("ICD-10", "ICD-10")
 )
 CODES(df)
-#> Warning: cannot open file '/home/runner/.local/share/codeminer/ontology.duckdb': No such file or directory
-#> Error in file(con, "w"): cannot open the connection
+#> Error in dbSendQuery(conn, statement, ...): Catalog Error: Table with name _lookup_metadata does not exist!
+#> Did you mean "duckdb_databases"?
+#> 
+#> LINE 1: SELECT * FROM _lookup_metadata
+#>                       ^
+#> ℹ Context: rapi_prepare
+#> ℹ Error type: CATALOG
 CODES_LIKE("^E1", type = "ICD-10")
-#> Warning: cannot open file '/home/runner/.local/share/codeminer/ontology.duckdb': No such file or directory
-#> Error in file(con, "w"): cannot open the connection
+#> Error in dbSendQuery(conn, statement, ...): Catalog Error: Table with name _lookup_metadata does not exist!
+#> Did you mean "duckdb_databases"?
+#> 
+#> LINE 1: SELECT * FROM _lookup_metadata
+#>                       ^
+#> ℹ Context: rapi_prepare
+#> ℹ Error type: CATALOG
 ```

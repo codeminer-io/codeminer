@@ -73,7 +73,7 @@ Other Clinical code lookups and mappings:
 # Set up a temporary dummy database
 temp_db <- tempfile(fileext = ".duckdb")
 create_dummy_database(temp_db)
-#> Creating new database at /tmp/RtmpMbNoIX/file1bff2705f0aa.duckdb
+#> Creating new database at /tmp/RtmpDQc1MV/file1c5e6fbdb1d1.duckdb
 #> Reading 17 selected tables from UKB Resource 592
 #> 
 #> Extending read_v2_drugs_bnf with BNF hierarchy and descriptions
@@ -104,18 +104,33 @@ create_dummy_database(temp_db)
 
 # Single code
 MAP("X40J4", from = "Read 3", to = "ICD-10")
-#> Warning: cannot open file '/home/runner/.local/share/codeminer/ontology.duckdb': No such file or directory
-#> Error in file(con, "w"): cannot open the connection
+#> Error in dbSendQuery(conn, statement, ...): Catalog Error: Table with name _mapping_metadata does not exist!
+#> Did you mean "pragma_database_list"?
+#> 
+#> LINE 1: SELECT * FROM _mapping_metadata
+#>                       ^
+#> ℹ Context: rapi_prepare
+#> ℹ Error type: CATALOG
 
 # Multiple codes
 MAP("X40J4", "X40J5", from = "Read 3", to = "ICD-10")
-#> Warning: cannot open file '/home/runner/.local/share/codeminer/ontology.duckdb': No such file or directory
-#> Error in file(con, "w"): cannot open the connection
+#> Error in dbSendQuery(conn, statement, ...): Catalog Error: Table with name _mapping_metadata does not exist!
+#> Did you mean "pragma_database_list"?
+#> 
+#> LINE 1: SELECT * FROM _mapping_metadata
+#>                       ^
+#> ℹ Context: rapi_prepare
+#> ℹ Error type: CATALOG
 
 # || separated
 MAP("X40J4 || X40J5", from = "Read 3", to = "ICD-10")
-#> Warning: cannot open file '/home/runner/.local/share/codeminer/ontology.duckdb': No such file or directory
-#> Error in file(con, "w"): cannot open the connection
+#> Error in dbSendQuery(conn, statement, ...): Catalog Error: Table with name _mapping_metadata does not exist!
+#> Did you mean "pragma_database_list"?
+#> 
+#> LINE 1: SELECT * FROM _mapping_metadata
+#>                       ^
+#> ℹ Context: rapi_prepare
+#> ℹ Error type: CATALOG
 
 # Data frame input (from is optional)
 df <- data.frame(
@@ -124,11 +139,21 @@ df <- data.frame(
   code_type = c("Read 3", "Read 3")
 )
 MAP(df, to = "ICD-10")
-#> Warning: cannot open file '/home/runner/.local/share/codeminer/ontology.duckdb': No such file or directory
-#> Error in file(con, "w"): cannot open the connection
+#> Error in dbSendQuery(conn, statement, ...): Catalog Error: Table with name _mapping_metadata does not exist!
+#> Did you mean "pragma_database_list"?
+#> 
+#> LINE 1: SELECT * FROM _mapping_metadata
+#>                       ^
+#> ℹ Context: rapi_prepare
+#> ℹ Error type: CATALOG
 
 # Return the mapping table itself
 MAP("all", from = "Read 3", to = "ICD-10")
-#> Warning: cannot open file '/home/runner/.local/share/codeminer/ontology.duckdb': No such file or directory
-#> Error in file(con, "w"): cannot open the connection
+#> Error in dbSendQuery(conn, statement, ...): Catalog Error: Table with name _mapping_metadata does not exist!
+#> Did you mean "pragma_database_list"?
+#> 
+#> LINE 1: SELECT * FROM _mapping_metadata
+#>                       ^
+#> ℹ Context: rapi_prepare
+#> ℹ Error type: CATALOG
 ```

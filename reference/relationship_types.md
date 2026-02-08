@@ -55,7 +55,7 @@ Other Code relationships:
 
 ``` r
 create_dummy_database()
-#> Creating new database at /tmp/RtmpMbNoIX/file1bff1d99b9b7.duckdb
+#> Creating new database at /tmp/RtmpDQc1MV/file1c5e7b1c9a1.duckdb
 #> Reading 17 selected tables from UKB Resource 592
 #> 
 #> Extending read_v2_drugs_bnf with BNF hierarchy and descriptions

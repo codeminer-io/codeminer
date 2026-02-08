@@ -81,11 +81,7 @@ various clinical codings systems (e.g. ICD10 and Read codes)</li>
 this resource</li>
 </ol>
 <p>This vignette demonstrates the above using dummy data included with
-the package. You can try out the steps either locally by installing
-codeminer on your own machine, or online by clicking on the following
-link to RStudio Cloud<a class="footnote-ref" tabindex="0" data-bs-toggle="popover" data-bs-content="&lt;p&gt;You will be asked to sign up for a free account if you
-do not have one already.&lt;/p&gt;"><sup>1</sup></a> and navigating to this Rmd file in the
-‘vignettes’ directory: <a href="https://rstudio.cloud/project/4007004" class="external-link"><img src="https://img.shields.io/badge/RStudio-Cloud-blue" alt="Launch RStudio Cloud"></a></p>
+the package.</p>
 <p>Also included are functions for mapping between different clinical
 coding systems, and using Phecodes<span class="citation">(Denny,
 Bastarache, and Roden 2016; Wu et al. 2019)</span> with UK Biobank data.
@@ -113,7 +109,7 @@ list of data frames:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Create a temporary database with dummy data</span></span>
 <span><span class="op">(</span><span class="va">db_path</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/create_dummy_database.html">create_dummy_database</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Creating new database at <span style="color: #0000BB;">/tmp/Rtmp3HEnpK/file251fbb85c9b.duckdb</span></span></span>
+<span><span class="co">#&gt; Creating new database at <span style="color: #0000BB;">/tmp/RtmpPSCI8l/file259c1153dc16.duckdb</span></span></span>
 <span><span class="co">#&gt; Reading 17 selected tables from UKB Resource 592</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Extending <span style="color: #00BB00;">read_v2_drugs_bnf</span> with BNF hierarchy and descriptions</span></span>
@@ -141,44 +137,32 @@ list of data frames:</p>
 <span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Mapping table <span style="color: #00BB00;">Read 3_OPCS4_UKB v4</span> added successfully.</span></span>
 <span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Mapping table <span style="color: #00BB00;">Read 3_Read 2_UKB v4</span> added successfully.</span></span>
 <span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Dummy database ready to use!</span></span>
-<span><span class="co">#&gt; [1] "/tmp/Rtmp3HEnpK/file251fbb85c9b.duckdb"</span></span>
+<span><span class="co">#&gt; [1] "/tmp/RtmpPSCI8l/file259c1153dc16.duckdb"</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/Sys.getenv.html" class="external-link">Sys.getenv</a></span><span class="op">(</span><span class="st">"CODEMINER_DB_PATH"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] "/tmp/Rtmp3HEnpK/file251fbb85c9b.duckdb"</span></span></code></pre></div>
-<p>Setting the <code>CODEMINER_DB_PATH</code> environment variable
-ensures that all subsequent <code>codeminer</code> calls will use this
-database.</p>
-<p>To persist the database across sessions, set the
-<code>CODEMINER_DB_PATH</code> environment variable to a path on your
-system, e.g. using <a href="https://usethis.r-lib.org/reference/edit.html?q=edit_r_environ#ref-usage" class="external-link"><code>usethis::edit_r_environ(scope = "project")</code></a>:</p>
+<span><span class="co">#&gt; [1] "/tmp/RtmpPSCI8l/file259c1153dc16.duckdb"</span></span></code></pre></div>
+<p><code>codeminer</code> resolves the database location using the
+following precedence:</p>
+<ol style="list-style-type: decimal">
+<li>The <code>CODEMINER_DB_PATH</code> environment variable, if set</li>
+<li>A default location determined by <a href="https://rappdirs.r-lib.org/reference/user_data_dir.html" class="external-link"><code>rappdirs::user_data_dir()</code></a>
+</li>
+</ol>
+<p>To persist the database location across sessions, set
+<code>CODEMINER_DB_PATH</code> in your <code>.Renviron</code>,
+e.g. using <a href="https://usethis.r-lib.org/reference/edit.html?q=edit_r_environ#ref-usage" class="external-link"><code>usethis::edit_r_environ(scope = "project")</code></a>:</p>
 <pre><code># ./.Renviron
 CODEMINER_DB_PATH=/path/to/codeminer-database.duckdb</code></pre>
-<p>Alternatively, if the environment variable is not set,
-<code>codeminer</code> will store the database in a default location,
-determined by <a href="https://rappdirs.r-lib.org/reference/user_data_dir.html" class="external-link"><code>rappdirs::user_data_dir()</code></a>.</p>
-<p>The database is a <a href="https://r.duckdb.org/index.html" class="external-link">duckdb</a> database and can be
-inspected using the <a href="https://dbi.r-dbi.org/" class="external-link">DBI</a>
-package.</p>
+<p>Alternatively, you can point <code>codeminer</code> at a specific
+database file with <code><a href="../reference/codeminer_connect.html">codeminer_connect()</a></code>:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># connect to Duckdb database</span></span>
-<span><span class="va">con</span> <span class="op">&lt;-</span> <span class="fu">DBI</span><span class="fu">::</span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbConnect.html" class="external-link">dbConnect</a></span><span class="op">(</span><span class="fu">duckdb</span><span class="fu">::</span><span class="fu"><a href="https://r.duckdb.org/reference/duckdb.html" class="external-link">duckdb</a></span><span class="op">(</span><span class="op">)</span>, <span class="va">db_path</span>, read_only <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span><span class="fu">DBI</span><span class="fu">::</span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbListTables.html" class="external-link">dbListTables</a></span><span class="op">(</span><span class="va">con</span><span class="op">)</span></span>
-<span><span class="co">#&gt;  [1] "BNF_UKB v4"                 "BNF_relationship_UKB v4"   </span></span>
-<span><span class="co">#&gt;  [3] "DM+D_UKB v4"                "ICD-10_UKB v4"             </span></span>
-<span><span class="co">#&gt;  [5] "ICD-10_relationship_UKB v4" "ICD-9_ICD-10_UKB v4"       </span></span>
-<span><span class="co">#&gt;  [7] "ICD-9_UKB v4"               "ICD-9_relationship_UKB v4" </span></span>
-<span><span class="co">#&gt;  [9] "Read 2, drugs_BNF_UKB v4"   "Read 2, drugs_UKB v4"      </span></span>
-<span><span class="co">#&gt; [11] "Read 2_ICD-10_UKB v4"       "Read 2_ICD-9_UKB v4"       </span></span>
-<span><span class="co">#&gt; [13] "Read 2_OPCS4_UKB v4"        "Read 2_Read 3_UKB v4"      </span></span>
-<span><span class="co">#&gt; [15] "Read 2_UKB v4"              "Read 2_relationship_UKB v4"</span></span>
-<span><span class="co">#&gt; [17] "Read 3_ICD-10_UKB v4"       "Read 3_ICD-9_UKB v4"       </span></span>
-<span><span class="co">#&gt; [19] "Read 3_OPCS4_UKB v4"        "Read 3_Read 2_UKB v4"      </span></span>
-<span><span class="co">#&gt; [21] "Read 3_UKB v4"              "_lookup_metadata"          </span></span>
-<span><span class="co">#&gt; [23] "_mapping_metadata"          "_relationship_metadata"</span></span>
-<span></span>
-<span><span class="co"># Close the connection when you're done</span></span>
-<span><span class="fu">DBI</span><span class="fu">::</span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbDisconnect.html" class="external-link">dbDisconnect</a></span><span class="op">(</span><span class="va">con</span><span class="op">)</span></span></code></pre></div>
-<p>Note that manual interaction with the database should not be
-necessary, <code>codeminer</code> will take care of this for you.</p>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/codeminer_connect.html">codeminer_connect</a></span><span class="op">(</span>main <span class="op">=</span> <span class="st">"/path/to/codeminer-database.duckdb"</span><span class="op">)</span></span></code></pre></div>
+<p>The database is a <a href="https://r.duckdb.org/index.html" class="external-link">duckdb</a> database.
+<code>codeminer</code> manages the database connection automatically —
+you don’t need to connect or disconnect manually. You can check the
+current connection status with <code><a href="../reference/codeminer_status.html">codeminer_status()</a></code>:</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/codeminer_status.html">codeminer_status</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; No active workbench connection.</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="build-a-clinical-code-list">Build a clinical code list<a class="anchor" aria-label="anchor" href="#build-a-clinical-code-list"></a>
@@ -192,11 +176,13 @@ necessary, <code>codeminer</code> will take care of this for you.</p>
 <code><a href="../reference/CODES.html">CODES()</a></code>: look up descriptions for a set of code in the
 given code system type</li>
 </ul>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/CODES.html">CODES</a></span><span class="op">(</span></span>
 <span>  codes <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"E10"</span>, <span class="st">"E11"</span><span class="op">)</span>,</span>
 <span>  type <span class="op">=</span> <span class="st">"ICD-10"</span></span>
 <span><span class="op">)</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Using database at <span style="color: #0000BB;">/tmp/RtmpPSCI8l/file259c1153dc16.duckdb</span></span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Set `CODEMINER_DB_PATH` or use `codeminer_connect()` to change this.</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Using 'UKB v4' as latest version</span></span>
 <span><span class="co">#&gt; <span style="color: #0000BB;">&lt;codeminer_codelist&gt;</span>: 2 codes</span></span>
 <span><span class="co">#&gt; </span></span>
@@ -211,7 +197,7 @@ given code system type</li>
 <code>DESCRIPTION():</code> search for codes that match a
 description</li>
 </ul>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/DESCRIPTION.html">DESCRIPTION</a></span><span class="op">(</span>pattern <span class="op">=</span> <span class="st">"cyst"</span>, type <span class="op">=</span> <span class="st">"ICD-10"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Using 'UKB v4' as latest version</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Using 'UKB v4' as latest version</span></span>
@@ -230,6 +216,86 @@ description</li>
 <!--   type = "ICD-10" -->
 <!-- ) -->
 <!-- ``` -->
+</div>
+</div>
+<div class="section level2">
+<h2 id="version-pinning">Version pinning<a class="anchor" aria-label="anchor" href="#version-pinning"></a>
+</h2>
+<p>When multiple versions of a lookup, mapping, or relationship table
+are available, <code>codeminer</code> resolves <code>"latest"</code>
+automatically. You can override this for the current session with
+<code><a href="../reference/codeminer_set_version.html">codeminer_set_version()</a></code>:</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Pin lookup and relationship versions for a code type</span></span>
+<span><span class="fu"><a href="../reference/codeminer_set_version.html">codeminer_set_version</a></span><span class="op">(</span></span>
+<span>  lookup       <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"ICD-10"</span> <span class="op">=</span> <span class="st">"UKB v4"</span><span class="op">)</span>,</span>
+<span>  relationship <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"ICD-10"</span> <span class="op">=</span> <span class="st">"UKB v4"</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Pin a mapping version (use "from &gt; to" format for the key)</span></span>
+<span><span class="fu"><a href="../reference/codeminer_set_version.html">codeminer_set_version</a></span><span class="op">(</span></span>
+<span>  mapping <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Read 3 &gt; ICD-10"</span> <span class="op">=</span> <span class="st">"UKB v4"</span><span class="op">)</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<p>Pins only affect the default <code>"latest"</code> resolution.
+Explicit version arguments always take precedence:</p>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># This uses the pinned version for ICD-10:</span></span>
+<span><span class="fu"><a href="../reference/CODES.html">CODES</a></span><span class="op">(</span><span class="st">"E10"</span>, type <span class="op">=</span> <span class="st">"ICD-10"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB;">&lt;codeminer_codelist&gt;</span>: 1 code</span></span>
+<span><span class="co">#&gt; Code type: <span style="color: #0000BB;">"ICD-10"</span></span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 1 × 3</span></span></span>
+<span><span class="co">#&gt;   code  description              code_type</span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> E10   Type 1 diabetes mellitus ICD-10</span></span>
+<span></span>
+<span><span class="co"># This ignores the pin and uses "UKB v4" directly:</span></span>
+<span><span class="fu"><a href="../reference/CODES.html">CODES</a></span><span class="op">(</span><span class="st">"E10"</span>, type <span class="op">=</span> <span class="st">"ICD-10"</span>, lookup_version <span class="op">=</span> <span class="st">"UKB v4"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB;">&lt;codeminer_codelist&gt;</span>: 1 code</span></span>
+<span><span class="co">#&gt; Code type: <span style="color: #0000BB;">"ICD-10"</span></span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 1 × 3</span></span></span>
+<span><span class="co">#&gt;   code  description              code_type</span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> E10   Type 1 diabetes mellitus ICD-10</span></span></code></pre></div>
+<p>To clear all pins and return to automatic <code>"latest"</code>
+resolution:</p>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/codeminer_clear_versions.html">codeminer_clear_versions</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<p><code><a href="../reference/codeminer_status.html">codeminer_status()</a></code> shows any active pins alongside the
+connection info.</p>
+<div class="section level3">
+<h3 id="storing-version-settings">Storing version settings<a class="anchor" aria-label="anchor" href="#storing-version-settings"></a>
+</h3>
+<p>For reproducible analysis, you can store your version pins in a
+configuration file and load them at the start of a session.</p>
+<p><strong>CSV format</strong> (one row per code type, columns for each
+table type):</p>
+<pre><code>code_type,lookup,relationship
+ICD-10,UKB v4,UKB v4
+Read 3,UKB v4,UKB v4
+SNOMED CT,GPS v1,GPS v1</code></pre>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">cfg</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">read.csv</a></span><span class="op">(</span><span class="st">"codeminer_versions.csv"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/codeminer_set_version.html">codeminer_set_version</a></span><span class="op">(</span></span>
+<span>  lookup       <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/setNames.html" class="external-link">setNames</a></span><span class="op">(</span><span class="va">cfg</span><span class="op">$</span><span class="va">lookup</span>, <span class="va">cfg</span><span class="op">$</span><span class="va">code_type</span><span class="op">)</span>,</span>
+<span>  relationship <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/setNames.html" class="external-link">setNames</a></span><span class="op">(</span><span class="va">cfg</span><span class="op">$</span><span class="va">relationship</span>, <span class="va">cfg</span><span class="op">$</span><span class="va">code_type</span><span class="op">)</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<p>Mapping pins use a <code>"from &gt; to"</code> key format and are
+best stored in a separate file or in JSON:</p>
+<p><strong>JSON format:</strong></p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb13-1"><a href="#cb13-1" tabindex="-1"></a><span class="fu">{</span></span>
+<span id="cb13-2"><a href="#cb13-2" tabindex="-1"></a>  <span class="dt">"lookup"</span><span class="fu">:</span> <span class="fu">{</span><span class="dt">"ICD-10"</span><span class="fu">:</span> <span class="st">"UKB v4"</span><span class="fu">,</span> <span class="dt">"Read 3"</span><span class="fu">:</span> <span class="st">"UKB v4"</span><span class="fu">},</span></span>
+<span id="cb13-3"><a href="#cb13-3" tabindex="-1"></a>  <span class="dt">"relationship"</span><span class="fu">:</span> <span class="fu">{</span><span class="dt">"ICD-10"</span><span class="fu">:</span> <span class="st">"UKB v4"</span><span class="fu">},</span></span>
+<span id="cb13-4"><a href="#cb13-4" tabindex="-1"></a>  <span class="dt">"mapping"</span><span class="fu">:</span> <span class="fu">{</span><span class="dt">"Read 3 &gt; ICD-10"</span><span class="fu">:</span> <span class="st">"UKB v4"</span><span class="fu">}</span></span>
+<span id="cb13-5"><a href="#cb13-5" tabindex="-1"></a><span class="fu">}</span></span></code></pre></div>
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">cfg</span> <span class="op">&lt;-</span> <span class="fu">jsonlite</span><span class="fu">::</span><span class="fu"><a href="https://jeroen.r-universe.dev/jsonlite/reference/fromJSON.html" class="external-link">fromJSON</a></span><span class="op">(</span><span class="st">"codeminer_versions.json"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/codeminer_set_version.html">codeminer_set_version</a></span><span class="op">(</span></span>
+<span>  lookup       <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/unlist.html" class="external-link">unlist</a></span><span class="op">(</span><span class="va">cfg</span><span class="op">$</span><span class="va">lookup</span><span class="op">)</span>,</span>
+<span>  relationship <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/unlist.html" class="external-link">unlist</a></span><span class="op">(</span><span class="va">cfg</span><span class="op">$</span><span class="va">relationship</span><span class="op">)</span>,</span>
+<span>  mapping      <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/unlist.html" class="external-link">unlist</a></span><span class="op">(</span><span class="va">cfg</span><span class="op">$</span><span class="va">mapping</span><span class="op">)</span></span>
+<span><span class="op">)</span></span></code></pre></div>
 <div id="refs" class="references csl-bib-body hanging-indent" entry-spacing="0">
 <div id="ref-denny2016" class="csl-entry">
 Denny, Joshua C., Lisa Bastarache, and Dan M. Roden. 2016.
@@ -246,7 +312,6 @@ Codes to Phecodes: Workflow Development and Initial Evaluation.”</span>
 </div>
 </div>
 </div>
-
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>
 </div>

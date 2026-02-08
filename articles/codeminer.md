@@ -15,11 +15,7 @@ research using electronic health records. The workflow is as follows:
     this resource
 
 This vignette demonstrates the above using dummy data included with the
-package. You can try out the steps either locally by installing
-codeminer on your own machine, or online by clicking on the following
-link to RStudio Cloud[¹](#fn1) and navigating to this Rmd file in the
-‘vignettes’ directory: [![Launch RStudio
-Cloud](https://img.shields.io/badge/RStudio-Cloud-blue)](https://rstudio.cloud/project/4007004)
+package.
 
 Also included are functions for mapping between different clinical
 coding systems, and using Phecodes(Denny, Bastarache, and Roden 2016; Wu
@@ -51,7 +47,7 @@ of data frames:
 ``` r
 # Create a temporary database with dummy data
 (db_path <- create_dummy_database())
-#> Creating new database at /tmp/Rtmp3HEnpK/file251fbb85c9b.duckdb
+#> Creating new database at /tmp/RtmpPSCI8l/file259c1153dc16.duckdb
 #> Reading 17 selected tables from UKB Resource 592
 #> 
 #> Extending read_v2_drugs_bnf with BNF hierarchy and descriptions
@@ -79,51 +75,43 @@ of data frames:
 #> ✔ Mapping table Read 3_OPCS4_UKB v4 added successfully.
 #> ✔ Mapping table Read 3_Read 2_UKB v4 added successfully.
 #> ✔ Dummy database ready to use!
-#> [1] "/tmp/Rtmp3HEnpK/file251fbb85c9b.duckdb"
+#> [1] "/tmp/RtmpPSCI8l/file259c1153dc16.duckdb"
 Sys.getenv("CODEMINER_DB_PATH")
-#> [1] "/tmp/Rtmp3HEnpK/file251fbb85c9b.duckdb"
+#> [1] "/tmp/RtmpPSCI8l/file259c1153dc16.duckdb"
 ```
 
-Setting the `CODEMINER_DB_PATH` environment variable ensures that all
-subsequent `codeminer` calls will use this database.
+`codeminer` resolves the database location using the following
+precedence:
 
-To persist the database across sessions, set the `CODEMINER_DB_PATH`
-environment variable to a path on your system, e.g. using
+1.  The `CODEMINER_DB_PATH` environment variable, if set
+2.  A default location determined by
+    [`rappdirs::user_data_dir()`](https://rappdirs.r-lib.org/reference/user_data_dir.html)
+
+To persist the database location across sessions, set
+`CODEMINER_DB_PATH` in your `.Renviron`, e.g. using
 [`usethis::edit_r_environ(scope = "project")`](https://usethis.r-lib.org/reference/edit.html?q=edit_r_environ#ref-usage):
 
     # ./.Renviron
     CODEMINER_DB_PATH=/path/to/codeminer-database.duckdb
 
-Alternatively, if the environment variable is not set, `codeminer` will
-store the database in a default location, determined by
-[`rappdirs::user_data_dir()`](https://rappdirs.r-lib.org/reference/user_data_dir.html).
-
-The database is a [duckdb](https://r.duckdb.org/index.html) database and
-can be inspected using the [DBI](https://dbi.r-dbi.org/) package.
+Alternatively, you can point `codeminer` at a specific database file
+with
+[`codeminer_connect()`](https://codeminer-io.github.io/codeminer/reference/codeminer_connect.md):
 
 ``` r
-# connect to Duckdb database
-con <- DBI::dbConnect(duckdb::duckdb(), db_path, read_only = TRUE)
-DBI::dbListTables(con)
-#>  [1] "BNF_UKB v4"                 "BNF_relationship_UKB v4"   
-#>  [3] "DM+D_UKB v4"                "ICD-10_UKB v4"             
-#>  [5] "ICD-10_relationship_UKB v4" "ICD-9_ICD-10_UKB v4"       
-#>  [7] "ICD-9_UKB v4"               "ICD-9_relationship_UKB v4" 
-#>  [9] "Read 2, drugs_BNF_UKB v4"   "Read 2, drugs_UKB v4"      
-#> [11] "Read 2_ICD-10_UKB v4"       "Read 2_ICD-9_UKB v4"       
-#> [13] "Read 2_OPCS4_UKB v4"        "Read 2_Read 3_UKB v4"      
-#> [15] "Read 2_UKB v4"              "Read 2_relationship_UKB v4"
-#> [17] "Read 3_ICD-10_UKB v4"       "Read 3_ICD-9_UKB v4"       
-#> [19] "Read 3_OPCS4_UKB v4"        "Read 3_Read 2_UKB v4"      
-#> [21] "Read 3_UKB v4"              "_lookup_metadata"          
-#> [23] "_mapping_metadata"          "_relationship_metadata"
-
-# Close the connection when you're done
-DBI::dbDisconnect(con)
+codeminer_connect(main = "/path/to/codeminer-database.duckdb")
 ```
 
-Note that manual interaction with the database should not be necessary,
-`codeminer` will take care of this for you.
+The database is a [duckdb](https://r.duckdb.org/index.html) database.
+`codeminer` manages the database connection automatically — you don’t
+need to connect or disconnect manually. You can check the current
+connection status with
+[`codeminer_status()`](https://codeminer-io.github.io/codeminer/reference/codeminer_status.md):
+
+``` r
+codeminer_status()
+#> No active workbench connection.
+```
 
 ## Build a clinical code list
 
@@ -139,6 +127,8 @@ CODES(
   codes = c("E10", "E11"),
   type = "ICD-10"
 )
+#> ℹ Using database at /tmp/RtmpPSCI8l/file259c1153dc16.duckdb
+#> ℹ Set `CODEMINER_DB_PATH` or use `codeminer_connect()` to change this.
 #> ℹ Using 'UKB v4' as latest version
 #> <codeminer_codelist>: 2 codes
 #> 
@@ -166,6 +156,102 @@ DESCRIPTION(pattern = "cyst", type = "ICD-10")
 #> 2 N330  Tuberculous cystitis ICD-10
 ```
 
+## Version pinning
+
+When multiple versions of a lookup, mapping, or relationship table are
+available, `codeminer` resolves `"latest"` automatically. You can
+override this for the current session with
+[`codeminer_set_version()`](https://codeminer-io.github.io/codeminer/reference/codeminer_set_version.md):
+
+``` r
+# Pin lookup and relationship versions for a code type
+codeminer_set_version(
+  lookup       = c("ICD-10" = "UKB v4"),
+  relationship = c("ICD-10" = "UKB v4")
+)
+
+# Pin a mapping version (use "from > to" format for the key)
+codeminer_set_version(
+  mapping = c("Read 3 > ICD-10" = "UKB v4")
+)
+```
+
+Pins only affect the default `"latest"` resolution. Explicit version
+arguments always take precedence:
+
+``` r
+# This uses the pinned version for ICD-10:
+CODES("E10", type = "ICD-10")
+#> <codeminer_codelist>: 1 code
+#> Code type: "ICD-10"
+#> 
+#> # A tibble: 1 × 3
+#>   code  description              code_type
+#>   <chr> <chr>                    <chr>    
+#> 1 E10   Type 1 diabetes mellitus ICD-10
+
+# This ignores the pin and uses "UKB v4" directly:
+CODES("E10", type = "ICD-10", lookup_version = "UKB v4")
+#> <codeminer_codelist>: 1 code
+#> Code type: "ICD-10"
+#> 
+#> # A tibble: 1 × 3
+#>   code  description              code_type
+#>   <chr> <chr>                    <chr>    
+#> 1 E10   Type 1 diabetes mellitus ICD-10
+```
+
+To clear all pins and return to automatic `"latest"` resolution:
+
+``` r
+codeminer_clear_versions()
+```
+
+[`codeminer_status()`](https://codeminer-io.github.io/codeminer/reference/codeminer_status.md)
+shows any active pins alongside the connection info.
+
+### Storing version settings
+
+For reproducible analysis, you can store your version pins in a
+configuration file and load them at the start of a session.
+
+**CSV format** (one row per code type, columns for each table type):
+
+    code_type,lookup,relationship
+    ICD-10,UKB v4,UKB v4
+    Read 3,UKB v4,UKB v4
+    SNOMED CT,GPS v1,GPS v1
+
+``` r
+cfg <- read.csv("codeminer_versions.csv")
+codeminer_set_version(
+  lookup       = setNames(cfg$lookup, cfg$code_type),
+  relationship = setNames(cfg$relationship, cfg$code_type)
+)
+```
+
+Mapping pins use a `"from > to"` key format and are best stored in a
+separate file or in JSON:
+
+**JSON format:**
+
+``` json
+{
+  "lookup": {"ICD-10": "UKB v4", "Read 3": "UKB v4"},
+  "relationship": {"ICD-10": "UKB v4"},
+  "mapping": {"Read 3 > ICD-10": "UKB v4"}
+}
+```
+
+``` r
+cfg <- jsonlite::fromJSON("codeminer_versions.json")
+codeminer_set_version(
+  lookup       = unlist(cfg$lookup),
+  relationship = unlist(cfg$relationship),
+  mapping      = unlist(cfg$mapping)
+)
+```
+
 Denny, Joshua C., Lisa Bastarache, and Dan M. Roden. 2016. “Phenome-Wide
 Association Studies as a Tool to Advance Precision Medicine.” *Annual
 Review of Genomics and Human Genetics* 17 (August): 353–73.
@@ -175,8 +261,3 @@ Wu, Patrick, Aliya Gifford, Xiangrui Meng, Xue Li, Harry Campbell, Tim
 Varley, Juan Zhao, et al. 2019. “Mapping ICD-10 and ICD-10-CM Codes to
 Phecodes: Workflow Development and Initial Evaluation.” *JMIR medical
 informatics* 7 (4): e14325. <https://doi.org/10.2196/14325>.
-
-------------------------------------------------------------------------
-
-1.  You will be asked to sign up for a free account if you do not have
-    one already.

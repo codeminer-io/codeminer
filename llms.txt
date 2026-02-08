@@ -192,6 +192,26 @@ coding systems.
 - [`get_col_filters()`](https://codeminer-io.github.io/codeminer/reference/get_col_filters.md)
   : Extract column filters from metadata tables
 
+## Workbench management
+
+Connect to and manage the codeminer workbench (persistent DuckDB
+connection).
+
+- [`codeminer_connect()`](https://codeminer-io.github.io/codeminer/reference/codeminer_connect.md)
+  : Connect to the codeminer workbench
+- [`codeminer_disconnect()`](https://codeminer-io.github.io/codeminer/reference/codeminer_disconnect.md)
+  : Disconnect the codeminer workbench
+- [`codeminer_status()`](https://codeminer-io.github.io/codeminer/reference/codeminer_status.md)
+  : Show workbench status
+- [`codeminer_refresh_cache()`](https://codeminer-io.github.io/codeminer/reference/codeminer_refresh_cache.md)
+  : Refresh the metadata cache
+- [`codeminer_set_version()`](https://codeminer-io.github.io/codeminer/reference/codeminer_set_version.md)
+  : Pin table versions for the session
+- [`codeminer_clear_versions()`](https://codeminer-io.github.io/codeminer/reference/codeminer_clear_versions.md)
+  : Clear all pinned versions
+- [`codeminer_snapshot_extra()`](https://codeminer-io.github.io/codeminer/reference/codeminer_snapshot_extra.md)
+  : Create a snapshot of the extra database
+
 ## Database management
 
 Build a local database with lookup and mapping tables for various

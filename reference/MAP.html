@@ -109,7 +109,7 @@ database.</p>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># Set up a temporary dummy database</span></span></span>
 <span class="r-in"><span><span class="va">temp_db</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span>fileext <span class="op">=</span> <span class="st">".duckdb"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="create_dummy_database.html">create_dummy_database</a></span><span class="op">(</span><span class="va">temp_db</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Creating new database at <span style="color: #0000BB;">/tmp/RtmpMbNoIX/file1bff2705f0aa.duckdb</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Creating new database at <span style="color: #0000BB;">/tmp/RtmpDQc1MV/file1c5e6fbdb1d1.duckdb</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Reading 17 selected tables from UKB Resource 592</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Extending <span style="color: #00BB00;">read_v2_drugs_bnf</span> with BNF hierarchy and descriptions</span>
@@ -140,18 +140,33 @@ database.</p>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Single code</span></span></span>
 <span class="r-in"><span><span class="fu">MAP</span><span class="op">(</span><span class="st">"X40J4"</span>, from <span class="op">=</span> <span class="st">"Read 3"</span>, to <span class="op">=</span> <span class="st">"ICD-10"</span><span class="op">)</span></span></span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>cannot open file '/home/runner/.local/share/codeminer/ontology.duckdb': No such file or directory</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in file(con, "w"):</span> cannot open the connection</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in dbSendQuery(conn, statement, ...):</span> Catalog Error: Table with name _mapping_metadata does not exist!</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> Did you mean "pragma_database_list"?</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> LINE 1: SELECT * FROM _mapping_metadata</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span>                       ^</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">ℹ</span> Context: rapi_prepare</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">ℹ</span> Error type: CATALOG</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Multiple codes</span></span></span>
 <span class="r-in"><span><span class="fu">MAP</span><span class="op">(</span><span class="st">"X40J4"</span>, <span class="st">"X40J5"</span>, from <span class="op">=</span> <span class="st">"Read 3"</span>, to <span class="op">=</span> <span class="st">"ICD-10"</span><span class="op">)</span></span></span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>cannot open file '/home/runner/.local/share/codeminer/ontology.duckdb': No such file or directory</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in file(con, "w"):</span> cannot open the connection</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in dbSendQuery(conn, statement, ...):</span> Catalog Error: Table with name _mapping_metadata does not exist!</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> Did you mean "pragma_database_list"?</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> LINE 1: SELECT * FROM _mapping_metadata</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span>                       ^</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">ℹ</span> Context: rapi_prepare</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">ℹ</span> Error type: CATALOG</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># || separated</span></span></span>
 <span class="r-in"><span><span class="fu">MAP</span><span class="op">(</span><span class="st">"X40J4 || X40J5"</span>, from <span class="op">=</span> <span class="st">"Read 3"</span>, to <span class="op">=</span> <span class="st">"ICD-10"</span><span class="op">)</span></span></span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>cannot open file '/home/runner/.local/share/codeminer/ontology.duckdb': No such file or directory</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in file(con, "w"):</span> cannot open the connection</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in dbSendQuery(conn, statement, ...):</span> Catalog Error: Table with name _mapping_metadata does not exist!</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> Did you mean "pragma_database_list"?</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> LINE 1: SELECT * FROM _mapping_metadata</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span>                       ^</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">ℹ</span> Context: rapi_prepare</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">ℹ</span> Error type: CATALOG</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Data frame input (from is optional)</span></span></span>
 <span class="r-in"><span><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span></span>
@@ -160,13 +175,23 @@ database.</p>
 <span class="r-in"><span>  code_type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Read 3"</span>, <span class="st">"Read 3"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">MAP</span><span class="op">(</span><span class="va">df</span>, to <span class="op">=</span> <span class="st">"ICD-10"</span><span class="op">)</span></span></span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>cannot open file '/home/runner/.local/share/codeminer/ontology.duckdb': No such file or directory</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in file(con, "w"):</span> cannot open the connection</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in dbSendQuery(conn, statement, ...):</span> Catalog Error: Table with name _mapping_metadata does not exist!</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> Did you mean "pragma_database_list"?</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> LINE 1: SELECT * FROM _mapping_metadata</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span>                       ^</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">ℹ</span> Context: rapi_prepare</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">ℹ</span> Error type: CATALOG</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Return the mapping table itself</span></span></span>
 <span class="r-in"><span><span class="fu">MAP</span><span class="op">(</span><span class="st">"all"</span>, from <span class="op">=</span> <span class="st">"Read 3"</span>, to <span class="op">=</span> <span class="st">"ICD-10"</span><span class="op">)</span></span></span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>cannot open file '/home/runner/.local/share/codeminer/ontology.duckdb': No such file or directory</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in file(con, "w"):</span> cannot open the connection</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in dbSendQuery(conn, statement, ...):</span> Catalog Error: Table with name _mapping_metadata does not exist!</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> Did you mean "pragma_database_list"?</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> LINE 1: SELECT * FROM _mapping_metadata</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span>                       ^</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">ℹ</span> Context: rapi_prepare</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">ℹ</span> Error type: CATALOG</span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

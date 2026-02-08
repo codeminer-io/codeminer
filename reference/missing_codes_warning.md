@@ -66,7 +66,7 @@ failed.
 # Set up a temporary dummy database
 temp_db <- tempfile(fileext = ".duckdb")
 create_dummy_database(temp_db)
-#> Creating new database at /tmp/RtmpMbNoIX/file1bff520be757.duckdb
+#> Creating new database at /tmp/RtmpDQc1MV/file1c5e73953674.duckdb
 #> Reading 17 selected tables from UKB Resource 592
 #> 
 #> Extending read_v2_drugs_bnf with BNF hierarchy and descriptions
@@ -108,8 +108,13 @@ withCallingHandlers(
     invokeRestart("muffleWarning")
   }
 )
-#> Error in CODES(c("foo", "bar", "E10"), type = "ICD-10"): Code type 'ICD-10' not found in lookup metadata.
-#> ℹ Did you add the lookup table with `codeminer::add_lookup_table()`?
+#> Error in dbSendQuery(conn, statement, ...): Catalog Error: Table with name _lookup_metadata does not exist!
+#> Did you mean "duckdb_databases"?
+#> 
+#> LINE 1: SELECT * FROM _lookup_metadata
+#>                       ^
+#> ℹ Context: rapi_prepare
+#> ℹ Error type: CATALOG
 
 # Recognised codes
 codes
