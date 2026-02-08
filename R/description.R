@@ -32,7 +32,7 @@ DESCRIPTION <- function(
   check_logical_scalar(ignore_case, "ignore_case")
   check_logical_scalar(preferred_description_only, "preferred_description_only")
 
-  con <- connect_to_db()
+  con <- get_db_con()
   lkp_table <- get_lookup_table(
     con,
     code_type = type,

@@ -6,6 +6,8 @@
 #' @param type The type of metadata to return. By default returns a list
 #'   containing all metadata types. Otherwise, returns a data frame for the
 #'   specified type. Must be one of "lookup", "mapping" or "relationship".
+#' @param con Optional DBI connection. If `NULL` (default), uses the
+#'   workbench connection.
 #' @return If a single type is requested, a data frame. If multiple types are
 #'   requested, a named list of data frames.
 #' @export
@@ -15,7 +17,8 @@
 #' get_codeminer_metadata("lookup")
 #' get_codeminer_metadata(c("lookup", "mapping"))
 get_codeminer_metadata <- function(
-  type = c("lookup", "mapping", "relationship")
+  type = c("lookup", "mapping", "relationship"),
+  con = NULL
 ) {
   type <- rlang::arg_match(
     type,
@@ -23,7 +26,7 @@ get_codeminer_metadata <- function(
     multiple = TRUE
   )
 
-  con <- connect_to_db()
+  con <- get_db_con(con)
 
   result <- list()
   if ("lookup" %in% type) {
@@ -42,32 +45,47 @@ get_codeminer_metadata <- function(
   result
 }
 
-# Return the lookup metadata table as a data frame
-#' @param con A database connection object. Uses the default connection if not provided.
+# Return the lookup metadata table as a data frame.
+# Uses cached metadata from the workbench when available.
+#' @param con A database connection object. If `NULL`, uses the workbench cache.
 #' @return A data frame containing the lookup metadata.
 #' @noRd
 #' @keywords internal
-get_lookup_metadata <- function(con = connect_to_db()) {
+get_lookup_metadata <- function(con = NULL) {
+  if (is.null(con) && !is.null(.codeminer_env$metadata$lookup)) {
+    return(.codeminer_env$metadata$lookup)
+  }
+  con <- get_db_con(con)
   tbl_name <- codeminer_metadata_table_names$lookup
   read_table_from_db(con, tbl_name)
 }
 
-# Return the mapping metadata table as a data frame
-#' @param con A database connection object. Uses the default connection if not provided.
+# Return the mapping metadata table as a data frame.
+# Uses cached metadata from the workbench when available.
+#' @param con A database connection object. If `NULL`, uses the workbench cache.
 #' @return A data frame containing the mapping metadata.
 #' @noRd
 #' @keywords internal
-get_mapping_metadata <- function(con = connect_to_db()) {
+get_mapping_metadata <- function(con = NULL) {
+  if (is.null(con) && !is.null(.codeminer_env$metadata$mapping)) {
+    return(.codeminer_env$metadata$mapping)
+  }
+  con <- get_db_con(con)
   tbl_name <- codeminer_metadata_table_names$mapping
   read_table_from_db(con, tbl_name)
 }
 
-# Return the relationship metadata table as a data frame
-#' @param con A database connection object. Uses the default connection if not provided.
+# Return the relationship metadata table as a data frame.
+# Uses cached metadata from the workbench when available.
+#' @param con A database connection object. If `NULL`, uses the workbench cache.
 #' @return A data frame containing the relationship metadata.
 #' @noRd
 #' @keywords internal
-get_relationship_metadata <- function(con = connect_to_db()) {
+get_relationship_metadata <- function(con = NULL) {
+  if (is.null(con) && !is.null(.codeminer_env$metadata$relationship)) {
+    return(.codeminer_env$metadata$relationship)
+  }
+  con <- get_db_con(con)
   tbl_name <- codeminer_metadata_table_names$relationship
   read_table_from_db(con, tbl_name)
 }

@@ -118,8 +118,7 @@ CODES <- function(
     check_code_type(type)
     check_version(lookup_version)
 
-    con <- connect_to_db()
-    check_database(con)
+    con <- get_db_con()
     lookup_table <- get_lookup_table(con, type, lookup_version)
     result <- dplyr::collect(lookup_table)
 
@@ -137,8 +136,7 @@ CODES <- function(
   check_code_type(type)
   check_version(lookup_version)
 
-  con <- connect_to_db()
-  check_database(con)
+  con <- get_db_con()
 
   lookup_table <- get_lookup_table(con, type, lookup_version)
 
@@ -275,8 +273,7 @@ CODES_LIKE <- function(
   check_version(lookup_version)
   check_logical_scalar(preferred_description_only, "preferred_description_only")
 
-  con <- connect_to_db()
-  check_database(con)
+  con <- get_db_con()
 
   lookup_table <- get_lookup_table(con, type, lookup_version)
   like_codes <- dplyr::filter(

@@ -201,7 +201,7 @@ graph_closure_codes <- function(
 ) {
   check_code_type(code_type, call = call)
 
-  con <- connect_to_db()
+  con <- get_db_con()
   meta <- get_metadata_for_relationship(
     con,
     code_type,

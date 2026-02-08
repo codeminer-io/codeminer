@@ -81,8 +81,7 @@ MAP <- function(
       )
     }
 
-    con <- connect_to_db()
-    check_database(con)
+    con <- get_db_con()
     mapping_table <- get_mapping_table(con, from, to, map_version)
     return(dplyr::collect(mapping_table))
   }
@@ -99,8 +98,7 @@ MAP <- function(
     )
   }
 
-  con <- connect_to_db()
-  check_database(con)
+  con <- get_db_con()
 
   mapping_table <- get_mapping_table(con, from, to, map_version)
 
