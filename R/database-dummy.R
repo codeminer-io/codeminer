@@ -106,10 +106,10 @@ dummy_ukb_resource_592_path <- function() {
 dummy_snomed_ct_uk_monolith_path <- function() {
   # Return cached path if already extracted
   if (
-    !is.null(.codeminer_cache$snomed_path) &&
-      dir.exists(.codeminer_cache$snomed_path)
+    !is.null(.codeminer_env$snomed_path) &&
+      dir.exists(.codeminer_env$snomed_path)
   ) {
-    return(.codeminer_cache$snomed_path)
+    return(.codeminer_env$snomed_path)
   }
 
   # Get path to zip file in package
@@ -131,6 +131,6 @@ dummy_snomed_ct_uk_monolith_path <- function() {
   target_dir <- file.path(extract_dir, "SnomedCT_GPS_PRODUCTION")
 
   # Cache and return
-  .codeminer_cache$snomed_path <- target_dir
+  .codeminer_env$snomed_path <- target_dir
   target_dir
 }
