@@ -43,10 +43,13 @@ reference:
       - dummy_ukb_resource_592_path
       - create_dummy_database
       - add_lookup_table
+      - remove_lookup_table
       - lookup_metadata
       - add_mapping_table
+      - remove_mapping_table
       - mapping_metadata
       - add_relationship_table
+      - remove_relationship_table
       - relationship_metadata
       - get_codeminer_metadata
 

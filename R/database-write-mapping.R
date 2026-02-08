@@ -71,6 +71,38 @@ add_mapping_table <- function(table, metadata) {
   return(invisible(success))
 }
 
+#' Remove a mapping table from the database
+#'
+#' Removes a mapping table and its metadata entry from the database.
+#'
+#' @param from_code_type The source coding system (e.g. `"Read 3"`).
+#' @param to_code_type The target coding system (e.g. `"ICD-10"`).
+#' @param map_version The version to remove (e.g. `"UKB v4"`).
+#'
+#' @return `TRUE` invisibly if successful.
+#'
+#' @seealso [add_mapping_table()], [mapping_metadata()]
+#' @export
+remove_mapping_table <- function(from_code_type, to_code_type, map_version) {
+  table_name <- paste(from_code_type, to_code_type, map_version, sep = "_")
+
+  con <- connect_to_db(read_only = FALSE)
+  check_database(con)
+
+  meta <- read_table_from_db(con, codeminer_metadata_table_names$mapping)
+  if (!table_name %in% meta$mapping_table_name) {
+    codeminer_abort(
+      "No mapping table found for {.val {from_code_type}} > {.val {to_code_type}} version {.val {map_version}}."
+    )
+  }
+
+  remove_table_entry(con, "mapping", table_name)
+  codeminer_inform(c(
+    "v" = "Mapping table {.field {table_name}} removed."
+  ))
+  invisible(TRUE)
+}
+
 #' Create mapping metadata
 #'
 #' Generate the required metadata for a mapping table. This is mainly used to

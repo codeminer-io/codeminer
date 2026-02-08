@@ -94,6 +94,37 @@ add_relationship_table <- function(table, metadata) {
   return(invisible(success))
 }
 
+#' Remove a relationship table from the database
+#'
+#' Removes a relationship table and its metadata entry from the database.
+#'
+#' @param code_type The coding system type (e.g. `"ICD-10"`).
+#' @param relationship_version The version to remove (e.g. `"UKB v4"`).
+#'
+#' @return `TRUE` invisibly if successful.
+#'
+#' @seealso [add_relationship_table()], [relationship_metadata()]
+#' @export
+remove_relationship_table <- function(code_type, relationship_version) {
+  table_name <- paste(code_type, "relationship", relationship_version, sep = "_")
+
+  con <- connect_to_db(read_only = FALSE)
+  check_database(con)
+
+  meta <- read_table_from_db(con, codeminer_metadata_table_names$relationship)
+  if (!table_name %in% meta$relationship_table_name) {
+    codeminer_abort(
+      "No relationship table found for {.val {code_type}} version {.val {relationship_version}}."
+    )
+  }
+
+  remove_table_entry(con, "relationship", table_name)
+  codeminer_inform(c(
+    "v" = "Relationship table {.field {table_name}} removed."
+  ))
+  invisible(TRUE)
+}
+
 #' Create relationship metadata
 #'
 #' Generate the required metadata for a relationship table. This is mainly used

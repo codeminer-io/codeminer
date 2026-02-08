@@ -280,3 +280,40 @@ add_metadata_table <- function(
   rows_added <- DBI::dbAppendTable(con, tbl_name, meta_df)
   return(invisible(rows_added))
 }
+
+# Remove a data table and its metadata row from the database.
+#
+# Shared helper for `remove_lookup_table()`, `remove_mapping_table()`,
+# and `remove_relationship_table()`.
+#
+# @param con A database connection object (write access required).
+# @param type One of "lookup", "mapping", or "relationship".
+# @param table_name The internal table name (primary key in the metadata table).
+# @return `TRUE` invisibly.
+# @noRd
+# @keywords internal
+remove_table_entry <- function(con, type, table_name) {
+  meta_tbl <- codeminer_metadata_table_names[[type]]
+  id_col <- switch(
+    type,
+    lookup = "lookup_table_name",
+    mapping = "mapping_table_name",
+    relationship = "relationship_table_name"
+  )
+
+  # Delete metadata row
+  DBI::dbExecute(
+    con,
+    glue::glue_sql(
+      "DELETE FROM {`meta_tbl`} WHERE {`id_col`} = {table_name}",
+      .con = con
+    )
+  )
+
+  # Drop data table
+  if (table_exists(con, table_name)) {
+    DBI::dbRemoveTable(con, table_name)
+  }
+
+  invisible(TRUE)
+}
