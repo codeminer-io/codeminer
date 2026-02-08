@@ -134,3 +134,244 @@ test_that("connect_to_db(read_only=FALSE) detaches and re-attaches", {
   # Write connection should be valid and writable
   expect_true(DBI::dbIsValid(write_con))
 })
+
+# codeminer_set_version() --------------------------------------------------
+
+test_that("codeminer_set_version() stores lookup pins", {
+  local_build_temp_database()
+
+  codeminer_set_version(lookup = c("ICD-10" = "UKB v4"))
+  expect_equal(
+    .codeminer_env$active_versions$lookup[["ICD-10"]],
+    "UKB v4"
+  )
+})
+
+test_that("codeminer_set_version() stores relationship pins", {
+  local_build_temp_database()
+
+  codeminer_set_version(relationship = c("ICD-10" = "UKB v4"))
+  expect_equal(
+    .codeminer_env$active_versions$relationship[["ICD-10"]],
+    "UKB v4"
+  )
+})
+
+test_that("codeminer_set_version() stores mapping pins", {
+  local_build_temp_database()
+
+  codeminer_set_version(mapping = c("Read 3 > ICD-10" = "UKB v4"))
+  expect_equal(
+    .codeminer_env$active_versions$mapping[["Read 3 > ICD-10"]],
+    "UKB v4"
+  )
+})
+
+test_that("codeminer_set_version() normalizes mapping key spacing", {
+  local_build_temp_database()
+
+  # No spaces around >
+  codeminer_set_version(mapping = c("Read 3>ICD-10" = "UKB v4"))
+  expect_equal(
+    .codeminer_env$active_versions$mapping[["Read 3 > ICD-10"]],
+    "UKB v4"
+  )
+
+  codeminer_clear_versions()
+
+  # Extra spaces around >
+  codeminer_set_version(mapping = c("Read 3  >   ICD-10" = "UKB v4"))
+  expect_equal(
+    .codeminer_env$active_versions$mapping[["Read 3 > ICD-10"]],
+    "UKB v4"
+  )
+})
+
+test_that("codeminer_set_version() trims whitespace from keys and values", {
+  local_build_temp_database()
+
+  codeminer_set_version(lookup = c("  ICD-10  " = "  UKB v4  "))
+  expect_equal(
+    .codeminer_env$active_versions$lookup[["ICD-10"]],
+    "UKB v4"
+  )
+})
+
+test_that("codeminer_set_version() merges with existing pins", {
+  local_build_temp_database()
+
+  codeminer_set_version(lookup = c("ICD-10" = "UKB v4"))
+  codeminer_set_version(lookup = c("Read 3" = "UKB v4"))
+
+  expect_equal(.codeminer_env$active_versions$lookup[["ICD-10"]], "UKB v4")
+  expect_equal(.codeminer_env$active_versions$lookup[["Read 3"]], "UKB v4")
+})
+
+test_that("codeminer_set_version() overwrites existing pin for same key", {
+  local_build_temp_database()
+
+  codeminer_set_version(lookup = c("ICD-10" = "UKB v4"))
+  suppressWarnings(
+    codeminer_set_version(lookup = c("ICD-10" = "UKB v5"))
+  )
+
+  expect_equal(.codeminer_env$active_versions$lookup[["ICD-10"]], "UKB v5")
+})
+
+test_that("codeminer_set_version() errors with no arguments", {
+  local_build_temp_database()
+
+  expect_error(
+    codeminer_set_version(),
+    "At least one"
+  )
+})
+
+test_that("codeminer_set_version() errors with unnamed vector", {
+  local_build_temp_database()
+
+  expect_error(
+    codeminer_set_version(lookup = c("UKB v4")),
+    "named character vector"
+  )
+})
+
+test_that("codeminer_set_version() errors when pinning to 'latest'", {
+  local_build_temp_database()
+
+  expect_error(
+    codeminer_set_version(lookup = c("ICD-10" = "latest")),
+    "latest.*cannot be used"
+  )
+})
+
+test_that("codeminer_set_version() warns for non-existent version", {
+  suppressMessages(local_build_temp_dummy_database())
+
+  expect_warning(
+    codeminer_set_version(lookup = c("ICD-10" = "nonexistent_version")),
+    "No lookup metadata found"
+  )
+})
+
+test_that("codeminer_set_version() errors for bad mapping key format", {
+  local_build_temp_database()
+
+  expect_error(
+    codeminer_set_version(mapping = c("bad_format" = "v1")),
+    "from > to"
+  )
+})
+
+# codeminer_clear_versions() -----------------------------------------------
+
+test_that("codeminer_clear_versions() removes all pins", {
+  local_build_temp_database()
+
+  codeminer_set_version(lookup = c("ICD-10" = "UKB v4"))
+  expect_true(length(.codeminer_env$active_versions) > 0)
+
+  codeminer_clear_versions()
+  expect_equal(length(.codeminer_env$active_versions), 0)
+})
+
+test_that("codeminer_disconnect() also clears version pins", {
+  local_build_temp_database()
+
+  codeminer_set_version(lookup = c("ICD-10" = "UKB v4"))
+  codeminer_disconnect()
+
+  expect_false(exists("active_versions", envir = .codeminer_env))
+})
+
+# Pinned versions affect resolution ----------------------------------------
+
+test_that("pinned lookup version overrides 'latest' resolution", {
+  suppressMessages(local_build_temp_dummy_database())
+
+  # Add a second version of ICD-10
+  test_table <- data.frame(
+    code = c("PIN1", "PIN2"),
+    description = c("Pinned code 1", "Pinned code 2")
+  )
+  add_lookup_table(
+    test_table,
+    lookup_metadata("ICD-10", lookup_version = "UKB v5")
+  )
+
+  # Without pin, "latest" resolves to v5 (highest numeric)
+  result_latest <- CODES("all", type = "ICD-10", lookup_version = "latest")
+  expect_true("PIN1" %in% result_latest$code)
+
+  # Pin to v4
+  codeminer_set_version(lookup = c("ICD-10" = "UKB v4"))
+
+  # Now "latest" should resolve to v4
+  result_pinned <- CODES("all", type = "ICD-10", lookup_version = "latest")
+  expect_false("PIN1" %in% result_pinned$code)
+
+  # Explicit version still overrides the pin
+  result_explicit <- CODES("all", type = "ICD-10", lookup_version = "UKB v5")
+  expect_true("PIN1" %in% result_explicit$code)
+})
+
+test_that("pinned relationship version overrides 'latest' resolution", {
+  suppressMessages(local_build_temp_dummy_database())
+
+  con <- get_db_con()
+  meta <- get_metadata_for_relationship(con, "ICD-10", "latest")
+  expect_equal(meta$relationship_version, "UKB v4")
+
+  # Pin to the known version and verify it's used
+  codeminer_set_version(relationship = c("ICD-10" = "UKB v4"))
+  meta_pinned <- get_metadata_for_relationship(con, "ICD-10", "latest")
+  expect_equal(meta_pinned$relationship_version, "UKB v4")
+})
+
+test_that("pinned mapping version overrides 'latest' resolution", {
+  suppressMessages(local_build_temp_dummy_database())
+
+  con <- get_db_con()
+  meta <- get_metadata_for_mapping(con, "Read 3", "ICD-10", "latest")
+  expect_equal(meta$map_version, "UKB v4")
+
+  # Pin the mapping version
+  codeminer_set_version(mapping = c("Read 3 > ICD-10" = "UKB v4"))
+  meta_pinned <- get_metadata_for_mapping(con, "Read 3", "ICD-10", "latest")
+  expect_equal(meta_pinned$map_version, "UKB v4")
+})
+
+# Reserved "latest" version name -----------------------------------------
+
+test_that("add_metadata_table() rejects 'latest' as a version name", {
+  local_build_temp_database()
+
+  meta <- lookup_metadata("test-type", lookup_version = "latest")
+  test_table <- data.frame(code = "X1", description = "Test")
+
+  expect_error(
+    add_lookup_table(test_table, meta),
+    "latest.*reserved"
+  )
+})
+
+test_that("add_metadata_table() rejects '>' in code_type values", {
+  local_build_temp_database()
+
+  meta <- lookup_metadata("ICD > 10", lookup_version = "v1")
+  test_table <- data.frame(code = "X1", description = "Test")
+
+  expect_error(
+    add_lookup_table(test_table, meta),
+    "must not contain"
+  )
+})
+
+# codeminer_status() with pins ---------------------------------------------
+
+test_that("codeminer_status() shows pinned versions", {
+  local_build_temp_database()
+
+  codeminer_set_version(lookup = c("ICD-10" = "UKB v4"))
+  expect_message(codeminer_status(), "Pinned versions")
+})

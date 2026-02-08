@@ -124,11 +124,24 @@ codeminer_status <- function() {
   }
   main_path <- .codeminer_env$db_paths$main %||% "not attached"
   extra_path <- .codeminer_env$db_paths$extra %||% "not attached"
-  cli::cli_inform(c(
+  msgs <- c(
     "i" = "Workbench active",
     " " = "Main:  {.file {main_path}}",
     " " = "Extra: {.file {extra_path}}"
-  ))
+  )
+
+  # Show pinned versions if any
+  pins <- .codeminer_env$active_versions
+  if (length(pins) > 0) {
+    msgs <- c(msgs, "i" = "Pinned versions:")
+    for (type in names(pins)) {
+      for (key in names(pins[[type]])) {
+        msgs <- c(msgs, " " = "  {type}: {.val {key}} = {.val {pins[[type]][[key]]}}")
+      }
+    }
+  }
+
+  cli::cli_inform(msgs)
   invisible(.codeminer_env$db_paths)
 }
 
@@ -220,6 +233,110 @@ codeminer_init_extra <- function(path) {
 }
 
 
+#' Pin table versions for the session
+#'
+#' Overrides the default "latest" version resolution for lookup, relationship,
+#' and/or mapping tables. Pinned versions persist until cleared with
+#' [codeminer_clear_versions()] or [codeminer_disconnect()].
+#'
+#' @param lookup Named character vector of lookup versions, keyed by code type.
+#'   E.g. `c("ICD-10" = "v42", "Read 3" = "v1")`.
+#' @param relationship Named character vector of relationship versions, keyed
+#'   by code type.
+#' @param mapping Named character vector of mapping versions, keyed by
+#'   `"from > to"` pairs. E.g. `c("Read 3 > ICD-10" = "v1")`.
+#'
+#' @details
+#' Pinned versions only affect "latest" resolution. Explicit version arguments
+#' on query functions (e.g. `CODES(..., lookup_version = "v1")`) always take
+#' precedence.
+#'
+#' New pins are merged with existing ones. To replace all pins, call
+#' [codeminer_clear_versions()] first.
+#'
+#' @return The current pinned versions (a list), invisibly.
+#' @export
+#' @family Workbench management
+#' @examples
+#' \dontrun{
+#' # Pin lookup versions for multiple code types
+#' codeminer_set_version(
+#'   lookup = c("ICD-10" = "v42", "Read 3" = "v1")
+#' )
+#'
+#' # Pin mapping version for a specific pair
+#' codeminer_set_version(
+#'   mapping = c("Read 3 > ICD-10" = "v1")
+#' )
+#'
+#' # Clear all pins
+#' codeminer_clear_versions()
+#' }
+codeminer_set_version <- function(
+  lookup = NULL,
+  relationship = NULL,
+  mapping = NULL
+) {
+  if (is.null(lookup) && is.null(relationship) && is.null(mapping)) {
+    codeminer_abort("At least one of {.arg lookup}, {.arg relationship}, or {.arg mapping} must be provided.")
+  }
+
+  # Trim whitespace from keys and values (users may copy-paste from configs)
+  if (!is.null(lookup)) lookup <- trim_pins(lookup)
+  if (!is.null(relationship)) relationship <- trim_pins(relationship)
+  if (!is.null(mapping)) mapping <- trim_pins(mapping)
+
+  # Reject "latest" as a pin value — it's the sentinel we're overriding
+  all_pins <- c(lookup, relationship, mapping)
+  if (any(all_pins == "latest")) {
+    codeminer_abort(
+      "{.val latest} cannot be used as a pinned version. Specify the actual version string instead."
+    )
+  }
+
+  # Initialise if needed
+  if (is.null(.codeminer_env$active_versions)) {
+    .codeminer_env$active_versions <- list()
+  }
+
+  # Validate and merge each type
+  if (!is.null(lookup)) {
+    validate_version_pins(lookup, "lookup", "lookup_version", "code_type")
+    .codeminer_env$active_versions$lookup <- merge_pins(
+      .codeminer_env$active_versions$lookup, lookup
+    )
+  }
+  if (!is.null(relationship)) {
+    validate_version_pins(relationship, "relationship", "relationship_version", "code_type")
+    .codeminer_env$active_versions$relationship <- merge_pins(
+      .codeminer_env$active_versions$relationship, relationship
+    )
+  }
+  if (!is.null(mapping)) {
+    mapping <- normalize_mapping_keys(mapping)
+    validate_version_pins(mapping, "mapping", "map_version", NULL)
+    .codeminer_env$active_versions$mapping <- merge_pins(
+      .codeminer_env$active_versions$mapping, mapping
+    )
+  }
+
+  invisible(.codeminer_env$active_versions)
+}
+
+#' Clear all pinned versions
+#'
+#' Removes all version pins set by [codeminer_set_version()], returning
+#' to the default "latest" resolution for all tables.
+#'
+#' @return `NULL`, invisibly.
+#' @export
+#' @family Workbench management
+codeminer_clear_versions <- function() {
+  .codeminer_env$active_versions <- list()
+  invisible()
+}
+
+
 # Internal helpers --------------------------------------------------------
 
 #' Set the DuckDB search path based on attached databases
@@ -250,4 +367,91 @@ schema_table_exists <- function(con, schema, tbl_name) {
     .con = con
   )
   nrow(DBI::dbGetQuery(con, query)) > 0
+}
+
+#' Validate version pins against cached metadata
+#' @noRd
+validate_version_pins <- function(
+  pins,
+  type,
+  version_col,
+  key_col,
+  call = rlang::caller_env()
+) {
+  if (!rlang::is_named(pins) || !is.character(pins)) {
+    codeminer_abort(
+      "{.arg {type}} must be a named character vector.",
+      call = call
+    )
+  }
+
+  # Validate mapping key format (always, regardless of metadata availability)
+  if (type == "mapping") {
+    for (key in names(pins)) {
+      parts <- trimws(strsplit(key, ">", fixed = TRUE)[[1]])
+      if (length(parts) != 2) {
+        codeminer_abort(
+          "Mapping key {.val {key}} must be in {.val from > to} format.",
+          call = call
+        )
+      }
+    }
+  }
+
+  # Cross-check against cached metadata (skip if metadata not available)
+  meta <- .codeminer_env$metadata[[type]]
+  if (is.null(meta)) return(invisible())
+
+  for (i in seq_along(pins)) {
+    key <- names(pins)[[i]]
+    version <- pins[[i]]
+
+    if (type == "mapping") {
+      parts <- trimws(strsplit(key, ">", fixed = TRUE)[[1]])
+      match <- meta$from_code_type == parts[1] &
+        meta$to_code_type == parts[2] &
+        meta[[version_col]] == version
+    } else {
+      match <- meta[[key_col]] == key & meta[[version_col]] == version
+    }
+
+    if (!any(match)) {
+      codeminer_warn(c(
+        "!" = "No {type} metadata found for {.val {key}} version {.val {version}}.",
+        "i" = "Pin will be set but may not resolve to a valid table."
+      ))
+    }
+  }
+  invisible()
+}
+
+#' Trim leading/trailing whitespace from pin names and values
+#' @noRd
+trim_pins <- function(pins) {
+  names(pins) <- trimws(names(pins))
+  pins[] <- trimws(pins)
+  pins
+}
+
+#' Normalize mapping pin keys to canonical "from > to" form
+#'
+#' Accepts flexible spacing (e.g. "Read 3>ICD-10", "Read 3 >  ICD-10") and
+#' converts to the canonical form used internally by `get_metadata_for_mapping()`.
+#' @noRd
+normalize_mapping_keys <- function(pins) {
+  new_names <- vapply(names(pins), function(key) {
+    parts <- trimws(strsplit(key, ">", fixed = TRUE)[[1]])
+    paste(parts, collapse = " > ")
+  }, character(1), USE.NAMES = FALSE)
+  names(pins) <- new_names
+  pins
+}
+
+#' Merge new pins into existing pins (overwrite by name)
+#' @noRd
+merge_pins <- function(existing, new_pins) {
+  if (is.null(existing)) return(new_pins)
+  # New pins overwrite existing ones with the same name
+  existing[names(new_pins)] <- new_pins
+  existing
 }

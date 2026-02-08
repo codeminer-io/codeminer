@@ -90,6 +90,80 @@ get_relationship_metadata <- function(con = NULL) {
   read_table_from_db(con, tbl_name)
 }
 
+#' Resolve a single-row metadata entry by code_type + version
+#'
+#' Shared helper for `get_metadata_for_lookup()`, `get_metadata_for_mapping()`,
+#' and `get_metadata_for_relationship()`. Handles "latest" resolution (with
+#' pinned version override via `.codeminer_env$active_versions`) and error
+#' messaging.
+#'
+#' @param meta Data frame of metadata rows.
+#' @param code_type_val Value to match in `code_type_col`.
+#' @param version_val Version string (or "latest").
+#' @param code_type_col Column name containing the code type.
+#' @param version_col Column name containing the version.
+#' @param pin_type Key into `.codeminer_env$active_versions` for pinned versions
+#'   (one of "lookup", "relationship", "mapping", or NULL to skip).
+#' @param pin_key Key to look up in the pinned versions list. Defaults to
+#'   `code_type_val`.
+#' @param type_label Human-readable label for error messages (e.g. "lookup").
+#' @param add_fun_name Qualified function name for the "did you add..." hint.
+#' @param call Calling environment for error messages.
+#' @return A single-row data frame.
+#' @noRd
+#' @keywords internal
+resolve_versioned_metadata <- function(
+  meta,
+  code_type_val,
+  version_val,
+  code_type_col = "code_type",
+  version_col,
+  pin_type = NULL,
+  pin_key = code_type_val,
+  type_label = pin_type,
+  add_fun_name = NULL,
+  call = rlang::caller_env()
+) {
+  # Check code_type exists
+  if (!(code_type_val %in% meta[[code_type_col]])) {
+    hint <- if (!is.null(add_fun_name)) {
+      c("i" = "Did you add the {type_label} table with {.fun {add_fun_name}}?")
+    }
+    codeminer_abort(
+      c(
+        "Code type '{code_type_val}' not found in {type_label} metadata.",
+        hint
+      ),
+      call = call
+    )
+  }
+
+  # Filter to code_type
+  filtered <- meta[meta[[code_type_col]] == code_type_val, ]
+
+  # Resolve "latest" — check pinned version first
+  if (identical(version_val, "latest")) {
+    pinned <- .codeminer_env$active_versions[[pin_type]][[pin_key]]
+    if (!is.null(pinned)) {
+      version_val <- pinned
+    } else {
+      version_val <- get_latest_version(filtered[[version_col]])
+    }
+  }
+
+  # Filter to version
+  this_meta <- filtered[filtered[[version_col]] == version_val, ]
+
+  if (nrow(this_meta) == 0) {
+    codeminer_abort(
+      "No {type_label} metadata found for '{code_type_val}' version '{version_val}'",
+      call = call
+    )
+  }
+  stopifnot(nrow(this_meta) == 1)
+  return(this_meta)
+}
+
 # Helper to read a table from the database as a data.frame
 read_table_from_db <- function(con, tbl_name) {
   DBI::dbReadTable(con, tbl_name)
@@ -162,6 +236,36 @@ add_metadata_table <- function(
   ids <- metadata[[id_col]]
   if (is.null(ids)) {
     codeminer_abort("Missing field {id_col} in metadata.")
+  }
+
+  # "latest" is reserved — it's the sentinel for automatic version resolution
+  version_col <- switch(
+    type,
+    lookup = "lookup_version",
+    mapping = "map_version",
+    relationship = "relationship_version"
+  )
+  versions <- metadata[[version_col]]
+  if (!is.null(versions) && any(versions == "latest")) {
+    codeminer_abort(
+      "{.val latest} is a reserved version name and cannot be used."
+    )
+  }
+
+  # ">" is reserved in code_type values — used as a separator in mapping keys
+  code_type_cols <- switch(
+    type,
+    lookup = "code_type",
+    mapping = c("from_code_type", "to_code_type"),
+    relationship = "code_type"
+  )
+  for (col in code_type_cols) {
+    vals <- metadata[[col]]
+    if (!is.null(vals) && any(grepl(">", vals, fixed = TRUE))) {
+      codeminer_abort(
+        "Code type values must not contain {.val >} (found in column {.field {col}})."
+      )
+    }
   }
 
   current_metadata <- read_table_from_db(con, tbl_name)

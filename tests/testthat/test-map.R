@@ -31,18 +31,17 @@ test_that("MAP fails for wrong argument types", {
 })
 
 test_that("MAP fails for missing mapping table", {
-  expected_msg <- "No mapping table found"
   expect_error(
     MAP("foo", from = "idontexist", to = "ICD-10"),
-    expected_msg
+    "not found in mapping metadata"
   )
   expect_error(
     MAP("foo", from = "Read 3", to = "idontexist"),
-    expected_msg
+    "not found in mapping metadata"
   )
   expect_error(
     MAP("foo", from = "Read 3", to = "ICD-10", map_version = "nope"),
-    expected_msg
+    "No mapping metadata found"
   )
 })
 

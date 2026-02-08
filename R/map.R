@@ -172,28 +172,23 @@ get_metadata_for_mapping <- function(
     to <- old_from
   }
 
-  all_version_meta <- dplyr::filter(
-    all_meta,
-    .data$from_code_type == from,
-    .data$to_code_type == to
+  # Filter to from/to pair, then use shared version resolution
+  pair_meta <- all_meta[
+    all_meta$from_code_type == from & all_meta$to_code_type == to,
+  ]
+  pin_key <- paste(from, ">", to)
+  this_meta <- resolve_versioned_metadata(
+    pair_meta,
+    code_type_val = from,
+    version_val = map_version,
+    code_type_col = "from_code_type",
+    version_col = "map_version",
+    pin_type = "mapping",
+    pin_key = pin_key,
+    type_label = "mapping",
+    add_fun_name = "codeminer::add_mapping_table",
+    call = call
   )
-  if (map_version == "latest") {
-    map_version <- get_latest_version(all_version_meta$map_version)
-  }
-  this_meta <- dplyr::filter(
-    all_version_meta,
-    .data$map_version == .env$map_version
-  )
-
-  if (nrow(this_meta) == 0) {
-    codeminer_abort(
-      c(
-        "No mapping table found for from type '{from}' and to type '{to}', version '{map_version}'.",
-        "i" = "Did you add the mapping table with {.fun codeminer::add_mapping_table}?"
-      ),
-      call = call
-    )
-  }
 
   if (swap) {
     # Swap the from and to column names if necessary
@@ -202,6 +197,5 @@ get_metadata_for_mapping <- function(
     this_meta$to_col <- old_from_col
   }
 
-  stopifnot(nrow(this_meta) == 1) # expect a unique mapping table
   return(this_meta)
 }

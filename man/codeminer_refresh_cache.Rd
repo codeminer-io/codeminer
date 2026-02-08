@@ -16,8 +16,10 @@ after write operations.
 }
 \seealso{
 Other Workbench management: 
+\code{\link{codeminer_clear_versions}()},
 \code{\link{codeminer_connect}()},
 \code{\link{codeminer_disconnect}()},
+\code{\link{codeminer_set_version}()},
 \code{\link{codeminer_snapshot_extra}()},
 \code{\link{codeminer_status}()}
 }

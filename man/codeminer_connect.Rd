@@ -33,8 +33,10 @@ the \code{CODEMINER_DB_PATH} environment variable (or \code{rappdirs} default).
 \code{\link[=codeminer_disconnect]{codeminer_disconnect()}}, \code{\link[=codeminer_status]{codeminer_status()}}
 
 Other Workbench management: 
+\code{\link{codeminer_clear_versions}()},
 \code{\link{codeminer_disconnect}()},
 \code{\link{codeminer_refresh_cache}()},
+\code{\link{codeminer_set_version}()},
 \code{\link{codeminer_snapshot_extra}()},
 \code{\link{codeminer_status}()}
 }

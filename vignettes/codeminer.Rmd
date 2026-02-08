@@ -106,3 +106,80 @@ DESCRIPTION(pattern = "cyst", type = "ICD-10")
 <!--   type = "ICD-10" -->
 <!-- ) -->
 <!-- ``` -->
+
+# Version pinning
+
+When multiple versions of a lookup, mapping, or relationship table are available, `codeminer` resolves `"latest"` automatically. You can override this for the current session with `codeminer_set_version()`:
+
+```{r version_pinning}
+# Pin lookup and relationship versions for a code type
+codeminer_set_version(
+  lookup       = c("ICD-10" = "UKB v4"),
+  relationship = c("ICD-10" = "UKB v4")
+)
+
+# Pin a mapping version (use "from > to" format for the key)
+codeminer_set_version(
+  mapping = c("Read 3 > ICD-10" = "UKB v4")
+)
+```
+
+Pins only affect the default `"latest"` resolution. Explicit version arguments always take precedence:
+
+```{r version_pinning_explicit}
+# This uses the pinned version for ICD-10:
+CODES("E10", type = "ICD-10")
+
+# This ignores the pin and uses "UKB v4" directly:
+CODES("E10", type = "ICD-10", lookup_version = "UKB v4")
+```
+
+To clear all pins and return to automatic `"latest"` resolution:
+
+```{r version_pinning_clear}
+codeminer_clear_versions()
+```
+
+`codeminer_status()` shows any active pins alongside the connection info.
+
+## Storing version settings
+
+For reproducible analysis, you can store your version pins in a configuration file and load them at the start of a session.
+
+**CSV format** (one row per code type, columns for each table type):
+
+```
+code_type,lookup,relationship
+ICD-10,UKB v4,UKB v4
+Read 3,UKB v4,UKB v4
+SNOMED CT,GPS v1,GPS v1
+```
+
+```r
+cfg <- read.csv("codeminer_versions.csv")
+codeminer_set_version(
+  lookup       = setNames(cfg$lookup, cfg$code_type),
+  relationship = setNames(cfg$relationship, cfg$code_type)
+)
+```
+
+Mapping pins use a `"from > to"` key format and are best stored in a separate file or in JSON:
+
+**JSON format:**
+
+```json
+{
+  "lookup": {"ICD-10": "UKB v4", "Read 3": "UKB v4"},
+  "relationship": {"ICD-10": "UKB v4"},
+  "mapping": {"Read 3 > ICD-10": "UKB v4"}
+}
+```
+
+```r
+cfg <- jsonlite::fromJSON("codeminer_versions.json")
+codeminer_set_version(
+  lookup       = unlist(cfg$lookup),
+  relationship = unlist(cfg$relationship),
+  mapping      = unlist(cfg$mapping)
+)
+```

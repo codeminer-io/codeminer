@@ -23,3 +23,13 @@ local_build_temp_database <- function(..., .envir = parent.frame()) {
   codeminer_connect(main = temp_db)
   invisible(temp_db)
 }
+
+# Build a temporary database with dummy data (ICD-10, Read 3, mappings, etc.)
+# and connect the workbench. Use this when tests need real code data.
+local_build_temp_dummy_database <- function(..., .envir = parent.frame()) {
+  temp_db <- local_temp_database(.envir = .envir)
+  build_database(overwrite = TRUE)
+  add_ukb_resource_592(path = dummy_ukb_resource_592_path())
+  codeminer_connect(main = temp_db)
+  invisible(temp_db)
+}

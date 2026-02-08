@@ -149,7 +149,7 @@ CODES <- function(
     missing_codes_warning(
       missing_codes,
       table_type = "lookup",
-      table_meta = get_metadata_for_table(con, type, lookup_version)
+      table_meta = get_metadata_for_lookup(con, type, lookup_version)
     )
   }
 
@@ -306,7 +306,7 @@ get_lookup_table <- function(
   lookup_version,
   call = rlang::caller_env()
 ) {
-  this_meta <- get_metadata_for_table(con, code_type, lookup_version, call)
+  this_meta <- get_metadata_for_lookup(con, code_type, lookup_version, call)
 
   tbl_name <- this_meta$lookup_table_name
   tbl <- dplyr::tbl(con, tbl_name)
@@ -331,42 +331,23 @@ get_lookup_table <- function(
   return(tbl)
 }
 
-get_metadata_for_table <- function(
+get_metadata_for_lookup <- function(
   con,
   code_type,
   lookup_version,
   call = rlang::caller_env()
 ) {
   meta <- get_lookup_metadata(con = con)
-  if (!(code_type %in% meta$code_type)) {
-    codeminer_abort(
-      c(
-        "Code type '{code_type}' not found in lookup metadata.",
-        "i" = "Did you add the lookup table with {.fun codeminer::add_lookup_table}?"
-      ),
-      call = call
-    )
-  }
-
-  all_version_meta <- dplyr::filter(meta, .data$code_type == .env$code_type)
-
-  if (lookup_version == "latest") {
-    lookup_version <- get_latest_version(all_version_meta$lookup_version)
-  }
-  this_meta <- dplyr::filter(
-    all_version_meta,
-    .data$lookup_version == .env$lookup_version
+  resolve_versioned_metadata(
+    meta,
+    code_type_val = code_type,
+    version_val = lookup_version,
+    version_col = "lookup_version",
+    pin_type = "lookup",
+    type_label = "lookup",
+    add_fun_name = "codeminer::add_lookup_table",
+    call = call
   )
-
-  if (nrow(this_meta) == 0) {
-    codeminer_abort(
-      "No lookup metadata found for '{code_type}' version '{lookup_version}'",
-      call = call
-    )
-  }
-  stopifnot(nrow(this_meta) == 1) # code_type + version combo should be unique
-
-  return(this_meta)
 }
 
 # NOTE: this helper has a strong assumption that the versions have some numeric component (e.g. "v42")
