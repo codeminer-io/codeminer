@@ -16,6 +16,17 @@ reference:
       - default_col_filters
       - get_col_filters
 
+  - title: Workbench management
+    desc: Connect to and manage the codeminer workbench (persistent DuckDB connection).
+  - contents:
+      - codeminer_connect
+      - codeminer_disconnect
+      - codeminer_status
+      - codeminer_refresh_cache
+      - codeminer_set_version
+      - codeminer_clear_versions
+      - codeminer_snapshot_extra
+
   - title: Database management
     desc: Build a local database with lookup and mapping tables for various clinical coding systems.
   - contents:

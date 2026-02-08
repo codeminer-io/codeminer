@@ -4,12 +4,18 @@
 \alias{get_codeminer_metadata}
 \title{Get codeminer metadata}
 \usage{
-get_codeminer_metadata(type = c("lookup", "mapping", "relationship"))
+get_codeminer_metadata(
+  type = c("lookup", "mapping", "relationship"),
+  con = NULL
+)
 }
 \arguments{
 \item{type}{The type of metadata to return. By default returns a list
 containing all metadata types. Otherwise, returns a data frame for the
 specified type. Must be one of "lookup", "mapping" or "relationship".}
+
+\item{con}{Optional DBI connection. If \code{NULL} (default), uses the
+workbench connection.}
 }
 \value{
 If a single type is requested, a data frame. If multiple types are

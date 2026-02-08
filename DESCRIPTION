@@ -37,6 +37,7 @@ Imports:
     cli,
     duckdb,
     fs,
+    glue,
     magrittr,
     purrr,
     readr,

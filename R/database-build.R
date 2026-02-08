@@ -187,11 +187,63 @@ required_relationship_metadata_columns <- function() {
   )
 }
 
-# Helper function to connect to the database
-# .envir = parent.frame() ensures the connection is closed when the caller exits.
+# Connect to the database.
+# Read-only callers get the persistent workbench connection (via get_db_con()).
+# Write callers get a direct file connection that auto-closes when .envir exits.
+# If the workbench has the same file ATTACHed, it is DETACHed first to avoid
+# DuckDB file locking, then re-ATTACHed via withr::defer().
 connect_to_db <- function(..., read_only = TRUE, .envir = parent.frame()) {
-  con <- DBI::dbConnect(duckdb::duckdb(), db_path(), read_only = read_only)
-  withr::defer(DBI::dbDisconnect(con), envir = .envir)
+  if (read_only) {
+    return(get_db_con())
+  }
+
+  target_path <- db_path()
+
+  # Check if the workbench holds this file
+
+  workbench_active <- exists("con", envir = .codeminer_env) &&
+    DBI::dbIsValid(.codeminer_env$con)
+  workbench_holds_file <- workbench_active &&
+    identical(.codeminer_env$db_paths$main, target_path)
+
+  if (workbench_holds_file) {
+    # Switch to the in-memory catalog first -- DuckDB won't DETACH the
+    # "current" database (which search_path may have set to core).
+    DBI::dbExecute(.codeminer_env$con, "USE memory")
+    DBI::dbExecute(
+      .codeminer_env$con,
+      glue::glue_sql(
+        "DETACH {`CODEMINER_ALIAS_MAIN`}",
+        .con = .codeminer_env$con
+      )
+    )
+    .codeminer_env$db_paths$main <- NULL
+    withr::defer(
+      {
+        # Only re-ATTACH if workbench is still active and core is still
+        # detached. Another code path (e.g. auto-init) may have already
+        # reconnected.
+        wb_alive <- exists("con", envir = .codeminer_env) &&
+          DBI::dbIsValid(.codeminer_env$con)
+        if (wb_alive && is.null(.codeminer_env$db_paths$main)) {
+          DBI::dbExecute(
+            .codeminer_env$con,
+            glue::glue_sql(
+              "ATTACH {target_path} AS {`CODEMINER_ALIAS_MAIN`} (READ_ONLY)",
+              .con = .codeminer_env$con
+            )
+          )
+          .codeminer_env$db_paths$main <- target_path
+          codeminer_set_search_path()
+          codeminer_refresh_cache()
+        }
+      },
+      envir = .envir
+    )
+  }
+
+  con <- DBI::dbConnect(duckdb::duckdb(), target_path, read_only = FALSE)
+  withr::defer(DBI::dbDisconnect(con, shutdown = TRUE), envir = .envir)
   return(con)
 }
 

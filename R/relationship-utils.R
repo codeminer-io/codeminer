@@ -16,40 +16,16 @@ get_metadata_for_relationship <- function(
   call = rlang::caller_env()
 ) {
   meta <- get_relationship_metadata(con = con)
-
-  if (!(code_type %in% meta$code_type)) {
-    codeminer_abort(
-      c(
-        "Code type '{code_type}' not found in relationship metadata.",
-        "i" = "Did you add the relationship table with {.fun codeminer::add_relationship_table}?"
-      ),
-      call = call
-    )
-  }
-
-  all_version_meta <- dplyr::filter(meta, .data$code_type == .env$code_type)
-
-  if (identical(relationship_version, "latest")) {
-    relationship_version <- get_latest_version(
-      all_version_meta$relationship_version
-    )
-  }
-
-  this_meta <- dplyr::filter(
-    all_version_meta,
-    .data$relationship_version == .env$relationship_version
+  resolve_versioned_metadata(
+    meta,
+    code_type_val = code_type,
+    version_val = relationship_version,
+    version_col = "relationship_version",
+    pin_type = "relationship",
+    type_label = "relationship",
+    add_fun_name = "codeminer::add_relationship_table",
+    call = call
   )
-
-  if (nrow(this_meta) == 0) {
-    codeminer_abort(
-      "No relationship metadata found for '{code_type}' version '{relationship_version}'",
-      call = call
-    )
-  }
-
-  stopifnot(nrow(this_meta) == 1) # code_type + version combo should be unique
-
-  return(this_meta)
 }
 
 #' Perform transitive closure graph traversal
@@ -201,7 +177,7 @@ graph_closure_codes <- function(
 ) {
   check_code_type(code_type, call = call)
 
-  con <- connect_to_db()
+  con <- get_db_con()
   meta <- get_metadata_for_relationship(
     con,
     code_type,
