@@ -26,9 +26,7 @@ The goal of codeminer is to simplify working with clinical codes for research us
 1.  Create a local resource containing lookup and mapping tables for various clinical codings systems (e.g. ICD10 and Read codes)
 2.  Build clinical code lists for conditions of interest by querying this resource
 
-This vignette demonstrates the above using dummy data included with the package. You can try out the steps either locally by installing codeminer on your own machine, or online by clicking on the following link to RStudio Cloud[^1] and navigating to this Rmd file in the 'vignettes' directory: [![Launch RStudio Cloud](https://img.shields.io/badge/RStudio-Cloud-blue)](https://rstudio.cloud/project/4007004)
-
-[^1]: You will be asked to sign up for a free account if you do not have one already.
+This vignette demonstrates the above using dummy data included with the package.
 
 Also included are functions for mapping between different clinical coding systems, and using Phecodes[@denny2016; @wu2019] with UK Biobank data. See vignettes `vignette('MAP')` `vignette('caliber')` and `vignette('phecodes')` for further information.
 
@@ -52,9 +50,12 @@ The tables are imported into R, reformatted, and stored as a named list of data 
 Sys.getenv("CODEMINER_DB_PATH")
 ```
 
-Setting the `CODEMINER_DB_PATH` environment variable ensures that all subsequent `codeminer` calls will use this database.
+`codeminer` resolves the database location using the following precedence:
 
-To persist the database across sessions, set the `CODEMINER_DB_PATH` environment variable to a path on your system, e.g. using
+1. The `CODEMINER_DB_PATH` environment variable, if set
+2. A default location determined by [`rappdirs::user_data_dir()`](https://rappdirs.r-lib.org/reference/user_data_dir.html)
+
+To persist the database location across sessions, set `CODEMINER_DB_PATH` in your `.Renviron`, e.g. using
 [`usethis::edit_r_environ(scope = "project")`](https://usethis.r-lib.org/reference/edit.html?q=edit_r_environ#ref-usage):
 
 ```
@@ -62,24 +63,19 @@ To persist the database across sessions, set the `CODEMINER_DB_PATH` environment
 CODEMINER_DB_PATH=/path/to/codeminer-database.duckdb
 ```
 
-Alternatively, if the environment variable is not set, `codeminer` will store the database in a default location,
-determined by
-[`rappdirs::user_data_dir()`](https://rappdirs.r-lib.org/reference/user_data_dir.html).
+Alternatively, you can point `codeminer` at a specific database file with `codeminer_connect()`:
 
-The database is a [duckdb](https://r.duckdb.org/index.html) database and can be inspected using the
-[DBI](https://dbi.r-dbi.org/) package.
-
-```{r connect_to_db}
-# connect to Duckdb database
-con <- DBI::dbConnect(duckdb::duckdb(), db_path, read_only = TRUE)
-DBI::dbListTables(con)
-
-# Close the connection when you're done
-DBI::dbDisconnect(con)
+```r
+codeminer_connect(main = "/path/to/codeminer-database.duckdb")
 ```
 
-Note that manual interaction with the database should not be necessary, `codeminer` will take care of this for you.
+The database is a [duckdb](https://r.duckdb.org/index.html) database. `codeminer` manages the
+database connection automatically — you don't need to connect or disconnect manually. You can
+check the current connection status with `codeminer_status()`:
 
+```{r codeminer_status}
+codeminer_status()
+```
 
 # Build a clinical code list
 
