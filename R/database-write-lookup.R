@@ -86,6 +86,37 @@ add_lookup_table <- function(table, metadata) {
   return(invisible(success))
 }
 
+#' Remove a lookup table from the database
+#'
+#' Removes a lookup table and its metadata entry from the database.
+#'
+#' @param code_type The coding system type (e.g. `"ICD-10"`).
+#' @param lookup_version The version to remove (e.g. `"UKB v4"`).
+#'
+#' @return `TRUE` invisibly if successful.
+#'
+#' @seealso [add_lookup_table()], [lookup_metadata()]
+#' @export
+remove_lookup_table <- function(code_type, lookup_version) {
+  table_name <- paste(code_type, lookup_version, sep = "_")
+
+  con <- connect_to_db(read_only = FALSE)
+  check_database(con)
+
+  meta <- read_table_from_db(con, codeminer_metadata_table_names$lookup)
+  if (!table_name %in% meta$lookup_table_name) {
+    codeminer_abort(
+      "No lookup table found for {.val {code_type}} version {.val {lookup_version}}."
+    )
+  }
+
+  remove_table_entry(con, "lookup", table_name)
+  codeminer_inform(c(
+    "v" = "Lookup table {.field {table_name}} removed."
+  ))
+  invisible(TRUE)
+}
+
 #' Create lookup metadata
 #'
 #' Generate the required metadata for a lookup table. This is mainly used to

@@ -107,6 +107,44 @@ DESCRIPTION(pattern = "cyst", type = "ICD-10")
 <!-- ) -->
 <!-- ``` -->
 
+# Managing tables
+
+## Adding tables
+
+You can add custom lookup, mapping, and relationship tables to the database with `add_lookup_table()`, `add_mapping_table()`, and `add_relationship_table()`. Each requires a data frame and a metadata object created with the corresponding `*_metadata()` constructor:
+
+```{r add_table}
+custom_lookup <- data.frame(
+  code = c("CUSTOM1", "CUSTOM2"),
+  description = c("Custom code 1", "Custom code 2")
+)
+
+add_lookup_table(
+  custom_lookup,
+  lookup_metadata("custom_codes", lookup_version = "v1")
+)
+
+CODES("all", type = "custom_codes")
+```
+
+## Removing tables
+
+To remove a table, use the corresponding `remove_*_table()` function with the same identifying keys:
+
+```{r remove_table}
+remove_lookup_table("custom_codes", "v1")
+```
+
+Removing a table deletes both the data table and its metadata entry. After removal, the same code type and version can be re-added.
+
+## Viewing metadata
+
+Use `get_codeminer_metadata()` to inspect the tables currently in the database:
+
+```{r metadata}
+get_codeminer_metadata("lookup")
+```
+
 # Version pinning
 
 When multiple versions of a lookup, mapping, or relationship table are available, `codeminer` resolves `"latest"` automatically. You can override this for the current session with `codeminer_set_version()`:
