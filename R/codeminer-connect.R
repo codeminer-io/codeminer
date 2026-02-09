@@ -506,17 +506,17 @@ codeminer_clear_col_filters <- function() {
 #' \dontrun{
 #' # Temporarily include inactive SNOMED concepts
 #' with_col_filters(
-#'   lookup = list("SNOMED CT" = list(active_concept = c("0", "1"))),
 #'   {
 #'     CODES("all", type = "SNOMED CT")
-#'   }
+#'   },
+#'   lookup = list("SNOMED CT" = list(active_concept = c("0", "1")))
 #' )
 #' }
 with_col_filters <- function(
+  code,
   lookup = NULL,
   relationship = NULL,
-  mapping = NULL,
-  code
+  mapping = NULL
 ) {
   # Save current state
   old_filters <- .codeminer_env$active_col_filters
