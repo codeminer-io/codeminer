@@ -47,6 +47,14 @@
 add_relationship_table <- function(table, metadata) {
   validate_relationship_metadata(metadata, arg = rlang::caller_arg(metadata))
 
+  # Validate col_filters column names exist in the data table
+  cf <- deserialise_col_filters(metadata$col_filters)
+  validate_col_filters_columns(
+    cf,
+    table_cols = names(as.data.frame(table)),
+    table_name = metadata$relationship_table_name
+  )
+
   table_name <- metadata$relationship_table_name
   if (length(table_name) != 1) {
     codeminer_abort(
@@ -145,6 +153,9 @@ remove_relationship_table <- function(code_type, relationship_version) {
 #' @param child_parent_relationship_code The code value that indicates a
 #'   child-parent (is-a) relationship in the `type_col` column (default: "is a")
 #' @param relationship_source The source of the relationship metadata (default: `NA_character_`)
+#' @param col_filters Optional column filter specification. A named list where
+#'   each element is a list with `values` (all valid values) and `defaults`
+#'   (default filter values). `NULL` (default) means no column filters.
 #'
 #' @return A list containing the relationship metadata
 #'
@@ -160,7 +171,8 @@ relationship_metadata <- function(
   to_col = "to",
   type_col = "type",
   child_parent_relationship_code = "is a",
-  relationship_source = NA_character_
+  relationship_source = NA_character_,
+  col_filters = NULL
 ) {
   rlang::check_dots_empty()
 
@@ -178,7 +190,8 @@ relationship_metadata <- function(
     to_col = to_col,
     type_col = type_col,
     child_parent_relationship_code = child_parent_relationship_code,
-    relationship_source = relationship_source
+    relationship_source = relationship_source,
+    col_filters = serialise_col_filters(col_filters)
   ))
 }
 

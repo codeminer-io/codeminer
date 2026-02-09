@@ -135,6 +135,23 @@ remove_lookup_table <- function(code_type, lookup_version) {
 #' @param preferred_description_indicator The value in the
 #'   `preferred_description_col` column that indicates the preferred description
 #'   (default: `NA_character_`)
+#' @param col_filters Optional column filter specification. A named list where
+#'   each element is a list with `values` (all valid values) and `defaults`
+#'   (default filter values). See **Details** for the format. `NULL` (default)
+#'   means no column filters.
+#'
+#' @details
+#' The `col_filters` argument specifies which columns in the lookup table are
+#' filterable and what the default filter values are. The format is:
+#'
+#' ```
+#' list(
+#'   column_name = list(values = c("val1", "val2"), defaults = c("val1"))
+#' )
+#' ```
+#'
+#' When `col_filters` is set, query functions like [CODES()] will automatically
+#' filter the lookup table to only include rows matching the default values.
 #'
 #' @return A list containing the lookup metadata
 #'
@@ -146,11 +163,13 @@ lookup_metadata <- function(
   code_type,
   lookup_version = "v0",
   ...,
+
   lookup_code_col = "code",
   lookup_description_col = "description",
   lookup_source = NA_character_,
   preferred_description_col = NA_character_,
-  preferred_description_indicator = NA_character_
+  preferred_description_indicator = NA_character_,
+  col_filters = NULL
 ) {
   rlang::check_dots_empty()
 
@@ -173,7 +192,8 @@ lookup_metadata <- function(
     lookup_description_col = lookup_description_col,
     lookup_source = lookup_source,
     preferred_description_col = preferred_description_col,
-    preferred_description_indicator = preferred_description_indicator
+    preferred_description_indicator = preferred_description_indicator,
+    col_filters = serialise_col_filters(col_filters)
   ))
 }
 
@@ -224,6 +244,15 @@ validate_lookup_metadata <- function(
       call = call
     )
   }
+
+  # Validate col_filters column names exist in the data table
+  cf <- deserialise_col_filters(metadata$col_filters)
+  validate_col_filters_columns(
+    cf,
+    table_cols = names(table),
+    table_name = metadata$lookup_table_name,
+    call = call
+  )
 
   return(invisible(metadata))
 }

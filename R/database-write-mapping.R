@@ -31,6 +31,14 @@
 add_mapping_table <- function(table, metadata) {
   validate_mapping_metadata(metadata, arg = rlang::caller_arg(metadata))
 
+  # Validate col_filters column names exist in the data table
+  cf <- deserialise_col_filters(metadata$col_filters)
+  validate_col_filters_columns(
+    cf,
+    table_cols = names(as.data.frame(table)),
+    table_name = metadata$mapping_table_name
+  )
+
   table_name <- metadata$mapping_table_name
   if (length(table_name) != 1) {
     codeminer_abort(
@@ -119,6 +127,9 @@ remove_mapping_table <- function(from_code_type, to_code_type, map_version) {
 #' @param to_col The column name for the target codes (default: "to")
 #' @param map_source The source of the lookup metadata (default:
 #'   `NA_character_`)
+#' @param col_filters Optional column filter specification. A named list where
+#'   each element is a list with `values` (all valid values) and `defaults`
+#'   (default filter values). `NULL` (default) means no column filters.
 #'
 #' @return A list containing the mapping metadata
 #'
@@ -133,7 +144,8 @@ mapping_metadata <- function(
   ...,
   from_col = "from",
   to_col = "to",
-  map_source = NA_character_
+  map_source = NA_character_,
+  col_filters = NULL
 ) {
   rlang::check_dots_empty()
 
@@ -151,7 +163,8 @@ mapping_metadata <- function(
     map_version = map_version,
     from_col = from_col,
     to_col = to_col,
-    map_source = map_source
+    map_source = map_source,
+    col_filters = serialise_col_filters(col_filters)
   ))
 }
 
