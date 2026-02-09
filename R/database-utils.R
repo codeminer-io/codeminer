@@ -450,6 +450,90 @@ apply_col_filters <- function(
   tbl
 }
 
+#' Extract column filters from database metadata
+#'
+#' Reads `col_filters` from all metadata tables in the connected database.
+#' Returns a nested list keyed by table type and table key (code type or
+#' mapping pair).
+#'
+#' @param defaults_only Logical. If `TRUE` (default), return only the default
+#'   filter values. If `FALSE`, return the full specification including all
+#'   available values (useful for Shiny UI checkboxes).
+#'
+#' @return A named list with entries for `lookup`, `mapping`, and
+#'   `relationship`. Each entry is a named list keyed by code type (or
+#'   `"from > to"` for mappings), containing either:
+#'   - If `defaults_only = TRUE`: a flat `list(col = c(default_values))`
+#'   - If `defaults_only = FALSE`: a full `list(col = list(values = ..., defaults = ...))`
+#'
+#'   Returns an empty list if no database is connected.
+#' @export
+#' @family Workbench management
+get_col_filters <- function(defaults_only = TRUE) {
+  check_logical_scalar(defaults_only, "defaults_only")
+
+  result <- list()
+
+  # Safely access metadata — return empty list if no connection
+  tryCatch(
+    {
+      for (type in c("lookup", "mapping", "relationship")) {
+        meta <- .codeminer_env$metadata[[type]]
+        if (is.null(meta) || nrow(meta) == 0) {
+          next
+        }
+
+        # Determine the key column(s) for each type
+        key_fn <- switch(
+          type,
+          lookup = function(row) row$code_type,
+          mapping = function(row) {
+            paste(row$from_code_type, ">", row$to_code_type)
+          },
+          relationship = function(row) row$code_type
+        )
+
+        type_result <- list()
+        for (i in seq_len(nrow(meta))) {
+          row <- meta[i, ]
+          cf <- deserialise_col_filters(row$col_filters)
+          if (is.null(cf)) {
+            next
+          }
+
+          key <- key_fn(row)
+          if (defaults_only) {
+            type_result[[key]] <- lapply(cf, function(entry) entry$defaults)
+          } else {
+            type_result[[key]] <- cf
+          }
+        }
+
+        if (length(type_result) > 0) {
+          result[[type]] <- type_result
+        }
+      }
+    },
+    error = function(e) {
+      # No database connected — return empty list
+    }
+  )
+
+  result
+}
+
+#' Default column filters
+#'
+#' Returns the default filtering parameters for all registered lookup, mapping,
+#' and relationship tables. Equivalent to `get_col_filters(defaults_only = TRUE)`.
+#'
+#' @return A named list. See [get_col_filters()] for details.
+#' @export
+#' @family Workbench management
+default_col_filters <- function() {
+  get_col_filters(defaults_only = TRUE)
+}
+
 # Helper to read a table from the database as a data.frame
 read_table_from_db <- function(con, tbl_name) {
   DBI::dbReadTable(con, tbl_name)
