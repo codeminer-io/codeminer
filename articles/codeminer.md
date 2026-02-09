@@ -47,7 +47,7 @@ of data frames:
 ``` r
 # Create a temporary database with dummy data
 (db_path <- create_dummy_database())
-#> Creating new database at /tmp/RtmpPSCI8l/file259c1153dc16.duckdb
+#> Creating new database at /tmp/RtmpKqskMH/file260d10f7e97b.duckdb
 #> Reading 17 selected tables from UKB Resource 592
 #> 
 #> Extending read_v2_drugs_bnf with BNF hierarchy and descriptions
@@ -75,9 +75,9 @@ of data frames:
 #> ✔ Mapping table Read 3_OPCS4_UKB v4 added successfully.
 #> ✔ Mapping table Read 3_Read 2_UKB v4 added successfully.
 #> ✔ Dummy database ready to use!
-#> [1] "/tmp/RtmpPSCI8l/file259c1153dc16.duckdb"
+#> [1] "/tmp/RtmpKqskMH/file260d10f7e97b.duckdb"
 Sys.getenv("CODEMINER_DB_PATH")
-#> [1] "/tmp/RtmpPSCI8l/file259c1153dc16.duckdb"
+#> [1] "/tmp/RtmpKqskMH/file260d10f7e97b.duckdb"
 ```
 
 `codeminer` resolves the database location using the following
@@ -127,7 +127,7 @@ CODES(
   codes = c("E10", "E11"),
   type = "ICD-10"
 )
-#> ℹ Using database at /tmp/RtmpPSCI8l/file259c1153dc16.duckdb
+#> ℹ Using database at /tmp/RtmpKqskMH/file260d10f7e97b.duckdb
 #> ℹ Set `CODEMINER_DB_PATH` or use `codeminer_connect()` to change this.
 #> ℹ Using 'UKB v4' as latest version
 #> <codeminer_codelist>: 2 codes
@@ -154,6 +154,90 @@ DESCRIPTION(pattern = "cyst", type = "ICD-10")
 #>   <chr> <chr>                <chr>    
 #> 1 L721  Trichilemmal cyst    ICD-10   
 #> 2 N330  Tuberculous cystitis ICD-10
+```
+
+## Managing tables
+
+### Adding tables
+
+You can add custom lookup, mapping, and relationship tables to the
+database with
+[`add_lookup_table()`](https://codeminer-io.github.io/codeminer/reference/add_lookup_table.md),
+[`add_mapping_table()`](https://codeminer-io.github.io/codeminer/reference/add_mapping_table.md),
+and
+[`add_relationship_table()`](https://codeminer-io.github.io/codeminer/reference/add_relationship_table.md).
+Each requires a data frame and a metadata object created with the
+corresponding `*_metadata()` constructor:
+
+``` r
+custom_lookup <- data.frame(
+  code = c("CUSTOM1", "CUSTOM2"),
+  description = c("Custom code 1", "Custom code 2")
+)
+
+add_lookup_table(
+  custom_lookup,
+  lookup_metadata("custom_codes", lookup_version = "v1")
+)
+#> ✔ Lookup table custom_codes_v1 added successfully.
+
+CODES("all", type = "custom_codes")
+#> ℹ Using 'v1' as latest version
+#> <codeminer_codelist>: 2 codes
+#> 
+#> Code type: "custom_codes"
+#> # A tibble: 2 × 3
+#>   code    description   code_type   
+#>   <chr>   <chr>         <chr>       
+#> 1 CUSTOM1 Custom code 1 custom_codes
+#> 2 CUSTOM2 Custom code 2 custom_codes
+```
+
+### Removing tables
+
+To remove a table, use the corresponding `remove_*_table()` function
+with the same identifying keys:
+
+``` r
+remove_lookup_table("custom_codes", "v1")
+#> ✔ Lookup table custom_codes_v1 removed.
+```
+
+Removing a table deletes both the data table and its metadata entry.
+After removal, the same code type and version can be re-added.
+
+### Viewing metadata
+
+Use
+[`get_codeminer_metadata()`](https://codeminer-io.github.io/codeminer/reference/get_codeminer_metadata.md)
+to inspect the tables currently in the database:
+
+``` r
+get_codeminer_metadata("lookup")
+#>      lookup_table_name     code_type lookup_version lookup_code_col
+#> 1           BNF_UKB v4           BNF         UKB v4        BNF_Code
+#> 2          DM+D_UKB v4          DM+D         UKB v4      concept_id
+#> 3         ICD-9_UKB v4         ICD-9         UKB v4            ICD9
+#> 4        ICD-10_UKB v4        ICD-10         UKB v4        ALT_CODE
+#> 5        Read 2_UKB v4        Read 2         UKB v4       read_code
+#> 6 Read 2, drugs_UKB v4 Read 2, drugs         UKB v4       read_code
+#> 7        Read 3_UKB v4        Read 3         UKB v4       read_code
+#>   lookup_description_col                                      lookup_source
+#> 1            Description https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592
+#> 2                   term https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592
+#> 3       DESCRIPTION_ICD9 https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592
+#> 4            DESCRIPTION https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592
+#> 5       term_description https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592
+#> 6       term_description https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592
+#> 7       term_description https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592
+#>   preferred_description_col preferred_description_indicator
+#> 1                      <NA>                            <NA>
+#> 2                      <NA>                            <NA>
+#> 3                      <NA>                            <NA>
+#> 4                      <NA>                            <NA>
+#> 5                 term_code                              00
+#> 6                      <NA>                            <NA>
+#> 7          description_type                               P
 ```
 
 ## Version pinning

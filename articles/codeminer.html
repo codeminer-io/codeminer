@@ -109,7 +109,7 @@ list of data frames:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Create a temporary database with dummy data</span></span>
 <span><span class="op">(</span><span class="va">db_path</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/create_dummy_database.html">create_dummy_database</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Creating new database at <span style="color: #0000BB;">/tmp/RtmpPSCI8l/file259c1153dc16.duckdb</span></span></span>
+<span><span class="co">#&gt; Creating new database at <span style="color: #0000BB;">/tmp/RtmpKqskMH/file260d10f7e97b.duckdb</span></span></span>
 <span><span class="co">#&gt; Reading 17 selected tables from UKB Resource 592</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Extending <span style="color: #00BB00;">read_v2_drugs_bnf</span> with BNF hierarchy and descriptions</span></span>
@@ -137,9 +137,9 @@ list of data frames:</p>
 <span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Mapping table <span style="color: #00BB00;">Read 3_OPCS4_UKB v4</span> added successfully.</span></span>
 <span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Mapping table <span style="color: #00BB00;">Read 3_Read 2_UKB v4</span> added successfully.</span></span>
 <span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Dummy database ready to use!</span></span>
-<span><span class="co">#&gt; [1] "/tmp/RtmpPSCI8l/file259c1153dc16.duckdb"</span></span>
+<span><span class="co">#&gt; [1] "/tmp/RtmpKqskMH/file260d10f7e97b.duckdb"</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/Sys.getenv.html" class="external-link">Sys.getenv</a></span><span class="op">(</span><span class="st">"CODEMINER_DB_PATH"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] "/tmp/RtmpPSCI8l/file259c1153dc16.duckdb"</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] "/tmp/RtmpKqskMH/file260d10f7e97b.duckdb"</span></span></code></pre></div>
 <p><code>codeminer</code> resolves the database location using the
 following precedence:</p>
 <ol style="list-style-type: decimal">
@@ -181,7 +181,7 @@ given code system type</li>
 <span>  codes <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"E10"</span>, <span class="st">"E11"</span><span class="op">)</span>,</span>
 <span>  type <span class="op">=</span> <span class="st">"ICD-10"</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Using database at <span style="color: #0000BB;">/tmp/RtmpPSCI8l/file259c1153dc16.duckdb</span></span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Using database at <span style="color: #0000BB;">/tmp/RtmpKqskMH/file260d10f7e97b.duckdb</span></span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Set `CODEMINER_DB_PATH` or use `codeminer_connect()` to change this.</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Using 'UKB v4' as latest version</span></span>
 <span><span class="co">#&gt; <span style="color: #0000BB;">&lt;codeminer_codelist&gt;</span>: 2 codes</span></span>
@@ -219,13 +219,93 @@ description</li>
 </div>
 </div>
 <div class="section level2">
+<h2 id="managing-tables">Managing tables<a class="anchor" aria-label="anchor" href="#managing-tables"></a>
+</h2>
+<div class="section level3">
+<h3 id="adding-tables">Adding tables<a class="anchor" aria-label="anchor" href="#adding-tables"></a>
+</h3>
+<p>You can add custom lookup, mapping, and relationship tables to the
+database with <code><a href="../reference/add_lookup_table.html">add_lookup_table()</a></code>,
+<code><a href="../reference/add_mapping_table.html">add_mapping_table()</a></code>, and
+<code><a href="../reference/add_relationship_table.html">add_relationship_table()</a></code>. Each requires a data frame and a
+metadata object created with the corresponding <code>*_metadata()</code>
+constructor:</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">custom_lookup</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
+<span>  code <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"CUSTOM1"</span>, <span class="st">"CUSTOM2"</span><span class="op">)</span>,</span>
+<span>  description <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Custom code 1"</span>, <span class="st">"Custom code 2"</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="../reference/add_lookup_table.html">add_lookup_table</a></span><span class="op">(</span></span>
+<span>  <span class="va">custom_lookup</span>,</span>
+<span>  <span class="fu"><a href="../reference/lookup_metadata.html">lookup_metadata</a></span><span class="op">(</span><span class="st">"custom_codes"</span>, lookup_version <span class="op">=</span> <span class="st">"v1"</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Lookup table <span style="color: #00BB00;">custom_codes_v1</span> added successfully.</span></span>
+<span></span>
+<span><span class="fu"><a href="../reference/CODES.html">CODES</a></span><span class="op">(</span><span class="st">"all"</span>, type <span class="op">=</span> <span class="st">"custom_codes"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Using 'v1' as latest version</span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB;">&lt;codeminer_codelist&gt;</span>: 2 codes</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Code type: <span style="color: #0000BB;">"custom_codes"</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 2 × 3</span></span></span>
+<span><span class="co">#&gt;   code    description   code_type   </span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> CUSTOM1 Custom code 1 custom_codes</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> CUSTOM2 Custom code 2 custom_codes</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="removing-tables">Removing tables<a class="anchor" aria-label="anchor" href="#removing-tables"></a>
+</h3>
+<p>To remove a table, use the corresponding
+<code>remove_*_table()</code> function with the same identifying
+keys:</p>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/remove_lookup_table.html">remove_lookup_table</a></span><span class="op">(</span><span class="st">"custom_codes"</span>, <span class="st">"v1"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Lookup table <span style="color: #00BB00;">custom_codes_v1</span> removed.</span></span></code></pre></div>
+<p>Removing a table deletes both the data table and its metadata entry.
+After removal, the same code type and version can be re-added.</p>
+</div>
+<div class="section level3">
+<h3 id="viewing-metadata">Viewing metadata<a class="anchor" aria-label="anchor" href="#viewing-metadata"></a>
+</h3>
+<p>Use <code><a href="../reference/get_codeminer_metadata.html">get_codeminer_metadata()</a></code> to inspect the tables
+currently in the database:</p>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/get_codeminer_metadata.html">get_codeminer_metadata</a></span><span class="op">(</span><span class="st">"lookup"</span><span class="op">)</span></span>
+<span><span class="co">#&gt;      lookup_table_name     code_type lookup_version lookup_code_col</span></span>
+<span><span class="co">#&gt; 1           BNF_UKB v4           BNF         UKB v4        BNF_Code</span></span>
+<span><span class="co">#&gt; 2          DM+D_UKB v4          DM+D         UKB v4      concept_id</span></span>
+<span><span class="co">#&gt; 3         ICD-9_UKB v4         ICD-9         UKB v4            ICD9</span></span>
+<span><span class="co">#&gt; 4        ICD-10_UKB v4        ICD-10         UKB v4        ALT_CODE</span></span>
+<span><span class="co">#&gt; 5        Read 2_UKB v4        Read 2         UKB v4       read_code</span></span>
+<span><span class="co">#&gt; 6 Read 2, drugs_UKB v4 Read 2, drugs         UKB v4       read_code</span></span>
+<span><span class="co">#&gt; 7        Read 3_UKB v4        Read 3         UKB v4       read_code</span></span>
+<span><span class="co">#&gt;   lookup_description_col                                      lookup_source</span></span>
+<span><span class="co">#&gt; 1            Description https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592</span></span>
+<span><span class="co">#&gt; 2                   term https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592</span></span>
+<span><span class="co">#&gt; 3       DESCRIPTION_ICD9 https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592</span></span>
+<span><span class="co">#&gt; 4            DESCRIPTION https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592</span></span>
+<span><span class="co">#&gt; 5       term_description https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592</span></span>
+<span><span class="co">#&gt; 6       term_description https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592</span></span>
+<span><span class="co">#&gt; 7       term_description https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592</span></span>
+<span><span class="co">#&gt;   preferred_description_col preferred_description_indicator</span></span>
+<span><span class="co">#&gt; 1                      &lt;NA&gt;                            &lt;NA&gt;</span></span>
+<span><span class="co">#&gt; 2                      &lt;NA&gt;                            &lt;NA&gt;</span></span>
+<span><span class="co">#&gt; 3                      &lt;NA&gt;                            &lt;NA&gt;</span></span>
+<span><span class="co">#&gt; 4                      &lt;NA&gt;                            &lt;NA&gt;</span></span>
+<span><span class="co">#&gt; 5                 term_code                              00</span></span>
+<span><span class="co">#&gt; 6                      &lt;NA&gt;                            &lt;NA&gt;</span></span>
+<span><span class="co">#&gt; 7          description_type                               P</span></span></code></pre></div>
+</div>
+</div>
+<div class="section level2">
 <h2 id="version-pinning">Version pinning<a class="anchor" aria-label="anchor" href="#version-pinning"></a>
 </h2>
 <p>When multiple versions of a lookup, mapping, or relationship table
 are available, <code>codeminer</code> resolves <code>"latest"</code>
 automatically. You can override this for the current session with
 <code><a href="../reference/codeminer_set_version.html">codeminer_set_version()</a></code>:</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Pin lookup and relationship versions for a code type</span></span>
 <span><span class="fu"><a href="../reference/codeminer_set_version.html">codeminer_set_version</a></span><span class="op">(</span></span>
 <span>  lookup       <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"ICD-10"</span> <span class="op">=</span> <span class="st">"UKB v4"</span><span class="op">)</span>,</span>
@@ -238,7 +318,7 @@ automatically. You can override this for the current session with
 <span><span class="op">)</span></span></code></pre></div>
 <p>Pins only affect the default <code>"latest"</code> resolution.
 Explicit version arguments always take precedence:</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># This uses the pinned version for ICD-10:</span></span>
 <span><span class="fu"><a href="../reference/CODES.html">CODES</a></span><span class="op">(</span><span class="st">"E10"</span>, type <span class="op">=</span> <span class="st">"ICD-10"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #0000BB;">&lt;codeminer_codelist&gt;</span>: 1 code</span></span>
@@ -260,7 +340,7 @@ Explicit version arguments always take precedence:</p>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> E10   Type 1 diabetes mellitus ICD-10</span></span></code></pre></div>
 <p>To clear all pins and return to automatic <code>"latest"</code>
 resolution:</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/codeminer_clear_versions.html">codeminer_clear_versions</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p><code><a href="../reference/codeminer_status.html">codeminer_status()</a></code> shows any active pins alongside the
 connection info.</p>
@@ -275,7 +355,7 @@ table type):</p>
 ICD-10,UKB v4,UKB v4
 Read 3,UKB v4,UKB v4
 SNOMED CT,GPS v1,GPS v1</code></pre>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">cfg</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">read.csv</a></span><span class="op">(</span><span class="st">"codeminer_versions.csv"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/codeminer_set_version.html">codeminer_set_version</a></span><span class="op">(</span></span>
 <span>  lookup       <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/setNames.html" class="external-link">setNames</a></span><span class="op">(</span><span class="va">cfg</span><span class="op">$</span><span class="va">lookup</span>, <span class="va">cfg</span><span class="op">$</span><span class="va">code_type</span><span class="op">)</span>,</span>
@@ -284,12 +364,12 @@ SNOMED CT,GPS v1,GPS v1</code></pre>
 <p>Mapping pins use a <code>"from &gt; to"</code> key format and are
 best stored in a separate file or in JSON:</p>
 <p><strong>JSON format:</strong></p>
-<div class="sourceCode" id="cb13"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb13-1"><a href="#cb13-1" tabindex="-1"></a><span class="fu">{</span></span>
-<span id="cb13-2"><a href="#cb13-2" tabindex="-1"></a>  <span class="dt">"lookup"</span><span class="fu">:</span> <span class="fu">{</span><span class="dt">"ICD-10"</span><span class="fu">:</span> <span class="st">"UKB v4"</span><span class="fu">,</span> <span class="dt">"Read 3"</span><span class="fu">:</span> <span class="st">"UKB v4"</span><span class="fu">},</span></span>
-<span id="cb13-3"><a href="#cb13-3" tabindex="-1"></a>  <span class="dt">"relationship"</span><span class="fu">:</span> <span class="fu">{</span><span class="dt">"ICD-10"</span><span class="fu">:</span> <span class="st">"UKB v4"</span><span class="fu">},</span></span>
-<span id="cb13-4"><a href="#cb13-4" tabindex="-1"></a>  <span class="dt">"mapping"</span><span class="fu">:</span> <span class="fu">{</span><span class="dt">"Read 3 &gt; ICD-10"</span><span class="fu">:</span> <span class="st">"UKB v4"</span><span class="fu">}</span></span>
-<span id="cb13-5"><a href="#cb13-5" tabindex="-1"></a><span class="fu">}</span></span></code></pre></div>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb16"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb16-1"><a href="#cb16-1" tabindex="-1"></a><span class="fu">{</span></span>
+<span id="cb16-2"><a href="#cb16-2" tabindex="-1"></a>  <span class="dt">"lookup"</span><span class="fu">:</span> <span class="fu">{</span><span class="dt">"ICD-10"</span><span class="fu">:</span> <span class="st">"UKB v4"</span><span class="fu">,</span> <span class="dt">"Read 3"</span><span class="fu">:</span> <span class="st">"UKB v4"</span><span class="fu">},</span></span>
+<span id="cb16-3"><a href="#cb16-3" tabindex="-1"></a>  <span class="dt">"relationship"</span><span class="fu">:</span> <span class="fu">{</span><span class="dt">"ICD-10"</span><span class="fu">:</span> <span class="st">"UKB v4"</span><span class="fu">},</span></span>
+<span id="cb16-4"><a href="#cb16-4" tabindex="-1"></a>  <span class="dt">"mapping"</span><span class="fu">:</span> <span class="fu">{</span><span class="dt">"Read 3 &gt; ICD-10"</span><span class="fu">:</span> <span class="st">"UKB v4"</span><span class="fu">}</span></span>
+<span id="cb16-5"><a href="#cb16-5" tabindex="-1"></a><span class="fu">}</span></span></code></pre></div>
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">cfg</span> <span class="op">&lt;-</span> <span class="fu">jsonlite</span><span class="fu">::</span><span class="fu"><a href="https://jeroen.r-universe.dev/jsonlite/reference/fromJSON.html" class="external-link">fromJSON</a></span><span class="op">(</span><span class="st">"codeminer_versions.json"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/codeminer_set_version.html">codeminer_set_version</a></span><span class="op">(</span></span>
 <span>  lookup       <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/unlist.html" class="external-link">unlist</a></span><span class="op">(</span><span class="va">cfg</span><span class="op">$</span><span class="va">lookup</span><span class="op">)</span>,</span>

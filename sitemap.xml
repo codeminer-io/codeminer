@@ -73,6 +73,9 @@
 <url><loc>https://codeminer-io.github.io/codeminer/reference/read_ukb_resource_592.html</loc></url>
 <url><loc>https://codeminer-io.github.io/codeminer/reference/relationship_metadata.html</loc></url>
 <url><loc>https://codeminer-io.github.io/codeminer/reference/relationship_types.html</loc></url>
+<url><loc>https://codeminer-io.github.io/codeminer/reference/remove_lookup_table.html</loc></url>
+<url><loc>https://codeminer-io.github.io/codeminer/reference/remove_mapping_table.html</loc></url>
+<url><loc>https://codeminer-io.github.io/codeminer/reference/remove_relationship_table.html</loc></url>
 <url><loc>https://codeminer-io.github.io/codeminer/reference/start_api.html</loc></url>
 <url><loc>https://codeminer-io.github.io/codeminer/reference/with_code_type_helpers.html</loc></url>
 </urlset>

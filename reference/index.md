@@ -79,14 +79,20 @@ clinical coding systems.
   : Create a dummy database
 - [`add_lookup_table()`](https://codeminer-io.github.io/codeminer/reference/add_lookup_table.md)
   : Add a lookup table to the database
+- [`remove_lookup_table()`](https://codeminer-io.github.io/codeminer/reference/remove_lookup_table.md)
+  : Remove a lookup table from the database
 - [`lookup_metadata()`](https://codeminer-io.github.io/codeminer/reference/lookup_metadata.md)
   : Create lookup metadata
 - [`add_mapping_table()`](https://codeminer-io.github.io/codeminer/reference/add_mapping_table.md)
   : Add a mapping table to the database
+- [`remove_mapping_table()`](https://codeminer-io.github.io/codeminer/reference/remove_mapping_table.md)
+  : Remove a mapping table from the database
 - [`mapping_metadata()`](https://codeminer-io.github.io/codeminer/reference/mapping_metadata.md)
   : Create mapping metadata
 - [`add_relationship_table()`](https://codeminer-io.github.io/codeminer/reference/add_relationship_table.md)
   : Add a relationship table to the database
+- [`remove_relationship_table()`](https://codeminer-io.github.io/codeminer/reference/remove_relationship_table.md)
+  : Remove a relationship table from the database
 - [`relationship_metadata()`](https://codeminer-io.github.io/codeminer/reference/relationship_metadata.md)
   : Create relationship metadata
 - [`get_codeminer_metadata()`](https://codeminer-io.github.io/codeminer/reference/get_codeminer_metadata.md)

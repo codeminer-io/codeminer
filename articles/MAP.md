@@ -13,7 +13,7 @@ library(dplyr)
 #>     intersect, setdiff, setequal, union
 
 create_dummy_database()
-#> Creating new database at /tmp/RtmpmaAqMY/file26955f626eed.duckdb
+#> Creating new database at /tmp/RtmpewXnVg/file271479252f21.duckdb
 #> Reading 17 selected tables from UKB Resource 592
 #> 
 #> Extending read_v2_drugs_bnf with BNF hierarchy and descriptions
@@ -50,7 +50,7 @@ to map a vector of codes from one clinical coding system to another:
 
 ``` r
 MAP(codes = "X40J4", from = "Read 3", to = "ICD-10")
-#> ℹ Using database at /tmp/RtmpmaAqMY/file26955f626eed.duckdb
+#> ℹ Using database at /tmp/RtmpewXnVg/file271479252f21.duckdb
 #> ℹ Set `CODEMINER_DB_PATH` or use `codeminer_connect()` to change this.
 #> ℹ Using 'UKB v4' as latest version
 #> ℹ Using 'UKB v4' as latest version

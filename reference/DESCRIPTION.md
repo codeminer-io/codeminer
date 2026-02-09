@@ -54,7 +54,7 @@ A `codeminer_codelist` with codes that match the description.
 ``` r
 # build dummy database
 create_dummy_database()
-#> Creating new database at /tmp/RtmpDQc1MV/file1c5e2f535bf5.duckdb
+#> Creating new database at /tmp/Rtmp8JLRAf/file1c6d61330ee2.duckdb
 #> Reading 17 selected tables from UKB Resource 592
 #> 
 #> Extending read_v2_drugs_bnf with BNF hierarchy and descriptions
