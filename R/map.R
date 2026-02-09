@@ -92,7 +92,11 @@ MAP <- function(
 
     con <- get_db_con()
     mapping_table <- get_mapping_table(
-      con, from, to, map_version, col_filters = col_filters
+      con,
+      from,
+      to,
+      map_version,
+      col_filters = col_filters
     )
     return(dplyr::collect(mapping_table))
   }
@@ -112,7 +116,11 @@ MAP <- function(
   con <- get_db_con()
 
   mapping_table <- get_mapping_table(
-    con, from, to, map_version, col_filters = col_filters
+    con,
+    from,
+    to,
+    map_version,
+    col_filters = col_filters
   )
 
   mapping <- dplyr::filter(

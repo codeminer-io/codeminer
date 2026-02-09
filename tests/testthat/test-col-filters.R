@@ -19,7 +19,6 @@ test_that("serialise/deserialise round-trips correctly", {
   expect_type(json, "character")
   expect_length(json, 1)
 
-
   result <- deserialise_col_filters(json)
   expect_identical(result, spec)
 })
@@ -234,7 +233,8 @@ test_that("MAP col_filters applies to mapping table", {
   )
 
   map_meta <- mapping_metadata(
-    "source_type", "target_type",
+    "source_type",
+    "target_type",
     col_filters = list(
       quality = list(
         values = c("exact", "approximate"),
@@ -253,7 +253,9 @@ test_that("MAP col_filters applies to mapping table", {
 
   # Override: all mappings
   result_all <- MAP(
-    "S1", "S2", "S3",
+    "S1",
+    "S2",
+    "S3",
     from = "source_type",
     to = "target_type",
     col_filters = NULL
@@ -459,7 +461,11 @@ test_that("DESCRIPTION does not match inactive descriptions", {
   # and an active description "Kidney disease" (status = "1").
   table <- data.frame(
     code = c("C100", "C200", "C200"),
-    description = c("Diabetes mellitus", "Diabetes insipidus", "Kidney disease"),
+    description = c(
+      "Diabetes mellitus",
+      "Diabetes insipidus",
+      "Kidney disease"
+    ),
     status = c("1", "0", "1")
   )
   meta <- lookup_metadata(

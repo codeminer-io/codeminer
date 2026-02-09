@@ -216,7 +216,9 @@ migrate_metadata_schema <- function(con) {
   )
 
   for (entry in meta_tables) {
-    if (!table_exists(con, entry$tbl)) next
+    if (!table_exists(con, entry$tbl)) {
+      next
+    }
 
     existing_cols <- DBI::dbListFields(con, entry$tbl)
     missing_cols <- setdiff(entry$required, existing_cols)

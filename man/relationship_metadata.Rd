@@ -12,7 +12,8 @@ relationship_metadata(
   to_col = "to",
   type_col = "type",
   child_parent_relationship_code = "is a",
-  relationship_source = NA_character_
+  relationship_source = NA_character_,
+  col_filters = NULL
 )
 }
 \arguments{
@@ -32,6 +33,10 @@ relationship_metadata(
 child-parent (is-a) relationship in the \code{type_col} column (default: "is a")}
 
 \item{relationship_source}{The source of the relationship metadata (default: \code{NA_character_})}
+
+\item{col_filters}{Optional column filter specification. A named list where
+each element is a list with \code{values} (all valid values) and \code{defaults}
+(default filter values). \code{NULL} (default) means no column filters.}
 }
 \value{
 A list containing the relationship metadata

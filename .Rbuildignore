@@ -20,3 +20,6 @@ _build_all_lkps_maps_db.R
 ^\.lintr$
 ^[.]?air[.]toml$
 ^.*_snaps$
+^\.claude$
+^CLAUDE\.md$
+^test\.R$

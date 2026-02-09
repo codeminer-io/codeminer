@@ -126,7 +126,10 @@ CODES <- function(
 
     con <- get_db_con()
     lookup_table <- get_lookup_table(
-      con, type, lookup_version, col_filters = col_filters
+      con,
+      type,
+      lookup_version,
+      col_filters = col_filters
     )
     result <- dplyr::collect(lookup_table)
 
@@ -147,7 +150,10 @@ CODES <- function(
   con <- get_db_con()
 
   lookup_table <- get_lookup_table(
-    con, type, lookup_version, col_filters = col_filters
+    con,
+    type,
+    lookup_version,
+    col_filters = col_filters
   )
 
   result <- lookup_table |>
@@ -287,7 +293,10 @@ CODES_LIKE <- function(
   con <- get_db_con()
 
   lookup_table <- get_lookup_table(
-    con, type, lookup_version, col_filters = col_filters
+    con,
+    type,
+    lookup_version,
+    col_filters = col_filters
   )
   like_codes <- dplyr::filter(
     lookup_table,

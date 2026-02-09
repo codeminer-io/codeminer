@@ -195,8 +195,10 @@ graph_closure_codes <- function(
     pin_key = code_type
   )
   rel_table <- apply_col_filters(
-    rel_table, resolved,
-    tbl_name = meta$relationship_table_name, call = call
+    rel_table,
+    resolved,
+    tbl_name = meta$relationship_table_name,
+    call = call
   )
 
   # Resolve rel_type if it's a from_meta reference

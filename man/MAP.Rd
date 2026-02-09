@@ -9,7 +9,8 @@ MAP(
   from = getOption("codeminer.map_from"),
   to = getOption("codeminer.map_to"),
   map_version = getOption("codeminer.map_version", default = "latest"),
-  lookup_version = getOption("codeminer.lookup_version", default = "latest")
+  lookup_version = getOption("codeminer.lookup_version", default = "latest"),
+  col_filters = "default"
 )
 }
 \arguments{
@@ -26,6 +27,17 @@ codelist with code_type.}
 \item{lookup_version}{character. Version of the lookup table to use. Default:
 \code{"latest"}. Can be configured through the \code{codeminer.lookup_version}
 option.}
+
+\item{col_filters}{Column filters to apply to the \strong{mapping table}. One of:
+\itemize{
+\item \code{"default"} (default): apply session-pinned or metadata-defined default
+filters
+\item \code{NULL}: no filtering (return all rows)
+\item A named list of \code{column_name = c(values)} pairs for explicit filtering
+}
+
+Note: this controls filtering of the mapping table, not the target lookup
+table (which uses its own default col_filters).}
 }
 \value{
 A \code{codeminer_codelist} of the mapped codes with their descriptions.
@@ -76,7 +88,6 @@ MAP("all", from = "Read 3", to = "ICD-10")
 database.
 
 Other Clinical code lookups and mappings: 
-\code{\link{CODES}()},
-\code{\link{default_col_filters}()}
+\code{\link{CODES}()}
 }
 \concept{Clinical code lookups and mappings}

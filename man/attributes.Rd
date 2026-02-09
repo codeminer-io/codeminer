@@ -12,7 +12,8 @@ ATTRIBUTES_FOR(
   lookup_version = getOption("codeminer.lookup_version", default = "latest"),
   relationship_version = getOption("codeminer.relationship_version", default = "latest"),
   relationship_types = NULL,
-  preferred_description_only = TRUE
+  preferred_description_only = TRUE,
+  col_filters = "default"
 )
 
 HAS_ATTRIBUTES(
@@ -21,7 +22,8 @@ HAS_ATTRIBUTES(
   lookup_version = getOption("codeminer.lookup_version", default = "latest"),
   relationship_version = getOption("codeminer.relationship_version", default = "latest"),
   relationship_types = NULL,
-  preferred_description_only = TRUE
+  preferred_description_only = TRUE,
+  col_filters = "default"
 )
 }
 \arguments{
@@ -38,6 +40,8 @@ by. If \code{NULL} (default), all relationship types are included.}
 
 \item{preferred_description_only}{Logical. If \code{TRUE}, return only preferred
 descriptions.}
+
+\item{col_filters}{Column filters to apply. See \code{\link[=CODES]{CODES()}} for details.}
 }
 \value{
 A data frame of codes and descriptions

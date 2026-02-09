@@ -56,7 +56,8 @@ RELATIONSHIP_TYPES_FROM <- function(
     pin_key = type
   )
   rel_table <- apply_col_filters(
-    rel_table, resolved,
+    rel_table,
+    resolved,
     tbl_name = meta$relationship_table_name
   )
 
@@ -143,7 +144,8 @@ RELATIONSHIP_TYPES_TO <- function(
     pin_key = type
   )
   rel_table <- apply_col_filters(
-    rel_table, resolved,
+    rel_table,
+    resolved,
     tbl_name = meta$relationship_table_name
   )
 

@@ -12,7 +12,8 @@ lookup_metadata(
   lookup_description_col = "description",
   lookup_source = NA_character_,
   preferred_description_col = NA_character_,
-  preferred_description_indicator = NA_character_
+  preferred_description_indicator = NA_character_,
+  col_filters = NULL
 )
 }
 \arguments{
@@ -35,6 +36,11 @@ descriptions for the same code (default: \code{NA_character_}).}
 \item{preferred_description_indicator}{The value in the
 \code{preferred_description_col} column that indicates the preferred description
 (default: \code{NA_character_})}
+
+\item{col_filters}{Optional column filter specification. A named list where
+each element is a list with \code{values} (all valid values) and \code{defaults}
+(default filter values). See \strong{Details} for the format. \code{NULL} (default)
+means no column filters.}
 }
 \value{
 A list containing the lookup metadata
@@ -43,6 +49,18 @@ A list containing the lookup metadata
 Generate the required metadata for a lookup table. This is mainly used to
 generate the necessary metadata when adding a new lookup table to the database
 with \code{\link[=add_lookup_table]{add_lookup_table()}}.
+}
+\details{
+The \code{col_filters} argument specifies which columns in the lookup table are
+filterable and what the default filter values are. The format is:
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{list(
+  column_name = list(values = c("val1", "val2"), defaults = c("val1"))
+)
+}\if{html}{\out{</div>}}
+
+When \code{col_filters} is set, query functions like \code{\link[=CODES]{CODES()}} will automatically
+filter the lookup table to only include rows matching the default values.
 }
 \examples{
 lookup_metadata("ICD-10", lookup_version = "2023")

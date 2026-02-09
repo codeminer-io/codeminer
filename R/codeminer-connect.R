@@ -105,7 +105,11 @@ codeminer_disconnect <- function() {
     DBI::dbDisconnect(.codeminer_env$con, shutdown = TRUE)
   }
   for (field in c(
-    "con", "db_paths", "metadata", "active_versions", "active_col_filters"
+    "con",
+    "db_paths",
+    "metadata",
+    "active_versions",
+    "active_col_filters"
   )) {
     if (exists(field, envir = .codeminer_env)) {
       rm(list = field, envir = .codeminer_env)

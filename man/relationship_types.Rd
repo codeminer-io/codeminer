@@ -9,13 +9,15 @@
 RELATIONSHIP_TYPES_FROM(
   ...,
   type = getOption("codeminer.code_type"),
-  relationship_version = getOption("codeminer.relationship_version", default = "latest")
+  relationship_version = getOption("codeminer.relationship_version", default = "latest"),
+  col_filters = "default"
 )
 
 RELATIONSHIP_TYPES_TO(
   ...,
   type = getOption("codeminer.code_type"),
-  relationship_version = getOption("codeminer.relationship_version", default = "latest")
+  relationship_version = getOption("codeminer.relationship_version", default = "latest"),
+  col_filters = "default"
 )
 }
 \arguments{
@@ -24,6 +26,8 @@ RELATIONSHIP_TYPES_TO(
 \item{type}{Code type (character).}
 
 \item{relationship_version}{Relationship table version (character).}
+
+\item{col_filters}{Column filters to apply. See \code{\link[=CODES]{CODES()}} for details.}
 }
 \value{
 A character vector of distinct relationship types.
