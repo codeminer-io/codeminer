@@ -23,6 +23,11 @@
 #'   option.
 #' @param preferred_description_only logical. If `TRUE`, only returns the
 #'   preferred description for each code. Default: `FALSE`.
+#' @param col_filters Column filters to apply. One of:
+#'   - `"default"` (default): apply session-pinned or metadata-defined default
+#'     filters
+#'   - `NULL`: no filtering (return all rows)
+#'   - A named list of `column_name = c(values)` pairs for explicit filtering
 #'
 #' @return A `codeminer_codelist` object (tibble) containing the codes and their
 #'   descriptions
@@ -58,7 +63,8 @@ CODES <- function(
   ...,
   type = getOption("codeminer.code_type"),
   lookup_version = getOption("codeminer.lookup_version", default = "latest"),
-  preferred_description_only = TRUE
+  preferred_description_only = TRUE,
+  col_filters = "default"
 ) {
   # Validate logical parameter
   check_logical_scalar(preferred_description_only, "preferred_description_only")
@@ -119,7 +125,9 @@ CODES <- function(
     check_version(lookup_version)
 
     con <- get_db_con()
-    lookup_table <- get_lookup_table(con, type, lookup_version)
+    lookup_table <- get_lookup_table(
+      con, type, lookup_version, col_filters = col_filters
+    )
     result <- dplyr::collect(lookup_table)
 
     if (preferred_description_only) {
@@ -138,7 +146,9 @@ CODES <- function(
 
   con <- get_db_con()
 
-  lookup_table <- get_lookup_table(con, type, lookup_version)
+  lookup_table <- get_lookup_table(
+    con, type, lookup_version, col_filters = col_filters
+  )
 
   result <- lookup_table |>
     dplyr::filter(.data[["code"]] %in% .env$codes_vec) |>
@@ -266,7 +276,8 @@ CODES_LIKE <- function(
   pattern,
   type = getOption("codeminer.code_type"),
   lookup_version = getOption("codeminer.lookup_version", default = "latest"),
-  preferred_description_only = TRUE
+  preferred_description_only = TRUE,
+  col_filters = "default"
 ) {
   check_pattern(pattern)
   check_code_type(type)
@@ -275,7 +286,9 @@ CODES_LIKE <- function(
 
   con <- get_db_con()
 
-  lookup_table <- get_lookup_table(con, type, lookup_version)
+  lookup_table <- get_lookup_table(
+    con, type, lookup_version, col_filters = col_filters
+  )
   like_codes <- dplyr::filter(
     lookup_table,
     stringr::str_detect(.data$code, pattern)
@@ -286,7 +299,8 @@ CODES_LIKE <- function(
     unique(like_codes),
     type = type,
     lookup_version = lookup_version,
-    preferred_description_only = preferred_description_only
+    preferred_description_only = preferred_description_only,
+    col_filters = col_filters
   )
   return(result)
 }
@@ -304,12 +318,22 @@ get_lookup_table <- function(
   con,
   code_type,
   lookup_version,
+  col_filters = "default",
   call = rlang::caller_env()
 ) {
   this_meta <- get_metadata_for_lookup(con, code_type, lookup_version, call)
 
   tbl_name <- this_meta$lookup_table_name
   tbl <- dplyr::tbl(con, tbl_name)
+
+  # Apply col_filters BEFORE column renaming (filter on original column names)
+  resolved <- resolve_col_filters(
+    col_filters,
+    this_meta$col_filters,
+    pin_type = "lookup",
+    pin_key = code_type
+  )
+  tbl <- apply_col_filters(tbl, resolved, tbl_name = tbl_name, call = call)
 
   tbl <- dplyr::select(
     tbl,

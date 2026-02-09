@@ -6,6 +6,14 @@
 #'   codelist with code_type.
 #' @param to Coding system to map codes to.
 #' @param map_version Version of the mapping table to use.
+#' @param col_filters Column filters to apply to the **mapping table**. One of:
+#'   - `"default"` (default): apply session-pinned or metadata-defined default
+#'     filters
+#'   - `NULL`: no filtering (return all rows)
+#'   - A named list of `column_name = c(values)` pairs for explicit filtering
+#'
+#'   Note: this controls filtering of the mapping table, not the target lookup
+#'   table (which uses its own default col_filters).
 #' @inheritParams CODES
 #'
 #' @details If no mapping table matching the `from -> to` direction is found,
@@ -53,7 +61,8 @@ MAP <- function(
   from = getOption("codeminer.map_from"),
   to = getOption("codeminer.map_to"),
   map_version = getOption("codeminer.map_version", default = "latest"),
-  lookup_version = getOption("codeminer.lookup_version", default = "latest")
+  lookup_version = getOption("codeminer.lookup_version", default = "latest"),
+  col_filters = "default"
 ) {
   # Collect and validate input
   collected <- collect_codes_input(
@@ -82,7 +91,9 @@ MAP <- function(
     }
 
     con <- get_db_con()
-    mapping_table <- get_mapping_table(con, from, to, map_version)
+    mapping_table <- get_mapping_table(
+      con, from, to, map_version, col_filters = col_filters
+    )
     return(dplyr::collect(mapping_table))
   }
 
@@ -100,7 +111,9 @@ MAP <- function(
 
   con <- get_db_con()
 
-  mapping_table <- get_mapping_table(con, from, to, map_version)
+  mapping_table <- get_mapping_table(
+    con, from, to, map_version, col_filters = col_filters
+  )
 
   mapping <- dplyr::filter(
     mapping_table,
@@ -136,11 +149,22 @@ get_mapping_table <- function(
   from,
   to,
   map_version,
+  col_filters = "default",
   call = rlang::caller_env()
 ) {
   this_meta <- get_metadata_for_mapping(con, from, to, map_version, call = call)
   tbl_name <- this_meta$mapping_table_name
   tbl <- dplyr::tbl(con, tbl_name)
+
+  # Apply col_filters BEFORE column renaming (filter on original column names)
+  pin_key <- paste(from, ">", to)
+  resolved <- resolve_col_filters(
+    col_filters,
+    this_meta$col_filters,
+    pin_type = "mapping",
+    pin_key = pin_key
+  )
+  tbl <- apply_col_filters(tbl, resolved, tbl_name = tbl_name, call = call)
 
   tbl <- dplyr::rename(tbl, from = this_meta$from_col, to = this_meta$to_col)
   return(tbl)

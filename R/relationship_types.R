@@ -24,7 +24,8 @@ RELATIONSHIP_TYPES_FROM <- function(
   relationship_version = getOption(
     "codeminer.relationship_version",
     default = "latest"
-  )
+  ),
+  col_filters = "default"
 ) {
   # Collect and validate codes input
   collected <- collect_codes_input(..., type = type)
@@ -46,6 +47,18 @@ RELATIONSHIP_TYPES_FROM <- function(
     call = rlang::caller_env()
   )
   rel_table <- dplyr::tbl(con, meta$relationship_table_name)
+
+  # Apply col_filters to relationship table
+  resolved <- resolve_col_filters(
+    col_filters,
+    meta$col_filters,
+    pin_type = "relationship",
+    pin_key = type
+  )
+  rel_table <- apply_col_filters(
+    rel_table, resolved,
+    tbl_name = meta$relationship_table_name
+  )
 
   # Get relationship types where codes are in the 'from' column
   result <- rel_table |>
@@ -98,7 +111,8 @@ RELATIONSHIP_TYPES_TO <- function(
   relationship_version = getOption(
     "codeminer.relationship_version",
     default = "latest"
-  )
+  ),
+  col_filters = "default"
 ) {
   # Collect and validate codes input
   collected <- collect_codes_input(..., type = type)
@@ -120,6 +134,18 @@ RELATIONSHIP_TYPES_TO <- function(
     call = rlang::caller_env()
   )
   rel_table <- dplyr::tbl(con, meta$relationship_table_name)
+
+  # Apply col_filters to relationship table
+  resolved <- resolve_col_filters(
+    col_filters,
+    meta$col_filters,
+    pin_type = "relationship",
+    pin_key = type
+  )
+  rel_table <- apply_col_filters(
+    rel_table, resolved,
+    tbl_name = meta$relationship_table_name
+  )
 
   # Get relationship types where codes are in the 'to' column
   result <- rel_table |>
