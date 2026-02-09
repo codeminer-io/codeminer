@@ -91,7 +91,8 @@ create_example_data <- function() {
     preferred_description_col = NA_character_,
     preferred_description_indicator = NA_character_
   )
-  lookup_metadata <- dplyr::bind_rows(capital_metadata, lower_metadata)
+  lookup_metadata <- dplyr::bind_rows(capital_metadata, lower_metadata) |>
+    dplyr::mutate(col_filters = NA_character_)
 
   # Mapping tables and metadata
   mapping_tables <- list(
@@ -117,7 +118,8 @@ create_example_data <- function() {
     "capital_to_lowercase_v1" , "capital_letters" , "lowercase_letters" , "v1"             , "capital" , "lowercase" , "example_data",
     "capital_to_lowercase_v2" , "capital_letters" , "lowercase_letters" , "v2"             , "capital" , "lowercase" , "example_data",
     "capital_to_lowercase_v3" , "capital_letters" , "lowercase_letters" , "v3"             , "capital" , "lowercase",  "example_data"
-  )
+  ) |>
+    dplyr::mutate(col_filters = NA_character_)
   # nolint end
 
   # Relationship tables and metadata
@@ -169,7 +171,10 @@ create_example_data <- function() {
     "capital_letters_relationship_v2"  , "capital_letters" , "v2"                  , "from"    , "to"    , "type"    , "is a"                          ,
     "capital_letters_relationship_v3"  , "capital_letters" , "v3"                  , "from"    , "to"    , "type"    , "is a"
   ) |>
-    dplyr::mutate(relationship_source = NA_character_)
+    dplyr::mutate(
+      relationship_source = NA_character_,
+      col_filters = NA_character_
+    )
   # nolint end
 
   return(list(
