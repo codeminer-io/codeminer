@@ -343,6 +343,113 @@ validate_col_filters_columns <- function(
   invisible(col_filters)
 }
 
+# --- col_filters resolution and application -----------------------------------
+
+#' Resolve col_filters for a query
+#'
+#' Determines the effective col_filters to apply, following the resolution order:
+#' explicit list > session pin > metadata defaults > NULL (no filtering).
+#'
+#' @param col_filters The col_filters argument from the calling function:
+#'   `"default"` to resolve from pins/metadata, `NULL` for no filtering, or a
+#'   named list for explicit override.
+#' @param metadata_col_filters The serialised JSON col_filters string from
+#'   the metadata table.
+#' @param pin_type Key into `.codeminer_env$active_col_filters` (one of
+#'   "lookup", "mapping", or "relationship").
+#' @param pin_key Key to look up in the pinned col_filters list (e.g.
+#'   code_type or "from > to" mapping key).
+#' @return A named list of `col_name = c(values)` pairs for filtering, or
+#'   `NULL` if no filtering should be applied.
+#' @noRd
+resolve_col_filters <- function(
+  col_filters,
+  metadata_col_filters,
+  pin_type,
+  pin_key
+) {
+  # Explicit NULL → no filtering
+  if (is.null(col_filters)) {
+    return(NULL)
+  }
+
+  # Explicit list → use directly
+  if (is.list(col_filters)) {
+    return(col_filters)
+  }
+
+  # Must be "default" at this point
+  if (!identical(col_filters, "default")) {
+    codeminer_abort(
+      '{.arg col_filters} must be "default", NULL, or a named list.'
+    )
+  }
+
+  # Check session pin first
+  pinned <- .codeminer_env$active_col_filters[[pin_type]][[pin_key]]
+  if (!is.null(pinned)) {
+    return(pinned)
+  }
+
+  # Fall back to metadata defaults
+  full_spec <- deserialise_col_filters(metadata_col_filters)
+  if (is.null(full_spec)) {
+    return(NULL)
+  }
+
+  # Extract just the defaults from each entry
+  defaults <- lapply(full_spec, function(entry) entry$defaults)
+  # Drop entries with empty defaults (no default filtering for that column)
+  defaults <- Filter(function(x) length(x) > 0, defaults)
+
+  if (length(defaults) == 0) {
+    return(NULL)
+  }
+  defaults
+}
+
+#' Apply resolved col_filters to a lazy dplyr table
+#'
+#' For each column name → values pair, applies a `dplyr::filter()` to keep only
+#' rows where the column value is in the specified values.
+#'
+#' @param tbl A lazy dplyr table (from `dplyr::tbl()`).
+#' @param col_filters A named list of `col_name = c(values)` pairs, or `NULL`.
+#' @param tbl_name The table name (for warning messages).
+#' @param call The calling environment for warning messages.
+#' @return The filtered lazy dplyr table.
+#' @noRd
+apply_col_filters <- function(
+  tbl,
+  col_filters,
+  tbl_name = "unknown",
+  call = rlang::caller_env()
+) {
+  if (is.null(col_filters) || length(col_filters) == 0) {
+    return(tbl)
+  }
+
+  tbl_cols <- colnames(tbl)
+
+  for (col_name in names(col_filters)) {
+    if (!col_name %in% tbl_cols) {
+      codeminer_warn(
+        c(
+          "Column {.field {col_name}} not found in table {.field {tbl_name}}.",
+          "i" = "Skipping this col_filter."
+        ),
+        call = call
+      )
+      next
+    }
+
+    values <- col_filters[[col_name]]
+    tbl <- dplyr::filter(tbl, .data[[col_name]] %in% values)
+  }
+
+  tbl
+}
+
 # Helper to read a table from the database as a data.frame
 read_table_from_db <- function(con, tbl_name) {
   DBI::dbReadTable(con, tbl_name)
