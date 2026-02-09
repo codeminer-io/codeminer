@@ -164,6 +164,185 @@ resolve_versioned_metadata <- function(
   return(this_meta)
 }
 
+# --- col_filters serialisation helpers ----------------------------------------
+
+#' Serialise col_filters to JSON
+#'
+#' Converts a named list of column filter specifications to a JSON string for
+#' storage in the database. Validates the structure before serialising.
+#'
+#' @param col_filters A named list where each element is a list with `values`
+#'   (character vector of all valid values) and `defaults` (character vector of
+#'   default values, must be a subset of `values`). `NULL` is allowed and
+#'   returns `NA_character_`.
+#' @param call The calling environment for error messages.
+#' @return A single JSON string, or `NA_character_` if `col_filters` is `NULL`.
+#' @noRd
+serialise_col_filters <- function(col_filters, call = rlang::caller_env()) {
+  if (is.null(col_filters)) {
+    return(NA_character_)
+  }
+
+  validate_col_filters_structure(col_filters, call = call)
+
+  jsonlite::toJSON(col_filters, auto_unbox = FALSE)
+}
+
+#' Deserialise col_filters from JSON
+#'
+#' Converts a JSON string from the database back to a named list of column
+#' filter specifications.
+#'
+#' @param json_string A JSON string, or `NA` / `NULL`.
+#' @return A named list of column filter specs, or `NULL` if input is `NA` /
+#'   `NULL` / empty string.
+#' @noRd
+deserialise_col_filters <- function(json_string) {
+  if (is.null(json_string) || is.na(json_string) || json_string == "") {
+    return(NULL)
+  }
+
+  result <- jsonlite::fromJSON(json_string, simplifyVector = TRUE)
+
+  # jsonlite may return a data.frame or nested list — normalise to named list
+  # of lists with character vectors
+  lapply(result, function(entry) {
+    list(
+      values = as.character(entry$values),
+      defaults = as.character(entry$defaults)
+    )
+  })
+}
+
+#' Validate col_filters structure
+#'
+#' Checks that a col_filters list has the correct structure: a named list where
+#' each element contains `values` and `defaults` character vectors, with
+#' `defaults` being a subset of `values`.
+#'
+#' @param col_filters The col_filters list to validate.
+#' @param call The calling environment for error messages.
+#' @return `col_filters` invisibly if valid.
+#' @noRd
+validate_col_filters_structure <- function(
+  col_filters,
+  call = rlang::caller_env()
+) {
+  if (!is.list(col_filters)) {
+    codeminer_abort(
+      "{.arg col_filters} must be a named list, not {.cls {class(col_filters)}}.",
+      call = call
+    )
+  }
+
+  nms <- names(col_filters)
+  if (is.null(nms) || any(nms == "")) {
+    codeminer_abort(
+      "{.arg col_filters} must be a named list (all elements must have names).",
+      call = call
+    )
+  }
+
+  if (anyDuplicated(nms)) {
+    dups <- nms[duplicated(nms)]
+    codeminer_abort(
+      "Duplicate column names in {.arg col_filters}: {.field {dups}}.",
+      call = call
+    )
+  }
+
+  for (nm in nms) {
+    entry <- col_filters[[nm]]
+
+    if (!is.list(entry) || !all(c("values", "defaults") %in% names(entry))) {
+      codeminer_abort(
+        c(
+          "Each entry in {.arg col_filters} must be a list with {.field values} and {.field defaults}.",
+          "x" = "Entry {.field {nm}} is invalid."
+        ),
+        call = call
+      )
+    }
+
+    values <- as.character(entry$values)
+    defaults <- as.character(entry$defaults)
+
+    if (length(values) == 0) {
+      codeminer_abort(
+        "{.field values} for column {.field {nm}} must not be empty.",
+        call = call
+      )
+    }
+
+    if (anyDuplicated(values)) {
+      dups <- values[duplicated(values)]
+      codeminer_abort(
+        "Duplicate values in {.arg col_filters} for column {.field {nm}}: {.val {dups}}.",
+        call = call
+      )
+    }
+
+    if (anyDuplicated(defaults)) {
+      dups <- defaults[duplicated(defaults)]
+      codeminer_abort(
+        "Duplicate defaults in {.arg col_filters} for column {.field {nm}}: {.val {dups}}.",
+        call = call
+      )
+    }
+
+    bad <- setdiff(defaults, values)
+    if (length(bad) > 0) {
+      codeminer_abort(
+        c(
+          "{.field defaults} must be a subset of {.field values} for column {.field {nm}}.",
+          "x" = "Not found in values: {.val {bad}}."
+        ),
+        call = call
+      )
+    }
+  }
+
+  invisible(col_filters)
+}
+
+#' Validate col_filters column names against a data table
+#'
+#' Checks that all column names referenced in col_filters actually exist in the
+#' given data table.
+#'
+#' @param col_filters A col_filters list (already validated structurally).
+#' @param table_cols Character vector of column names in the data table.
+#' @param table_name Name of the data table (for error messages).
+#' @param call The calling environment for error messages.
+#' @return `col_filters` invisibly if valid.
+#' @noRd
+validate_col_filters_columns <- function(
+  col_filters,
+  table_cols,
+  table_name,
+  call = rlang::caller_env()
+) {
+  if (is.null(col_filters)) {
+    return(invisible(col_filters))
+  }
+
+  filter_cols <- names(col_filters)
+  missing_cols <- setdiff(filter_cols, table_cols)
+
+  if (length(missing_cols) > 0) {
+    codeminer_abort(
+      c(
+        "{.arg col_filters} references columns not found in table {.field {table_name}}.",
+        "x" = "Missing columns: {.field {missing_cols}}.",
+        "i" = "Available columns: {.field {table_cols}}."
+      ),
+      call = call
+    )
+  }
+
+  invisible(col_filters)
+}
+
 # Helper to read a table from the database as a data.frame
 read_table_from_db <- function(con, tbl_name) {
   DBI::dbReadTable(con, tbl_name)
