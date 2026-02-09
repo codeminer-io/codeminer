@@ -111,6 +111,82 @@ remove_mapping_table <- function(from_code_type, to_code_type, map_version) {
   invisible(TRUE)
 }
 
+#' Update mapping table metadata
+#'
+#' Updates metadata fields for an existing mapping table without re-adding the
+#' data. Currently supports updating `col_filters`.
+#'
+#' @param from_code_type The source coding system (e.g. `"Read 3"`).
+#' @param to_code_type The target coding system (e.g. `"ICD-10"`).
+#' @param map_version The version to update. Use `"latest"` (default) to
+#'   update the most recent version.
+#' @inheritParams rlang::args_dots_empty
+#' @param col_filters Column filter specification to set. See
+#'   [mapping_metadata()] for the format. Use `NULL` to clear existing filters.
+#'
+#' @return `TRUE` invisibly if successful.
+#' @export
+#' @family Database management
+#' @seealso [mapping_metadata()], [add_mapping_table()]
+update_mapping_metadata <- function(
+  from_code_type,
+  to_code_type,
+  map_version = "latest",
+  ...,
+  col_filters = NULL
+) {
+  rlang::check_dots_empty()
+
+  con <- connect_to_db(read_only = FALSE)
+  check_database(con)
+
+  # Resolve version
+  meta <- read_table_from_db(con, codeminer_metadata_table_names$mapping)
+  pair_meta <- meta[
+    meta$from_code_type == from_code_type & meta$to_code_type == to_code_type,
+  ]
+  pin_key <- paste(from_code_type, ">", to_code_type)
+  resolved <- resolve_versioned_metadata(
+    pair_meta,
+    code_type_val = from_code_type,
+    version_val = map_version,
+    code_type_col = "from_code_type",
+    version_col = "map_version",
+    pin_type = "mapping",
+    pin_key = pin_key,
+    type_label = "mapping",
+    add_fun_name = "codeminer::add_mapping_table"
+  )
+  table_name <- resolved$mapping_table_name
+
+  # Validate col_filters columns exist in the data table
+  cf_json <- serialise_col_filters(col_filters)
+  if (!is.na(cf_json)) {
+    table_cols <- DBI::dbListFields(con, table_name)
+    validate_col_filters_columns(
+      col_filters,
+      table_cols = table_cols,
+      table_name = table_name
+    )
+  }
+
+  # Update metadata row
+  DBI::dbExecute(
+    con,
+    glue::glue_sql(
+      "UPDATE {`codeminer_metadata_table_names$mapping`}
+       SET col_filters = {cf_json}
+       WHERE mapping_table_name = {table_name}",
+      .con = con
+    )
+  )
+
+  codeminer_inform(c(
+    "v" = "Updated metadata for mapping table {.field {table_name}}."
+  ))
+  invisible(TRUE)
+}
+
 #' Create mapping metadata
 #'
 #' Generate the required metadata for a mapping table. This is mainly used to
