@@ -117,6 +117,74 @@ remove_lookup_table <- function(code_type, lookup_version) {
   invisible(TRUE)
 }
 
+#' Update lookup table metadata
+#'
+#' Updates metadata fields for an existing lookup table without re-adding the
+#' data. Currently supports updating `col_filters`.
+#'
+#' @param code_type The coding system type (e.g. `"SNOMED CT"`).
+#' @param lookup_version The version to update. Use `"latest"` (default) to
+#'   update the most recent version.
+#' @inheritParams rlang::args_dots_empty
+#' @param col_filters Column filter specification to set. See
+#'   [lookup_metadata()] for the format. Use `NULL` to clear existing filters.
+#'
+#' @return `TRUE` invisibly if successful.
+#' @export
+#' @family Database management
+#' @seealso [lookup_metadata()], [add_lookup_table()]
+update_lookup_metadata <- function(
+  code_type,
+  lookup_version = "latest",
+  ...,
+  col_filters = NULL
+) {
+  rlang::check_dots_empty()
+
+  con <- connect_to_db(read_only = FALSE)
+  check_database(con)
+
+  # Resolve version
+  meta <- read_table_from_db(con, codeminer_metadata_table_names$lookup)
+  resolved <- resolve_versioned_metadata(
+    meta,
+    code_type_val = code_type,
+    version_val = lookup_version,
+    version_col = "lookup_version",
+    pin_type = "lookup",
+    type_label = "lookup",
+    add_fun_name = "codeminer::add_lookup_table"
+  )
+  table_name <- resolved$lookup_table_name
+
+  # Validate col_filters columns exist in the data table
+  cf_json <- serialise_col_filters(col_filters)
+  if (!is.na(cf_json)) {
+    table_cols <- DBI::dbListFields(con, table_name)
+    validate_col_filters_columns(
+      col_filters,
+      table_cols = table_cols,
+      table_name = table_name
+    )
+  }
+
+  # Update metadata row
+  DBI::dbExecute(
+    con,
+    glue::glue_sql(
+      "UPDATE {`codeminer_metadata_table_names$lookup`}
+       SET col_filters = {cf_json}
+       WHERE lookup_table_name = {table_name}",
+      .con = con
+    )
+  )
+
+  codeminer_inform(c(
+    "v" = "Updated metadata for lookup table {.field {table_name}}."
+  ))
+  invisible(TRUE)
+}
+
 #' Create lookup metadata
 #'
 #' Generate the required metadata for a lookup table. This is mainly used to
@@ -135,6 +203,23 @@ remove_lookup_table <- function(code_type, lookup_version) {
 #' @param preferred_description_indicator The value in the
 #'   `preferred_description_col` column that indicates the preferred description
 #'   (default: `NA_character_`)
+#' @param col_filters Optional column filter specification. A named list where
+#'   each element is a list with `values` (all valid values) and `defaults`
+#'   (default filter values). See **Details** for the format. `NULL` (default)
+#'   means no column filters.
+#'
+#' @details
+#' The `col_filters` argument specifies which columns in the lookup table are
+#' filterable and what the default filter values are. The format is:
+#'
+#' ```
+#' list(
+#'   column_name = list(values = c("val1", "val2"), defaults = c("val1"))
+#' )
+#' ```
+#'
+#' When `col_filters` is set, query functions like [CODES()] will automatically
+#' filter the lookup table to only include rows matching the default values.
 #'
 #' @return A list containing the lookup metadata
 #'
@@ -146,11 +231,13 @@ lookup_metadata <- function(
   code_type,
   lookup_version = "v0",
   ...,
+
   lookup_code_col = "code",
   lookup_description_col = "description",
   lookup_source = NA_character_,
   preferred_description_col = NA_character_,
-  preferred_description_indicator = NA_character_
+  preferred_description_indicator = NA_character_,
+  col_filters = NULL
 ) {
   rlang::check_dots_empty()
 
@@ -173,7 +260,8 @@ lookup_metadata <- function(
     lookup_description_col = lookup_description_col,
     lookup_source = lookup_source,
     preferred_description_col = preferred_description_col,
-    preferred_description_indicator = preferred_description_indicator
+    preferred_description_indicator = preferred_description_indicator,
+    col_filters = serialise_col_filters(col_filters)
   ))
 }
 
@@ -224,6 +312,15 @@ validate_lookup_metadata <- function(
       call = call
     )
   }
+
+  # Validate col_filters column names exist in the data table
+  cf <- deserialise_col_filters(metadata$col_filters)
+  validate_col_filters_columns(
+    cf,
+    table_cols = names(table),
+    table_name = metadata$lookup_table_name,
+    call = call
+  )
 
   return(invisible(metadata))
 }

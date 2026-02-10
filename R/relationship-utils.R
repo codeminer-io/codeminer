@@ -173,6 +173,7 @@ graph_closure_codes <- function(
   include_self = TRUE,
   max_depth = Inf,
   empty_warning = "No valid codes found.",
+  col_filters = "default",
   call = rlang::caller_env()
 ) {
   check_code_type(code_type, call = call)
@@ -185,6 +186,20 @@ graph_closure_codes <- function(
     call = call
   )
   rel_table <- dplyr::tbl(con, meta$relationship_table_name)
+
+  # Apply col_filters to relationship table before traversal
+  resolved <- resolve_col_filters(
+    col_filters,
+    meta$col_filters,
+    pin_type = "relationship",
+    pin_key = code_type
+  )
+  rel_table <- apply_col_filters(
+    rel_table,
+    resolved,
+    tbl_name = meta$relationship_table_name,
+    call = call
+  )
 
   # Resolve rel_type if it's a from_meta reference
 
@@ -245,7 +260,8 @@ graph_closure_codes <- function(
     result_codes,
     type = code_type,
     lookup_version = lookup_version,
-    preferred_description_only = preferred_description_only
+    preferred_description_only = preferred_description_only,
+    col_filters = col_filters
   )
 
   return(result)

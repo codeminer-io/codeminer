@@ -13,7 +13,8 @@ CHILDREN(
   type = getOption("codeminer.code_type"),
   lookup_version = getOption("codeminer.lookup_version", default = "latest"),
   relationship_version = getOption("codeminer.relationship_version", default = "latest"),
-  preferred_description_only = TRUE
+  preferred_description_only = TRUE,
+  col_filters = "default"
 )
 
 PARENTS(
@@ -21,7 +22,8 @@ PARENTS(
   type = getOption("codeminer.code_type"),
   lookup_version = getOption("codeminer.lookup_version", default = "latest"),
   relationship_version = getOption("codeminer.relationship_version", default = "latest"),
-  preferred_description_only = TRUE
+  preferred_description_only = TRUE,
+  col_filters = "default"
 )
 
 N_CHILDREN(
@@ -31,6 +33,7 @@ N_CHILDREN(
   lookup_version = getOption("codeminer.lookup_version", default = "latest"),
   relationship_version = getOption("codeminer.relationship_version", default = "latest"),
   preferred_description_only = TRUE,
+  col_filters = "default",
   call = rlang::caller_env()
 )
 
@@ -41,6 +44,7 @@ N_PARENTS(
   lookup_version = getOption("codeminer.lookup_version", default = "latest"),
   relationship_version = getOption("codeminer.relationship_version", default = "latest"),
   preferred_description_only = TRUE,
+  col_filters = "default",
   call = rlang::caller_env()
 )
 }
@@ -55,6 +59,8 @@ N_PARENTS(
 
 \item{preferred_description_only}{Logical. If \code{TRUE}, return only preferred
 descriptions.}
+
+\item{col_filters}{Column filters to apply. See \code{\link[=CODES]{CODES()}} for details.}
 
 \item{depth}{Integer. Maximum number of steps to traverse. Use \code{Inf} for
 transitive closure (all ancestors/descendants). Only used by \code{N_PARENTS()}

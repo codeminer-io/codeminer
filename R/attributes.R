@@ -30,7 +30,8 @@ ATTRIBUTES_FOR <- function(
     default = "latest"
   ),
   relationship_types = NULL,
-  preferred_description_only = TRUE
+  preferred_description_only = TRUE,
+  col_filters = "default"
 ) {
   check_version(lookup_version)
   check_version(relationship_version)
@@ -60,7 +61,8 @@ ATTRIBUTES_FOR <- function(
     rel_type = relationship_types,
     include_self = FALSE,
     max_depth = 1,
-    empty_warning = "No codes found with the specified attributes."
+    empty_warning = "No codes found with the specified attributes.",
+    col_filters = col_filters
   )
 }
 
@@ -75,7 +77,8 @@ HAS_ATTRIBUTES <- function(
     default = "latest"
   ),
   relationship_types = NULL,
-  preferred_description_only = TRUE
+  preferred_description_only = TRUE,
+  col_filters = "default"
 ) {
   check_version(lookup_version)
   check_version(relationship_version)
@@ -105,6 +108,7 @@ HAS_ATTRIBUTES <- function(
     rel_type = relationship_types,
     include_self = FALSE,
     max_depth = 1,
-    empty_warning = "No codes found with the specified attributes."
+    empty_warning = "No codes found with the specified attributes.",
+    col_filters = col_filters
   )
 }

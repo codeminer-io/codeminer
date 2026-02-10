@@ -16,6 +16,7 @@
 #' @param relationship_version Relationship table version (character).
 #' @param preferred_description_only Logical. If `TRUE`, return only preferred
 #'   descriptions.
+#' @param col_filters Column filters to apply. See [CODES()] for details.
 #' @param call **For internal use only.** The execution environment of a
 #'   currently running function. Used for error reporting. Users should not
 #'   need to set this parameter.
@@ -41,7 +42,8 @@ CHILDREN <- function(
     "codeminer.relationship_version",
     default = "latest"
   ),
-  preferred_description_only = TRUE
+  preferred_description_only = TRUE,
+  col_filters = "default"
 ) {
   N_CHILDREN(
     ...,
@@ -50,6 +52,7 @@ CHILDREN <- function(
     lookup_version = lookup_version,
     relationship_version = relationship_version,
     preferred_description_only = preferred_description_only,
+    col_filters = col_filters,
     call = rlang::caller_env()
   )
 }
@@ -64,7 +67,8 @@ PARENTS <- function(
     "codeminer.relationship_version",
     default = "latest"
   ),
-  preferred_description_only = TRUE
+  preferred_description_only = TRUE,
+  col_filters = "default"
 ) {
   N_PARENTS(
     ...,
@@ -73,6 +77,7 @@ PARENTS <- function(
     lookup_version = lookup_version,
     relationship_version = relationship_version,
     preferred_description_only = preferred_description_only,
+    col_filters = col_filters,
     call = rlang::caller_env()
   )
 }
@@ -89,6 +94,7 @@ N_CHILDREN <- function(
     default = "latest"
   ),
   preferred_description_only = TRUE,
+  col_filters = "default",
   call = rlang::caller_env()
 ) {
   check_depth(depth)
@@ -115,7 +121,8 @@ N_CHILDREN <- function(
     rel_type = from_meta("child_parent_relationship_code"),
     include_self = TRUE,
     max_depth = depth,
-    empty_warning = "No valid child codes found."
+    empty_warning = "No valid child codes found.",
+    col_filters = col_filters
   )
 }
 
@@ -131,6 +138,7 @@ N_PARENTS <- function(
     default = "latest"
   ),
   preferred_description_only = TRUE,
+  col_filters = "default",
   call = rlang::caller_env()
 ) {
   check_depth(depth)
@@ -157,6 +165,7 @@ N_PARENTS <- function(
     rel_type = from_meta("child_parent_relationship_code"),
     include_self = TRUE,
     max_depth = depth,
-    empty_warning = "No valid parent codes found."
+    empty_warning = "No valid parent codes found.",
+    col_filters = col_filters
   )
 }

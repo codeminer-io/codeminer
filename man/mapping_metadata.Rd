@@ -11,7 +11,8 @@ mapping_metadata(
   ...,
   from_col = "from",
   to_col = "to",
-  map_source = NA_character_
+  map_source = NA_character_,
+  col_filters = NULL
 )
 }
 \arguments{
@@ -31,6 +32,10 @@ ICD-10, SNOMED-CT)}
 
 \item{map_source}{The source of the lookup metadata (default:
 \code{NA_character_})}
+
+\item{col_filters}{Optional column filter specification. A named list where
+each element is a list with \code{values} (all valid values) and \code{defaults}
+(default filter values). \code{NULL} (default) means no column filters.}
 }
 \value{
 A list containing the mapping metadata

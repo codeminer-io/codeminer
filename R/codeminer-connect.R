@@ -104,7 +104,13 @@ codeminer_disconnect <- function() {
   ) {
     DBI::dbDisconnect(.codeminer_env$con, shutdown = TRUE)
   }
-  for (field in c("con", "db_paths", "metadata", "active_versions")) {
+  for (field in c(
+    "con",
+    "db_paths",
+    "metadata",
+    "active_versions",
+    "active_col_filters"
+  )) {
     if (exists(field, envir = .codeminer_env)) {
       rm(list = field, envir = .codeminer_env)
     }
@@ -145,6 +151,31 @@ codeminer_status <- function() {
         msgs <- c(
           msgs,
           " " = "  {type}: {.val {key}} = {.val {pins[[type]][[key]]}}"
+        )
+      }
+    }
+  }
+
+  # Show pinned col_filters if any
+  cf_pins <- .codeminer_env$active_col_filters
+  if (length(cf_pins) > 0) {
+    msgs <- c(msgs, "i" = "Pinned column filters:")
+    for (type in names(cf_pins)) {
+      for (key in names(cf_pins[[type]])) {
+        filter_desc <- paste(
+          vapply(
+            names(cf_pins[[type]][[key]]),
+            function(col) {
+              vals <- cf_pins[[type]][[key]][[col]]
+              paste0(col, " = [", paste(vals, collapse = ", "), "]")
+            },
+            character(1)
+          ),
+          collapse = "; "
+        )
+        msgs <- c(
+          msgs,
+          " " = "  {type}: {.val {key}} -> {filter_desc}"
         )
       }
     }
@@ -366,6 +397,150 @@ codeminer_clear_versions <- function() {
 }
 
 
+#' Pin column filters for the session
+#'
+#' Overrides the default column filters defined in table metadata. Pinned
+#' filters persist until cleared with [codeminer_clear_col_filters()] or
+#' [codeminer_disconnect()].
+#'
+#' @param lookup Named list of column filters for lookup tables, keyed by
+#'   code type. Each value is a named list of `column_name = c(values)` pairs.
+#'   E.g. `list("SNOMED CT" = list(active_concept = c("1")))`.
+#' @param relationship Named list of column filters for relationship tables,
+#'   keyed by code type.
+#' @param mapping Named list of column filters for mapping tables, keyed by
+#'   `"from > to"` pairs.
+#'   E.g. `list("Read 3 > ICD-10" = list(mapping_status = c("E", "G")))`.
+#'
+#' @details
+#' Pinned filters only affect `col_filters = "default"` resolution. Explicit
+#' `col_filters` arguments on query functions always take precedence.
+#'
+#' New pins are merged with existing ones. To replace all pins, call
+#' [codeminer_clear_col_filters()] first.
+#'
+#' @return The current pinned col_filters (a list), invisibly.
+#' @export
+#' @family Workbench management
+#' @seealso [with_col_filters()], [codeminer_clear_col_filters()]
+#' @examples
+#' \dontrun{
+#' # Pin lookup filters — only return active SNOMED concepts
+#' codeminer_set_col_filters(
+#'   lookup = list("SNOMED CT" = list(active_concept = c("1")))
+#' )
+#'
+#' # Pin mapping filters
+#' codeminer_set_col_filters(
+#'   mapping = list("Read 3 > ICD-10" = list(mapping_status = c("E", "G")))
+#' )
+#'
+#' # Clear all filter pins
+#' codeminer_clear_col_filters()
+#' }
+codeminer_set_col_filters <- function(
+  lookup = NULL,
+  relationship = NULL,
+  mapping = NULL
+) {
+  if (is.null(lookup) && is.null(relationship) && is.null(mapping)) {
+    codeminer_abort(
+      "At least one of {.arg lookup}, {.arg relationship}, or {.arg mapping} must be provided."
+    )
+  }
+
+  # Initialise if needed
+  if (is.null(.codeminer_env$active_col_filters)) {
+    .codeminer_env$active_col_filters <- list()
+  }
+
+  # Validate and merge each type
+  if (!is.null(lookup)) {
+    validate_col_filter_pins(lookup, "lookup")
+    .codeminer_env$active_col_filters$lookup <- merge_col_filter_pins(
+      .codeminer_env$active_col_filters$lookup,
+      lookup
+    )
+  }
+  if (!is.null(relationship)) {
+    validate_col_filter_pins(relationship, "relationship")
+    .codeminer_env$active_col_filters$relationship <- merge_col_filter_pins(
+      .codeminer_env$active_col_filters$relationship,
+      relationship
+    )
+  }
+  if (!is.null(mapping)) {
+    validate_col_filter_pins(mapping, "mapping")
+    .codeminer_env$active_col_filters$mapping <- merge_col_filter_pins(
+      .codeminer_env$active_col_filters$mapping,
+      mapping
+    )
+  }
+
+  invisible(.codeminer_env$active_col_filters)
+}
+
+#' Clear all pinned column filters
+#'
+#' Removes all column filter pins set by [codeminer_set_col_filters()],
+#' returning to the metadata-defined defaults.
+#'
+#' @return `NULL`, invisibly.
+#' @export
+#' @family Workbench management
+codeminer_clear_col_filters <- function() {
+  .codeminer_env$active_col_filters <- list()
+  invisible()
+}
+
+#' Temporarily override column filters
+#'
+#' Sets column filter pins for the duration of the supplied code block,
+#' then restores the previous state. This is useful when you need different
+#' filters for a group of calls without permanently changing session state.
+#'
+#' @inheritParams codeminer_set_col_filters
+#' @param code Code to execute with the temporary filters.
+#'
+#' @return The result of evaluating `code`.
+#' @export
+#' @family Workbench management
+#' @seealso [codeminer_set_col_filters()]
+#' @examples
+#' \dontrun{
+#' # Temporarily include inactive SNOMED concepts
+#' with_col_filters(
+#'   {
+#'     CODES("all", type = "SNOMED CT")
+#'   },
+#'   lookup = list("SNOMED CT" = list(active_concept = c("0", "1")))
+#' )
+#' }
+with_col_filters <- function(
+  code,
+  lookup = NULL,
+  relationship = NULL,
+  mapping = NULL
+) {
+  # Save current state
+  old_filters <- .codeminer_env$active_col_filters
+
+  # Restore on exit (even if code errors)
+  on.exit(.codeminer_env$active_col_filters <- old_filters, add = TRUE)
+
+  # Apply temporary pins (merge with existing)
+  if (!is.null(lookup) || !is.null(relationship) || !is.null(mapping)) {
+    codeminer_set_col_filters(
+      lookup = lookup,
+      relationship = relationship,
+      mapping = mapping
+    )
+  }
+
+  force(code)
+}
+
+
 # Internal helpers --------------------------------------------------------
 
 #' Set the DuckDB search path based on attached databases
@@ -490,6 +665,50 @@ merge_pins <- function(existing, new_pins) {
     return(new_pins)
   }
   # New pins overwrite existing ones with the same name
+  existing[names(new_pins)] <- new_pins
+  existing
+}
+
+#' Validate col_filter pin structure
+#' @noRd
+validate_col_filter_pins <- function(
+  pins,
+  type,
+  call = rlang::caller_env()
+) {
+  if (!is.list(pins) || !rlang::is_named(pins)) {
+    codeminer_abort(
+      "{.arg {type}} must be a named list.",
+      call = call
+    )
+  }
+
+  for (key in names(pins)) {
+    filters <- pins[[key]]
+    if (!is.list(filters) || !rlang::is_named(filters)) {
+      codeminer_abort(
+        "Column filters for {.val {key}} must be a named list of {.code column = c(values)} pairs.",
+        call = call
+      )
+    }
+    for (col in names(filters)) {
+      if (!is.character(filters[[col]])) {
+        codeminer_abort(
+          "Filter values for column {.val {col}} in {.val {key}} must be a character vector.",
+          call = call
+        )
+      }
+    }
+  }
+  invisible()
+}
+
+#' Merge col_filter pins (new pins overwrite existing by key)
+#' @noRd
+merge_col_filter_pins <- function(existing, new_pins) {
+  if (is.null(existing)) {
+    return(new_pins)
+  }
   existing[names(new_pins)] <- new_pins
   existing
 }

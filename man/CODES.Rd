@@ -9,14 +9,16 @@ CODES(
   ...,
   type = getOption("codeminer.code_type"),
   lookup_version = getOption("codeminer.lookup_version", default = "latest"),
-  preferred_description_only = TRUE
+  preferred_description_only = TRUE,
+  col_filters = "default"
 )
 
 CODES_LIKE(
   pattern,
   type = getOption("codeminer.code_type"),
   lookup_version = getOption("codeminer.lookup_version", default = "latest"),
-  preferred_description_only = TRUE
+  preferred_description_only = TRUE,
+  col_filters = "default"
 )
 }
 \arguments{
@@ -45,6 +47,14 @@ option.}
 
 \item{preferred_description_only}{logical. If \code{TRUE}, only returns the
 preferred description for each code. Default: \code{FALSE}.}
+
+\item{col_filters}{Column filters to apply. One of:
+\itemize{
+\item \code{"default"} (default): apply session-pinned or metadata-defined default
+filters
+\item \code{NULL}: no filtering (return all rows)
+\item A named list of \code{column_name = c(values)} pairs for explicit filtering
+}}
 
 \item{pattern}{a regular expression to search for}
 }
@@ -91,7 +101,6 @@ CODES_LIKE("^E1", type = "ICD-10")
 \code{\link[=add_lookup_table]{add_lookup_table()}} for adding new lookup tables to the database.
 
 Other Clinical code lookups and mappings: 
-\code{\link{MAP}()},
-\code{\link{default_col_filters}()}
+\code{\link{MAP}()}
 }
 \concept{Clinical code lookups and mappings}

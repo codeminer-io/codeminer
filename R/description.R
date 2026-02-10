@@ -8,6 +8,7 @@
 #' @param ignore_case If `TRUE` (default), ignore case in `description`.
 #' @param preferred_description_only `logical`. If `TRUE` (default), return only
 #'   preferred descriptions.
+#' @param col_filters Column filters to apply. See [CODES()] for details.
 #' @inheritParams CODES
 #'
 #' @return A `codeminer_codelist` with codes that match the description.
@@ -24,7 +25,8 @@ DESCRIPTION <- function(
   type = getOption("codeminer.code_type"),
   lookup_version = getOption("codeminer.lookup_version", default = "latest"),
   ignore_case = TRUE,
-  preferred_description_only = TRUE
+  preferred_description_only = TRUE,
+  col_filters = "default"
 ) {
   check_pattern(pattern)
   check_code_type(type)
@@ -36,7 +38,8 @@ DESCRIPTION <- function(
   lkp_table <- get_lookup_table(
     con,
     code_type = type,
-    lookup_version = lookup_version
+    lookup_version = lookup_version,
+    col_filters = col_filters
   )
   code_col <- "code"
   description_col <- "description"
@@ -69,7 +72,8 @@ DESCRIPTION <- function(
     codes,
     type = type,
     lookup_version = lookup_version,
-    preferred_description_only = preferred_description_only
+    preferred_description_only = preferred_description_only,
+    col_filters = col_filters
   )
 
   return(result)

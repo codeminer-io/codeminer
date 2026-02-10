@@ -9,7 +9,8 @@ DESCRIPTION(
   type = getOption("codeminer.code_type"),
   lookup_version = getOption("codeminer.lookup_version", default = "latest"),
   ignore_case = TRUE,
-  preferred_description_only = TRUE
+  preferred_description_only = TRUE,
+  col_filters = "default"
 )
 }
 \arguments{
@@ -30,6 +31,8 @@ option.}
 
 \item{preferred_description_only}{\code{logical}. If \code{TRUE} (default), return only
 preferred descriptions.}
+
+\item{col_filters}{Column filters to apply. See \code{\link[=CODES]{CODES()}} for details.}
 }
 \value{
 A \code{codeminer_codelist} with codes that match the description.

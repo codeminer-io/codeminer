@@ -47,6 +47,11 @@ build_database <- function(overwrite = FALSE) {
   create_mapping_metadata_table(con, overwrite = overwrite)
   create_relationship_metadata_table(con, overwrite = overwrite)
 
+  # Migrate existing metadata tables to add any new columns (e.g. col_filters)
+  if (db_exists && !overwrite) {
+    migrate_metadata_schema(con)
+  }
+
   invisible(TRUE)
 }
 
@@ -156,7 +161,8 @@ required_lookup_metadata_columns <- function() {
     "lookup_description_col",
     "lookup_source",
     "preferred_description_col",
-    "preferred_description_indicator"
+    "preferred_description_indicator",
+    "col_filters"
   )
 }
 
@@ -167,7 +173,8 @@ required_mapping_metadata_columns <- function() {
     "map_version",
     "from_col",
     "to_col",
-    "map_source"
+    "map_source",
+    "col_filters"
   )
 }
 
@@ -183,8 +190,51 @@ required_relationship_metadata_columns <- function() {
     "to_col",
     "type_col",
     "child_parent_relationship_code", # Code for child -> parent relationship (e.g. SNOMED 'is a')
-    "relationship_source"
+    "relationship_source",
+    "col_filters"
   )
+}
+
+# Migrate metadata tables to add any missing columns.
+# Called during `build_database()` when the database already exists and
+# `overwrite = FALSE`, so that older databases gain new columns (e.g.
+# col_filters) without requiring a full rebuild.
+migrate_metadata_schema <- function(con) {
+  meta_tables <- list(
+    list(
+      tbl = codeminer_metadata_table_names$lookup,
+      required = required_lookup_metadata_columns()
+    ),
+    list(
+      tbl = codeminer_metadata_table_names$mapping,
+      required = required_mapping_metadata_columns()
+    ),
+    list(
+      tbl = codeminer_metadata_table_names$relationship,
+      required = required_relationship_metadata_columns()
+    )
+  )
+
+  for (entry in meta_tables) {
+    if (!table_exists(con, entry$tbl)) {
+      next
+    }
+
+    existing_cols <- DBI::dbListFields(con, entry$tbl)
+    missing_cols <- setdiff(entry$required, existing_cols)
+
+    for (col in missing_cols) {
+      DBI::dbExecute(
+        con,
+        glue::glue_sql(
+          "ALTER TABLE {`entry$tbl`} ADD COLUMN {`col`} VARCHAR",
+          .con = con
+        )
+      )
+    }
+  }
+
+  invisible(TRUE)
 }
 
 # Connect to the database.

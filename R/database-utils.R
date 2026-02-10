@@ -164,6 +164,376 @@ resolve_versioned_metadata <- function(
   return(this_meta)
 }
 
+# --- col_filters serialisation helpers ----------------------------------------
+
+#' Serialise col_filters to JSON
+#'
+#' Converts a named list of column filter specifications to a JSON string for
+#' storage in the database. Validates the structure before serialising.
+#'
+#' @param col_filters A named list where each element is a list with `values`
+#'   (character vector of all valid values) and `defaults` (character vector of
+#'   default values, must be a subset of `values`). `NULL` is allowed and
+#'   returns `NA_character_`.
+#' @param call The calling environment for error messages.
+#' @return A single JSON string, or `NA_character_` if `col_filters` is `NULL`.
+#' @noRd
+serialise_col_filters <- function(col_filters, call = rlang::caller_env()) {
+  if (is.null(col_filters)) {
+    return(NA_character_)
+  }
+
+  validate_col_filters_structure(col_filters, call = call)
+
+  jsonlite::toJSON(col_filters, auto_unbox = FALSE)
+}
+
+#' Deserialise col_filters from JSON
+#'
+#' Converts a JSON string from the database back to a named list of column
+#' filter specifications.
+#'
+#' @param json_string A JSON string, or `NA` / `NULL`.
+#' @return A named list of column filter specs, or `NULL` if input is `NA` /
+#'   `NULL` / empty string.
+#' @noRd
+deserialise_col_filters <- function(json_string) {
+  if (is.null(json_string) || is.na(json_string) || json_string == "") {
+    return(NULL)
+  }
+
+  result <- jsonlite::fromJSON(json_string, simplifyVector = TRUE)
+
+  # jsonlite may return a data.frame or nested list — normalise to named list
+  # of lists with character vectors
+  lapply(result, function(entry) {
+    list(
+      values = as.character(entry$values),
+      defaults = as.character(entry$defaults)
+    )
+  })
+}
+
+#' Validate col_filters structure
+#'
+#' Checks that a col_filters list has the correct structure: a named list where
+#' each element contains `values` and `defaults` character vectors, with
+#' `defaults` being a subset of `values`.
+#'
+#' @param col_filters The col_filters list to validate.
+#' @param call The calling environment for error messages.
+#' @return `col_filters` invisibly if valid.
+#' @noRd
+validate_col_filters_structure <- function(
+  col_filters,
+  call = rlang::caller_env()
+) {
+  if (!is.list(col_filters)) {
+    codeminer_abort(
+      "{.arg col_filters} must be a named list, not {.cls {class(col_filters)}}.",
+      call = call
+    )
+  }
+
+  nms <- names(col_filters)
+  if (is.null(nms) || any(nms == "")) {
+    codeminer_abort(
+      "{.arg col_filters} must be a named list (all elements must have names).",
+      call = call
+    )
+  }
+
+  if (anyDuplicated(nms)) {
+    dups <- nms[duplicated(nms)]
+    codeminer_abort(
+      "Duplicate column names in {.arg col_filters}: {.field {dups}}.",
+      call = call
+    )
+  }
+
+  for (nm in nms) {
+    entry <- col_filters[[nm]]
+
+    if (!is.list(entry) || !all(c("values", "defaults") %in% names(entry))) {
+      codeminer_abort(
+        c(
+          "Each entry in {.arg col_filters} must be a list with {.field values} and {.field defaults}.",
+          "x" = "Entry {.field {nm}} is invalid."
+        ),
+        call = call
+      )
+    }
+
+    values <- as.character(entry$values)
+    defaults <- as.character(entry$defaults)
+
+    if (length(values) == 0) {
+      codeminer_abort(
+        "{.field values} for column {.field {nm}} must not be empty.",
+        call = call
+      )
+    }
+
+    if (anyDuplicated(values)) {
+      dups <- values[duplicated(values)]
+      codeminer_abort(
+        "Duplicate values in {.arg col_filters} for column {.field {nm}}: {.val {dups}}.",
+        call = call
+      )
+    }
+
+    if (anyDuplicated(defaults)) {
+      dups <- defaults[duplicated(defaults)]
+      codeminer_abort(
+        "Duplicate defaults in {.arg col_filters} for column {.field {nm}}: {.val {dups}}.",
+        call = call
+      )
+    }
+
+    bad <- setdiff(defaults, values)
+    if (length(bad) > 0) {
+      codeminer_abort(
+        c(
+          "{.field defaults} must be a subset of {.field values} for column {.field {nm}}.",
+          "x" = "Not found in values: {.val {bad}}."
+        ),
+        call = call
+      )
+    }
+  }
+
+  invisible(col_filters)
+}
+
+#' Validate col_filters column names against a data table
+#'
+#' Checks that all column names referenced in col_filters actually exist in the
+#' given data table.
+#'
+#' @param col_filters A col_filters list (already validated structurally).
+#' @param table_cols Character vector of column names in the data table.
+#' @param table_name Name of the data table (for error messages).
+#' @param call The calling environment for error messages.
+#' @return `col_filters` invisibly if valid.
+#' @noRd
+validate_col_filters_columns <- function(
+  col_filters,
+  table_cols,
+  table_name,
+  call = rlang::caller_env()
+) {
+  if (is.null(col_filters)) {
+    return(invisible(col_filters))
+  }
+
+  filter_cols <- names(col_filters)
+  missing_cols <- setdiff(filter_cols, table_cols)
+
+  if (length(missing_cols) > 0) {
+    codeminer_abort(
+      c(
+        "{.arg col_filters} references columns not found in table {.field {table_name}}.",
+        "x" = "Missing columns: {.field {missing_cols}}.",
+        "i" = "Available columns: {.field {table_cols}}."
+      ),
+      call = call
+    )
+  }
+
+  invisible(col_filters)
+}
+
+# --- col_filters resolution and application -----------------------------------
+
+#' Resolve col_filters for a query
+#'
+#' Determines the effective col_filters to apply, following the resolution order:
+#' explicit list > session pin > metadata defaults > NULL (no filtering).
+#'
+#' @param col_filters The col_filters argument from the calling function:
+#'   `"default"` to resolve from pins/metadata, `NULL` for no filtering, or a
+#'   named list for explicit override.
+#' @param metadata_col_filters The serialised JSON col_filters string from
+#'   the metadata table.
+#' @param pin_type Key into `.codeminer_env$active_col_filters` (one of
+#'   "lookup", "mapping", or "relationship").
+#' @param pin_key Key to look up in the pinned col_filters list (e.g.
+#'   code_type or "from > to" mapping key).
+#' @return A named list of `col_name = c(values)` pairs for filtering, or
+#'   `NULL` if no filtering should be applied.
+#' @noRd
+resolve_col_filters <- function(
+  col_filters,
+  metadata_col_filters,
+  pin_type,
+  pin_key
+) {
+  # Explicit NULL → no filtering
+  if (is.null(col_filters)) {
+    return(NULL)
+  }
+
+  # Explicit list → use directly
+  if (is.list(col_filters)) {
+    return(col_filters)
+  }
+
+  # Must be "default" at this point
+  if (!identical(col_filters, "default")) {
+    codeminer_abort(
+      '{.arg col_filters} must be "default", NULL, or a named list.'
+    )
+  }
+
+  # Check session pin first
+  pinned <- .codeminer_env$active_col_filters[[pin_type]][[pin_key]]
+  if (!is.null(pinned)) {
+    return(pinned)
+  }
+
+  # Fall back to metadata defaults
+  full_spec <- deserialise_col_filters(metadata_col_filters)
+  if (is.null(full_spec)) {
+    return(NULL)
+  }
+
+  # Extract just the defaults from each entry
+  defaults <- lapply(full_spec, function(entry) entry$defaults)
+  # Drop entries with empty defaults (no default filtering for that column)
+  defaults <- Filter(function(x) length(x) > 0, defaults)
+
+  if (length(defaults) == 0) {
+    return(NULL)
+  }
+  defaults
+}
+
+#' Apply resolved col_filters to a lazy dplyr table
+#'
+#' For each column name → values pair, applies a `dplyr::filter()` to keep only
+#' rows where the column value is in the specified values.
+#'
+#' @param tbl A lazy dplyr table (from `dplyr::tbl()`).
+#' @param col_filters A named list of `col_name = c(values)` pairs, or `NULL`.
+#' @param tbl_name The table name (for warning messages).
+#' @param call The calling environment for warning messages.
+#' @return The filtered lazy dplyr table.
+#' @noRd
+apply_col_filters <- function(
+  tbl,
+  col_filters,
+  tbl_name = "unknown",
+  call = rlang::caller_env()
+) {
+  if (is.null(col_filters) || length(col_filters) == 0) {
+    return(tbl)
+  }
+
+  tbl_cols <- colnames(tbl)
+
+  for (col_name in names(col_filters)) {
+    if (!col_name %in% tbl_cols) {
+      codeminer_warn(
+        c(
+          "Column {.field {col_name}} not found in table {.field {tbl_name}}.",
+          "i" = "Skipping this col_filter."
+        ),
+        call = call
+      )
+      next
+    }
+
+    values <- col_filters[[col_name]]
+    tbl <- dplyr::filter(tbl, .data[[col_name]] %in% values)
+  }
+
+  tbl
+}
+
+#' Extract column filters from database metadata
+#'
+#' Reads `col_filters` from all metadata tables in the connected database.
+#' Returns a nested list keyed by table type and table key (code type or
+#' mapping pair).
+#'
+#' @param defaults_only Logical. If `TRUE` (default), return only the default
+#'   filter values. If `FALSE`, return the full specification including all
+#'   available values (useful for Shiny UI checkboxes).
+#'
+#' @return A named list with entries for `lookup`, `mapping`, and
+#'   `relationship`. Each entry is a named list keyed by code type (or
+#'   `"from > to"` for mappings), containing either:
+#'   - If `defaults_only = TRUE`: a flat `list(col = c(default_values))`
+#'   - If `defaults_only = FALSE`: a full `list(col = list(values = ..., defaults = ...))`
+#'
+#'   Returns an empty list if no database is connected.
+#' @export
+#' @family Workbench management
+get_col_filters <- function(defaults_only = TRUE) {
+  check_logical_scalar(defaults_only, "defaults_only")
+
+  result <- list()
+
+  # Safely access metadata — return empty list if no connection
+  tryCatch(
+    {
+      for (type in c("lookup", "mapping", "relationship")) {
+        meta <- .codeminer_env$metadata[[type]]
+        if (is.null(meta) || nrow(meta) == 0) {
+          next
+        }
+
+        # Determine the key column(s) for each type
+        key_fn <- switch(
+          type,
+          lookup = function(row) row$code_type,
+          mapping = function(row) {
+            paste(row$from_code_type, ">", row$to_code_type)
+          },
+          relationship = function(row) row$code_type
+        )
+
+        type_result <- list()
+        for (i in seq_len(nrow(meta))) {
+          row <- meta[i, ]
+          cf <- deserialise_col_filters(row$col_filters)
+          if (is.null(cf)) {
+            next
+          }
+
+          key <- key_fn(row)
+          if (defaults_only) {
+            type_result[[key]] <- lapply(cf, function(entry) entry$defaults)
+          } else {
+            type_result[[key]] <- cf
+          }
+        }
+
+        if (length(type_result) > 0) {
+          result[[type]] <- type_result
+        }
+      }
+    },
+    error = function(e) {
+      # No database connected — return empty list
+    }
+  )
+
+  result
+}
+
+#' Default column filters
+#'
+#' Returns the default filtering parameters for all registered lookup, mapping,
+#' and relationship tables. Equivalent to `get_col_filters(defaults_only = TRUE)`.
+#'
+#' @return A named list. See [get_col_filters()] for details.
+#' @export
+#' @family Workbench management
+default_col_filters <- function() {
+  get_col_filters(defaults_only = TRUE)
+}
+
 # Helper to read a table from the database as a data.frame
 read_table_from_db <- function(con, tbl_name) {
   DBI::dbReadTable(con, tbl_name)

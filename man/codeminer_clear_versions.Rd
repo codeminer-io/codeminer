@@ -15,11 +15,16 @@ to the default "latest" resolution for all tables.
 }
 \seealso{
 Other Workbench management: 
+\code{\link{codeminer_clear_col_filters}()},
 \code{\link{codeminer_connect}()},
 \code{\link{codeminer_disconnect}()},
 \code{\link{codeminer_refresh_cache}()},
+\code{\link{codeminer_set_col_filters}()},
 \code{\link{codeminer_set_version}()},
 \code{\link{codeminer_snapshot_extra}()},
-\code{\link{codeminer_status}()}
+\code{\link{codeminer_status}()},
+\code{\link{default_col_filters}()},
+\code{\link{get_col_filters}()},
+\code{\link{with_col_filters}()}
 }
 \concept{Workbench management}

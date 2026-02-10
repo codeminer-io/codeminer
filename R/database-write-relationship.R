@@ -47,6 +47,14 @@
 add_relationship_table <- function(table, metadata) {
   validate_relationship_metadata(metadata, arg = rlang::caller_arg(metadata))
 
+  # Validate col_filters column names exist in the data table
+  cf <- deserialise_col_filters(metadata$col_filters)
+  validate_col_filters_columns(
+    cf,
+    table_cols = names(as.data.frame(table)),
+    table_name = metadata$relationship_table_name
+  )
+
   table_name <- metadata$relationship_table_name
   if (length(table_name) != 1) {
     codeminer_abort(
@@ -130,6 +138,75 @@ remove_relationship_table <- function(code_type, relationship_version) {
   invisible(TRUE)
 }
 
+#' Update relationship table metadata
+#'
+#' Updates metadata fields for an existing relationship table without re-adding
+#' the data. Currently supports updating `col_filters`.
+#'
+#' @param code_type The coding system type (e.g. `"SNOMED CT"`).
+#' @param relationship_version The version to update. Use `"latest"` (default)
+#'   to update the most recent version.
+#' @inheritParams rlang::args_dots_empty
+#' @param col_filters Column filter specification to set. See
+#'   [relationship_metadata()] for the format. Use `NULL` to clear existing
+#'   filters.
+#'
+#' @return `TRUE` invisibly if successful.
+#' @export
+#' @family Database management
+#' @seealso [relationship_metadata()], [add_relationship_table()]
+update_relationship_metadata <- function(
+  code_type,
+  relationship_version = "latest",
+  ...,
+  col_filters = NULL
+) {
+  rlang::check_dots_empty()
+
+  con <- connect_to_db(read_only = FALSE)
+  check_database(con)
+
+  # Resolve version
+  meta <- read_table_from_db(con, codeminer_metadata_table_names$relationship)
+  resolved <- resolve_versioned_metadata(
+    meta,
+    code_type_val = code_type,
+    version_val = relationship_version,
+    version_col = "relationship_version",
+    pin_type = "relationship",
+    type_label = "relationship",
+    add_fun_name = "codeminer::add_relationship_table"
+  )
+  table_name <- resolved$relationship_table_name
+
+  # Validate col_filters columns exist in the data table
+  cf_json <- serialise_col_filters(col_filters)
+  if (!is.na(cf_json)) {
+    table_cols <- DBI::dbListFields(con, table_name)
+    validate_col_filters_columns(
+      col_filters,
+      table_cols = table_cols,
+      table_name = table_name
+    )
+  }
+
+  # Update metadata row
+  DBI::dbExecute(
+    con,
+    glue::glue_sql(
+      "UPDATE {`codeminer_metadata_table_names$relationship`}
+       SET col_filters = {cf_json}
+       WHERE relationship_table_name = {table_name}",
+      .con = con
+    )
+  )
+
+  codeminer_inform(c(
+    "v" = "Updated metadata for relationship table {.field {table_name}}."
+  ))
+  invisible(TRUE)
+}
+
 #' Create relationship metadata
 #'
 #' Generate the required metadata for a relationship table. This is mainly used
@@ -145,6 +222,9 @@ remove_relationship_table <- function(code_type, relationship_version) {
 #' @param child_parent_relationship_code The code value that indicates a
 #'   child-parent (is-a) relationship in the `type_col` column (default: "is a")
 #' @param relationship_source The source of the relationship metadata (default: `NA_character_`)
+#' @param col_filters Optional column filter specification. A named list where
+#'   each element is a list with `values` (all valid values) and `defaults`
+#'   (default filter values). `NULL` (default) means no column filters.
 #'
 #' @return A list containing the relationship metadata
 #'
@@ -160,7 +240,8 @@ relationship_metadata <- function(
   to_col = "to",
   type_col = "type",
   child_parent_relationship_code = "is a",
-  relationship_source = NA_character_
+  relationship_source = NA_character_,
+  col_filters = NULL
 ) {
   rlang::check_dots_empty()
 
@@ -178,7 +259,8 @@ relationship_metadata <- function(
     to_col = to_col,
     type_col = type_col,
     child_parent_relationship_code = child_parent_relationship_code,
-    relationship_source = relationship_source
+    relationship_source = relationship_source,
+    col_filters = serialise_col_filters(col_filters)
   ))
 }
 
