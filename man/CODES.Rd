@@ -101,6 +101,9 @@ CODES_LIKE("^E1", type = "ICD-10")
 \code{\link[=add_lookup_table]{add_lookup_table()}} for adding new lookup tables to the database.
 
 Other Clinical code lookups and mappings: 
-\code{\link{MAP}()}
+\code{\link{MAP}()},
+\code{\link{get_lookup_table}()},
+\code{\link{get_mapping_table}()},
+\code{\link{get_relationship_table}()}
 }
 \concept{Clinical code lookups and mappings}

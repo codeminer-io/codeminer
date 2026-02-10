@@ -1,4 +1,4 @@
-create_dummy_database()
+suppressMessages(create_dummy_database(.local = TRUE))
 
 test_that("RELATIONSHIP_TYPES_FROM() and RELATIONSHIP_TYPES_TO() return expected types", {
   # Setup using example_ontology v2 (has both "is a" and "has attribute")

@@ -2,28 +2,63 @@
 % Please edit documentation in R/codes.R
 \name{get_lookup_table}
 \alias{get_lookup_table}
-\title{Get the lookup table for the given code type in standardised format}
+\title{Get the full lookup table for a code type}
 \usage{
 get_lookup_table(
-  con,
-  code_type,
-  lookup_version,
+  type,
+  lookup_version = "latest",
   col_filters = "default",
+  con = NULL,
   call = rlang::caller_env()
 )
 }
 \arguments{
-\item{con}{A database connection.}
+\item{type}{The code type for which to retrieve the lookup table.}
 
-\item{code_type}{The code type for which to retrieve the lookup table.}
+\item{lookup_version}{The version to retrieve. Defaults to \code{"latest"}.}
+
+\item{col_filters}{Column filters to apply. See \code{\link[=CODES]{CODES()}} for details.}
+
+\item{con}{Optional DBI connection. If \code{NULL} (default), uses the
+workbench connection.}
 
 \item{call}{The calling environment. Passed to \link{codeminer_abort}.}
 }
 \value{
-A data frame containing the lookup table with three columns:
-\code{code}, \code{description} and \code{code_type}.
+A lazy \code{dplyr::tbl()} with standardised columns (\code{code},
+\code{description}, \code{code_type}, \code{preferred_description}) plus all other
+columns from the underlying table.
 }
 \description{
-Get the lookup table for the given code type in standardised format
+Returns a lazy \code{dplyr::tbl()} containing the lookup table with standardised
+column names (\code{code}, \code{description}, \code{code_type}, \code{preferred_description})
+plus all additional columns from the underlying database table. Call
+\code{\link[dplyr:compute]{dplyr::collect()}} to materialise the result.
 }
-\keyword{internal}
+\details{
+This is useful for inspecting columns beyond the standard codelist output
+returned by \code{\link[=CODES]{CODES()}} and \code{\link[=DESCRIPTION]{DESCRIPTION()}}.
+}
+\examples{
+create_dummy_database()
+
+# Get the full ICD-10 lookup table
+get_lookup_table("ICD-10") |> dplyr::collect()
+
+# Inspect raw columns for specific codes
+result <- CODES("E10", "E11", type = "ICD-10")
+get_lookup_table("ICD-10") |>
+  dplyr::filter(code \%in\% .env$result$code) |>
+  dplyr::collect()
+}
+\seealso{
+\code{\link[=CODES]{CODES()}} for standardised codelist output,
+\code{\link[=get_codeminer_metadata]{get_codeminer_metadata()}} for discovering available tables.
+
+Other Clinical code lookups and mappings: 
+\code{\link{CODES}()},
+\code{\link{MAP}()},
+\code{\link{get_mapping_table}()},
+\code{\link{get_relationship_table}()}
+}
+\concept{Clinical code lookups and mappings}

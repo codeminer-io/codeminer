@@ -13,6 +13,9 @@ reference:
       - attributes
       - relationship_types
       - MAP
+      - get_lookup_table
+      - get_mapping_table
+      - get_relationship_table
       - default_col_filters
       - get_col_filters
 

@@ -7,6 +7,8 @@
 create_dummy_database(
   db_path = tempfile(fileext = ".duckdb"),
   ...,
+  verbose = FALSE,
+  .local = FALSE,
   .envir = parent.frame()
 )
 }
@@ -16,16 +18,26 @@ This is to avoid writing the dummy data to an already existing database.}
 
 \item{...}{These dots are for future extensions and must be empty.}
 
-\item{.envir}{Environment in which to set the \code{CODEMINER_DB_PATH} variable.
-Defaults to the calling environment.}
+\item{verbose}{If \code{TRUE}, prints progress messages during the database
+build. Defaults to \code{FALSE} for cleaner output.}
+
+\item{.local}{If \code{FALSE} (default), sets \code{CODEMINER_DB_PATH} globally
+via \code{\link[=Sys.setenv]{Sys.setenv()}}. The dummy database persists until you reconnect
+manually. If \code{TRUE}, uses \code{\link[withr:with_envvar]{withr::local_envvar()}} scoped to \code{.envir}
+so the environment variable and workbench are automatically cleaned up
+when \code{.envir} exits. Use \code{.local = TRUE} in tests and functions that
+need automatic teardown.}
+
+\item{.envir}{Environment for scoped cleanup when \code{.local = TRUE}.
+Ignored when \code{.local = FALSE}. Defaults to the calling environment.}
 }
 \value{
 The path to the created database file, invisibly.
 }
 \description{
-Sets up an example database for codeminer with dummy data
-and sets the environment variable \code{CODEMINER_DB_PATH}.
-Any subsequent \code{codeminer} actions will use this database.
+Sets up an example database for codeminer with dummy data,
+sets the environment variable \code{CODEMINER_DB_PATH}, and connects
+the workbench. Any subsequent \code{codeminer} actions will use this database.
 }
 \examples{
 # Create dummy database in a temporary location

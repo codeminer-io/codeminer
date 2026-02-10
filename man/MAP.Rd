@@ -88,6 +88,9 @@ MAP("all", from = "Read 3", to = "ICD-10")
 database.
 
 Other Clinical code lookups and mappings: 
-\code{\link{CODES}()}
+\code{\link{CODES}()},
+\code{\link{get_lookup_table}()},
+\code{\link{get_mapping_table}()},
+\code{\link{get_relationship_table}()}
 }
 \concept{Clinical code lookups and mappings}
