@@ -36,10 +36,10 @@ DESCRIPTION <- function(
 
   con <- get_db_con()
   lkp_table <- get_lookup_table(
-    con,
-    code_type = type,
-    lookup_version = lookup_version,
-    col_filters = col_filters
+    type,
+    lookup_version,
+    col_filters = col_filters,
+    con = con
   )
   code_col <- "code"
   description_col <- "description"

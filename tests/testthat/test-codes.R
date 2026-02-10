@@ -1,5 +1,5 @@
 ## Set up dummy database
-suppressMessages(create_dummy_database())
+suppressMessages(create_dummy_database(.local = TRUE))
 
 test_that("CODES() returns the expected data format", {
   test_codes <- c("A028", "U838", "E12", "E106", "O109")

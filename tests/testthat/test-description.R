@@ -1,4 +1,4 @@
-create_dummy_database()
+suppressMessages(create_dummy_database(.local = TRUE))
 
 # fmt: skip
 test_lookup_table <- tibble::tribble(
