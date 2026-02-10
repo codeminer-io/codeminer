@@ -76,7 +76,9 @@ add_mapping_table <- function(table, metadata) {
       )
     )
     map_pin_key <- paste(
-      metadata$from_code_type, ">", metadata$to_code_type
+      metadata$from_code_type,
+      ">",
+      metadata$to_code_type
     )
     cached <- .codeminer_env$active_versions[["mapping"]][[
       map_pin_key

@@ -29,6 +29,10 @@ Pinned versions only affect "latest" resolution. Explicit version arguments
 on query functions (e.g. \code{CODES(..., lookup_version = "v1")}) always take
 precedence.
 
+Versions are also auto-cached the first time \code{"latest"} is resolved for a
+given code type. Calling \code{codeminer_set_version()} overrides any
+auto-cached version.
+
 New pins are merged with existing ones. To replace all pins, call
 \code{\link[=codeminer_clear_versions]{codeminer_clear_versions()}} first.
 }

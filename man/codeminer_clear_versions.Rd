@@ -2,16 +2,50 @@
 % Please edit documentation in R/codeminer-connect.R
 \name{codeminer_clear_versions}
 \alias{codeminer_clear_versions}
-\title{Clear all pinned versions}
+\title{Clear active version selections}
 \usage{
-codeminer_clear_versions()
+codeminer_clear_versions(lookup = NULL, relationship = NULL, mapping = NULL)
+}
+\arguments{
+\item{lookup}{Character vector of code types whose lookup version should
+be cleared (e.g. \code{"ICD-10"}). \code{NULL} (default) means no lookup versions
+are cleared unless all arguments are \code{NULL}.}
+
+\item{relationship}{Character vector of code types whose relationship
+version should be cleared. \code{NULL} (default) means no relationship
+versions are cleared unless all arguments are \code{NULL}.}
+
+\item{mapping}{Character vector of mapping keys (\code{"from > to"} format)
+whose version should be cleared. \code{NULL} (default) means no mapping
+versions are cleared unless all arguments are \code{NULL}.}
 }
 \value{
 \code{NULL}, invisibly.
 }
 \description{
-Removes all version pins set by \code{\link[=codeminer_set_version]{codeminer_set_version()}}, returning
-to the default "latest" resolution for all tables.
+Removes version selections from the current session. This covers both
+versions pinned explicitly with \code{\link[=codeminer_set_version]{codeminer_set_version()}} and versions
+auto-cached on first \code{"latest"} resolution.
+}
+\details{
+Called with no arguments, all version selections are cleared and subsequent
+queries will re-resolve \code{"latest"} from the database. To clear only
+specific code types, pass them as character vectors.
+}
+\examples{
+\dontrun{
+# Clear all version selections
+codeminer_clear_versions()
+
+# Clear only the ICD-10 lookup version
+codeminer_clear_versions(lookup = "ICD-10")
+
+# Clear lookup and relationship versions for SNOMED CT
+codeminer_clear_versions(
+  lookup = "SNOMED CT",
+  relationship = "SNOMED CT"
+)
+}
 }
 \seealso{
 Other Workbench management: 

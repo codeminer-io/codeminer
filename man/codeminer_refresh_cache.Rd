@@ -14,6 +14,12 @@ Re-reads metadata tables from all attached databases and updates
 the internal cache. Called automatically by \code{\link[=codeminer_connect]{codeminer_connect()}} and
 after write operations.
 }
+\details{
+This refreshes the \emph{metadata inventory} (which tables and versions exist
+in the database). It does not affect version selections — use
+\code{\link[=codeminer_clear_versions]{codeminer_clear_versions()}} to reset which version is used for each
+code type.
+}
 \seealso{
 Other Workbench management: 
 \code{\link{codeminer_clear_col_filters}()},
