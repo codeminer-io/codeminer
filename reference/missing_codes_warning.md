@@ -66,34 +66,10 @@ failed.
 # Set up a temporary dummy database
 temp_db <- tempfile(fileext = ".duckdb")
 create_dummy_database(temp_db)
-#> Creating new database at /tmp/RtmpLYACwM/file1c67141e7833.duckdb
-#> Reading 17 selected tables from UKB Resource 592
-#> 
-#> Extending read_v2_drugs_bnf with BNF hierarchy and descriptions
-#> Extending read_v2_icd10 by expanding ICD-10 code ranges
-#> Adding tables to database
-#> ✔ Lookup table BNF_UKB v4 added successfully.
-#> ✔ Relationship table BNF_relationship_UKB v4 added successfully.
-#> ✔ Lookup table DM+D_UKB v4 added successfully.
-#> ✔ Lookup table ICD-9_UKB v4 added successfully.
-#> ✔ Relationship table ICD-9_relationship_UKB v4 added successfully.
-#> ✔ Lookup table ICD-10_UKB v4 added successfully.
-#> ✔ Relationship table ICD-10_relationship_UKB v4 added successfully.
-#> ✔ Mapping table ICD-9_ICD-10_UKB v4 added successfully.
-#> ✔ Lookup table Read 2_UKB v4 added successfully.
-#> ✔ Relationship table Read 2_relationship_UKB v4 added successfully.
-#> ✔ Lookup table Read 2, drugs_UKB v4 added successfully.
-#> ✔ Mapping table Read 2, drugs_BNF_UKB v4 added successfully.
-#> ✔ Mapping table Read 2_ICD-9_UKB v4 added successfully.
-#> ✔ Mapping table Read 2_ICD-10_UKB v4 added successfully.
-#> ✔ Mapping table Read 2_OPCS4_UKB v4 added successfully.
-#> ✔ Mapping table Read 2_Read 3_UKB v4 added successfully.
-#> ✔ Lookup table Read 3_UKB v4 added successfully.
-#> ✔ Mapping table Read 3_ICD-9_UKB v4 added successfully.
-#> ✔ Mapping table Read 3_ICD-10_UKB v4 added successfully.
-#> ✔ Mapping table Read 3_OPCS4_UKB v4 added successfully.
-#> ✔ Mapping table Read 3_Read 2_UKB v4 added successfully.
 #> ✔ Dummy database ready to use!
+#> ℹ To reconnect to your previous database:
+#>   `Sys.setenv(CODEMINER_DB_PATH = "/tmp/Rtmp8tnFLb/file1c53749c3499.duckdb")`
+#>   `codeminer_connect()`
 missing_codes <- table_type <- table_meta <- NULL
 
 # Capture missing codes from waning using `withCallingHandlers()`
@@ -108,23 +84,29 @@ withCallingHandlers(
     invokeRestart("muffleWarning")
   }
 )
-#> Error in dbSendQuery(conn, statement, ...): Catalog Error: Table with name _lookup_metadata does not exist!
-#> Did you mean "duckdb_databases"?
-#> 
-#> LINE 1: SELECT * FROM _lookup_metadata
-#>                       ^
-#> ℹ Context: rapi_prepare
-#> ℹ Error type: CATALOG
+#> ℹ Using 'UKB v4' as latest version
+#> ℹ Using 'UKB v4' as latest version
 
 # Recognised codes
 codes
-#> Error: object 'codes' not found
+#> <codeminer_codelist>: 1 code
+#> Code type: "ICD-10"
+#> 
+#> # A tibble: 1 × 3
+#>   code  description              code_type
+#>   <chr> <chr>                    <chr>    
+#> 1 E10   Type 1 diabetes mellitus ICD-10   
 
 # Unrecognised codes and related context
 missing_codes
-#> NULL
+#> [1] "bar" "foo"
 table_type
-#> NULL
+#> [1] "lookup"
 table_meta
-#> NULL
+#>   lookup_table_name code_type lookup_version lookup_code_col
+#> 4     ICD-10_UKB v4    ICD-10         UKB v4        ALT_CODE
+#>   lookup_description_col                                      lookup_source
+#> 4            DESCRIPTION https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592
+#>   preferred_description_col preferred_description_indicator col_filters
+#> 4                      <NA>                            <NA>        <NA>
 ```

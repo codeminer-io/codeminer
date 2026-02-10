@@ -109,34 +109,10 @@ warning, while still preserving full context about where the lookup failed.</p>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># Set up a temporary dummy database</span></span></span>
 <span class="r-in"><span><span class="va">temp_db</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span>fileext <span class="op">=</span> <span class="st">".duckdb"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="create_dummy_database.html">create_dummy_database</a></span><span class="op">(</span><span class="va">temp_db</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Creating new database at <span style="color: #0000BB;">/tmp/RtmpLYACwM/file1c67141e7833.duckdb</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Reading 17 selected tables from UKB Resource 592</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Extending <span style="color: #00BB00;">read_v2_drugs_bnf</span> with BNF hierarchy and descriptions</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Extending <span style="color: #00BB00;">read_v2_icd10</span> by expanding ICD-10 code ranges</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Adding tables to database</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Lookup table <span style="color: #00BB00;">BNF_UKB v4</span> added successfully.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Relationship table <span style="color: #00BB00;">BNF_relationship_UKB v4</span> added successfully.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Lookup table <span style="color: #00BB00;">DM+D_UKB v4</span> added successfully.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Lookup table <span style="color: #00BB00;">ICD-9_UKB v4</span> added successfully.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Relationship table <span style="color: #00BB00;">ICD-9_relationship_UKB v4</span> added successfully.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Lookup table <span style="color: #00BB00;">ICD-10_UKB v4</span> added successfully.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Relationship table <span style="color: #00BB00;">ICD-10_relationship_UKB v4</span> added successfully.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Mapping table <span style="color: #00BB00;">ICD-9_ICD-10_UKB v4</span> added successfully.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Lookup table <span style="color: #00BB00;">Read 2_UKB v4</span> added successfully.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Relationship table <span style="color: #00BB00;">Read 2_relationship_UKB v4</span> added successfully.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Lookup table <span style="color: #00BB00;">Read 2, drugs_UKB v4</span> added successfully.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Mapping table <span style="color: #00BB00;">Read 2, drugs_BNF_UKB v4</span> added successfully.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Mapping table <span style="color: #00BB00;">Read 2_ICD-9_UKB v4</span> added successfully.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Mapping table <span style="color: #00BB00;">Read 2_ICD-10_UKB v4</span> added successfully.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Mapping table <span style="color: #00BB00;">Read 2_OPCS4_UKB v4</span> added successfully.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Mapping table <span style="color: #00BB00;">Read 2_Read 3_UKB v4</span> added successfully.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Lookup table <span style="color: #00BB00;">Read 3_UKB v4</span> added successfully.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Mapping table <span style="color: #00BB00;">Read 3_ICD-9_UKB v4</span> added successfully.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Mapping table <span style="color: #00BB00;">Read 3_ICD-10_UKB v4</span> added successfully.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Mapping table <span style="color: #00BB00;">Read 3_OPCS4_UKB v4</span> added successfully.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Mapping table <span style="color: #00BB00;">Read 3_Read 2_UKB v4</span> added successfully.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Dummy database ready to use!</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> To reconnect to your previous database:</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>   `Sys.setenv(CODEMINER_DB_PATH = "/tmp/Rtmp8tnFLb/file1c53749c3499.duckdb")`</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>   `codeminer_connect()`</span>
 <span class="r-in"><span><span class="va">missing_codes</span> <span class="op">&lt;-</span> <span class="va">table_type</span> <span class="op">&lt;-</span> <span class="va">table_meta</span> <span class="op">&lt;-</span> <span class="cn">NULL</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Capture missing codes from waning using `withCallingHandlers()`</span></span></span>
@@ -151,25 +127,31 @@ warning, while still preserving full context about where the lookup failed.</p>
 <span class="r-in"><span>    <span class="fu"><a href="https://rdrr.io/r/base/conditions.html" class="external-link">invokeRestart</a></span><span class="op">(</span><span class="st">"muffleWarning"</span><span class="op">)</span></span></span>
 <span class="r-in"><span>  <span class="op">}</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in dbSendQuery(conn, statement, ...):</span> Catalog Error: Table with name _lookup_metadata does not exist!</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> Did you mean "duckdb_databases"?</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> LINE 1: SELECT * FROM _lookup_metadata</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span>                       ^</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">ℹ</span> Context: rapi_prepare</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">ℹ</span> Error type: CATALOG</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Using 'UKB v4' as latest version</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Using 'UKB v4' as latest version</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Recognised codes</span></span></span>
 <span class="r-in"><span><span class="va">codes</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error:</span> object 'codes' not found</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">&lt;codeminer_codelist&gt;</span>: 1 code</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Code type: <span style="color: #0000BB;">"ICD-10"</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 1 × 3</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   code  description              code_type</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> E10   Type 1 diabetes mellitus ICD-10   </span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Unrecognised codes and related context</span></span></span>
 <span class="r-in"><span><span class="va">missing_codes</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "bar" "foo"</span>
 <span class="r-in"><span><span class="va">table_type</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "lookup"</span>
 <span class="r-in"><span><span class="va">table_meta</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   lookup_table_name code_type lookup_version lookup_code_col</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4     ICD-10_UKB v4    ICD-10         UKB v4        ALT_CODE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   lookup_description_col                                      lookup_source</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4            DESCRIPTION https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   preferred_description_col preferred_description_indicator col_filters</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4                      &lt;NA&gt;                            &lt;NA&gt;        &lt;NA&gt;</span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

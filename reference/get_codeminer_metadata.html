@@ -77,58 +77,154 @@ requested, a named list of data frames.</p>
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="create_dummy_database.html">create_dummy_database</a></span><span class="op">(</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Creating new database at <span style="color: #0000BB;">/tmp/RtmpLYACwM/file1c678596b54.duckdb</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Reading 17 selected tables from UKB Resource 592</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Extending <span style="color: #00BB00;">read_v2_drugs_bnf</span> with BNF hierarchy and descriptions</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Extending <span style="color: #00BB00;">read_v2_icd10</span> by expanding ICD-10 code ranges</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Adding tables to database</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Lookup table <span style="color: #00BB00;">BNF_UKB v4</span> added successfully.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Relationship table <span style="color: #00BB00;">BNF_relationship_UKB v4</span> added successfully.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Lookup table <span style="color: #00BB00;">DM+D_UKB v4</span> added successfully.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Lookup table <span style="color: #00BB00;">ICD-9_UKB v4</span> added successfully.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Relationship table <span style="color: #00BB00;">ICD-9_relationship_UKB v4</span> added successfully.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Lookup table <span style="color: #00BB00;">ICD-10_UKB v4</span> added successfully.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Relationship table <span style="color: #00BB00;">ICD-10_relationship_UKB v4</span> added successfully.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Mapping table <span style="color: #00BB00;">ICD-9_ICD-10_UKB v4</span> added successfully.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Lookup table <span style="color: #00BB00;">Read 2_UKB v4</span> added successfully.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Relationship table <span style="color: #00BB00;">Read 2_relationship_UKB v4</span> added successfully.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Lookup table <span style="color: #00BB00;">Read 2, drugs_UKB v4</span> added successfully.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Mapping table <span style="color: #00BB00;">Read 2, drugs_BNF_UKB v4</span> added successfully.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Mapping table <span style="color: #00BB00;">Read 2_ICD-9_UKB v4</span> added successfully.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Mapping table <span style="color: #00BB00;">Read 2_ICD-10_UKB v4</span> added successfully.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Mapping table <span style="color: #00BB00;">Read 2_OPCS4_UKB v4</span> added successfully.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Mapping table <span style="color: #00BB00;">Read 2_Read 3_UKB v4</span> added successfully.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Lookup table <span style="color: #00BB00;">Read 3_UKB v4</span> added successfully.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Mapping table <span style="color: #00BB00;">Read 3_ICD-9_UKB v4</span> added successfully.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Mapping table <span style="color: #00BB00;">Read 3_ICD-10_UKB v4</span> added successfully.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Mapping table <span style="color: #00BB00;">Read 3_OPCS4_UKB v4</span> added successfully.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Mapping table <span style="color: #00BB00;">Read 3_Read 2_UKB v4</span> added successfully.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Dummy database ready to use!</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> To reconnect to your previous database:</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>   `Sys.setenv(CODEMINER_DB_PATH = "/tmp/Rtmp8tnFLb/file1c5316e53e51.duckdb")`</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>   `codeminer_connect()`</span>
 <span class="r-in"><span><span class="fu">get_codeminer_metadata</span><span class="op">(</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in dbSendQuery(conn, statement, ...):</span> Catalog Error: Table with name _lookup_metadata does not exist!</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> Did you mean "duckdb_databases"?</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> LINE 1: SELECT * FROM _lookup_metadata</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span>                       ^</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">ℹ</span> Context: rapi_prepare</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">ℹ</span> Error type: CATALOG</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $lookup</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      lookup_table_name     code_type lookup_version lookup_code_col</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1           BNF_UKB v4           BNF         UKB v4        BNF_Code</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2          DM+D_UKB v4          DM+D         UKB v4      concept_id</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3         ICD-9_UKB v4         ICD-9         UKB v4            ICD9</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4        ICD-10_UKB v4        ICD-10         UKB v4        ALT_CODE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5        Read 2_UKB v4        Read 2         UKB v4       read_code</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6 Read 2, drugs_UKB v4 Read 2, drugs         UKB v4       read_code</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7        Read 3_UKB v4        Read 3         UKB v4       read_code</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   lookup_description_col                                      lookup_source</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1            Description https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2                   term https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3       DESCRIPTION_ICD9 https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4            DESCRIPTION https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5       term_description https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6       term_description https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7       term_description https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   preferred_description_col preferred_description_indicator col_filters</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1                      &lt;NA&gt;                            &lt;NA&gt;        &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2                      &lt;NA&gt;                            &lt;NA&gt;        &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3                      &lt;NA&gt;                            &lt;NA&gt;        &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4                      &lt;NA&gt;                            &lt;NA&gt;        &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5                 term_code                              00        &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6                      &lt;NA&gt;                            &lt;NA&gt;        &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7          description_type                               P        &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $mapping</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>          mapping_table_name from_code_type to_code_type map_version    from_col</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1       ICD-9_ICD-10_UKB v4          ICD-9       ICD-10      UKB v4        ICD9</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2  Read 2, drugs_BNF_UKB v4  Read 2, drugs          BNF      UKB v4   read_code</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3       Read 2_ICD-9_UKB v4         Read 2        ICD-9      UKB v4   read_code</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4      Read 2_ICD-10_UKB v4         Read 2       ICD-10      UKB v4   read_code</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5       Read 2_OPCS4_UKB v4         Read 2        OPCS4      UKB v4   read_code</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6      Read 2_Read 3_UKB v4         Read 2       Read 3      UKB v4 READV2_CODE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7       Read 3_ICD-9_UKB v4         Read 3        ICD-9      UKB v4   read_code</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 8      Read 3_ICD-10_UKB v4         Read 3       ICD-10      UKB v4   read_code</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 9       Read 3_OPCS4_UKB v4         Read 3        OPCS4      UKB v4   read_code</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10     Read 3_Read 2_UKB v4         Read 3       Read 2      UKB v4 READV3_CODE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>           to_col                                         map_source col_filters</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1          ICD10 https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592        &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2       bnf_code https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592        &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3      icd9_code https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592        &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4     icd10_code https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592        &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5  opcs_4.2_code https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592        &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6    READV3_CODE https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592        &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7      icd9_code https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592        &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 8     icd10_code https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592        &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 9     opcs4_code https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592        &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10   READV2_CODE https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592        &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $relationship</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      relationship_table_name code_type relationship_version from_col to_col</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1    BNF_relationship_UKB v4       BNF               UKB v4     from     to</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2  ICD-9_relationship_UKB v4     ICD-9               UKB v4     from     to</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3 ICD-10_relationship_UKB v4    ICD-10               UKB v4     from     to</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4 Read 2_relationship_UKB v4    Read 2               UKB v4     from     to</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   type_col child_parent_relationship_code</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1     type                           is a</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2     type                           is a</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3     type                           is a</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4     type                           is a</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                                  relationship_source col_filters</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592        &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2 https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592        &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3 https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592        &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4 https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592        &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span><span class="fu">get_codeminer_metadata</span><span class="op">(</span><span class="st">"lookup"</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in dbSendQuery(conn, statement, ...):</span> Catalog Error: Table with name _lookup_metadata does not exist!</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> Did you mean "duckdb_databases"?</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> LINE 1: SELECT * FROM _lookup_metadata</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span>                       ^</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">ℹ</span> Context: rapi_prepare</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">ℹ</span> Error type: CATALOG</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      lookup_table_name     code_type lookup_version lookup_code_col</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1           BNF_UKB v4           BNF         UKB v4        BNF_Code</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2          DM+D_UKB v4          DM+D         UKB v4      concept_id</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3         ICD-9_UKB v4         ICD-9         UKB v4            ICD9</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4        ICD-10_UKB v4        ICD-10         UKB v4        ALT_CODE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5        Read 2_UKB v4        Read 2         UKB v4       read_code</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6 Read 2, drugs_UKB v4 Read 2, drugs         UKB v4       read_code</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7        Read 3_UKB v4        Read 3         UKB v4       read_code</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   lookup_description_col                                      lookup_source</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1            Description https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2                   term https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3       DESCRIPTION_ICD9 https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4            DESCRIPTION https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5       term_description https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6       term_description https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7       term_description https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   preferred_description_col preferred_description_indicator col_filters</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1                      &lt;NA&gt;                            &lt;NA&gt;        &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2                      &lt;NA&gt;                            &lt;NA&gt;        &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3                      &lt;NA&gt;                            &lt;NA&gt;        &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4                      &lt;NA&gt;                            &lt;NA&gt;        &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5                 term_code                              00        &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6                      &lt;NA&gt;                            &lt;NA&gt;        &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7          description_type                               P        &lt;NA&gt;</span>
 <span class="r-in"><span><span class="fu">get_codeminer_metadata</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"lookup"</span>, <span class="st">"mapping"</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in dbSendQuery(conn, statement, ...):</span> Catalog Error: Table with name _lookup_metadata does not exist!</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> Did you mean "duckdb_databases"?</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> LINE 1: SELECT * FROM _lookup_metadata</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span>                       ^</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">ℹ</span> Context: rapi_prepare</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">ℹ</span> Error type: CATALOG</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $lookup</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      lookup_table_name     code_type lookup_version lookup_code_col</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1           BNF_UKB v4           BNF         UKB v4        BNF_Code</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2          DM+D_UKB v4          DM+D         UKB v4      concept_id</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3         ICD-9_UKB v4         ICD-9         UKB v4            ICD9</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4        ICD-10_UKB v4        ICD-10         UKB v4        ALT_CODE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5        Read 2_UKB v4        Read 2         UKB v4       read_code</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6 Read 2, drugs_UKB v4 Read 2, drugs         UKB v4       read_code</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7        Read 3_UKB v4        Read 3         UKB v4       read_code</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   lookup_description_col                                      lookup_source</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1            Description https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2                   term https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3       DESCRIPTION_ICD9 https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4            DESCRIPTION https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5       term_description https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6       term_description https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7       term_description https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   preferred_description_col preferred_description_indicator col_filters</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1                      &lt;NA&gt;                            &lt;NA&gt;        &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2                      &lt;NA&gt;                            &lt;NA&gt;        &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3                      &lt;NA&gt;                            &lt;NA&gt;        &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4                      &lt;NA&gt;                            &lt;NA&gt;        &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5                 term_code                              00        &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6                      &lt;NA&gt;                            &lt;NA&gt;        &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7          description_type                               P        &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $mapping</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>          mapping_table_name from_code_type to_code_type map_version    from_col</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1       ICD-9_ICD-10_UKB v4          ICD-9       ICD-10      UKB v4        ICD9</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2  Read 2, drugs_BNF_UKB v4  Read 2, drugs          BNF      UKB v4   read_code</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3       Read 2_ICD-9_UKB v4         Read 2        ICD-9      UKB v4   read_code</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4      Read 2_ICD-10_UKB v4         Read 2       ICD-10      UKB v4   read_code</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5       Read 2_OPCS4_UKB v4         Read 2        OPCS4      UKB v4   read_code</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6      Read 2_Read 3_UKB v4         Read 2       Read 3      UKB v4 READV2_CODE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7       Read 3_ICD-9_UKB v4         Read 3        ICD-9      UKB v4   read_code</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 8      Read 3_ICD-10_UKB v4         Read 3       ICD-10      UKB v4   read_code</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 9       Read 3_OPCS4_UKB v4         Read 3        OPCS4      UKB v4   read_code</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10     Read 3_Read 2_UKB v4         Read 3       Read 2      UKB v4 READV3_CODE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>           to_col                                         map_source col_filters</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1          ICD10 https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592        &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2       bnf_code https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592        &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3      icd9_code https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592        &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4     icd10_code https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592        &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5  opcs_4.2_code https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592        &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6    READV3_CODE https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592        &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7      icd9_code https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592        &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 8     icd10_code https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592        &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 9     opcs4_code https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592        &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10   READV2_CODE https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592        &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

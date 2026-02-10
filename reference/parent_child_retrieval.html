@@ -149,66 +149,72 @@ ancestors/descendants).</p>
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="create_dummy_database.html">create_dummy_database</a></span><span class="op">(</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Creating new database at <span style="color: #0000BB;">/tmp/RtmpLYACwM/file1c6773ec5399.duckdb</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Reading 17 selected tables from UKB Resource 592</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Extending <span style="color: #00BB00;">read_v2_drugs_bnf</span> with BNF hierarchy and descriptions</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Extending <span style="color: #00BB00;">read_v2_icd10</span> by expanding ICD-10 code ranges</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Adding tables to database</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Lookup table <span style="color: #00BB00;">BNF_UKB v4</span> added successfully.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Relationship table <span style="color: #00BB00;">BNF_relationship_UKB v4</span> added successfully.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Lookup table <span style="color: #00BB00;">DM+D_UKB v4</span> added successfully.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Lookup table <span style="color: #00BB00;">ICD-9_UKB v4</span> added successfully.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Relationship table <span style="color: #00BB00;">ICD-9_relationship_UKB v4</span> added successfully.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Lookup table <span style="color: #00BB00;">ICD-10_UKB v4</span> added successfully.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Relationship table <span style="color: #00BB00;">ICD-10_relationship_UKB v4</span> added successfully.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Mapping table <span style="color: #00BB00;">ICD-9_ICD-10_UKB v4</span> added successfully.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Lookup table <span style="color: #00BB00;">Read 2_UKB v4</span> added successfully.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Relationship table <span style="color: #00BB00;">Read 2_relationship_UKB v4</span> added successfully.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Lookup table <span style="color: #00BB00;">Read 2, drugs_UKB v4</span> added successfully.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Mapping table <span style="color: #00BB00;">Read 2, drugs_BNF_UKB v4</span> added successfully.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Mapping table <span style="color: #00BB00;">Read 2_ICD-9_UKB v4</span> added successfully.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Mapping table <span style="color: #00BB00;">Read 2_ICD-10_UKB v4</span> added successfully.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Mapping table <span style="color: #00BB00;">Read 2_OPCS4_UKB v4</span> added successfully.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Mapping table <span style="color: #00BB00;">Read 2_Read 3_UKB v4</span> added successfully.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Lookup table <span style="color: #00BB00;">Read 3_UKB v4</span> added successfully.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Mapping table <span style="color: #00BB00;">Read 3_ICD-9_UKB v4</span> added successfully.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Mapping table <span style="color: #00BB00;">Read 3_ICD-10_UKB v4</span> added successfully.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Mapping table <span style="color: #00BB00;">Read 3_OPCS4_UKB v4</span> added successfully.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Mapping table <span style="color: #00BB00;">Read 3_Read 2_UKB v4</span> added successfully.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Dummy database ready to use!</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> To reconnect to your previous database:</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>   `Sys.setenv(CODEMINER_DB_PATH = "/tmp/Rtmp8tnFLb/file1c5327791d12.duckdb")`</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>   `codeminer_connect()`</span>
 <span class="r-in"><span><span class="fu">PARENTS</span><span class="op">(</span><span class="st">"E10"</span>, <span class="st">"E11"</span>, type <span class="op">=</span> <span class="st">"ICD-10"</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in dbSendQuery(conn, statement, ...):</span> Catalog Error: Table with name _relationship_metadata does not exist!</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> Did you mean "sqlite_temp_schema"?</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> LINE 1: SELECT * FROM _relationship_metadata</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span>                       ^</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">ℹ</span> Context: rapi_prepare</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">ℹ</span> Error type: CATALOG</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Using 'UKB v4' as latest version</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Using 'UKB v4' as latest version</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">&lt;codeminer_codelist&gt;</span>: 2 codes</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Code type: <span style="color: #0000BB;">"ICD-10"</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 2 × 3</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   code  description              code_type</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> E10   Type 1 diabetes mellitus ICD-10   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span> E11   Type 2 diabetes mellitus ICD-10   </span>
 <span class="r-in"><span><span class="fu">CHILDREN</span><span class="op">(</span><span class="st">"E10"</span>, <span class="st">"E11"</span>, type <span class="op">=</span> <span class="st">"ICD-10"</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in dbSendQuery(conn, statement, ...):</span> Catalog Error: Table with name _relationship_metadata does not exist!</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> Did you mean "sqlite_temp_schema"?</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> LINE 1: SELECT * FROM _relationship_metadata</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span>                       ^</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">ℹ</span> Context: rapi_prepare</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">ℹ</span> Error type: CATALOG</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Using 'UKB v4' as latest version</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Using 'UKB v4' as latest version</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">&lt;codeminer_codelist&gt;</span>: 22 codes</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Code type: <span style="color: #0000BB;">"ICD-10"</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 22 × 3</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    code  description                                                   code_type</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                                                         <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span> E10   Type 1 diabetes mellitus                                      ICD-10   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span> E100  Type 1 diabetes mellitus With coma                            ICD-10   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span> E101  Type 1 diabetes mellitus With ketoacidosis                    ICD-10   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span> E102  Type 1 diabetes mellitus With renal complications             ICD-10   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span> E103  Type 1 diabetes mellitus With ophthalmic complications        ICD-10   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span> E104  Type 1 diabetes mellitus With neurological complications      ICD-10   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span> E105  Type 1 diabetes mellitus With peripheral circulatory complic… ICD-10   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span> E106  Type 1 diabetes mellitus With other specified complications   ICD-10   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span> E107  Type 1 diabetes mellitus With multiple complications          ICD-10   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span> E108  Type 1 diabetes mellitus With unspecified complications       ICD-10   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 12 more rows</span></span>
 <span class="r-in"><span><span class="fu">N_PARENTS</span><span class="op">(</span><span class="st">"E10"</span>, <span class="st">"E11"</span>, type <span class="op">=</span> <span class="st">"ICD-10"</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in dbSendQuery(conn, statement, ...):</span> Catalog Error: Table with name _relationship_metadata does not exist!</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> Did you mean "sqlite_temp_schema"?</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> LINE 1: SELECT * FROM _relationship_metadata</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span>                       ^</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">ℹ</span> Context: rapi_prepare</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">ℹ</span> Error type: CATALOG</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Using 'UKB v4' as latest version</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Using 'UKB v4' as latest version</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">&lt;codeminer_codelist&gt;</span>: 2 codes</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Code type: <span style="color: #0000BB;">"ICD-10"</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 2 × 3</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   code  description              code_type</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> E10   Type 1 diabetes mellitus ICD-10   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span> E11   Type 2 diabetes mellitus ICD-10   </span>
 <span class="r-in"><span><span class="fu">N_CHILDREN</span><span class="op">(</span><span class="st">"E10"</span>, <span class="st">"E11"</span>, type <span class="op">=</span> <span class="st">"ICD-10"</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in dbSendQuery(conn, statement, ...):</span> Catalog Error: Table with name _relationship_metadata does not exist!</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> Did you mean "sqlite_temp_schema"?</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> LINE 1: SELECT * FROM _relationship_metadata</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span>                       ^</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">ℹ</span> Context: rapi_prepare</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">ℹ</span> Error type: CATALOG</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Using 'UKB v4' as latest version</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Using 'UKB v4' as latest version</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">&lt;codeminer_codelist&gt;</span>: 22 codes</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Code type: <span style="color: #0000BB;">"ICD-10"</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 22 × 3</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    code  description                                                   code_type</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                                                         <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span> E10   Type 1 diabetes mellitus                                      ICD-10   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span> E100  Type 1 diabetes mellitus With coma                            ICD-10   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span> E101  Type 1 diabetes mellitus With ketoacidosis                    ICD-10   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span> E102  Type 1 diabetes mellitus With renal complications             ICD-10   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span> E103  Type 1 diabetes mellitus With ophthalmic complications        ICD-10   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span> E104  Type 1 diabetes mellitus With neurological complications      ICD-10   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span> E105  Type 1 diabetes mellitus With peripheral circulatory complic… ICD-10   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span> E106  Type 1 diabetes mellitus With other specified complications   ICD-10   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span> E107  Type 1 diabetes mellitus With multiple complications          ICD-10   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span> E108  Type 1 diabetes mellitus With unspecified complications       ICD-10   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 12 more rows</span></span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

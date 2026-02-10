@@ -34,56 +34,152 @@ requested, a named list of data frames.
 
 ``` r
 create_dummy_database()
-#> Creating new database at /tmp/RtmpLYACwM/file1c678596b54.duckdb
-#> Reading 17 selected tables from UKB Resource 592
-#> 
-#> Extending read_v2_drugs_bnf with BNF hierarchy and descriptions
-#> Extending read_v2_icd10 by expanding ICD-10 code ranges
-#> Adding tables to database
-#> ✔ Lookup table BNF_UKB v4 added successfully.
-#> ✔ Relationship table BNF_relationship_UKB v4 added successfully.
-#> ✔ Lookup table DM+D_UKB v4 added successfully.
-#> ✔ Lookup table ICD-9_UKB v4 added successfully.
-#> ✔ Relationship table ICD-9_relationship_UKB v4 added successfully.
-#> ✔ Lookup table ICD-10_UKB v4 added successfully.
-#> ✔ Relationship table ICD-10_relationship_UKB v4 added successfully.
-#> ✔ Mapping table ICD-9_ICD-10_UKB v4 added successfully.
-#> ✔ Lookup table Read 2_UKB v4 added successfully.
-#> ✔ Relationship table Read 2_relationship_UKB v4 added successfully.
-#> ✔ Lookup table Read 2, drugs_UKB v4 added successfully.
-#> ✔ Mapping table Read 2, drugs_BNF_UKB v4 added successfully.
-#> ✔ Mapping table Read 2_ICD-9_UKB v4 added successfully.
-#> ✔ Mapping table Read 2_ICD-10_UKB v4 added successfully.
-#> ✔ Mapping table Read 2_OPCS4_UKB v4 added successfully.
-#> ✔ Mapping table Read 2_Read 3_UKB v4 added successfully.
-#> ✔ Lookup table Read 3_UKB v4 added successfully.
-#> ✔ Mapping table Read 3_ICD-9_UKB v4 added successfully.
-#> ✔ Mapping table Read 3_ICD-10_UKB v4 added successfully.
-#> ✔ Mapping table Read 3_OPCS4_UKB v4 added successfully.
-#> ✔ Mapping table Read 3_Read 2_UKB v4 added successfully.
 #> ✔ Dummy database ready to use!
+#> ℹ To reconnect to your previous database:
+#>   `Sys.setenv(CODEMINER_DB_PATH = "/tmp/Rtmp8tnFLb/file1c5316e53e51.duckdb")`
+#>   `codeminer_connect()`
 get_codeminer_metadata()
-#> Error in dbSendQuery(conn, statement, ...): Catalog Error: Table with name _lookup_metadata does not exist!
-#> Did you mean "duckdb_databases"?
+#> $lookup
+#>      lookup_table_name     code_type lookup_version lookup_code_col
+#> 1           BNF_UKB v4           BNF         UKB v4        BNF_Code
+#> 2          DM+D_UKB v4          DM+D         UKB v4      concept_id
+#> 3         ICD-9_UKB v4         ICD-9         UKB v4            ICD9
+#> 4        ICD-10_UKB v4        ICD-10         UKB v4        ALT_CODE
+#> 5        Read 2_UKB v4        Read 2         UKB v4       read_code
+#> 6 Read 2, drugs_UKB v4 Read 2, drugs         UKB v4       read_code
+#> 7        Read 3_UKB v4        Read 3         UKB v4       read_code
+#>   lookup_description_col                                      lookup_source
+#> 1            Description https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592
+#> 2                   term https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592
+#> 3       DESCRIPTION_ICD9 https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592
+#> 4            DESCRIPTION https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592
+#> 5       term_description https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592
+#> 6       term_description https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592
+#> 7       term_description https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592
+#>   preferred_description_col preferred_description_indicator col_filters
+#> 1                      <NA>                            <NA>        <NA>
+#> 2                      <NA>                            <NA>        <NA>
+#> 3                      <NA>                            <NA>        <NA>
+#> 4                      <NA>                            <NA>        <NA>
+#> 5                 term_code                              00        <NA>
+#> 6                      <NA>                            <NA>        <NA>
+#> 7          description_type                               P        <NA>
 #> 
-#> LINE 1: SELECT * FROM _lookup_metadata
-#>                       ^
-#> ℹ Context: rapi_prepare
-#> ℹ Error type: CATALOG
+#> $mapping
+#>          mapping_table_name from_code_type to_code_type map_version    from_col
+#> 1       ICD-9_ICD-10_UKB v4          ICD-9       ICD-10      UKB v4        ICD9
+#> 2  Read 2, drugs_BNF_UKB v4  Read 2, drugs          BNF      UKB v4   read_code
+#> 3       Read 2_ICD-9_UKB v4         Read 2        ICD-9      UKB v4   read_code
+#> 4      Read 2_ICD-10_UKB v4         Read 2       ICD-10      UKB v4   read_code
+#> 5       Read 2_OPCS4_UKB v4         Read 2        OPCS4      UKB v4   read_code
+#> 6      Read 2_Read 3_UKB v4         Read 2       Read 3      UKB v4 READV2_CODE
+#> 7       Read 3_ICD-9_UKB v4         Read 3        ICD-9      UKB v4   read_code
+#> 8      Read 3_ICD-10_UKB v4         Read 3       ICD-10      UKB v4   read_code
+#> 9       Read 3_OPCS4_UKB v4         Read 3        OPCS4      UKB v4   read_code
+#> 10     Read 3_Read 2_UKB v4         Read 3       Read 2      UKB v4 READV3_CODE
+#>           to_col                                         map_source col_filters
+#> 1          ICD10 https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592        <NA>
+#> 2       bnf_code https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592        <NA>
+#> 3      icd9_code https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592        <NA>
+#> 4     icd10_code https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592        <NA>
+#> 5  opcs_4.2_code https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592        <NA>
+#> 6    READV3_CODE https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592        <NA>
+#> 7      icd9_code https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592        <NA>
+#> 8     icd10_code https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592        <NA>
+#> 9     opcs4_code https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592        <NA>
+#> 10   READV2_CODE https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592        <NA>
+#> 
+#> $relationship
+#>      relationship_table_name code_type relationship_version from_col to_col
+#> 1    BNF_relationship_UKB v4       BNF               UKB v4     from     to
+#> 2  ICD-9_relationship_UKB v4     ICD-9               UKB v4     from     to
+#> 3 ICD-10_relationship_UKB v4    ICD-10               UKB v4     from     to
+#> 4 Read 2_relationship_UKB v4    Read 2               UKB v4     from     to
+#>   type_col child_parent_relationship_code
+#> 1     type                           is a
+#> 2     type                           is a
+#> 3     type                           is a
+#> 4     type                           is a
+#>                                  relationship_source col_filters
+#> 1 https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592        <NA>
+#> 2 https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592        <NA>
+#> 3 https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592        <NA>
+#> 4 https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592        <NA>
+#> 
 get_codeminer_metadata("lookup")
-#> Error in dbSendQuery(conn, statement, ...): Catalog Error: Table with name _lookup_metadata does not exist!
-#> Did you mean "duckdb_databases"?
-#> 
-#> LINE 1: SELECT * FROM _lookup_metadata
-#>                       ^
-#> ℹ Context: rapi_prepare
-#> ℹ Error type: CATALOG
+#>      lookup_table_name     code_type lookup_version lookup_code_col
+#> 1           BNF_UKB v4           BNF         UKB v4        BNF_Code
+#> 2          DM+D_UKB v4          DM+D         UKB v4      concept_id
+#> 3         ICD-9_UKB v4         ICD-9         UKB v4            ICD9
+#> 4        ICD-10_UKB v4        ICD-10         UKB v4        ALT_CODE
+#> 5        Read 2_UKB v4        Read 2         UKB v4       read_code
+#> 6 Read 2, drugs_UKB v4 Read 2, drugs         UKB v4       read_code
+#> 7        Read 3_UKB v4        Read 3         UKB v4       read_code
+#>   lookup_description_col                                      lookup_source
+#> 1            Description https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592
+#> 2                   term https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592
+#> 3       DESCRIPTION_ICD9 https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592
+#> 4            DESCRIPTION https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592
+#> 5       term_description https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592
+#> 6       term_description https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592
+#> 7       term_description https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592
+#>   preferred_description_col preferred_description_indicator col_filters
+#> 1                      <NA>                            <NA>        <NA>
+#> 2                      <NA>                            <NA>        <NA>
+#> 3                      <NA>                            <NA>        <NA>
+#> 4                      <NA>                            <NA>        <NA>
+#> 5                 term_code                              00        <NA>
+#> 6                      <NA>                            <NA>        <NA>
+#> 7          description_type                               P        <NA>
 get_codeminer_metadata(c("lookup", "mapping"))
-#> Error in dbSendQuery(conn, statement, ...): Catalog Error: Table with name _lookup_metadata does not exist!
-#> Did you mean "duckdb_databases"?
+#> $lookup
+#>      lookup_table_name     code_type lookup_version lookup_code_col
+#> 1           BNF_UKB v4           BNF         UKB v4        BNF_Code
+#> 2          DM+D_UKB v4          DM+D         UKB v4      concept_id
+#> 3         ICD-9_UKB v4         ICD-9         UKB v4            ICD9
+#> 4        ICD-10_UKB v4        ICD-10         UKB v4        ALT_CODE
+#> 5        Read 2_UKB v4        Read 2         UKB v4       read_code
+#> 6 Read 2, drugs_UKB v4 Read 2, drugs         UKB v4       read_code
+#> 7        Read 3_UKB v4        Read 3         UKB v4       read_code
+#>   lookup_description_col                                      lookup_source
+#> 1            Description https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592
+#> 2                   term https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592
+#> 3       DESCRIPTION_ICD9 https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592
+#> 4            DESCRIPTION https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592
+#> 5       term_description https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592
+#> 6       term_description https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592
+#> 7       term_description https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592
+#>   preferred_description_col preferred_description_indicator col_filters
+#> 1                      <NA>                            <NA>        <NA>
+#> 2                      <NA>                            <NA>        <NA>
+#> 3                      <NA>                            <NA>        <NA>
+#> 4                      <NA>                            <NA>        <NA>
+#> 5                 term_code                              00        <NA>
+#> 6                      <NA>                            <NA>        <NA>
+#> 7          description_type                               P        <NA>
 #> 
-#> LINE 1: SELECT * FROM _lookup_metadata
-#>                       ^
-#> ℹ Context: rapi_prepare
-#> ℹ Error type: CATALOG
+#> $mapping
+#>          mapping_table_name from_code_type to_code_type map_version    from_col
+#> 1       ICD-9_ICD-10_UKB v4          ICD-9       ICD-10      UKB v4        ICD9
+#> 2  Read 2, drugs_BNF_UKB v4  Read 2, drugs          BNF      UKB v4   read_code
+#> 3       Read 2_ICD-9_UKB v4         Read 2        ICD-9      UKB v4   read_code
+#> 4      Read 2_ICD-10_UKB v4         Read 2       ICD-10      UKB v4   read_code
+#> 5       Read 2_OPCS4_UKB v4         Read 2        OPCS4      UKB v4   read_code
+#> 6      Read 2_Read 3_UKB v4         Read 2       Read 3      UKB v4 READV2_CODE
+#> 7       Read 3_ICD-9_UKB v4         Read 3        ICD-9      UKB v4   read_code
+#> 8      Read 3_ICD-10_UKB v4         Read 3       ICD-10      UKB v4   read_code
+#> 9       Read 3_OPCS4_UKB v4         Read 3        OPCS4      UKB v4   read_code
+#> 10     Read 3_Read 2_UKB v4         Read 3       Read 2      UKB v4 READV3_CODE
+#>           to_col                                         map_source col_filters
+#> 1          ICD10 https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592        <NA>
+#> 2       bnf_code https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592        <NA>
+#> 3      icd9_code https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592        <NA>
+#> 4     icd10_code https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592        <NA>
+#> 5  opcs_4.2_code https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592        <NA>
+#> 6    READV3_CODE https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592        <NA>
+#> 7      icd9_code https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592        <NA>
+#> 8     icd10_code https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592        <NA>
+#> 9     opcs4_code https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592        <NA>
+#> 10   READV2_CODE https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592        <NA>
+#> 
 ```

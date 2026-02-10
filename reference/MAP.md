@@ -80,7 +80,10 @@ as most mapping tables only work one way.
 for adding new mapping tables to the codeminer database.
 
 Other Clinical code lookups and mappings:
-[`CODES()`](https://codeminer-io.github.io/codeminer/reference/CODES.md)
+[`CODES()`](https://codeminer-io.github.io/codeminer/reference/CODES.md),
+[`get_lookup_table()`](https://codeminer-io.github.io/codeminer/reference/get_lookup_table.md),
+[`get_mapping_table()`](https://codeminer-io.github.io/codeminer/reference/get_mapping_table.md),
+[`get_relationship_table()`](https://codeminer-io.github.io/codeminer/reference/get_relationship_table.md)
 
 ## Examples
 
@@ -88,64 +91,64 @@ Other Clinical code lookups and mappings:
 # Set up a temporary dummy database
 temp_db <- tempfile(fileext = ".duckdb")
 create_dummy_database(temp_db)
-#> Creating new database at /tmp/RtmpLYACwM/file1c671915de5c.duckdb
-#> Reading 17 selected tables from UKB Resource 592
-#> 
-#> Extending read_v2_drugs_bnf with BNF hierarchy and descriptions
-#> Extending read_v2_icd10 by expanding ICD-10 code ranges
-#> Adding tables to database
-#> ✔ Lookup table BNF_UKB v4 added successfully.
-#> ✔ Relationship table BNF_relationship_UKB v4 added successfully.
-#> ✔ Lookup table DM+D_UKB v4 added successfully.
-#> ✔ Lookup table ICD-9_UKB v4 added successfully.
-#> ✔ Relationship table ICD-9_relationship_UKB v4 added successfully.
-#> ✔ Lookup table ICD-10_UKB v4 added successfully.
-#> ✔ Relationship table ICD-10_relationship_UKB v4 added successfully.
-#> ✔ Mapping table ICD-9_ICD-10_UKB v4 added successfully.
-#> ✔ Lookup table Read 2_UKB v4 added successfully.
-#> ✔ Relationship table Read 2_relationship_UKB v4 added successfully.
-#> ✔ Lookup table Read 2, drugs_UKB v4 added successfully.
-#> ✔ Mapping table Read 2, drugs_BNF_UKB v4 added successfully.
-#> ✔ Mapping table Read 2_ICD-9_UKB v4 added successfully.
-#> ✔ Mapping table Read 2_ICD-10_UKB v4 added successfully.
-#> ✔ Mapping table Read 2_OPCS4_UKB v4 added successfully.
-#> ✔ Mapping table Read 2_Read 3_UKB v4 added successfully.
-#> ✔ Lookup table Read 3_UKB v4 added successfully.
-#> ✔ Mapping table Read 3_ICD-9_UKB v4 added successfully.
-#> ✔ Mapping table Read 3_ICD-10_UKB v4 added successfully.
-#> ✔ Mapping table Read 3_OPCS4_UKB v4 added successfully.
-#> ✔ Mapping table Read 3_Read 2_UKB v4 added successfully.
 #> ✔ Dummy database ready to use!
+#> ℹ To reconnect to your previous database:
+#>   `Sys.setenv(CODEMINER_DB_PATH = "/tmp/Rtmp8tnFLb/file1c533315e932.duckdb")`
+#>   `codeminer_connect()`
 
 # Single code
 MAP("X40J4", from = "Read 3", to = "ICD-10")
-#> Error in dbSendQuery(conn, statement, ...): Catalog Error: Table with name _mapping_metadata does not exist!
-#> Did you mean "pragma_database_list"?
+#> ℹ Using 'UKB v4' as latest version
+#> ℹ Using 'UKB v4' as latest version
+#> ℹ Using 'UKB v4' as latest version
+#> Warning: ! The following codes were not found in the lookup table:
+#> • `O240`
+#> <codeminer_codelist>: 2 codes
+#> Code type: "ICD-10"
 #> 
-#> LINE 1: SELECT * FROM _mapping_metadata
-#>                       ^
-#> ℹ Context: rapi_prepare
-#> ℹ Error type: CATALOG
+#> # A tibble: 2 × 3
+#>   code  description                                    code_type
+#>   <chr> <chr>                                          <chr>    
+#> 1 E10   Type 1 diabetes mellitus                       ICD-10   
+#> 2 E109  Type 1 diabetes mellitus Without complications ICD-10   
 
 # Multiple codes
 MAP("X40J4", "X40J5", from = "Read 3", to = "ICD-10")
-#> Error in dbSendQuery(conn, statement, ...): Catalog Error: Table with name _mapping_metadata does not exist!
-#> Did you mean "pragma_database_list"?
+#> ℹ Using 'UKB v4' as latest version
+#> ℹ Using 'UKB v4' as latest version
+#> Warning: ! The following codes were not found in the mapping table:
+#> • `X40J5`
+#> ℹ Using 'UKB v4' as latest version
+#> ℹ Using 'UKB v4' as latest version
+#> Warning: ! The following codes were not found in the lookup table:
+#> • `O240`
+#> <codeminer_codelist>: 2 codes
+#> Code type: "ICD-10"
 #> 
-#> LINE 1: SELECT * FROM _mapping_metadata
-#>                       ^
-#> ℹ Context: rapi_prepare
-#> ℹ Error type: CATALOG
+#> # A tibble: 2 × 3
+#>   code  description                                    code_type
+#>   <chr> <chr>                                          <chr>    
+#> 1 E10   Type 1 diabetes mellitus                       ICD-10   
+#> 2 E109  Type 1 diabetes mellitus Without complications ICD-10   
 
 # || separated
 MAP("X40J4 || X40J5", from = "Read 3", to = "ICD-10")
-#> Error in dbSendQuery(conn, statement, ...): Catalog Error: Table with name _mapping_metadata does not exist!
-#> Did you mean "pragma_database_list"?
+#> ℹ Using 'UKB v4' as latest version
+#> ℹ Using 'UKB v4' as latest version
+#> Warning: ! The following codes were not found in the mapping table:
+#> • `X40J5`
+#> ℹ Using 'UKB v4' as latest version
+#> ℹ Using 'UKB v4' as latest version
+#> Warning: ! The following codes were not found in the lookup table:
+#> • `O240`
+#> <codeminer_codelist>: 2 codes
+#> Code type: "ICD-10"
 #> 
-#> LINE 1: SELECT * FROM _mapping_metadata
-#>                       ^
-#> ℹ Context: rapi_prepare
-#> ℹ Error type: CATALOG
+#> # A tibble: 2 × 3
+#>   code  description                                    code_type
+#>   <chr> <chr>                                          <chr>    
+#> 1 E10   Type 1 diabetes mellitus                       ICD-10   
+#> 2 E109  Type 1 diabetes mellitus Without complications ICD-10   
 
 # Data frame input (from is optional)
 df <- data.frame(
@@ -154,21 +157,39 @@ df <- data.frame(
   code_type = c("Read 3", "Read 3")
 )
 MAP(df, to = "ICD-10")
-#> Error in dbSendQuery(conn, statement, ...): Catalog Error: Table with name _mapping_metadata does not exist!
-#> Did you mean "pragma_database_list"?
+#> ℹ Using 'UKB v4' as latest version
+#> ℹ Using 'UKB v4' as latest version
+#> Warning: ! The following codes were not found in the mapping table:
+#> • `X40J5`
+#> ℹ Using 'UKB v4' as latest version
+#> ℹ Using 'UKB v4' as latest version
+#> Warning: ! The following codes were not found in the lookup table:
+#> • `O240`
+#> <codeminer_codelist>: 2 codes
+#> Code type: "ICD-10"
 #> 
-#> LINE 1: SELECT * FROM _mapping_metadata
-#>                       ^
-#> ℹ Context: rapi_prepare
-#> ℹ Error type: CATALOG
+#> # A tibble: 2 × 3
+#>   code  description                                    code_type
+#>   <chr> <chr>                                          <chr>    
+#> 1 E10   Type 1 diabetes mellitus                       ICD-10   
+#> 2 E109  Type 1 diabetes mellitus Without complications ICD-10   
 
 # Return the mapping table itself
 MAP("all", from = "Read 3", to = "ICD-10")
-#> Error in dbSendQuery(conn, statement, ...): Catalog Error: Table with name _mapping_metadata does not exist!
-#> Did you mean "pragma_database_list"?
-#> 
-#> LINE 1: SELECT * FROM _mapping_metadata
-#>                       ^
-#> ℹ Context: rapi_prepare
-#> ℹ Error type: CATALOG
+#> ℹ Using 'UKB v4' as latest version
+#> # A tibble: 36 × 8
+#>    from  to    mapping_status refine_flag add_code_flag element_num block_num
+#>    <chr> <chr> <chr>          <chr>       <chr>         <chr>       <chr>    
+#>  1 X40J4 E109  D              C           P             0           0        
+#>  2 X40J4 E10   A              M           P             0           0        
+#>  3 X40J4 O240  R              C           C             0           0        
+#>  4 C10.. E149  D              C           C             0           0        
+#>  5 C10.. E14   A              M           P             0           0        
+#>  6 C10.. E109  R              C           C             0           0        
+#>  7 C10.. E119  R              C           C             0           0        
+#>  8 C10.. E129  R              C           C             0           0        
+#>  9 C10.. E139  R              C           C             0           0        
+#> 10 C10.. O249  R              C           C             0           0        
+#> # ℹ 26 more rows
+#> # ℹ 1 more variable: icd10_dagger_asterisk <chr>
 ```

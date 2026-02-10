@@ -108,64 +108,70 @@ Other Code relationships:
 
 ``` r
 create_dummy_database()
-#> Creating new database at /tmp/RtmpLYACwM/file1c6773ec5399.duckdb
-#> Reading 17 selected tables from UKB Resource 592
-#> 
-#> Extending read_v2_drugs_bnf with BNF hierarchy and descriptions
-#> Extending read_v2_icd10 by expanding ICD-10 code ranges
-#> Adding tables to database
-#> ✔ Lookup table BNF_UKB v4 added successfully.
-#> ✔ Relationship table BNF_relationship_UKB v4 added successfully.
-#> ✔ Lookup table DM+D_UKB v4 added successfully.
-#> ✔ Lookup table ICD-9_UKB v4 added successfully.
-#> ✔ Relationship table ICD-9_relationship_UKB v4 added successfully.
-#> ✔ Lookup table ICD-10_UKB v4 added successfully.
-#> ✔ Relationship table ICD-10_relationship_UKB v4 added successfully.
-#> ✔ Mapping table ICD-9_ICD-10_UKB v4 added successfully.
-#> ✔ Lookup table Read 2_UKB v4 added successfully.
-#> ✔ Relationship table Read 2_relationship_UKB v4 added successfully.
-#> ✔ Lookup table Read 2, drugs_UKB v4 added successfully.
-#> ✔ Mapping table Read 2, drugs_BNF_UKB v4 added successfully.
-#> ✔ Mapping table Read 2_ICD-9_UKB v4 added successfully.
-#> ✔ Mapping table Read 2_ICD-10_UKB v4 added successfully.
-#> ✔ Mapping table Read 2_OPCS4_UKB v4 added successfully.
-#> ✔ Mapping table Read 2_Read 3_UKB v4 added successfully.
-#> ✔ Lookup table Read 3_UKB v4 added successfully.
-#> ✔ Mapping table Read 3_ICD-9_UKB v4 added successfully.
-#> ✔ Mapping table Read 3_ICD-10_UKB v4 added successfully.
-#> ✔ Mapping table Read 3_OPCS4_UKB v4 added successfully.
-#> ✔ Mapping table Read 3_Read 2_UKB v4 added successfully.
 #> ✔ Dummy database ready to use!
+#> ℹ To reconnect to your previous database:
+#>   `Sys.setenv(CODEMINER_DB_PATH = "/tmp/Rtmp8tnFLb/file1c5327791d12.duckdb")`
+#>   `codeminer_connect()`
 PARENTS("E10", "E11", type = "ICD-10")
-#> Error in dbSendQuery(conn, statement, ...): Catalog Error: Table with name _relationship_metadata does not exist!
-#> Did you mean "sqlite_temp_schema"?
+#> ℹ Using 'UKB v4' as latest version
+#> ℹ Using 'UKB v4' as latest version
+#> <codeminer_codelist>: 2 codes
+#> Code type: "ICD-10"
 #> 
-#> LINE 1: SELECT * FROM _relationship_metadata
-#>                       ^
-#> ℹ Context: rapi_prepare
-#> ℹ Error type: CATALOG
+#> # A tibble: 2 × 3
+#>   code  description              code_type
+#>   <chr> <chr>                    <chr>    
+#> 1 E10   Type 1 diabetes mellitus ICD-10   
+#> 2 E11   Type 2 diabetes mellitus ICD-10   
 CHILDREN("E10", "E11", type = "ICD-10")
-#> Error in dbSendQuery(conn, statement, ...): Catalog Error: Table with name _relationship_metadata does not exist!
-#> Did you mean "sqlite_temp_schema"?
+#> ℹ Using 'UKB v4' as latest version
+#> ℹ Using 'UKB v4' as latest version
+#> <codeminer_codelist>: 22 codes
+#> Code type: "ICD-10"
 #> 
-#> LINE 1: SELECT * FROM _relationship_metadata
-#>                       ^
-#> ℹ Context: rapi_prepare
-#> ℹ Error type: CATALOG
+#> # A tibble: 22 × 3
+#>    code  description                                                   code_type
+#>    <chr> <chr>                                                         <chr>    
+#>  1 E10   Type 1 diabetes mellitus                                      ICD-10   
+#>  2 E100  Type 1 diabetes mellitus With coma                            ICD-10   
+#>  3 E101  Type 1 diabetes mellitus With ketoacidosis                    ICD-10   
+#>  4 E102  Type 1 diabetes mellitus With renal complications             ICD-10   
+#>  5 E103  Type 1 diabetes mellitus With ophthalmic complications        ICD-10   
+#>  6 E104  Type 1 diabetes mellitus With neurological complications      ICD-10   
+#>  7 E105  Type 1 diabetes mellitus With peripheral circulatory complic… ICD-10   
+#>  8 E106  Type 1 diabetes mellitus With other specified complications   ICD-10   
+#>  9 E107  Type 1 diabetes mellitus With multiple complications          ICD-10   
+#> 10 E108  Type 1 diabetes mellitus With unspecified complications       ICD-10   
+#> # ℹ 12 more rows
 N_PARENTS("E10", "E11", type = "ICD-10")
-#> Error in dbSendQuery(conn, statement, ...): Catalog Error: Table with name _relationship_metadata does not exist!
-#> Did you mean "sqlite_temp_schema"?
+#> ℹ Using 'UKB v4' as latest version
+#> ℹ Using 'UKB v4' as latest version
+#> <codeminer_codelist>: 2 codes
+#> Code type: "ICD-10"
 #> 
-#> LINE 1: SELECT * FROM _relationship_metadata
-#>                       ^
-#> ℹ Context: rapi_prepare
-#> ℹ Error type: CATALOG
+#> # A tibble: 2 × 3
+#>   code  description              code_type
+#>   <chr> <chr>                    <chr>    
+#> 1 E10   Type 1 diabetes mellitus ICD-10   
+#> 2 E11   Type 2 diabetes mellitus ICD-10   
 N_CHILDREN("E10", "E11", type = "ICD-10")
-#> Error in dbSendQuery(conn, statement, ...): Catalog Error: Table with name _relationship_metadata does not exist!
-#> Did you mean "sqlite_temp_schema"?
+#> ℹ Using 'UKB v4' as latest version
+#> ℹ Using 'UKB v4' as latest version
+#> <codeminer_codelist>: 22 codes
+#> Code type: "ICD-10"
 #> 
-#> LINE 1: SELECT * FROM _relationship_metadata
-#>                       ^
-#> ℹ Context: rapi_prepare
-#> ℹ Error type: CATALOG
+#> # A tibble: 22 × 3
+#>    code  description                                                   code_type
+#>    <chr> <chr>                                                         <chr>    
+#>  1 E10   Type 1 diabetes mellitus                                      ICD-10   
+#>  2 E100  Type 1 diabetes mellitus With coma                            ICD-10   
+#>  3 E101  Type 1 diabetes mellitus With ketoacidosis                    ICD-10   
+#>  4 E102  Type 1 diabetes mellitus With renal complications             ICD-10   
+#>  5 E103  Type 1 diabetes mellitus With ophthalmic complications        ICD-10   
+#>  6 E104  Type 1 diabetes mellitus With neurological complications      ICD-10   
+#>  7 E105  Type 1 diabetes mellitus With peripheral circulatory complic… ICD-10   
+#>  8 E106  Type 1 diabetes mellitus With other specified complications   ICD-10   
+#>  9 E107  Type 1 diabetes mellitus With multiple complications          ICD-10   
+#> 10 E108  Type 1 diabetes mellitus With unspecified complications       ICD-10   
+#> # ℹ 12 more rows
 ```

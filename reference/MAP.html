@@ -110,7 +110,10 @@ most mapping tables only work one way.</p>
     <div class="dont-index"><p><code><a href="add_mapping_table.html">add_mapping_table()</a></code> for adding new mapping tables to the codeminer
 database.</p>
 <p>Other Clinical code lookups and mappings:
-<code><a href="CODES.html">CODES()</a></code></p></div>
+<code><a href="CODES.html">CODES()</a></code>,
+<code><a href="get_lookup_table.html">get_lookup_table()</a></code>,
+<code><a href="get_mapping_table.html">get_mapping_table()</a></code>,
+<code><a href="get_relationship_table.html">get_relationship_table()</a></code></p></div>
     </div>
 
     <div class="section level2">
@@ -118,64 +121,64 @@ database.</p>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># Set up a temporary dummy database</span></span></span>
 <span class="r-in"><span><span class="va">temp_db</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span>fileext <span class="op">=</span> <span class="st">".duckdb"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="create_dummy_database.html">create_dummy_database</a></span><span class="op">(</span><span class="va">temp_db</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Creating new database at <span style="color: #0000BB;">/tmp/RtmpLYACwM/file1c671915de5c.duckdb</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Reading 17 selected tables from UKB Resource 592</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Extending <span style="color: #00BB00;">read_v2_drugs_bnf</span> with BNF hierarchy and descriptions</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Extending <span style="color: #00BB00;">read_v2_icd10</span> by expanding ICD-10 code ranges</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Adding tables to database</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Lookup table <span style="color: #00BB00;">BNF_UKB v4</span> added successfully.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Relationship table <span style="color: #00BB00;">BNF_relationship_UKB v4</span> added successfully.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Lookup table <span style="color: #00BB00;">DM+D_UKB v4</span> added successfully.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Lookup table <span style="color: #00BB00;">ICD-9_UKB v4</span> added successfully.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Relationship table <span style="color: #00BB00;">ICD-9_relationship_UKB v4</span> added successfully.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Lookup table <span style="color: #00BB00;">ICD-10_UKB v4</span> added successfully.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Relationship table <span style="color: #00BB00;">ICD-10_relationship_UKB v4</span> added successfully.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Mapping table <span style="color: #00BB00;">ICD-9_ICD-10_UKB v4</span> added successfully.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Lookup table <span style="color: #00BB00;">Read 2_UKB v4</span> added successfully.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Relationship table <span style="color: #00BB00;">Read 2_relationship_UKB v4</span> added successfully.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Lookup table <span style="color: #00BB00;">Read 2, drugs_UKB v4</span> added successfully.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Mapping table <span style="color: #00BB00;">Read 2, drugs_BNF_UKB v4</span> added successfully.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Mapping table <span style="color: #00BB00;">Read 2_ICD-9_UKB v4</span> added successfully.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Mapping table <span style="color: #00BB00;">Read 2_ICD-10_UKB v4</span> added successfully.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Mapping table <span style="color: #00BB00;">Read 2_OPCS4_UKB v4</span> added successfully.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Mapping table <span style="color: #00BB00;">Read 2_Read 3_UKB v4</span> added successfully.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Lookup table <span style="color: #00BB00;">Read 3_UKB v4</span> added successfully.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Mapping table <span style="color: #00BB00;">Read 3_ICD-9_UKB v4</span> added successfully.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Mapping table <span style="color: #00BB00;">Read 3_ICD-10_UKB v4</span> added successfully.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Mapping table <span style="color: #00BB00;">Read 3_OPCS4_UKB v4</span> added successfully.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Mapping table <span style="color: #00BB00;">Read 3_Read 2_UKB v4</span> added successfully.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Dummy database ready to use!</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> To reconnect to your previous database:</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>   `Sys.setenv(CODEMINER_DB_PATH = "/tmp/Rtmp8tnFLb/file1c533315e932.duckdb")`</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>   `codeminer_connect()`</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Single code</span></span></span>
 <span class="r-in"><span><span class="fu">MAP</span><span class="op">(</span><span class="st">"X40J4"</span>, from <span class="op">=</span> <span class="st">"Read 3"</span>, to <span class="op">=</span> <span class="st">"ICD-10"</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in dbSendQuery(conn, statement, ...):</span> Catalog Error: Table with name _mapping_metadata does not exist!</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> Did you mean "pragma_database_list"?</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> LINE 1: SELECT * FROM _mapping_metadata</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span>                       ^</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">ℹ</span> Context: rapi_prepare</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">ℹ</span> Error type: CATALOG</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Using 'UKB v4' as latest version</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Using 'UKB v4' as latest version</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Using 'UKB v4' as latest version</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span><span style="color: #BBBB00;">!</span> The following codes were not found in the lookup table:</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> `O240`</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">&lt;codeminer_codelist&gt;</span>: 2 codes</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Code type: <span style="color: #0000BB;">"ICD-10"</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 2 × 3</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   code  description                                    code_type</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                                          <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> E10   Type 1 diabetes mellitus                       ICD-10   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span> E109  Type 1 diabetes mellitus Without complications ICD-10   </span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Multiple codes</span></span></span>
 <span class="r-in"><span><span class="fu">MAP</span><span class="op">(</span><span class="st">"X40J4"</span>, <span class="st">"X40J5"</span>, from <span class="op">=</span> <span class="st">"Read 3"</span>, to <span class="op">=</span> <span class="st">"ICD-10"</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in dbSendQuery(conn, statement, ...):</span> Catalog Error: Table with name _mapping_metadata does not exist!</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> Did you mean "pragma_database_list"?</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> LINE 1: SELECT * FROM _mapping_metadata</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span>                       ^</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">ℹ</span> Context: rapi_prepare</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">ℹ</span> Error type: CATALOG</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Using 'UKB v4' as latest version</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Using 'UKB v4' as latest version</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span><span style="color: #BBBB00;">!</span> The following codes were not found in the mapping table:</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> `X40J5`</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Using 'UKB v4' as latest version</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Using 'UKB v4' as latest version</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span><span style="color: #BBBB00;">!</span> The following codes were not found in the lookup table:</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> `O240`</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">&lt;codeminer_codelist&gt;</span>: 2 codes</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Code type: <span style="color: #0000BB;">"ICD-10"</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 2 × 3</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   code  description                                    code_type</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                                          <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> E10   Type 1 diabetes mellitus                       ICD-10   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span> E109  Type 1 diabetes mellitus Without complications ICD-10   </span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># || separated</span></span></span>
 <span class="r-in"><span><span class="fu">MAP</span><span class="op">(</span><span class="st">"X40J4 || X40J5"</span>, from <span class="op">=</span> <span class="st">"Read 3"</span>, to <span class="op">=</span> <span class="st">"ICD-10"</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in dbSendQuery(conn, statement, ...):</span> Catalog Error: Table with name _mapping_metadata does not exist!</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> Did you mean "pragma_database_list"?</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> LINE 1: SELECT * FROM _mapping_metadata</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span>                       ^</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">ℹ</span> Context: rapi_prepare</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">ℹ</span> Error type: CATALOG</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Using 'UKB v4' as latest version</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Using 'UKB v4' as latest version</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span><span style="color: #BBBB00;">!</span> The following codes were not found in the mapping table:</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> `X40J5`</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Using 'UKB v4' as latest version</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Using 'UKB v4' as latest version</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span><span style="color: #BBBB00;">!</span> The following codes were not found in the lookup table:</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> `O240`</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">&lt;codeminer_codelist&gt;</span>: 2 codes</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Code type: <span style="color: #0000BB;">"ICD-10"</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 2 × 3</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   code  description                                    code_type</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                                          <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> E10   Type 1 diabetes mellitus                       ICD-10   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span> E109  Type 1 diabetes mellitus Without complications ICD-10   </span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Data frame input (from is optional)</span></span></span>
 <span class="r-in"><span><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span></span>
@@ -184,23 +187,41 @@ database.</p>
 <span class="r-in"><span>  code_type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Read 3"</span>, <span class="st">"Read 3"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">MAP</span><span class="op">(</span><span class="va">df</span>, to <span class="op">=</span> <span class="st">"ICD-10"</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in dbSendQuery(conn, statement, ...):</span> Catalog Error: Table with name _mapping_metadata does not exist!</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> Did you mean "pragma_database_list"?</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> LINE 1: SELECT * FROM _mapping_metadata</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span>                       ^</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">ℹ</span> Context: rapi_prepare</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">ℹ</span> Error type: CATALOG</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Using 'UKB v4' as latest version</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Using 'UKB v4' as latest version</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span><span style="color: #BBBB00;">!</span> The following codes were not found in the mapping table:</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> `X40J5`</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Using 'UKB v4' as latest version</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Using 'UKB v4' as latest version</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span><span style="color: #BBBB00;">!</span> The following codes were not found in the lookup table:</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> `O240`</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">&lt;codeminer_codelist&gt;</span>: 2 codes</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Code type: <span style="color: #0000BB;">"ICD-10"</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 2 × 3</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   code  description                                    code_type</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                                          <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> E10   Type 1 diabetes mellitus                       ICD-10   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span> E109  Type 1 diabetes mellitus Without complications ICD-10   </span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Return the mapping table itself</span></span></span>
 <span class="r-in"><span><span class="fu">MAP</span><span class="op">(</span><span class="st">"all"</span>, from <span class="op">=</span> <span class="st">"Read 3"</span>, to <span class="op">=</span> <span class="st">"ICD-10"</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in dbSendQuery(conn, statement, ...):</span> Catalog Error: Table with name _mapping_metadata does not exist!</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> Did you mean "pragma_database_list"?</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> LINE 1: SELECT * FROM _mapping_metadata</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span>                       ^</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">ℹ</span> Context: rapi_prepare</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">ℹ</span> Error type: CATALOG</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Using 'UKB v4' as latest version</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 36 × 8</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    from  to    mapping_status refine_flag add_code_flag element_num block_num</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span> X40J4 E109  D              C           P             0           0        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span> X40J4 E10   A              M           P             0           0        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span> X40J4 O240  R              C           C             0           0        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span> C10.. E149  D              C           C             0           0        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span> C10.. E14   A              M           P             0           0        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span> C10.. E109  R              C           C             0           0        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span> C10.. E119  R              C           C             0           0        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span> C10.. E129  R              C           C             0           0        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span> C10.. E139  R              C           C             0           0        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span> C10.. O249  R              C           C             0           0        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 26 more rows</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 1 more variable: icd10_dagger_asterisk &lt;chr&gt;</span></span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

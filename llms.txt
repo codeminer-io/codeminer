@@ -187,6 +187,12 @@ coding systems.
   : Get relationship types for codes
 - [`MAP()`](https://codeminer-io.github.io/codeminer/reference/MAP.md) :
   Map clinical codes from one coding system to another
+- [`get_lookup_table()`](https://codeminer-io.github.io/codeminer/reference/get_lookup_table.md)
+  : Get the full lookup table for a code type
+- [`get_mapping_table()`](https://codeminer-io.github.io/codeminer/reference/get_mapping_table.md)
+  : Get the full mapping table for a pair of code types
+- [`get_relationship_table()`](https://codeminer-io.github.io/codeminer/reference/get_relationship_table.md)
+  : Get the full relationship table for a code type
 - [`default_col_filters()`](https://codeminer-io.github.io/codeminer/reference/default_col_filters.md)
   : Default column filters
 - [`get_col_filters()`](https://codeminer-io.github.io/codeminer/reference/get_col_filters.md)
