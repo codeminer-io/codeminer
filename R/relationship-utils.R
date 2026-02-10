@@ -1,14 +1,74 @@
-#' Retrieve relationship metadata for a code type and version
+#' Get the full relationship table for a code type
 #'
-#' @param con A database connection.
-#' @param code_type Code type (character).
-#' @param relationship_version Relationship table version (character).
-#' @param call Calling environment for error messages. Defaults to
-#'   [rlang::caller_env()].
+#' Returns a lazy `dplyr::tbl()` containing the relationship table with
+#' standardised column names (`from`, `to`, `type`, `code_type`) plus all
+#' additional columns from the underlying database table. Call
+#' [dplyr::collect()] to materialise the result.
 #'
-#' @return A single-row data frame with the relationship metadata.
-#' @keywords internal
-#' @noRd
+#' This is useful for inspecting the raw relationship data used by
+#' [CHILDREN()], [PARENTS()], and other graph traversal functions.
+#'
+#' @param code_type The code type for which to retrieve relationships.
+#' @param relationship_version The version to retrieve. Defaults to `"latest"`.
+#' @param col_filters Column filters to apply. See [CODES()] for details.
+#' @param con Optional DBI connection. If `NULL` (default), uses the
+#'   workbench connection.
+#' @param call The calling environment. Passed to [codeminer_abort].
+#'
+#' @return A lazy `dplyr::tbl()` with standardised columns (`from`, `to`,
+#'   `type`, `code_type`) plus all other columns from the underlying table.
+#' @export
+#' @family Clinical code lookups and mappings
+#' @seealso [CHILDREN()], [PARENTS()] for graph traversal,
+#'   [get_codeminer_metadata()] for discovering available tables.
+#' @examples
+#' create_dummy_database()
+#'
+#' # Get the full ICD-10 relationship table
+#' get_relationship_table("ICD-10") |> dplyr::collect()
+get_relationship_table <- function(
+  code_type,
+  relationship_version = "latest",
+  col_filters = "default",
+  con = NULL,
+  call = rlang::caller_env()
+) {
+  con <- get_db_con(con)
+  meta <- get_metadata_for_relationship(
+    con,
+    code_type,
+    relationship_version,
+    call
+  )
+  tbl <- dplyr::tbl(con, meta$relationship_table_name)
+
+  # Apply col_filters
+  resolved <- resolve_col_filters(
+    col_filters,
+    meta$col_filters,
+    pin_type = "relationship",
+    pin_key = code_type
+  )
+  tbl <- apply_col_filters(
+    tbl,
+    resolved,
+    tbl_name = meta$relationship_table_name,
+    call = call
+  )
+
+  # Standardise key columns, keep all others
+  tbl <- dplyr::select(
+    tbl,
+    from = .env$meta$from_col,
+    to = .env$meta$to_col,
+    type = .env$meta$type_col,
+    dplyr::everything()
+  ) |>
+    dplyr::mutate(code_type = .env$code_type)
+
+  tbl
+}
+
 get_metadata_for_relationship <- function(
   con,
   code_type,

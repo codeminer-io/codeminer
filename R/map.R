@@ -92,11 +92,11 @@ MAP <- function(
 
     con <- get_db_con()
     mapping_table <- get_mapping_table(
-      con,
       from,
       to,
       map_version,
-      col_filters = col_filters
+      col_filters = col_filters,
+      con = con
     )
     return(dplyr::collect(mapping_table))
   }
@@ -116,11 +116,11 @@ MAP <- function(
   con <- get_db_con()
 
   mapping_table <- get_mapping_table(
-    con,
     from,
     to,
     map_version,
-    col_filters = col_filters
+    col_filters = col_filters,
+    con = con
   )
 
   mapping <- dplyr::filter(
@@ -142,24 +142,43 @@ MAP <- function(
   return(CODES(mapped_codes, type = to, lookup_version = lookup_version))
 }
 
-#' Get the mapping table for the given from and to types in standardised format
+#' Get the full mapping table for a pair of code types
 #'
-#' @param con A database connection.
-#' @param from The source code type to map from
-#' @param to The target code type to map to
-#' @param map_version The version of the mapping table.
+#' Returns a lazy `dplyr::tbl()` containing the mapping table with standardised
+#' column names (`from`, `to`) plus all additional columns from the underlying
+#' database table. Call [dplyr::collect()] to materialise the result.
+#'
+#' This is useful for inspecting columns beyond the standard codelist output
+#' returned by [MAP()].
+#'
+#' @param from The source code type to map from.
+#' @param to The target code type to map to.
+#' @param map_version The version to retrieve. Defaults to `"latest"`.
+#' @param col_filters Column filters to apply. See [CODES()] for details.
+#' @param con Optional DBI connection. If `NULL` (default), uses the
+#'   workbench connection.
 #' @param call The calling environment. Passed to [codeminer_abort].
 #'
-#' @return A data frame containing the lookup table with two columns: `from` and `to`.
-#' @keywords internal
+#' @return A lazy `dplyr::tbl()` with standardised columns (`from`, `to`)
+#'   plus all other columns from the underlying table.
+#' @export
+#' @family Clinical code lookups and mappings
+#' @seealso [MAP()] for standardised codelist output,
+#'   [get_codeminer_metadata()] for discovering available tables.
+#' @examples
+#' create_dummy_database()
+#'
+#' # Get the full Read 3 to ICD-10 mapping table
+#' get_mapping_table("Read 3", "ICD-10") |> dplyr::collect()
 get_mapping_table <- function(
-  con,
   from,
   to,
-  map_version,
+  map_version = "latest",
   col_filters = "default",
+  con = NULL,
   call = rlang::caller_env()
 ) {
+  con <- get_db_con(con)
   this_meta <- get_metadata_for_mapping(con, from, to, map_version, call = call)
   tbl_name <- this_meta$mapping_table_name
   tbl <- dplyr::tbl(con, tbl_name)
@@ -174,7 +193,12 @@ get_mapping_table <- function(
   )
   tbl <- apply_col_filters(tbl, resolved, tbl_name = tbl_name, call = call)
 
-  tbl <- dplyr::rename(tbl, from = this_meta$from_col, to = this_meta$to_col)
+  tbl <- dplyr::select(
+    tbl,
+    from = .env$this_meta$from_col,
+    to = .env$this_meta$to_col,
+    dplyr::everything()
+  )
   return(tbl)
 }
 

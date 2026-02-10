@@ -126,10 +126,10 @@ CODES <- function(
 
     con <- get_db_con()
     lookup_table <- get_lookup_table(
-      con,
       type,
       lookup_version,
-      col_filters = col_filters
+      col_filters = col_filters,
+      con = con
     )
     result <- dplyr::collect(lookup_table)
 
@@ -150,10 +150,10 @@ CODES <- function(
   con <- get_db_con()
 
   lookup_table <- get_lookup_table(
-    con,
     type,
     lookup_version,
-    col_filters = col_filters
+    col_filters = col_filters,
+    con = con
   )
 
   result <- lookup_table |>
@@ -293,10 +293,10 @@ CODES_LIKE <- function(
   con <- get_db_con()
 
   lookup_table <- get_lookup_table(
-    con,
     type,
     lookup_version,
-    col_filters = col_filters
+    col_filters = col_filters,
+    con = con
   )
   like_codes <- dplyr::filter(
     lookup_table,
@@ -314,22 +314,49 @@ CODES_LIKE <- function(
   return(result)
 }
 
-#' Get the lookup table for the given code type in standardised format
+#' Get the full lookup table for a code type
 #'
-#' @param con A database connection.
+#' Returns a lazy `dplyr::tbl()` containing the lookup table with standardised
+#' column names (`code`, `description`, `code_type`, `preferred_description`)
+#' plus all additional columns from the underlying database table. Call
+#' [dplyr::collect()] to materialise the result.
+#'
+#' This is useful for inspecting columns beyond the standard codelist output
+#' returned by [CODES()] and [DESCRIPTION()].
+#'
 #' @param code_type The code type for which to retrieve the lookup table.
+#' @param lookup_version The version to retrieve. Defaults to `"latest"`.
+#' @param col_filters Column filters to apply. See [CODES()] for details.
+#' @param con Optional DBI connection. If `NULL` (default), uses the
+#'   workbench connection.
 #' @param call The calling environment. Passed to [codeminer_abort].
 #'
-#' @return A data frame containing the lookup table with three columns:
-#'   `code`, `description` and `code_type`.
-#' @keywords internal
+#' @return A lazy `dplyr::tbl()` with standardised columns (`code`,
+#'   `description`, `code_type`, `preferred_description`) plus all other
+#'   columns from the underlying table.
+#' @export
+#' @family Clinical code lookups and mappings
+#' @seealso [CODES()] for standardised codelist output,
+#'   [get_codeminer_metadata()] for discovering available tables.
+#' @examples
+#' create_dummy_database()
+#'
+#' # Get the full ICD-10 lookup table
+#' get_lookup_table("ICD-10") |> dplyr::collect()
+#'
+#' # Inspect raw columns for specific codes
+#' result <- CODES("E10", "E11", type = "ICD-10")
+#' get_lookup_table("ICD-10") |>
+#'   dplyr::filter(code %in% .env$result$code) |>
+#'   dplyr::collect()
 get_lookup_table <- function(
-  con,
   code_type,
-  lookup_version,
+  lookup_version = "latest",
   col_filters = "default",
+  con = NULL,
   call = rlang::caller_env()
 ) {
+  con <- get_db_con(con)
   this_meta <- get_metadata_for_lookup(con, code_type, lookup_version, call)
 
   tbl_name <- this_meta$lookup_table_name

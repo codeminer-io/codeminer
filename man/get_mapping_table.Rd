@@ -2,32 +2,58 @@
 % Please edit documentation in R/map.R
 \name{get_mapping_table}
 \alias{get_mapping_table}
-\title{Get the mapping table for the given from and to types in standardised format}
+\title{Get the full mapping table for a pair of code types}
 \usage{
 get_mapping_table(
-  con,
   from,
   to,
-  map_version,
+  map_version = "latest",
   col_filters = "default",
+  con = NULL,
   call = rlang::caller_env()
 )
 }
 \arguments{
-\item{con}{A database connection.}
+\item{from}{The source code type to map from.}
 
-\item{from}{The source code type to map from}
+\item{to}{The target code type to map to.}
 
-\item{to}{The target code type to map to}
+\item{map_version}{The version to retrieve. Defaults to \code{"latest"}.}
 
-\item{map_version}{The version of the mapping table.}
+\item{col_filters}{Column filters to apply. See \code{\link[=CODES]{CODES()}} for details.}
+
+\item{con}{Optional DBI connection. If \code{NULL} (default), uses the
+workbench connection.}
 
 \item{call}{The calling environment. Passed to \link{codeminer_abort}.}
 }
 \value{
-A data frame containing the lookup table with two columns: \code{from} and \code{to}.
+A lazy \code{dplyr::tbl()} with standardised columns (\code{from}, \code{to})
+plus all other columns from the underlying table.
 }
 \description{
-Get the mapping table for the given from and to types in standardised format
+Returns a lazy \code{dplyr::tbl()} containing the mapping table with standardised
+column names (\code{from}, \code{to}) plus all additional columns from the underlying
+database table. Call \code{\link[dplyr:compute]{dplyr::collect()}} to materialise the result.
 }
-\keyword{internal}
+\details{
+This is useful for inspecting columns beyond the standard codelist output
+returned by \code{\link[=MAP]{MAP()}}.
+}
+\examples{
+create_dummy_database()
+
+# Get the full Read 3 to ICD-10 mapping table
+get_mapping_table("Read 3", "ICD-10") |> dplyr::collect()
+}
+\seealso{
+\code{\link[=MAP]{MAP()}} for standardised codelist output,
+\code{\link[=get_codeminer_metadata]{get_codeminer_metadata()}} for discovering available tables.
+
+Other Clinical code lookups and mappings: 
+\code{\link{CODES}()},
+\code{\link{MAP}()},
+\code{\link{get_lookup_table}()},
+\code{\link{get_relationship_table}()}
+}
+\concept{Clinical code lookups and mappings}
