@@ -324,7 +324,7 @@ CODES_LIKE <- function(
 #' This is useful for inspecting columns beyond the standard codelist output
 #' returned by [CODES()] and [DESCRIPTION()].
 #'
-#' @param code_type The code type for which to retrieve the lookup table.
+#' @param type The code type for which to retrieve the lookup table.
 #' @param lookup_version The version to retrieve. Defaults to `"latest"`.
 #' @param col_filters Column filters to apply. See [CODES()] for details.
 #' @param con Optional DBI connection. If `NULL` (default), uses the
@@ -350,14 +350,14 @@ CODES_LIKE <- function(
 #'   dplyr::filter(code %in% .env$result$code) |>
 #'   dplyr::collect()
 get_lookup_table <- function(
-  code_type,
+  type,
   lookup_version = "latest",
   col_filters = "default",
   con = NULL,
   call = rlang::caller_env()
 ) {
   con <- get_db_con(con)
-  this_meta <- get_metadata_for_lookup(con, code_type, lookup_version, call)
+  this_meta <- get_metadata_for_lookup(con, type, lookup_version, call)
 
   tbl_name <- this_meta$lookup_table_name
   tbl <- dplyr::tbl(con, tbl_name)
@@ -367,7 +367,7 @@ get_lookup_table <- function(
     col_filters,
     this_meta$col_filters,
     pin_type = "lookup",
-    pin_key = code_type
+    pin_key = type
   )
   tbl <- apply_col_filters(tbl, resolved, tbl_name = tbl_name, call = call)
 
@@ -377,7 +377,7 @@ get_lookup_table <- function(
     description = .env$this_meta$lookup_description_col,
     dplyr::everything()
   ) |>
-    dplyr::mutate(code_type = .env$code_type)
+    dplyr::mutate(code_type = .env$type)
 
   if (!is.na(this_meta$preferred_description_col)) {
     tbl <- dplyr::rename(

@@ -5,7 +5,7 @@
 \title{Get the full lookup table for a code type}
 \usage{
 get_lookup_table(
-  code_type,
+  type,
   lookup_version = "latest",
   col_filters = "default",
   con = NULL,
@@ -13,7 +13,7 @@ get_lookup_table(
 )
 }
 \arguments{
-\item{code_type}{The code type for which to retrieve the lookup table.}
+\item{type}{The code type for which to retrieve the lookup table.}
 
 \item{lookup_version}{The version to retrieve. Defaults to \code{"latest"}.}
 

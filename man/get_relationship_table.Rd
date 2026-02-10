@@ -5,7 +5,7 @@
 \title{Get the full relationship table for a code type}
 \usage{
 get_relationship_table(
-  code_type,
+  type,
   relationship_version = "latest",
   col_filters = "default",
   con = NULL,
@@ -13,7 +13,7 @@ get_relationship_table(
 )
 }
 \arguments{
-\item{code_type}{The code type for which to retrieve relationships.}
+\item{type}{The code type for which to retrieve relationships.}
 
 \item{relationship_version}{The version to retrieve. Defaults to \code{"latest"}.}
 

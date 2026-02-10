@@ -8,7 +8,7 @@
 #' This is useful for inspecting the raw relationship data used by
 #' [CHILDREN()], [PARENTS()], and other graph traversal functions.
 #'
-#' @param code_type The code type for which to retrieve relationships.
+#' @param type The code type for which to retrieve relationships.
 #' @param relationship_version The version to retrieve. Defaults to `"latest"`.
 #' @param col_filters Column filters to apply. See [CODES()] for details.
 #' @param con Optional DBI connection. If `NULL` (default), uses the
@@ -27,7 +27,7 @@
 #' # Get the full ICD-10 relationship table
 #' get_relationship_table("ICD-10") |> dplyr::collect()
 get_relationship_table <- function(
-  code_type,
+  type,
   relationship_version = "latest",
   col_filters = "default",
   con = NULL,
@@ -36,7 +36,7 @@ get_relationship_table <- function(
   con <- get_db_con(con)
   meta <- get_metadata_for_relationship(
     con,
-    code_type,
+    type,
     relationship_version,
     call
   )
@@ -47,7 +47,7 @@ get_relationship_table <- function(
     col_filters,
     meta$col_filters,
     pin_type = "relationship",
-    pin_key = code_type
+    pin_key = type
   )
   tbl <- apply_col_filters(
     tbl,
@@ -64,7 +64,7 @@ get_relationship_table <- function(
     type = .env$meta$type_col,
     dplyr::everything()
   ) |>
-    dplyr::mutate(code_type = .env$code_type)
+    dplyr::mutate(code_type = .env$type)
 
   tbl
 }
