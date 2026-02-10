@@ -278,6 +278,40 @@ test_that("codeminer_clear_versions() removes all pins", {
   expect_equal(length(.codeminer_env$active_versions), 0)
 })
 
+test_that("codeminer_clear_versions() selectively clears by type", {
+  local_build_temp_database()
+
+  codeminer_set_version(
+    lookup = c("ICD-10" = "UKB v4", "Read 3" = "UKB v4"),
+    relationship = c("ICD-10" = "UKB v4")
+  )
+
+  # Clear only ICD-10 lookup — Read 3 and relationship should remain
+  codeminer_clear_versions(lookup = "ICD-10")
+  expect_null(.codeminer_env$active_versions[["lookup"]][["ICD-10"]])
+  expect_equal(
+    .codeminer_env$active_versions[["lookup"]][["Read 3"]],
+    "UKB v4"
+  )
+  expect_equal(
+    .codeminer_env$active_versions[["relationship"]][["ICD-10"]],
+    "UKB v4"
+  )
+})
+
+test_that("'latest' version is auto-cached on first resolution", {
+  suppressMessages(local_build_temp_dummy_database())
+
+  # First call resolves and caches "latest"
+  result1 <- CODES("E10", type = "ICD-10", lookup_version = "latest")
+  cached <- .codeminer_env$active_versions[["lookup"]][["ICD-10"]]
+  expect_false(is.null(cached))
+
+  # Second call uses the cached version (no re-resolution)
+  result2 <- CODES("E10", type = "ICD-10", lookup_version = "latest")
+  expect_identical(result1, result2)
+})
+
 test_that("codeminer_disconnect() also clears version pins", {
   local_build_temp_database()
 
@@ -370,11 +404,11 @@ test_that("add_metadata_table() rejects '>' in code_type values", {
   )
 })
 
-# codeminer_status() with pins ---------------------------------------------
+# codeminer_status() with active versions -----------------------------------
 
-test_that("codeminer_status() shows pinned versions", {
+test_that("codeminer_status() shows active versions", {
   local_build_temp_database()
 
   codeminer_set_version(lookup = c("ICD-10" = "UKB v4"))
-  expect_message(codeminer_status(), "Pinned versions")
+  expect_message(codeminer_status(), "Active versions")
 })

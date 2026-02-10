@@ -141,13 +141,23 @@ resolve_versioned_metadata <- function(
   # Filter to code_type
   filtered <- meta[meta[[code_type_col]] == code_type_val, ]
 
-  # Resolve "latest" — check pinned version first
+  # Resolve "latest" — check pinned/cached version first, then resolve fresh.
+  # Resolved versions are cached in active_versions so the info message from
+
+  # get_latest_version() only appears once per code_type per session.
+  # Cache is invalidated by add/remove table functions and codeminer_refresh_cache().
   if (identical(version_val, "latest")) {
     pinned <- .codeminer_env$active_versions[[pin_type]][[pin_key]]
     if (!is.null(pinned)) {
       version_val <- pinned
     } else {
       version_val <- get_latest_version(filtered[[version_col]])
+      if (!is.null(pin_type)) {
+        if (is.null(.codeminer_env$active_versions[[pin_type]])) {
+          .codeminer_env$active_versions[[pin_type]] <- list()
+        }
+        .codeminer_env$active_versions[[pin_type]][[pin_key]] <- version_val
+      }
     }
   }
 

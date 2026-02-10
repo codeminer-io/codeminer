@@ -147,7 +147,9 @@ get_codeminer_metadata("lookup")
 
 # Version pinning
 
-When multiple versions of a lookup, mapping, or relationship table are available, `codeminer` resolves `"latest"` automatically. You can override this for the current session with `codeminer_set_version()`:
+When multiple versions of a lookup, mapping, or relationship table are available, `codeminer` resolves `"latest"` automatically. The first time a query function resolves `"latest"` for a given code type, the resolved version is cached for the remainder of the session. This avoids repeated informational messages and ensures consistent version usage across a workflow.
+
+You can override this for the current session with `codeminer_set_version()`:
 
 ```{r version_pinning}
 # Pin lookup and relationship versions for a code type
@@ -172,13 +174,26 @@ CODES("E10", type = "ICD-10")
 CODES("E10", type = "ICD-10", lookup_version = "UKB v4")
 ```
 
-To clear all pins and return to automatic `"latest"` resolution:
+To clear all version selections and return to automatic `"latest"` resolution:
 
 ```{r version_pinning_clear}
 codeminer_clear_versions()
 ```
 
-`codeminer_status()` shows any active pins alongside the connection info.
+You can also clear versions selectively by code type:
+
+```{r version_pinning_selective, eval = FALSE}
+# Clear only the ICD-10 lookup version
+codeminer_clear_versions(lookup = "ICD-10")
+
+# Clear lookup and relationship for SNOMED CT
+codeminer_clear_versions(
+  lookup = "SNOMED CT",
+  relationship = "SNOMED CT"
+)
+```
+
+`codeminer_status()` shows any active versions alongside the connection info.
 
 ## Storing version settings
 

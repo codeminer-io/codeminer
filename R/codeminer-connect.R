@@ -84,6 +84,9 @@ codeminer_connect <- function(main = NULL, extra = NULL) {
   # Set search path: extra first so user tables shadow core ontologies
   codeminer_set_search_path()
 
+  # Clear cached version selections — they may refer to a different database
+  .codeminer_env$active_versions <- list()
+
   # Cache metadata from attached databases
   codeminer_refresh_cache()
 
@@ -145,7 +148,7 @@ codeminer_status <- function() {
   # Show pinned versions if any
   pins <- .codeminer_env$active_versions
   if (length(pins) > 0) {
-    msgs <- c(msgs, "i" = "Pinned versions:")
+    msgs <- c(msgs, "i" = "Active versions:")
     for (type in names(pins)) {
       for (key in names(pins[[type]])) {
         msgs <- c(
@@ -190,6 +193,11 @@ codeminer_status <- function() {
 #' Re-reads metadata tables from all attached databases and updates
 #' the internal cache. Called automatically by [codeminer_connect()] and
 #' after write operations.
+#'
+#' This refreshes the *metadata inventory* (which tables and versions exist
+#' in the database). It does not affect version selections — use
+#' [codeminer_clear_versions()] to reset which version is used for each
+#' code type.
 #'
 #' @return `NULL`, invisibly.
 #' @export
@@ -295,6 +303,10 @@ codeminer_init_extra <- function(path) {
 #' on query functions (e.g. `CODES(..., lookup_version = "v1")`) always take
 #' precedence.
 #'
+#' Versions are also auto-cached the first time `"latest"` is resolved for a
+#' given code type. Calling `codeminer_set_version()` overrides any
+#' auto-cached version.
+#'
 #' New pins are merged with existing ones. To replace all pins, call
 #' [codeminer_clear_versions()] first.
 #'
@@ -383,16 +395,61 @@ codeminer_set_version <- function(
   invisible(.codeminer_env$active_versions)
 }
 
-#' Clear all pinned versions
+#' Clear active version selections
 #'
-#' Removes all version pins set by [codeminer_set_version()], returning
-#' to the default "latest" resolution for all tables.
+#' Removes version selections from the current session. This covers both
+#' versions pinned explicitly with [codeminer_set_version()] and versions
+#' auto-cached on first `"latest"` resolution.
+#'
+#' Called with no arguments, all version selections are cleared and subsequent
+#' queries will re-resolve `"latest"` from the database. To clear only
+#' specific code types, pass them as character vectors.
+#'
+#' @param lookup Character vector of code types whose lookup version should
+#'   be cleared (e.g. `"ICD-10"`). `NULL` (default) means no lookup versions
+#'   are cleared unless all arguments are `NULL`.
+#' @param relationship Character vector of code types whose relationship
+#'   version should be cleared. `NULL` (default) means no relationship
+#'   versions are cleared unless all arguments are `NULL`.
+#' @param mapping Character vector of mapping keys (`"from > to"` format)
+#'   whose version should be cleared. `NULL` (default) means no mapping
+#'   versions are cleared unless all arguments are `NULL`.
 #'
 #' @return `NULL`, invisibly.
 #' @export
 #' @family Workbench management
-codeminer_clear_versions <- function() {
-  .codeminer_env$active_versions <- list()
+#' @examples
+#' \dontrun{
+#' # Clear all version selections
+#' codeminer_clear_versions()
+#'
+#' # Clear only the ICD-10 lookup version
+#' codeminer_clear_versions(lookup = "ICD-10")
+#'
+#' # Clear lookup and relationship versions for SNOMED CT
+#' codeminer_clear_versions(
+#'   lookup = "SNOMED CT",
+#'   relationship = "SNOMED CT"
+#' )
+#' }
+codeminer_clear_versions <- function(
+  lookup = NULL,
+  relationship = NULL,
+  mapping = NULL
+) {
+  if (is.null(lookup) && is.null(relationship) && is.null(mapping)) {
+    .codeminer_env$active_versions <- list()
+  } else {
+    for (key in lookup) {
+      .codeminer_env$active_versions[["lookup"]][[key]] <- NULL
+    }
+    for (key in relationship) {
+      .codeminer_env$active_versions[["relationship"]][[key]] <- NULL
+    }
+    for (key in mapping) {
+      .codeminer_env$active_versions[["mapping"]][[key]] <- NULL
+    }
+  }
   invisible()
 }
 
@@ -662,10 +719,13 @@ normalize_mapping_keys <- function(pins) {
 #' @noRd
 merge_pins <- function(existing, new_pins) {
   if (is.null(existing)) {
-    return(new_pins)
+    return(as.list(new_pins))
   }
+  existing <- as.list(existing)
   # New pins overwrite existing ones with the same name
-  existing[names(new_pins)] <- new_pins
+  for (nm in names(new_pins)) {
+    existing[[nm]] <- new_pins[[nm]]
+  }
   existing
 }
 

@@ -82,6 +82,21 @@ add_lookup_table <- function(table, metadata) {
         "v" = "Lookup table {.field {metadata$lookup_table_name}} added successfully."
       )
     )
+    cached <- .codeminer_env$active_versions[["lookup"]][[
+      metadata$code_type
+    ]]
+    if (!is.null(cached) && cached != metadata$lookup_version) {
+      codeminer_inform(c(
+        "i" = paste0(
+          "Currently using version {.val {cached}} for ",
+          "{.val {metadata$code_type}} lookups."
+        ),
+        "i" = paste0(
+          "Use {.fun codeminer_clear_versions} or ",
+          "{.fun codeminer_set_version} to switch."
+        )
+      ))
+    }
   }
   return(invisible(success))
 }
@@ -111,6 +126,10 @@ remove_lookup_table <- function(code_type, lookup_version) {
   }
 
   remove_table_entry(con, "lookup", table_name)
+  cached <- .codeminer_env$active_versions[["lookup"]][[code_type]]
+  if (!is.null(cached) && cached == lookup_version) {
+    .codeminer_env$active_versions[["lookup"]][[code_type]] <- NULL
+  }
   codeminer_inform(c(
     "v" = "Lookup table {.field {table_name}} removed."
   ))

@@ -109,6 +109,11 @@ test_that("MAP handles versions correctly", {
     test_mapping_table,
     mapping_metadata(test_from, test_to, test_version)
   )
+  # Clear cached "latest" so it re-resolves to the newly added versions
+  codeminer_clear_versions(
+    lookup = test_to,
+    mapping = paste(test_from, ">", test_to)
+  )
 
   v2_result <- MAP(
     "all",
