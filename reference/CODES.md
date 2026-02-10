@@ -11,14 +11,16 @@ CODES(
   ...,
   type = getOption("codeminer.code_type"),
   lookup_version = getOption("codeminer.lookup_version", default = "latest"),
-  preferred_description_only = TRUE
+  preferred_description_only = TRUE,
+  col_filters = "default"
 )
 
 CODES_LIKE(
   pattern,
   type = getOption("codeminer.code_type"),
   lookup_version = getOption("codeminer.lookup_version", default = "latest"),
-  preferred_description_only = TRUE
+  preferred_description_only = TRUE,
+  col_filters = "default"
 )
 ```
 
@@ -61,6 +63,18 @@ CODES_LIKE(
   logical. If `TRUE`, only returns the preferred description for each
   code. Default: `FALSE`.
 
+- col_filters:
+
+  Column filters to apply. One of:
+
+  - `"default"` (default): apply session-pinned or metadata-defined
+    default filters
+
+  - `NULL`: no filtering (return all rows)
+
+  - A named list of `column_name = c(values)` pairs for explicit
+    filtering
+
 - pattern:
 
   a regular expression to search for
@@ -81,8 +95,7 @@ The matching is case-insensitive.
 for adding new lookup tables to the database.
 
 Other Clinical code lookups and mappings:
-[`MAP()`](https://codeminer-io.github.io/codeminer/reference/MAP.md),
-[`default_col_filters()`](https://codeminer-io.github.io/codeminer/reference/default_col_filters.md)
+[`MAP()`](https://codeminer-io.github.io/codeminer/reference/MAP.md)
 
 ## Examples
 
@@ -90,7 +103,7 @@ Other Clinical code lookups and mappings:
 # Set up a temporary dummy database
 temp_db <- tempfile(fileext = ".duckdb")
 create_dummy_database(temp_db)
-#> Creating new database at /tmp/Rtmp8JLRAf/file1c6d30627ed6.duckdb
+#> Creating new database at /tmp/RtmpLYACwM/file1c673ef3b82d.duckdb
 #> Reading 17 selected tables from UKB Resource 592
 #> 
 #> Extending read_v2_drugs_bnf with BNF hierarchy and descriptions

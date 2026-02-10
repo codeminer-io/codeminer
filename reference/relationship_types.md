@@ -9,13 +9,15 @@ from or point to the supplied codes.
 RELATIONSHIP_TYPES_FROM(
   ...,
   type = getOption("codeminer.code_type"),
-  relationship_version = getOption("codeminer.relationship_version", default = "latest")
+  relationship_version = getOption("codeminer.relationship_version", default = "latest"),
+  col_filters = "default"
 )
 
 RELATIONSHIP_TYPES_TO(
   ...,
   type = getOption("codeminer.code_type"),
-  relationship_version = getOption("codeminer.relationship_version", default = "latest")
+  relationship_version = getOption("codeminer.relationship_version", default = "latest"),
+  col_filters = "default"
 )
 ```
 
@@ -33,6 +35,12 @@ RELATIONSHIP_TYPES_TO(
 - relationship_version:
 
   Relationship table version (character).
+
+- col_filters:
+
+  Column filters to apply. See
+  [`CODES()`](https://codeminer-io.github.io/codeminer/reference/CODES.md)
+  for details.
 
 ## Value
 
@@ -55,7 +63,7 @@ Other Code relationships:
 
 ``` r
 create_dummy_database()
-#> Creating new database at /tmp/Rtmp8JLRAf/file1c6d664d86c8.duckdb
+#> Creating new database at /tmp/RtmpLYACwM/file1c677a2ab501.duckdb
 #> Reading 17 selected tables from UKB Resource 592
 #> 
 #> Extending read_v2_drugs_bnf with BNF hierarchy and descriptions

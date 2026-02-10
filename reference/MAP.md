@@ -10,7 +10,8 @@ MAP(
   from = getOption("codeminer.map_from"),
   to = getOption("codeminer.map_to"),
   map_version = getOption("codeminer.map_version", default = "latest"),
-  lookup_version = getOption("codeminer.lookup_version", default = "latest")
+  lookup_version = getOption("codeminer.lookup_version", default = "latest"),
+  col_filters = "default"
 )
 ```
 
@@ -40,6 +41,21 @@ MAP(
   character. Version of the lookup table to use. Default: `"latest"`.
   Can be configured through the `codeminer.lookup_version` option.
 
+- col_filters:
+
+  Column filters to apply to the **mapping table**. One of:
+
+  - `"default"` (default): apply session-pinned or metadata-defined
+    default filters
+
+  - `NULL`: no filtering (return all rows)
+
+  - A named list of `column_name = c(values)` pairs for explicit
+    filtering
+
+  Note: this controls filtering of the mapping table, not the target
+  lookup table (which uses its own default col_filters).
+
 ## Value
 
 A `codeminer_codelist` of the mapped codes with their descriptions.
@@ -64,8 +80,7 @@ as most mapping tables only work one way.
 for adding new mapping tables to the codeminer database.
 
 Other Clinical code lookups and mappings:
-[`CODES()`](https://codeminer-io.github.io/codeminer/reference/CODES.md),
-[`default_col_filters()`](https://codeminer-io.github.io/codeminer/reference/default_col_filters.md)
+[`CODES()`](https://codeminer-io.github.io/codeminer/reference/CODES.md)
 
 ## Examples
 
@@ -73,7 +88,7 @@ Other Clinical code lookups and mappings:
 # Set up a temporary dummy database
 temp_db <- tempfile(fileext = ".duckdb")
 create_dummy_database(temp_db)
-#> Creating new database at /tmp/Rtmp8JLRAf/file1c6d2cb79f06.duckdb
+#> Creating new database at /tmp/RtmpLYACwM/file1c671915de5c.duckdb
 #> Reading 17 selected tables from UKB Resource 592
 #> 
 #> Extending read_v2_drugs_bnf with BNF hierarchy and descriptions

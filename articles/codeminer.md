@@ -47,7 +47,7 @@ of data frames:
 ``` r
 # Create a temporary database with dummy data
 (db_path <- create_dummy_database())
-#> Creating new database at /tmp/RtmpKqskMH/file260d10f7e97b.duckdb
+#> Creating new database at /tmp/RtmpNSfmsH/file262f3e426461.duckdb
 #> Reading 17 selected tables from UKB Resource 592
 #> 
 #> Extending read_v2_drugs_bnf with BNF hierarchy and descriptions
@@ -75,9 +75,9 @@ of data frames:
 #> ✔ Mapping table Read 3_OPCS4_UKB v4 added successfully.
 #> ✔ Mapping table Read 3_Read 2_UKB v4 added successfully.
 #> ✔ Dummy database ready to use!
-#> [1] "/tmp/RtmpKqskMH/file260d10f7e97b.duckdb"
+#> [1] "/tmp/RtmpNSfmsH/file262f3e426461.duckdb"
 Sys.getenv("CODEMINER_DB_PATH")
-#> [1] "/tmp/RtmpKqskMH/file260d10f7e97b.duckdb"
+#> [1] "/tmp/RtmpNSfmsH/file262f3e426461.duckdb"
 ```
 
 `codeminer` resolves the database location using the following
@@ -127,7 +127,7 @@ CODES(
   codes = c("E10", "E11"),
   type = "ICD-10"
 )
-#> ℹ Using database at /tmp/RtmpKqskMH/file260d10f7e97b.duckdb
+#> ℹ Using database at /tmp/RtmpNSfmsH/file262f3e426461.duckdb
 #> ℹ Set `CODEMINER_DB_PATH` or use `codeminer_connect()` to change this.
 #> ℹ Using 'UKB v4' as latest version
 #> <codeminer_codelist>: 2 codes
@@ -230,14 +230,14 @@ get_codeminer_metadata("lookup")
 #> 5       term_description https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592
 #> 6       term_description https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592
 #> 7       term_description https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592
-#>   preferred_description_col preferred_description_indicator
-#> 1                      <NA>                            <NA>
-#> 2                      <NA>                            <NA>
-#> 3                      <NA>                            <NA>
-#> 4                      <NA>                            <NA>
-#> 5                 term_code                              00
-#> 6                      <NA>                            <NA>
-#> 7          description_type                               P
+#>   preferred_description_col preferred_description_indicator col_filters
+#> 1                      <NA>                            <NA>        <NA>
+#> 2                      <NA>                            <NA>        <NA>
+#> 3                      <NA>                            <NA>        <NA>
+#> 4                      <NA>                            <NA>        <NA>
+#> 5                 term_code                              00        <NA>
+#> 6                      <NA>                            <NA>        <NA>
+#> 7          description_type                               P        <NA>
 ```
 
 ## Version pinning
@@ -334,6 +334,143 @@ codeminer_set_version(
   relationship = unlist(cfg$relationship),
   mapping      = unlist(cfg$mapping)
 )
+```
+
+## Column filters
+
+Some tables contain rows that should be excluded by default — for
+example, inactive SNOMED CT concepts or approximate code mappings.
+Column filters (`col_filters`) let table authors declare which columns
+are filterable, what values are available, and which values should be
+selected by default.
+
+### How filters are defined
+
+Filters are stored in table metadata as a JSON specification. Each
+filterable column has an entry with `values` (all valid options) and
+`defaults` (applied when no override is given):
+
+``` r
+# When adding a lookup table with filters
+add_lookup_table(
+  my_snomed_lookup,
+  lookup_metadata(
+    "SNOMED CT",
+    lookup_version = "v1",
+    col_filters = list(
+      active_concept = list(
+        values = c("0", "1"),
+        defaults = c("1")
+      )
+    )
+  )
+)
+```
+
+### Query-time behaviour
+
+All query functions accept a `col_filters` parameter with three options:
+
+- **`"default"`** (the default): apply filters from session pin or
+  metadata defaults
+- **`NULL`**: no filtering — return all rows regardless of column values
+- **A named list**: apply explicit filters for this call only
+
+``` r
+# Default: only active concepts (from metadata defaults)
+CODES("all", type = "SNOMED CT")
+
+# Override: return all rows including inactive
+CODES("all", type = "SNOMED CT", col_filters = NULL)
+
+# Custom: only inactive concepts
+CODES("all", type = "SNOMED CT", col_filters = list(active_concept = c("0")))
+```
+
+### Filters are per-table-type
+
+An important design point: **each table type has its own independent
+col_filters**. This matters most for
+[`MAP()`](https://codeminer-io.github.io/codeminer/reference/MAP.md),
+which touches two table types:
+
+1.  The **mapping table** (e.g., Read 3 → ICD-10) may have filters like
+    `mapping_status`
+2.  The **target lookup table** (e.g., ICD-10) may have filters like
+    `active_concept`
+
+When you call `MAP(col_filters = ...)`, this controls only the mapping
+table. The target lookup table uses its own default filters when looking
+up descriptions. This is intentional — the two tables have different
+filterable columns and different semantics.
+
+To override filters on the target lookup as well, use session pinning:
+
+``` r
+# Pin lookup filters for SNOMED CT
+codeminer_set_col_filters(
+  lookup = list("SNOMED CT" = list(active_concept = c("0", "1")))
+)
+
+# Now MAP() will use the pinned lookup filters for the target table
+MAP("24700007", from = "SNOMED CT", to = "ICD-10")
+```
+
+### Session pinning
+
+Like version pinning, you can pin col_filters for the entire session:
+
+``` r
+# Pin: include inactive SNOMED concepts
+codeminer_set_col_filters(
+  lookup = list("SNOMED CT" = list(active_concept = c("0", "1")))
+)
+
+# Clear all filter pins
+codeminer_clear_col_filters()
+```
+
+### Temporary overrides
+
+For a scoped override, use
+[`with_col_filters()`](https://codeminer-io.github.io/codeminer/reference/with_col_filters.md):
+
+``` r
+# Temporarily include inactive concepts for this block only
+result <- with_col_filters(
+  {
+    CODES("all", type = "SNOMED CT")
+  },
+  lookup = list("SNOMED CT" = list(active_concept = c("0", "1")))
+)
+# Outside the block, default filters apply again
+```
+
+### Updating filters after table creation
+
+If you need to add or change filters on an existing table without
+re-adding the data:
+
+``` r
+update_lookup_metadata(
+  "SNOMED CT",
+  col_filters = list(
+    active_concept = list(values = c("0", "1"), defaults = c("1"))
+  )
+)
+```
+
+### Discovering available filters
+
+[`get_col_filters()`](https://codeminer-io.github.io/codeminer/reference/get_col_filters.md)
+returns all registered filters, useful for building UIs:
+
+``` r
+# Just defaults (for applying)
+get_col_filters(defaults_only = TRUE)
+
+# Full spec with all available values (for checkboxes in a Shiny app)
+get_col_filters(defaults_only = FALSE)
 ```
 
 Denny, Joshua C., Lisa Bastarache, and Dan M. Roden. 2016. “Phenome-Wide

@@ -15,7 +15,8 @@ mapping_metadata(
   ...,
   from_col = "from",
   to_col = "to",
-  map_source = NA_character_
+  map_source = NA_character_,
+  col_filters = NULL
 )
 ```
 
@@ -51,6 +52,12 @@ mapping_metadata(
 
   The source of the lookup metadata (default: `NA_character_`)
 
+- col_filters:
+
+  Optional column filter specification. A named list where each element
+  is a list with `values` (all valid values) and `defaults` (default
+  filter values). `NULL` (default) means no column filters.
+
 ## Value
 
 A list containing the mapping metadata
@@ -82,6 +89,9 @@ mapping_metadata("ICD-10", "SNOMED-CT", map_version = "2023")
 #> [1] "to"
 #> 
 #> $map_source
+#> [1] NA
+#> 
+#> $col_filters
 #> [1] NA
 #> 
 ```

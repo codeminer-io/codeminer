@@ -188,9 +188,9 @@ coding systems.
 - [`MAP()`](https://codeminer-io.github.io/codeminer/reference/MAP.md) :
   Map clinical codes from one coding system to another
 - [`default_col_filters()`](https://codeminer-io.github.io/codeminer/reference/default_col_filters.md)
-  : Default filtering parameters for lookup and mapping tables.
+  : Default column filters
 - [`get_col_filters()`](https://codeminer-io.github.io/codeminer/reference/get_col_filters.md)
-  : Extract column filters from metadata tables
+  : Extract column filters from database metadata
 
 ## Workbench management
 
@@ -209,6 +209,12 @@ connection).
   : Pin table versions for the session
 - [`codeminer_clear_versions()`](https://codeminer-io.github.io/codeminer/reference/codeminer_clear_versions.md)
   : Clear all pinned versions
+- [`codeminer_set_col_filters()`](https://codeminer-io.github.io/codeminer/reference/codeminer_set_col_filters.md)
+  : Pin column filters for the session
+- [`codeminer_clear_col_filters()`](https://codeminer-io.github.io/codeminer/reference/codeminer_clear_col_filters.md)
+  : Clear all pinned column filters
+- [`with_col_filters()`](https://codeminer-io.github.io/codeminer/reference/with_col_filters.md)
+  : Temporarily override column filters
 - [`codeminer_snapshot_extra()`](https://codeminer-io.github.io/codeminer/reference/codeminer_snapshot_extra.md)
   : Create a snapshot of the extra database
 
@@ -247,18 +253,24 @@ clinical coding systems.
   : Remove a lookup table from the database
 - [`lookup_metadata()`](https://codeminer-io.github.io/codeminer/reference/lookup_metadata.md)
   : Create lookup metadata
+- [`update_lookup_metadata()`](https://codeminer-io.github.io/codeminer/reference/update_lookup_metadata.md)
+  : Update lookup table metadata
 - [`add_mapping_table()`](https://codeminer-io.github.io/codeminer/reference/add_mapping_table.md)
   : Add a mapping table to the database
 - [`remove_mapping_table()`](https://codeminer-io.github.io/codeminer/reference/remove_mapping_table.md)
   : Remove a mapping table from the database
 - [`mapping_metadata()`](https://codeminer-io.github.io/codeminer/reference/mapping_metadata.md)
   : Create mapping metadata
+- [`update_mapping_metadata()`](https://codeminer-io.github.io/codeminer/reference/update_mapping_metadata.md)
+  : Update mapping table metadata
 - [`add_relationship_table()`](https://codeminer-io.github.io/codeminer/reference/add_relationship_table.md)
   : Add a relationship table to the database
 - [`remove_relationship_table()`](https://codeminer-io.github.io/codeminer/reference/remove_relationship_table.md)
   : Remove a relationship table from the database
 - [`relationship_metadata()`](https://codeminer-io.github.io/codeminer/reference/relationship_metadata.md)
   : Create relationship metadata
+- [`update_relationship_metadata()`](https://codeminer-io.github.io/codeminer/reference/update_relationship_metadata.md)
+  : Update relationship table metadata
 - [`get_codeminer_metadata()`](https://codeminer-io.github.io/codeminer/reference/get_codeminer_metadata.md)
   : Get codeminer metadata
 

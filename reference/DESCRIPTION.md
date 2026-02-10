@@ -11,7 +11,8 @@ DESCRIPTION(
   type = getOption("codeminer.code_type"),
   lookup_version = getOption("codeminer.lookup_version", default = "latest"),
   ignore_case = TRUE,
-  preferred_description_only = TRUE
+  preferred_description_only = TRUE,
+  col_filters = "default"
 )
 ```
 
@@ -45,6 +46,12 @@ DESCRIPTION(
 
   `logical`. If `TRUE` (default), return only preferred descriptions.
 
+- col_filters:
+
+  Column filters to apply. See
+  [`CODES()`](https://codeminer-io.github.io/codeminer/reference/CODES.md)
+  for details.
+
 ## Value
 
 A `codeminer_codelist` with codes that match the description.
@@ -54,7 +61,7 @@ A `codeminer_codelist` with codes that match the description.
 ``` r
 # build dummy database
 create_dummy_database()
-#> Creating new database at /tmp/Rtmp8JLRAf/file1c6d61330ee2.duckdb
+#> Creating new database at /tmp/RtmpLYACwM/file1c6747a42d88.duckdb
 #> Reading 17 selected tables from UKB Resource 592
 #> 
 #> Extending read_v2_drugs_bnf with BNF hierarchy and descriptions

@@ -50,13 +50,15 @@ point to the supplied codes.</p>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">RELATIONSHIP_TYPES_FROM</span><span class="op">(</span></span>
 <span>  <span class="va">...</span>,</span>
 <span>  type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"codeminer.code_type"</span><span class="op">)</span>,</span>
-<span>  relationship_version <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"codeminer.relationship_version"</span>, default <span class="op">=</span> <span class="st">"latest"</span><span class="op">)</span></span>
+<span>  relationship_version <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"codeminer.relationship_version"</span>, default <span class="op">=</span> <span class="st">"latest"</span><span class="op">)</span>,</span>
+<span>  col_filters <span class="op">=</span> <span class="st">"default"</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">RELATIONSHIP_TYPES_TO</span><span class="op">(</span></span>
 <span>  <span class="va">...</span>,</span>
 <span>  type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"codeminer.code_type"</span><span class="op">)</span>,</span>
-<span>  relationship_version <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"codeminer.relationship_version"</span>, default <span class="op">=</span> <span class="st">"latest"</span><span class="op">)</span></span>
+<span>  relationship_version <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"codeminer.relationship_version"</span>, default <span class="op">=</span> <span class="st">"latest"</span><span class="op">)</span>,</span>
+<span>  col_filters <span class="op">=</span> <span class="st">"default"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -74,6 +76,10 @@ point to the supplied codes.</p>
 
 <dt id="arg-relationship-version">relationship_version<a class="anchor" aria-label="anchor" href="#arg-relationship-version"></a></dt>
 <dd><p>Relationship table version (character).</p></dd>
+
+
+<dt id="arg-col-filters">col_filters<a class="anchor" aria-label="anchor" href="#arg-col-filters"></a></dt>
+<dd><p>Column filters to apply. See <code><a href="CODES.html">CODES()</a></code> for details.</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -96,7 +102,7 @@ point to the supplied codes.</p>
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="create_dummy_database.html">create_dummy_database</a></span><span class="op">(</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Creating new database at <span style="color: #0000BB;">/tmp/Rtmp8JLRAf/file1c6d664d86c8.duckdb</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Creating new database at <span style="color: #0000BB;">/tmp/RtmpLYACwM/file1c677a2ab501.duckdb</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Reading 17 selected tables from UKB Resource 592</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Extending <span style="color: #00BB00;">read_v2_drugs_bnf</span> with BNF hierarchy and descriptions</span>

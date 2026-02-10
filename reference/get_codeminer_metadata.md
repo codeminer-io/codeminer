@@ -34,7 +34,7 @@ requested, a named list of data frames.
 
 ``` r
 create_dummy_database()
-#> Creating new database at /tmp/Rtmp8JLRAf/file1c6d4a4505d3.duckdb
+#> Creating new database at /tmp/RtmpLYACwM/file1c678596b54.duckdb
 #> Reading 17 selected tables from UKB Resource 592
 #> 
 #> Extending read_v2_drugs_bnf with BNF hierarchy and descriptions

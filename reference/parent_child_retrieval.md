@@ -11,7 +11,8 @@ CHILDREN(
   type = getOption("codeminer.code_type"),
   lookup_version = getOption("codeminer.lookup_version", default = "latest"),
   relationship_version = getOption("codeminer.relationship_version", default = "latest"),
-  preferred_description_only = TRUE
+  preferred_description_only = TRUE,
+  col_filters = "default"
 )
 
 PARENTS(
@@ -19,7 +20,8 @@ PARENTS(
   type = getOption("codeminer.code_type"),
   lookup_version = getOption("codeminer.lookup_version", default = "latest"),
   relationship_version = getOption("codeminer.relationship_version", default = "latest"),
-  preferred_description_only = TRUE
+  preferred_description_only = TRUE,
+  col_filters = "default"
 )
 
 N_CHILDREN(
@@ -29,6 +31,7 @@ N_CHILDREN(
   lookup_version = getOption("codeminer.lookup_version", default = "latest"),
   relationship_version = getOption("codeminer.relationship_version", default = "latest"),
   preferred_description_only = TRUE,
+  col_filters = "default",
   call = rlang::caller_env()
 )
 
@@ -39,6 +42,7 @@ N_PARENTS(
   lookup_version = getOption("codeminer.lookup_version", default = "latest"),
   relationship_version = getOption("codeminer.relationship_version", default = "latest"),
   preferred_description_only = TRUE,
+  col_filters = "default",
   call = rlang::caller_env()
 )
 ```
@@ -65,6 +69,12 @@ N_PARENTS(
 - preferred_description_only:
 
   Logical. If `TRUE`, return only preferred descriptions.
+
+- col_filters:
+
+  Column filters to apply. See
+  [`CODES()`](https://codeminer-io.github.io/codeminer/reference/CODES.md)
+  for details.
 
 - depth:
 
@@ -98,7 +108,7 @@ Other Code relationships:
 
 ``` r
 create_dummy_database()
-#> Creating new database at /tmp/Rtmp8JLRAf/file1c6d78ef066.duckdb
+#> Creating new database at /tmp/RtmpLYACwM/file1c6773ec5399.duckdb
 #> Reading 17 selected tables from UKB Resource 592
 #> 
 #> Extending read_v2_drugs_bnf with BNF hierarchy and descriptions

@@ -1,23 +1,47 @@
-# Extract column filters from metadata tables
+# Extract column filters from database metadata
 
-Extract column filters from metadata tables
+Reads `col_filters` from all metadata tables in the connected database.
+Returns a nested list keyed by table type and table key (code type or
+mapping pair).
 
 ## Usage
 
 ``` r
-get_col_filters(defaults_only = TRUE, selected_table = NULL)
+get_col_filters(defaults_only = TRUE)
 ```
 
 ## Arguments
 
 - defaults_only:
 
-  Logical
-
-- selected_table:
-
-  Optional. Name of lookup or mapping table
+  Logical. If `TRUE` (default), return only the default filter values.
+  If `FALSE`, return the full specification including all available
+  values (useful for Shiny UI checkboxes).
 
 ## Value
 
-List
+A named list with entries for `lookup`, `mapping`, and `relationship`.
+Each entry is a named list keyed by code type (or `"from > to"` for
+mappings), containing either:
+
+- If `defaults_only = TRUE`: a flat `list(col = c(default_values))`
+
+- If `defaults_only = FALSE`: a full
+  `list(col = list(values = ..., defaults = ...))`
+
+Returns an empty list if no database is connected.
+
+## See also
+
+Other Workbench management:
+[`codeminer_clear_col_filters()`](https://codeminer-io.github.io/codeminer/reference/codeminer_clear_col_filters.md),
+[`codeminer_clear_versions()`](https://codeminer-io.github.io/codeminer/reference/codeminer_clear_versions.md),
+[`codeminer_connect()`](https://codeminer-io.github.io/codeminer/reference/codeminer_connect.md),
+[`codeminer_disconnect()`](https://codeminer-io.github.io/codeminer/reference/codeminer_disconnect.md),
+[`codeminer_refresh_cache()`](https://codeminer-io.github.io/codeminer/reference/codeminer_refresh_cache.md),
+[`codeminer_set_col_filters()`](https://codeminer-io.github.io/codeminer/reference/codeminer_set_col_filters.md),
+[`codeminer_set_version()`](https://codeminer-io.github.io/codeminer/reference/codeminer_set_version.md),
+[`codeminer_snapshot_extra()`](https://codeminer-io.github.io/codeminer/reference/codeminer_snapshot_extra.md),
+[`codeminer_status()`](https://codeminer-io.github.io/codeminer/reference/codeminer_status.md),
+[`default_col_filters()`](https://codeminer-io.github.io/codeminer/reference/default_col_filters.md),
+[`with_col_filters()`](https://codeminer-io.github.io/codeminer/reference/with_col_filters.md)

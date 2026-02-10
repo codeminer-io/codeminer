@@ -6,7 +6,14 @@ format
 ## Usage
 
 ``` r
-get_mapping_table(con, from, to, map_version, call = rlang::caller_env())
+get_mapping_table(
+  con,
+  from,
+  to,
+  map_version,
+  col_filters = "default",
+  call = rlang::caller_env()
+)
 ```
 
 ## Arguments

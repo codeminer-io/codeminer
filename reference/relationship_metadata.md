@@ -16,7 +16,8 @@ relationship_metadata(
   to_col = "to",
   type_col = "type",
   child_parent_relationship_code = "is a",
-  relationship_source = NA_character_
+  relationship_source = NA_character_,
+  col_filters = NULL
 )
 ```
 
@@ -57,6 +58,12 @@ relationship_metadata(
 
   The source of the relationship metadata (default: `NA_character_`)
 
+- col_filters:
+
+  Optional column filter specification. A named list where each element
+  is a list with `values` (all valid values) and `defaults` (default
+  filter values). `NULL` (default) means no column filters.
+
 ## Value
 
 A list containing the relationship metadata
@@ -91,6 +98,9 @@ relationship_metadata("SNOMED-CT", relationship_version = "2023")
 #> [1] "is a"
 #> 
 #> $relationship_source
+#> [1] NA
+#> 
+#> $col_filters
 #> [1] NA
 #> 
 ```

@@ -12,7 +12,8 @@ ATTRIBUTES_FOR(
   lookup_version = getOption("codeminer.lookup_version", default = "latest"),
   relationship_version = getOption("codeminer.relationship_version", default = "latest"),
   relationship_types = NULL,
-  preferred_description_only = TRUE
+  preferred_description_only = TRUE,
+  col_filters = "default"
 )
 
 HAS_ATTRIBUTES(
@@ -21,7 +22,8 @@ HAS_ATTRIBUTES(
   lookup_version = getOption("codeminer.lookup_version", default = "latest"),
   relationship_version = getOption("codeminer.relationship_version", default = "latest"),
   relationship_types = NULL,
-  preferred_description_only = TRUE
+  preferred_description_only = TRUE,
+  col_filters = "default"
 )
 ```
 
@@ -53,6 +55,12 @@ HAS_ATTRIBUTES(
 
   Logical. If `TRUE`, return only preferred descriptions.
 
+- col_filters:
+
+  Column filters to apply. See
+  [`CODES()`](https://codeminer-io.github.io/codeminer/reference/CODES.md)
+  for details.
+
 ## Value
 
 A data frame of codes and descriptions
@@ -74,7 +82,7 @@ Other Code relationships:
 
 ``` r
 create_dummy_database()
-#> Creating new database at /tmp/Rtmp8JLRAf/file1c6da592ac2.duckdb
+#> Creating new database at /tmp/RtmpLYACwM/file1c675e45c7c6.duckdb
 #> Reading 17 selected tables from UKB Resource 592
 #> 
 #> Extending read_v2_drugs_bnf with BNF hierarchy and descriptions

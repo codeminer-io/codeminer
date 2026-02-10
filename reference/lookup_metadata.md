@@ -16,7 +16,8 @@ lookup_metadata(
   lookup_description_col = "description",
   lookup_source = NA_character_,
   preferred_description_col = NA_character_,
-  preferred_description_indicator = NA_character_
+  preferred_description_indicator = NA_character_,
+  col_filters = NULL
 )
 ```
 
@@ -57,9 +58,30 @@ lookup_metadata(
   The value in the `preferred_description_col` column that indicates the
   preferred description (default: `NA_character_`)
 
+- col_filters:
+
+  Optional column filter specification. A named list where each element
+  is a list with `values` (all valid values) and `defaults` (default
+  filter values). See **Details** for the format. `NULL` (default) means
+  no column filters.
+
 ## Value
 
 A list containing the lookup metadata
+
+## Details
+
+The `col_filters` argument specifies which columns in the lookup table
+are filterable and what the default filter values are. The format is:
+
+    list(
+      column_name = list(values = c("val1", "val2"), defaults = c("val1"))
+    )
+
+When `col_filters` is set, query functions like
+[`CODES()`](https://codeminer-io.github.io/codeminer/reference/CODES.md)
+will automatically filter the lookup table to only include rows matching
+the default values.
 
 ## See also
 
@@ -91,6 +113,9 @@ lookup_metadata("ICD-10", lookup_version = "2023")
 #> [1] NA
 #> 
 #> $preferred_description_indicator
+#> [1] NA
+#> 
+#> $col_filters
 #> [1] NA
 #> 
 ```

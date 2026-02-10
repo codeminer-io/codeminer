@@ -1,5 +1,6 @@
 <urlset xmlns = 'http://www.sitemaps.org/schemas/sitemap/0.9'>
 <url><loc>https://codeminer-io.github.io/codeminer/404.html</loc></url>
+<url><loc>https://codeminer-io.github.io/codeminer/CLAUDE.html</loc></url>
 <url><loc>https://codeminer-io.github.io/codeminer/CONTRIBUTING.html</loc></url>
 <url><loc>https://codeminer-io.github.io/codeminer/LICENSE-text.html</loc></url>
 <url><loc>https://codeminer-io.github.io/codeminer/LICENSE.html</loc></url>
@@ -23,11 +24,13 @@
 <url><loc>https://codeminer-io.github.io/codeminer/reference/build_all_lkps_maps_dummy.html</loc></url>
 <url><loc>https://codeminer-io.github.io/codeminer/reference/build_database.html</loc></url>
 <url><loc>https://codeminer-io.github.io/codeminer/reference/codeminer-package.html</loc></url>
+<url><loc>https://codeminer-io.github.io/codeminer/reference/codeminer_clear_col_filters.html</loc></url>
 <url><loc>https://codeminer-io.github.io/codeminer/reference/codeminer_clear_versions.html</loc></url>
 <url><loc>https://codeminer-io.github.io/codeminer/reference/codeminer_connect.html</loc></url>
 <url><loc>https://codeminer-io.github.io/codeminer/reference/codeminer_disconnect.html</loc></url>
 <url><loc>https://codeminer-io.github.io/codeminer/reference/codeminer_metadata.html</loc></url>
 <url><loc>https://codeminer-io.github.io/codeminer/reference/codeminer_refresh_cache.html</loc></url>
+<url><loc>https://codeminer-io.github.io/codeminer/reference/codeminer_set_col_filters.html</loc></url>
 <url><loc>https://codeminer-io.github.io/codeminer/reference/codeminer_set_version.html</loc></url>
 <url><loc>https://codeminer-io.github.io/codeminer/reference/codeminer_snapshot_extra.html</loc></url>
 <url><loc>https://codeminer-io.github.io/codeminer/reference/codeminer_status.html</loc></url>
@@ -77,6 +80,10 @@
 <url><loc>https://codeminer-io.github.io/codeminer/reference/remove_mapping_table.html</loc></url>
 <url><loc>https://codeminer-io.github.io/codeminer/reference/remove_relationship_table.html</loc></url>
 <url><loc>https://codeminer-io.github.io/codeminer/reference/start_api.html</loc></url>
+<url><loc>https://codeminer-io.github.io/codeminer/reference/update_lookup_metadata.html</loc></url>
+<url><loc>https://codeminer-io.github.io/codeminer/reference/update_mapping_metadata.html</loc></url>
+<url><loc>https://codeminer-io.github.io/codeminer/reference/update_relationship_metadata.html</loc></url>
 <url><loc>https://codeminer-io.github.io/codeminer/reference/with_code_type_helpers.html</loc></url>
+<url><loc>https://codeminer-io.github.io/codeminer/reference/with_col_filters.html</loc></url>
 </urlset>
 

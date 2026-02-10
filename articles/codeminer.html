@@ -109,7 +109,7 @@ list of data frames:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Create a temporary database with dummy data</span></span>
 <span><span class="op">(</span><span class="va">db_path</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/create_dummy_database.html">create_dummy_database</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Creating new database at <span style="color: #0000BB;">/tmp/RtmpKqskMH/file260d10f7e97b.duckdb</span></span></span>
+<span><span class="co">#&gt; Creating new database at <span style="color: #0000BB;">/tmp/RtmpNSfmsH/file262f3e426461.duckdb</span></span></span>
 <span><span class="co">#&gt; Reading 17 selected tables from UKB Resource 592</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Extending <span style="color: #00BB00;">read_v2_drugs_bnf</span> with BNF hierarchy and descriptions</span></span>
@@ -137,9 +137,9 @@ list of data frames:</p>
 <span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Mapping table <span style="color: #00BB00;">Read 3_OPCS4_UKB v4</span> added successfully.</span></span>
 <span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Mapping table <span style="color: #00BB00;">Read 3_Read 2_UKB v4</span> added successfully.</span></span>
 <span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Dummy database ready to use!</span></span>
-<span><span class="co">#&gt; [1] "/tmp/RtmpKqskMH/file260d10f7e97b.duckdb"</span></span>
+<span><span class="co">#&gt; [1] "/tmp/RtmpNSfmsH/file262f3e426461.duckdb"</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/Sys.getenv.html" class="external-link">Sys.getenv</a></span><span class="op">(</span><span class="st">"CODEMINER_DB_PATH"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] "/tmp/RtmpKqskMH/file260d10f7e97b.duckdb"</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] "/tmp/RtmpNSfmsH/file262f3e426461.duckdb"</span></span></code></pre></div>
 <p><code>codeminer</code> resolves the database location using the
 following precedence:</p>
 <ol style="list-style-type: decimal">
@@ -181,7 +181,7 @@ given code system type</li>
 <span>  codes <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"E10"</span>, <span class="st">"E11"</span><span class="op">)</span>,</span>
 <span>  type <span class="op">=</span> <span class="st">"ICD-10"</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Using database at <span style="color: #0000BB;">/tmp/RtmpKqskMH/file260d10f7e97b.duckdb</span></span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Using database at <span style="color: #0000BB;">/tmp/RtmpNSfmsH/file262f3e426461.duckdb</span></span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Set `CODEMINER_DB_PATH` or use `codeminer_connect()` to change this.</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Using 'UKB v4' as latest version</span></span>
 <span><span class="co">#&gt; <span style="color: #0000BB;">&lt;codeminer_codelist&gt;</span>: 2 codes</span></span>
@@ -288,14 +288,14 @@ currently in the database:</p>
 <span><span class="co">#&gt; 5       term_description https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592</span></span>
 <span><span class="co">#&gt; 6       term_description https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592</span></span>
 <span><span class="co">#&gt; 7       term_description https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592</span></span>
-<span><span class="co">#&gt;   preferred_description_col preferred_description_indicator</span></span>
-<span><span class="co">#&gt; 1                      &lt;NA&gt;                            &lt;NA&gt;</span></span>
-<span><span class="co">#&gt; 2                      &lt;NA&gt;                            &lt;NA&gt;</span></span>
-<span><span class="co">#&gt; 3                      &lt;NA&gt;                            &lt;NA&gt;</span></span>
-<span><span class="co">#&gt; 4                      &lt;NA&gt;                            &lt;NA&gt;</span></span>
-<span><span class="co">#&gt; 5                 term_code                              00</span></span>
-<span><span class="co">#&gt; 6                      &lt;NA&gt;                            &lt;NA&gt;</span></span>
-<span><span class="co">#&gt; 7          description_type                               P</span></span></code></pre></div>
+<span><span class="co">#&gt;   preferred_description_col preferred_description_indicator col_filters</span></span>
+<span><span class="co">#&gt; 1                      &lt;NA&gt;                            &lt;NA&gt;        &lt;NA&gt;</span></span>
+<span><span class="co">#&gt; 2                      &lt;NA&gt;                            &lt;NA&gt;        &lt;NA&gt;</span></span>
+<span><span class="co">#&gt; 3                      &lt;NA&gt;                            &lt;NA&gt;        &lt;NA&gt;</span></span>
+<span><span class="co">#&gt; 4                      &lt;NA&gt;                            &lt;NA&gt;        &lt;NA&gt;</span></span>
+<span><span class="co">#&gt; 5                 term_code                              00        &lt;NA&gt;</span></span>
+<span><span class="co">#&gt; 6                      &lt;NA&gt;                            &lt;NA&gt;        &lt;NA&gt;</span></span>
+<span><span class="co">#&gt; 7          description_type                               P        &lt;NA&gt;</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level2">
@@ -376,6 +376,146 @@ best stored in a separate file or in JSON:</p>
 <span>  relationship <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/unlist.html" class="external-link">unlist</a></span><span class="op">(</span><span class="va">cfg</span><span class="op">$</span><span class="va">relationship</span><span class="op">)</span>,</span>
 <span>  mapping      <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/unlist.html" class="external-link">unlist</a></span><span class="op">(</span><span class="va">cfg</span><span class="op">$</span><span class="va">mapping</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
+</div>
+</div>
+<div class="section level2">
+<h2 id="column-filters">Column filters<a class="anchor" aria-label="anchor" href="#column-filters"></a>
+</h2>
+<p>Some tables contain rows that should be excluded by default — for
+example, inactive SNOMED CT concepts or approximate code mappings.
+Column filters (<code>col_filters</code>) let table authors declare
+which columns are filterable, what values are available, and which
+values should be selected by default.</p>
+<div class="section level3">
+<h3 id="how-filters-are-defined">How filters are defined<a class="anchor" aria-label="anchor" href="#how-filters-are-defined"></a>
+</h3>
+<p>Filters are stored in table metadata as a JSON specification. Each
+filterable column has an entry with <code>values</code> (all valid
+options) and <code>defaults</code> (applied when no override is
+given):</p>
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># When adding a lookup table with filters</span></span>
+<span><span class="fu"><a href="../reference/add_lookup_table.html">add_lookup_table</a></span><span class="op">(</span></span>
+<span>  <span class="va">my_snomed_lookup</span>,</span>
+<span>  <span class="fu"><a href="../reference/lookup_metadata.html">lookup_metadata</a></span><span class="op">(</span></span>
+<span>    <span class="st">"SNOMED CT"</span>,</span>
+<span>    lookup_version <span class="op">=</span> <span class="st">"v1"</span>,</span>
+<span>    col_filters <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>      active_concept <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>        values <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"0"</span>, <span class="st">"1"</span><span class="op">)</span>,</span>
+<span>        defaults <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"1"</span><span class="op">)</span></span>
+<span>      <span class="op">)</span></span>
+<span>    <span class="op">)</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="query-time-behaviour">Query-time behaviour<a class="anchor" aria-label="anchor" href="#query-time-behaviour"></a>
+</h3>
+<p>All query functions accept a <code>col_filters</code> parameter with
+three options:</p>
+<ul>
+<li>
+<strong><code>"default"</code></strong> (the default): apply filters
+from session pin or metadata defaults</li>
+<li>
+<strong><code>NULL</code></strong>: no filtering — return all rows
+regardless of column values</li>
+<li>
+<strong>A named list</strong>: apply explicit filters for this call
+only</li>
+</ul>
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Default: only active concepts (from metadata defaults)</span></span>
+<span><span class="fu"><a href="../reference/CODES.html">CODES</a></span><span class="op">(</span><span class="st">"all"</span>, type <span class="op">=</span> <span class="st">"SNOMED CT"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Override: return all rows including inactive</span></span>
+<span><span class="fu"><a href="../reference/CODES.html">CODES</a></span><span class="op">(</span><span class="st">"all"</span>, type <span class="op">=</span> <span class="st">"SNOMED CT"</span>, col_filters <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Custom: only inactive concepts</span></span>
+<span><span class="fu"><a href="../reference/CODES.html">CODES</a></span><span class="op">(</span><span class="st">"all"</span>, type <span class="op">=</span> <span class="st">"SNOMED CT"</span>, col_filters <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>active_concept <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"0"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="filters-are-per-table-type">Filters are per-table-type<a class="anchor" aria-label="anchor" href="#filters-are-per-table-type"></a>
+</h3>
+<p>An important design point: <strong>each table type has its own
+independent col_filters</strong>. This matters most for
+<code><a href="../reference/MAP.html">MAP()</a></code>, which touches two table types:</p>
+<ol style="list-style-type: decimal">
+<li>The <strong>mapping table</strong> (e.g., Read 3 → ICD-10) may have
+filters like <code>mapping_status</code>
+</li>
+<li>The <strong>target lookup table</strong> (e.g., ICD-10) may have
+filters like <code>active_concept</code>
+</li>
+</ol>
+<p>When you call <code>MAP(col_filters = ...)</code>, this controls only
+the mapping table. The target lookup table uses its own default filters
+when looking up descriptions. This is intentional — the two tables have
+different filterable columns and different semantics.</p>
+<p>To override filters on the target lookup as well, use session
+pinning:</p>
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Pin lookup filters for SNOMED CT</span></span>
+<span><span class="fu"><a href="../reference/codeminer_set_col_filters.html">codeminer_set_col_filters</a></span><span class="op">(</span></span>
+<span>  lookup <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"SNOMED CT"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>active_concept <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"0"</span>, <span class="st">"1"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Now MAP() will use the pinned lookup filters for the target table</span></span>
+<span><span class="fu"><a href="../reference/MAP.html">MAP</a></span><span class="op">(</span><span class="st">"24700007"</span>, from <span class="op">=</span> <span class="st">"SNOMED CT"</span>, to <span class="op">=</span> <span class="st">"ICD-10"</span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="session-pinning">Session pinning<a class="anchor" aria-label="anchor" href="#session-pinning"></a>
+</h3>
+<p>Like version pinning, you can pin col_filters for the entire
+session:</p>
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Pin: include inactive SNOMED concepts</span></span>
+<span><span class="fu"><a href="../reference/codeminer_set_col_filters.html">codeminer_set_col_filters</a></span><span class="op">(</span></span>
+<span>  lookup <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"SNOMED CT"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>active_concept <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"0"</span>, <span class="st">"1"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Clear all filter pins</span></span>
+<span><span class="fu"><a href="../reference/codeminer_clear_col_filters.html">codeminer_clear_col_filters</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="temporary-overrides">Temporary overrides<a class="anchor" aria-label="anchor" href="#temporary-overrides"></a>
+</h3>
+<p>For a scoped override, use <code><a href="../reference/with_col_filters.html">with_col_filters()</a></code>:</p>
+<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Temporarily include inactive concepts for this block only</span></span>
+<span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/with_col_filters.html">with_col_filters</a></span><span class="op">(</span></span>
+<span>  <span class="op">{</span></span>
+<span>    <span class="fu"><a href="../reference/CODES.html">CODES</a></span><span class="op">(</span><span class="st">"all"</span>, type <span class="op">=</span> <span class="st">"SNOMED CT"</span><span class="op">)</span></span>
+<span>  <span class="op">}</span>,</span>
+<span>  lookup <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"SNOMED CT"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>active_concept <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"0"</span>, <span class="st">"1"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span><span class="co"># Outside the block, default filters apply again</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="updating-filters-after-table-creation">Updating filters after table creation<a class="anchor" aria-label="anchor" href="#updating-filters-after-table-creation"></a>
+</h3>
+<p>If you need to add or change filters on an existing table without
+re-adding the data:</p>
+<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/update_lookup_metadata.html">update_lookup_metadata</a></span><span class="op">(</span></span>
+<span>  <span class="st">"SNOMED CT"</span>,</span>
+<span>  col_filters <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>    active_concept <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>values <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"0"</span>, <span class="st">"1"</span><span class="op">)</span>, defaults <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"1"</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="discovering-available-filters">Discovering available filters<a class="anchor" aria-label="anchor" href="#discovering-available-filters"></a>
+</h3>
+<p><code><a href="../reference/get_col_filters.html">get_col_filters()</a></code> returns all registered filters, useful
+for building UIs:</p>
+<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Just defaults (for applying)</span></span>
+<span><span class="fu"><a href="../reference/get_col_filters.html">get_col_filters</a></span><span class="op">(</span>defaults_only <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Full spec with all available values (for checkboxes in a Shiny app)</span></span>
+<span><span class="fu"><a href="../reference/get_col_filters.html">get_col_filters</a></span><span class="op">(</span>defaults_only <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
 <div id="refs" class="references csl-bib-body hanging-indent" entry-spacing="0">
 <div id="ref-denny2016" class="csl-entry">
 Denny, Joshua C., Lisa Bastarache, and Dan M. Roden. 2016.

@@ -52,7 +52,8 @@ traversing the relationship graph.</p>
 <span>  type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"codeminer.code_type"</span><span class="op">)</span>,</span>
 <span>  lookup_version <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"codeminer.lookup_version"</span>, default <span class="op">=</span> <span class="st">"latest"</span><span class="op">)</span>,</span>
 <span>  relationship_version <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"codeminer.relationship_version"</span>, default <span class="op">=</span> <span class="st">"latest"</span><span class="op">)</span>,</span>
-<span>  preferred_description_only <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span>  preferred_description_only <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  col_filters <span class="op">=</span> <span class="st">"default"</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">PARENTS</span><span class="op">(</span></span>
@@ -60,7 +61,8 @@ traversing the relationship graph.</p>
 <span>  type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"codeminer.code_type"</span><span class="op">)</span>,</span>
 <span>  lookup_version <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"codeminer.lookup_version"</span>, default <span class="op">=</span> <span class="st">"latest"</span><span class="op">)</span>,</span>
 <span>  relationship_version <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"codeminer.relationship_version"</span>, default <span class="op">=</span> <span class="st">"latest"</span><span class="op">)</span>,</span>
-<span>  preferred_description_only <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span>  preferred_description_only <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  col_filters <span class="op">=</span> <span class="st">"default"</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">N_CHILDREN</span><span class="op">(</span></span>
@@ -70,6 +72,7 @@ traversing the relationship graph.</p>
 <span>  lookup_version <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"codeminer.lookup_version"</span>, default <span class="op">=</span> <span class="st">"latest"</span><span class="op">)</span>,</span>
 <span>  relationship_version <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"codeminer.relationship_version"</span>, default <span class="op">=</span> <span class="st">"latest"</span><span class="op">)</span>,</span>
 <span>  preferred_description_only <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  col_filters <span class="op">=</span> <span class="st">"default"</span>,</span>
 <span>  call <span class="op">=</span> <span class="fu">rlang</span><span class="fu">::</span><span class="fu"><a href="https://rlang.r-lib.org/reference/stack.html" class="external-link">caller_env</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span></span>
@@ -80,6 +83,7 @@ traversing the relationship graph.</p>
 <span>  lookup_version <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"codeminer.lookup_version"</span>, default <span class="op">=</span> <span class="st">"latest"</span><span class="op">)</span>,</span>
 <span>  relationship_version <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"codeminer.relationship_version"</span>, default <span class="op">=</span> <span class="st">"latest"</span><span class="op">)</span>,</span>
 <span>  preferred_description_only <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  col_filters <span class="op">=</span> <span class="st">"default"</span>,</span>
 <span>  call <span class="op">=</span> <span class="fu">rlang</span><span class="fu">::</span><span class="fu"><a href="https://rlang.r-lib.org/reference/stack.html" class="external-link">caller_env</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -107,6 +111,10 @@ traversing the relationship graph.</p>
 <dt id="arg-preferred-description-only">preferred_description_only<a class="anchor" aria-label="anchor" href="#arg-preferred-description-only"></a></dt>
 <dd><p>Logical. If <code>TRUE</code>, return only preferred
 descriptions.</p></dd>
+
+
+<dt id="arg-col-filters">col_filters<a class="anchor" aria-label="anchor" href="#arg-col-filters"></a></dt>
+<dd><p>Column filters to apply. See <code><a href="CODES.html">CODES()</a></code> for details.</p></dd>
 
 
 <dt id="arg-depth">depth<a class="anchor" aria-label="anchor" href="#arg-depth"></a></dt>
@@ -141,7 +149,7 @@ ancestors/descendants).</p>
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="create_dummy_database.html">create_dummy_database</a></span><span class="op">(</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Creating new database at <span style="color: #0000BB;">/tmp/Rtmp8JLRAf/file1c6d78ef066.duckdb</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Creating new database at <span style="color: #0000BB;">/tmp/RtmpLYACwM/file1c6773ec5399.duckdb</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Reading 17 selected tables from UKB Resource 592</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Extending <span style="color: #00BB00;">read_v2_drugs_bnf</span> with BNF hierarchy and descriptions</span>
