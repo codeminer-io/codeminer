@@ -1,4 +1,4 @@
-create_dummy_database()
+suppressMessages(create_dummy_database(.local = TRUE))
 
 test_that("ATTRIBUTES_FOR() and HAS_ATTRIBUTES() return the expected data format", {
   # Setup using example_ontology v2 (has both hierarchy and attributes)

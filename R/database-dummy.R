@@ -1,14 +1,22 @@
 #' Create a dummy database
 #'
-#' Sets up an example database for codeminer with dummy data
-#' and sets the environment variable `CODEMINER_DB_PATH`.
-#' Any subsequent `codeminer` actions will use this database.
+#' Sets up an example database for codeminer with dummy data,
+#' sets the environment variable `CODEMINER_DB_PATH`, and connects
+#' the workbench. Any subsequent `codeminer` actions will use this database.
 #'
 #' @param db_path Path to the database file. Defaults to a temporary file.
 #'   This is to avoid writing the dummy data to an already existing database.
 #' @inheritParams rlang::args_dots_empty
-#' @param .envir Environment in which to set the `CODEMINER_DB_PATH` variable.
-#'   Defaults to the calling environment.
+#' @param verbose If `TRUE`, prints progress messages during the database
+#'   build. Defaults to `FALSE` for cleaner output.
+#' @param .local If `FALSE` (default), sets `CODEMINER_DB_PATH` globally
+#'   via [Sys.setenv()]. The dummy database persists until you reconnect
+#'   manually. If `TRUE`, uses [withr::local_envvar()] scoped to `.envir`
+#'   so the environment variable and workbench are automatically cleaned up
+#'   when `.envir` exits. Use `.local = TRUE` in tests and functions that
+#'   need automatic teardown.
+#' @param .envir Environment for scoped cleanup when `.local = TRUE`.
+#'   Ignored when `.local = FALSE`. Defaults to the calling environment.
 #'
 #' @return The path to the created database file, invisibly.
 #'
@@ -23,19 +31,57 @@
 create_dummy_database <- function(
   db_path = tempfile(fileext = ".duckdb"),
   ...,
+  verbose = FALSE,
+  .local = FALSE,
   .envir = parent.frame()
 ) {
   rlang::check_dots_empty()
 
-  withr::local_envvar(
-    list("CODEMINER_DB_PATH" = db_path),
-    .local_envir = .envir
-  )
-  build_database(overwrite = TRUE)
+  # Capture previous state for reconnection message
+  previous_env <- Sys.getenv("CODEMINER_DB_PATH", unset = NA)
+  had_previous_db <-
+    exists("db_paths", envir = .codeminer_env) &&
+    !is.null(.codeminer_env$db_paths$main)
 
-  add_ukb_resource_592(path = dummy_ukb_resource_592_path())
+  if (.local) {
+    withr::local_envvar(
+      list("CODEMINER_DB_PATH" = db_path),
+      .local_envir = .envir
+    )
+    withr::defer(codeminer_disconnect(), envir = .envir)
+  } else {
+    Sys.setenv(CODEMINER_DB_PATH = db_path)
+  }
 
-  codeminer_inform(c("v" = "Dummy database ready to use!"))
+  # Build and populate the database
+  wrapper <- if (verbose) identity else suppressMessages
+  wrapper({
+    build_database(overwrite = TRUE)
+    add_ukb_resource_592(path = dummy_ukb_resource_592_path())
+    codeminer_connect(main = db_path)
+  })
+
+  # Build user message
+  msgs <- c("v" = "Dummy database ready to use!")
+  if (had_previous_db && !.local) {
+    if (is.na(previous_env) || previous_env == "") {
+      reconnect_code <- 'Sys.unsetenv("CODEMINER_DB_PATH")'
+    } else {
+      reconnect_code <- paste0(
+        'Sys.setenv(CODEMINER_DB_PATH = "',
+        previous_env,
+        '")'
+      )
+    }
+    msgs <- c(
+      msgs,
+      "i" = "To reconnect to your previous database:",
+      " " = "  {.code {reconnect_code}}",
+      " " = "  {.code codeminer_connect()}"
+    )
+  }
+  codeminer_inform(msgs)
+
   return(invisible(db_path))
 }
 

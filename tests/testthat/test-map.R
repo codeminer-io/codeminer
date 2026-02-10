@@ -1,5 +1,5 @@
 ## Set up dummy database
-suppressMessages(create_dummy_database())
+suppressMessages(create_dummy_database(.local = TRUE))
 
 test_that("MAP() returns the expected data format", {
   test_codes <- c("C10..", "XE0Uc", "C10..", "C10..", "XE0Uc")

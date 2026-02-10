@@ -1,4 +1,4 @@
-suppressMessages(create_dummy_database())
+suppressMessages(create_dummy_database(.local = TRUE))
 
 test_that("get_metadata_for_relationship() works correctly", {
   con <- connect_to_db()

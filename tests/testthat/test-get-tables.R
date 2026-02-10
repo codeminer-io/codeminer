@@ -3,7 +3,7 @@
 # (GitHub issue #90)
 
 ## Set up dummy database
-suppressMessages(create_dummy_database())
+suppressMessages(create_dummy_database(.local = TRUE))
 
 # get_lookup_table() --------------------------------------------------------
 

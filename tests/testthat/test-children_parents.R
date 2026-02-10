@@ -1,4 +1,4 @@
-suppressMessages(create_dummy_database())
+suppressMessages(create_dummy_database(.local = TRUE))
 
 test_that("CHILDREN() and PARENTS() return the expected data format", {
   test_codes <- c("E10", "E11")
