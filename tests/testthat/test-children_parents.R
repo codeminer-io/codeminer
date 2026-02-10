@@ -246,6 +246,11 @@ test_that("CHILDREN() uses correct latest version", {
     test_relationship_table,
     relationship_metadata(test_type, test_version)
   )
+  # Clear cached "latest" so it re-resolves to the newly added versions
+  codeminer_clear_versions(
+    lookup = test_type,
+    relationship = test_type
+  )
 
   v2_result <- CHILDREN(
     "PARENT_A",

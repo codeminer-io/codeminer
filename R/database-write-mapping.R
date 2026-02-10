@@ -75,6 +75,24 @@ add_mapping_table <- function(table, metadata) {
         "v" = "Mapping table {.field {metadata$mapping_table_name}} added successfully."
       )
     )
+    map_pin_key <- paste(
+      metadata$from_code_type, ">", metadata$to_code_type
+    )
+    cached <- .codeminer_env$active_versions[["mapping"]][[
+      map_pin_key
+    ]]
+    if (!is.null(cached) && cached != metadata$map_version) {
+      codeminer_inform(c(
+        "i" = paste0(
+          "Currently using version {.val {cached}} for ",
+          "{.val {map_pin_key}} mappings."
+        ),
+        "i" = paste0(
+          "Use {.fun codeminer_clear_versions} or ",
+          "{.fun codeminer_set_version} to switch."
+        )
+      ))
+    }
   }
   return(invisible(success))
 }
@@ -105,6 +123,15 @@ remove_mapping_table <- function(from_code_type, to_code_type, map_version) {
   }
 
   remove_table_entry(con, "mapping", table_name)
+  map_pin_key <- paste(from_code_type, ">", to_code_type)
+  cached <- .codeminer_env$active_versions[["mapping"]][[
+    map_pin_key
+  ]]
+  if (!is.null(cached) && cached == map_version) {
+    .codeminer_env$active_versions[["mapping"]][[
+      map_pin_key
+    ]] <- NULL
+  }
   codeminer_inform(c(
     "v" = "Mapping table {.field {table_name}} removed."
   ))

@@ -98,6 +98,24 @@ add_relationship_table <- function(table, metadata) {
         "v" = "Relationship table {.field {metadata$relationship_table_name}} added successfully."
       )
     )
+    cached <- .codeminer_env$active_versions[["relationship"]][[
+      metadata$code_type
+    ]]
+    if (
+      !is.null(cached) &&
+        cached != metadata$relationship_version
+    ) {
+      codeminer_inform(c(
+        "i" = paste0(
+          "Currently using version {.val {cached}} for ",
+          "{.val {metadata$code_type}} relationships."
+        ),
+        "i" = paste0(
+          "Use {.fun codeminer_clear_versions} or ",
+          "{.fun codeminer_set_version} to switch."
+        )
+      ))
+    }
   }
   return(invisible(success))
 }
@@ -132,6 +150,14 @@ remove_relationship_table <- function(code_type, relationship_version) {
   }
 
   remove_table_entry(con, "relationship", table_name)
+  cached <- .codeminer_env$active_versions[["relationship"]][[
+    code_type
+  ]]
+  if (!is.null(cached) && cached == relationship_version) {
+    .codeminer_env$active_versions[["relationship"]][[
+      code_type
+    ]] <- NULL
+  }
   codeminer_inform(c(
     "v" = "Relationship table {.field {table_name}} removed."
   ))
