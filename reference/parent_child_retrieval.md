@@ -110,7 +110,7 @@ Other Code relationships:
 create_dummy_database()
 #> ✔ Dummy database ready to use!
 #> ℹ To reconnect to your previous database:
-#>   `Sys.setenv(CODEMINER_DB_PATH = "/tmp/Rtmp8tnFLb/file1c5327791d12.duckdb")`
+#>   `Sys.setenv(CODEMINER_DB_PATH = "/tmp/RtmpCHrX3n/file1c362e3db901.duckdb")`
 #>   `codeminer_connect()`
 PARENTS("E10", "E11", type = "ICD-10")
 #> ℹ Using 'UKB v4' as latest version
@@ -124,8 +124,6 @@ PARENTS("E10", "E11", type = "ICD-10")
 #> 1 E10   Type 1 diabetes mellitus ICD-10   
 #> 2 E11   Type 2 diabetes mellitus ICD-10   
 CHILDREN("E10", "E11", type = "ICD-10")
-#> ℹ Using 'UKB v4' as latest version
-#> ℹ Using 'UKB v4' as latest version
 #> <codeminer_codelist>: 22 codes
 #> Code type: "ICD-10"
 #> 
@@ -144,8 +142,6 @@ CHILDREN("E10", "E11", type = "ICD-10")
 #> 10 E108  Type 1 diabetes mellitus With unspecified complications       ICD-10   
 #> # ℹ 12 more rows
 N_PARENTS("E10", "E11", type = "ICD-10")
-#> ℹ Using 'UKB v4' as latest version
-#> ℹ Using 'UKB v4' as latest version
 #> <codeminer_codelist>: 2 codes
 #> Code type: "ICD-10"
 #> 
@@ -155,8 +151,6 @@ N_PARENTS("E10", "E11", type = "ICD-10")
 #> 1 E10   Type 1 diabetes mellitus ICD-10   
 #> 2 E11   Type 2 diabetes mellitus ICD-10   
 N_CHILDREN("E10", "E11", type = "ICD-10")
-#> ℹ Using 'UKB v4' as latest version
-#> ℹ Using 'UKB v4' as latest version
 #> <codeminer_codelist>: 22 codes
 #> Code type: "ICD-10"
 #> 

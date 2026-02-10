@@ -48,9 +48,9 @@ of data frames:
 # Create a temporary database with dummy data
 (db_path <- create_dummy_database())
 #> ✔ Dummy database ready to use!
-#> [1] "/tmp/Rtmpjh8om2/file27d765a648e3.duckdb"
+#> [1] "/tmp/RtmpyjWq0C/file27b96e832fe4.duckdb"
 Sys.getenv("CODEMINER_DB_PATH")
-#> [1] "/tmp/Rtmpjh8om2/file27d765a648e3.duckdb"
+#> [1] "/tmp/RtmpyjWq0C/file27b96e832fe4.duckdb"
 ```
 
 `codeminer` resolves the database location using the following
@@ -84,7 +84,7 @@ connection status with
 ``` r
 codeminer_status()
 #> ℹ Workbench active
-#>   Main: /tmp/Rtmpjh8om2/file27d765a648e3.duckdb
+#>   Main: /tmp/RtmpyjWq0C/file27b96e832fe4.duckdb
 #>   Extra: not attached
 ```
 
@@ -117,11 +117,9 @@ CODES(
 
 ``` r
 DESCRIPTION(pattern = "cyst", type = "ICD-10")
-#> ℹ Using 'UKB v4' as latest version
-#> ℹ Using 'UKB v4' as latest version
 #> <codeminer_codelist>: 2 codes
-#> 
 #> Code type: "ICD-10"
+#> 
 #> # A tibble: 2 × 3
 #>   code  description          code_type
 #>   <chr> <chr>                <chr>    
@@ -216,8 +214,13 @@ get_codeminer_metadata("lookup")
 ## Version pinning
 
 When multiple versions of a lookup, mapping, or relationship table are
-available, `codeminer` resolves `"latest"` automatically. You can
-override this for the current session with
+available, `codeminer` resolves `"latest"` automatically. The first time
+a query function resolves `"latest"` for a given code type, the resolved
+version is cached for the remainder of the session. This avoids repeated
+informational messages and ensures consistent version usage across a
+workflow.
+
+You can override this for the current session with
 [`codeminer_set_version()`](https://codeminer-io.github.io/codeminer/reference/codeminer_set_version.md):
 
 ``` r
@@ -258,14 +261,28 @@ CODES("E10", type = "ICD-10", lookup_version = "UKB v4")
 #> 1 E10   Type 1 diabetes mellitus ICD-10
 ```
 
-To clear all pins and return to automatic `"latest"` resolution:
+To clear all version selections and return to automatic `"latest"`
+resolution:
 
 ``` r
 codeminer_clear_versions()
 ```
 
+You can also clear versions selectively by code type:
+
+``` r
+# Clear only the ICD-10 lookup version
+codeminer_clear_versions(lookup = "ICD-10")
+
+# Clear lookup and relationship for SNOMED CT
+codeminer_clear_versions(
+  lookup = "SNOMED CT",
+  relationship = "SNOMED CT"
+)
+```
+
 [`codeminer_status()`](https://codeminer-io.github.io/codeminer/reference/codeminer_status.md)
-shows any active pins alongside the connection info.
+shows any active versions alongside the connection info.
 
 ### Storing version settings
 

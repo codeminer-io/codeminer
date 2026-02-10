@@ -80,7 +80,7 @@ Other Clinical code lookups and mappings:
 create_dummy_database()
 #> ✔ Dummy database ready to use!
 #> ℹ To reconnect to your previous database:
-#>   `Sys.setenv(CODEMINER_DB_PATH = "/tmp/Rtmp8tnFLb/file1c533382c341.duckdb")`
+#>   `Sys.setenv(CODEMINER_DB_PATH = "/tmp/RtmpCHrX3n/file1c365ae5173e.duckdb")`
 #>   `codeminer_connect()`
 
 # Get the full ICD-10 lookup table
@@ -105,11 +105,9 @@ get_lookup_table("ICD-10") |> dplyr::collect()
 
 # Inspect raw columns for specific codes
 result <- CODES("E10", "E11", type = "ICD-10")
-#> ℹ Using 'UKB v4' as latest version
 get_lookup_table("ICD-10") |>
   dplyr::filter(code %in% .env$result$code) |>
   dplyr::collect()
-#> ℹ Using 'UKB v4' as latest version
 #> # A tibble: 2 × 14
 #>   code  description   ICD10_CODE USAGE USAGE_UK MODIFIER_4 MODIFIER_5 QUALIFIERS
 #>   <chr> <chr>         <chr>      <chr> <chr>    <chr>      <chr>      <chr>     

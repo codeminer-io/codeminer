@@ -63,12 +63,11 @@ A `codeminer_codelist` with codes that match the description.
 create_dummy_database()
 #> ✔ Dummy database ready to use!
 #> ℹ To reconnect to your previous database:
-#>   `Sys.setenv(CODEMINER_DB_PATH = "/tmp/Rtmp8tnFLb/file1c5368a5887d.duckdb")`
+#>   `Sys.setenv(CODEMINER_DB_PATH = "/tmp/RtmpCHrX3n/file1c36412ffe4.duckdb")`
 #>   `codeminer_connect()`
 
 # lookup ICD10 code descriptions matching 'cyst'
 DESCRIPTION("cyst", type = "ICD-10")
-#> ℹ Using 'UKB v4' as latest version
 #> ℹ Using 'UKB v4' as latest version
 #> <codeminer_codelist>: 2 codes
 #> Code type: "ICD-10"

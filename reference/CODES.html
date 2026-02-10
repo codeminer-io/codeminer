@@ -150,7 +150,6 @@ expression. The matching is case-insensitive.</p>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># With comments</span></span></span>
 <span class="r-in"><span><span class="fu">CODES</span><span class="op">(</span><span class="st">"E10 &lt;&lt; Type 1 diabetes &gt;&gt;"</span>, type <span class="op">=</span> <span class="st">"ICD-10"</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Using 'UKB v4' as latest version</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">&lt;codeminer_codelist&gt;</span>: 1 code</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Code type: <span style="color: #0000BB;">"ICD-10"</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
@@ -161,7 +160,6 @@ expression. The matching is case-insensitive.</p>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># || separated string</span></span></span>
 <span class="r-in"><span><span class="fu">CODES</span><span class="op">(</span><span class="st">"E10 || E11"</span>, type <span class="op">=</span> <span class="st">"ICD-10"</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Using 'UKB v4' as latest version</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">&lt;codeminer_codelist&gt;</span>: 2 codes</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Code type: <span style="color: #0000BB;">"ICD-10"</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
@@ -174,7 +172,6 @@ expression. The matching is case-insensitive.</p>
 <span class="r-in"><span><span class="co"># Splice operator</span></span></span>
 <span class="r-in"><span><span class="va">my_codes</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"E10"</span>, <span class="st">"E11"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">CODES</span><span class="op">(</span><span class="op">!</span><span class="op">!</span><span class="op">!</span><span class="va">my_codes</span>, type <span class="op">=</span> <span class="st">"ICD-10"</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Using 'UKB v4' as latest version</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">&lt;codeminer_codelist&gt;</span>: 2 codes</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Code type: <span style="color: #0000BB;">"ICD-10"</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
@@ -191,7 +188,6 @@ expression. The matching is case-insensitive.</p>
 <span class="r-in"><span>  code_type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"ICD-10"</span>, <span class="st">"ICD-10"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">CODES</span><span class="op">(</span><span class="va">df</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Using 'UKB v4' as latest version</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">&lt;codeminer_codelist&gt;</span>: 2 codes</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Code type: <span style="color: #0000BB;">"ICD-10"</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
@@ -201,8 +197,6 @@ expression. The matching is case-insensitive.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> E10   Type 1 diabetes mellitus ICD-10   </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span> E11   Type 2 diabetes mellitus ICD-10   </span>
 <span class="r-in"><span><span class="fu">CODES_LIKE</span><span class="op">(</span><span class="st">"^E1"</span>, type <span class="op">=</span> <span class="st">"ICD-10"</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Using 'UKB v4' as latest version</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Using 'UKB v4' as latest version</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">&lt;codeminer_codelist&gt;</span>: 55 codes</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Code type: <span style="color: #0000BB;">"ICD-10"</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> </span>

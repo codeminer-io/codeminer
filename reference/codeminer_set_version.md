@@ -39,6 +39,10 @@ Pinned versions only affect "latest" resolution. Explicit version
 arguments on query functions (e.g. `CODES(..., lookup_version = "v1")`)
 always take precedence.
 
+Versions are also auto-cached the first time `"latest"` is resolved for
+a given code type. Calling `codeminer_set_version()` overrides any
+auto-cached version.
+
 New pins are merged with existing ones. To replace all pins, call
 [`codeminer_clear_versions()`](https://codeminer-io.github.io/codeminer/reference/codeminer_clear_versions.md)
 first.

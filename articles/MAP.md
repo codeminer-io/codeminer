@@ -25,7 +25,6 @@ to map a vector of codes from one clinical coding system to another:
 MAP(codes = "X40J4", from = "Read 3", to = "ICD-10")
 #> ℹ Using 'UKB v4' as latest version
 #> ℹ Using 'UKB v4' as latest version
-#> ℹ Using 'UKB v4' as latest version
 #> Warning: ! The following codes were not found in the lookup table:
 #> • `O240`
 #> <codeminer_codelist>: 2 codes
@@ -41,7 +40,6 @@ Use `MAP("all")` to return the entire mapping table:
 
 ``` r
 MAP("all", from = "Read 3", to = "ICD-10")
-#> ℹ Using 'UKB v4' as latest version
 #> # A tibble: 36 × 8
 #>    from  to    mapping_status refine_flag add_code_flag element_num block_num
 #>    <chr> <chr> <chr>          <chr>       <chr>         <chr>       <chr>    
@@ -70,7 +68,6 @@ includes `mapping_status` and `refine_flag` columns:
 ``` r
 MAP("all", from = "Read 3", to = "ICD-10") |>
   filter(from == "XaIP9")
-#> ℹ Using 'UKB v4' as latest version
 #> # A tibble: 5 × 8
 #>   from  to    mapping_status refine_flag add_code_flag element_num block_num
 #>   <chr> <chr> <chr>          <chr>       <chr>         <chr>       <chr>    
@@ -89,11 +86,9 @@ and ‘N948’):
 
 ``` r
 MAP("XaIP9", from = "Read 3", to = "ICD-10")
-#> ℹ Using 'UKB v4' as latest version
-#> ℹ Using 'UKB v4' as latest version
 #> <codeminer_codelist>: 5 codes
-#> 
 #> Code type: "ICD-10"
+#> 
 #> # A tibble: 5 × 3
 #>   code  description                                                    code_type
 #>   <chr> <chr>                                                          <chr>    

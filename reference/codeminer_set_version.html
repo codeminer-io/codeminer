@@ -81,6 +81,9 @@ by code type.</p></dd>
     <p>Pinned versions only affect "latest" resolution. Explicit version arguments
 on query functions (e.g. <code>CODES(..., lookup_version = "v1")</code>) always take
 precedence.</p>
+<p>Versions are also auto-cached the first time <code>"latest"</code> is resolved for a
+given code type. Calling <code>codeminer_set_version()</code> overrides any
+auto-cached version.</p>
 <p>New pins are merged with existing ones. To replace all pins, call
 <code><a href="codeminer_clear_versions.html">codeminer_clear_versions()</a></code> first.</p>
     </div>

@@ -15,6 +15,13 @@ codeminer_refresh_cache()
 
 `NULL`, invisibly.
 
+## Details
+
+This refreshes the *metadata inventory* (which tables and versions exist
+in the database). It does not affect version selections — use
+[`codeminer_clear_versions()`](https://codeminer-io.github.io/codeminer/reference/codeminer_clear_versions.md)
+to reset which version is used for each code type.
+
 ## See also
 
 Other Workbench management:

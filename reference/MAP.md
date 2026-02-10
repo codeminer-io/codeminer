@@ -93,12 +93,11 @@ temp_db <- tempfile(fileext = ".duckdb")
 create_dummy_database(temp_db)
 #> ✔ Dummy database ready to use!
 #> ℹ To reconnect to your previous database:
-#>   `Sys.setenv(CODEMINER_DB_PATH = "/tmp/Rtmp8tnFLb/file1c533315e932.duckdb")`
+#>   `Sys.setenv(CODEMINER_DB_PATH = "/tmp/RtmpCHrX3n/file1c361646c8c0.duckdb")`
 #>   `codeminer_connect()`
 
 # Single code
 MAP("X40J4", from = "Read 3", to = "ICD-10")
-#> ℹ Using 'UKB v4' as latest version
 #> ℹ Using 'UKB v4' as latest version
 #> ℹ Using 'UKB v4' as latest version
 #> Warning: ! The following codes were not found in the lookup table:
@@ -114,12 +113,8 @@ MAP("X40J4", from = "Read 3", to = "ICD-10")
 
 # Multiple codes
 MAP("X40J4", "X40J5", from = "Read 3", to = "ICD-10")
-#> ℹ Using 'UKB v4' as latest version
-#> ℹ Using 'UKB v4' as latest version
 #> Warning: ! The following codes were not found in the mapping table:
 #> • `X40J5`
-#> ℹ Using 'UKB v4' as latest version
-#> ℹ Using 'UKB v4' as latest version
 #> Warning: ! The following codes were not found in the lookup table:
 #> • `O240`
 #> <codeminer_codelist>: 2 codes
@@ -133,12 +128,8 @@ MAP("X40J4", "X40J5", from = "Read 3", to = "ICD-10")
 
 # || separated
 MAP("X40J4 || X40J5", from = "Read 3", to = "ICD-10")
-#> ℹ Using 'UKB v4' as latest version
-#> ℹ Using 'UKB v4' as latest version
 #> Warning: ! The following codes were not found in the mapping table:
 #> • `X40J5`
-#> ℹ Using 'UKB v4' as latest version
-#> ℹ Using 'UKB v4' as latest version
 #> Warning: ! The following codes were not found in the lookup table:
 #> • `O240`
 #> <codeminer_codelist>: 2 codes
@@ -157,12 +148,8 @@ df <- data.frame(
   code_type = c("Read 3", "Read 3")
 )
 MAP(df, to = "ICD-10")
-#> ℹ Using 'UKB v4' as latest version
-#> ℹ Using 'UKB v4' as latest version
 #> Warning: ! The following codes were not found in the mapping table:
 #> • `X40J5`
-#> ℹ Using 'UKB v4' as latest version
-#> ℹ Using 'UKB v4' as latest version
 #> Warning: ! The following codes were not found in the lookup table:
 #> • `O240`
 #> <codeminer_codelist>: 2 codes
@@ -176,7 +163,6 @@ MAP(df, to = "ICD-10")
 
 # Return the mapping table itself
 MAP("all", from = "Read 3", to = "ICD-10")
-#> ℹ Using 'UKB v4' as latest version
 #> # A tibble: 36 × 8
 #>    from  to    mapping_status refine_flag add_code_flag element_num block_num
 #>    <chr> <chr> <chr>          <chr>       <chr>         <chr>       <chr>    

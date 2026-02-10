@@ -122,7 +122,6 @@ CODES("E10", "E11", type = "ICD-10")
 
 # With comments
 CODES("E10 << Type 1 diabetes >>", type = "ICD-10")
-#> ℹ Using 'UKB v4' as latest version
 #> <codeminer_codelist>: 1 code
 #> Code type: "ICD-10"
 #> 
@@ -133,7 +132,6 @@ CODES("E10 << Type 1 diabetes >>", type = "ICD-10")
 
 # || separated string
 CODES("E10 || E11", type = "ICD-10")
-#> ℹ Using 'UKB v4' as latest version
 #> <codeminer_codelist>: 2 codes
 #> Code type: "ICD-10"
 #> 
@@ -146,7 +144,6 @@ CODES("E10 || E11", type = "ICD-10")
 # Splice operator
 my_codes <- c("E10", "E11")
 CODES(!!!my_codes, type = "ICD-10")
-#> ℹ Using 'UKB v4' as latest version
 #> <codeminer_codelist>: 2 codes
 #> Code type: "ICD-10"
 #> 
@@ -163,7 +160,6 @@ df <- data.frame(
   code_type = c("ICD-10", "ICD-10")
 )
 CODES(df)
-#> ℹ Using 'UKB v4' as latest version
 #> <codeminer_codelist>: 2 codes
 #> Code type: "ICD-10"
 #> 
@@ -173,8 +169,6 @@ CODES(df)
 #> 1 E10   Type 1 diabetes mellitus ICD-10   
 #> 2 E11   Type 2 diabetes mellitus ICD-10   
 CODES_LIKE("^E1", type = "ICD-10")
-#> ℹ Using 'UKB v4' as latest version
-#> ℹ Using 'UKB v4' as latest version
 #> <codeminer_codelist>: 55 codes
 #> Code type: "ICD-10"
 #> 

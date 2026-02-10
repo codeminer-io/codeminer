@@ -50,7 +50,7 @@ connection).
 - [`codeminer_set_version()`](https://codeminer-io.github.io/codeminer/reference/codeminer_set_version.md)
   : Pin table versions for the session
 - [`codeminer_clear_versions()`](https://codeminer-io.github.io/codeminer/reference/codeminer_clear_versions.md)
-  : Clear all pinned versions
+  : Clear active version selections
 - [`codeminer_set_col_filters()`](https://codeminer-io.github.io/codeminer/reference/codeminer_set_col_filters.md)
   : Pin column filters for the session
 - [`codeminer_clear_col_filters()`](https://codeminer-io.github.io/codeminer/reference/codeminer_clear_col_filters.md)

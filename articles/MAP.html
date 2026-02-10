@@ -89,7 +89,6 @@ coding system to another:</p>
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/MAP.html">MAP</a></span><span class="op">(</span>codes <span class="op">=</span> <span class="st">"X40J4"</span>, from <span class="op">=</span> <span class="st">"Read 3"</span>, to <span class="op">=</span> <span class="st">"ICD-10"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Using 'UKB v4' as latest version</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Using 'UKB v4' as latest version</span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Using 'UKB v4' as latest version</span></span>
 <span><span class="co">#&gt; Warning: <span style="color: #BBBB00;">!</span> The following codes were not found in the lookup table:</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">•</span> `O240`</span></span>
 <span><span class="co">#&gt; <span style="color: #0000BB;">&lt;codeminer_codelist&gt;</span>: 2 codes</span></span>
@@ -102,7 +101,6 @@ coding system to another:</p>
 <p>Use <code>MAP("all")</code> to return the entire mapping table:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/MAP.html">MAP</a></span><span class="op">(</span><span class="st">"all"</span>, from <span class="op">=</span> <span class="st">"Read 3"</span>, to <span class="op">=</span> <span class="st">"ICD-10"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Using 'UKB v4' as latest version</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 36 × 8</span></span></span>
 <span><span class="co">#&gt;    from  to    mapping_status refine_flag add_code_flag element_num block_num</span></span>
 <span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    </span></span>
@@ -131,7 +129,6 @@ example, the Read 3 to ICD10 mapping table includes
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/MAP.html">MAP</a></span><span class="op">(</span><span class="st">"all"</span>, from <span class="op">=</span> <span class="st">"Read 3"</span>, to <span class="op">=</span> <span class="st">"ICD-10"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">from</span> <span class="op">==</span> <span class="st">"XaIP9"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Using 'UKB v4' as latest version</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 5 × 8</span></span></span>
 <span><span class="co">#&gt;   from  to    mapping_status refine_flag add_code_flag element_num block_num</span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    </span></span>
@@ -147,11 +144,9 @@ will map to a number of ICD10 codes, some of which are sex-specific
 (‘N508’ and ‘N948’):</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/MAP.html">MAP</a></span><span class="op">(</span><span class="st">"XaIP9"</span>, from <span class="op">=</span> <span class="st">"Read 3"</span>, to <span class="op">=</span> <span class="st">"ICD-10"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Using 'UKB v4' as latest version</span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Using 'UKB v4' as latest version</span></span>
 <span><span class="co">#&gt; <span style="color: #0000BB;">&lt;codeminer_codelist&gt;</span>: 5 codes</span></span>
-<span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Code type: <span style="color: #0000BB;">"ICD-10"</span></span></span>
+<span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 5 × 3</span></span></span>
 <span><span class="co">#&gt;   code  description                                                    code_type</span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                                                          <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    </span></span>
