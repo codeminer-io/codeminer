@@ -82,25 +82,19 @@ Other Clinical code lookups and mappings:
 create_dummy_database()
 #> ✔ Dummy database ready to use!
 #> ℹ To reconnect to your previous database:
-#>   `Sys.setenv(CODEMINER_DB_PATH = "/tmp/RtmpCHrX3n/file1c361f252c5.duckdb")`
+#>   `Sys.setenv(CODEMINER_DB_PATH = "/tmp/RtmpYbnbrI/file1c36358cf13f.duckdb")`
 #>   `codeminer_connect()`
 
 # Get the full Read 3 to ICD-10 mapping table
 get_mapping_table("Read 3", "ICD-10") |> dplyr::collect()
 #> ℹ Using 'UKB v4' as latest version
-#> # A tibble: 36 × 8
-#>    from  to    mapping_status refine_flag add_code_flag element_num block_num
-#>    <chr> <chr> <chr>          <chr>       <chr>         <chr>       <chr>    
-#>  1 X40J4 E109  D              C           P             0           0        
-#>  2 X40J4 E10   A              M           P             0           0        
-#>  3 X40J4 O240  R              C           C             0           0        
-#>  4 C10.. E149  D              C           C             0           0        
-#>  5 C10.. E14   A              M           P             0           0        
-#>  6 C10.. E109  R              C           C             0           0        
-#>  7 C10.. E119  R              C           C             0           0        
-#>  8 C10.. E129  R              C           C             0           0        
-#>  9 C10.. E139  R              C           C             0           0        
-#> 10 C10.. O249  R              C           C             0           0        
-#> # ℹ 26 more rows
+#> # A tibble: 5 × 8
+#>   from  to    mapping_status refine_flag add_code_flag element_num block_num
+#>   <chr> <chr> <chr>          <chr>       <chr>         <chr>       <chr>    
+#> 1 X40J4 E109  D              C           P             0           0        
+#> 2 C10.. E149  D              C           C             0           0        
+#> 3 XaIP9 L721  D              C           C             0           0        
+#> 4 XE0e0 N390  D              C           P             0           0        
+#> 5 XE0Uc I10   D              C           C             0           0        
 #> # ℹ 1 more variable: icd10_dagger_asterisk <chr>
 ```

@@ -93,53 +93,44 @@ temp_db <- tempfile(fileext = ".duckdb")
 create_dummy_database(temp_db)
 #> ✔ Dummy database ready to use!
 #> ℹ To reconnect to your previous database:
-#>   `Sys.setenv(CODEMINER_DB_PATH = "/tmp/RtmpCHrX3n/file1c361646c8c0.duckdb")`
+#>   `Sys.setenv(CODEMINER_DB_PATH = "/tmp/RtmpYbnbrI/file1c366a3c95ee.duckdb")`
 #>   `codeminer_connect()`
 
 # Single code
 MAP("X40J4", from = "Read 3", to = "ICD-10")
 #> ℹ Using 'UKB v4' as latest version
 #> ℹ Using 'UKB v4' as latest version
-#> Warning: ! The following codes were not found in the lookup table:
-#> • `O240`
-#> <codeminer_codelist>: 2 codes
+#> <codeminer_codelist>: 1 code
 #> Code type: "ICD-10"
 #> 
-#> # A tibble: 2 × 3
+#> # A tibble: 1 × 3
 #>   code  description                                    code_type
 #>   <chr> <chr>                                          <chr>    
-#> 1 E10   Type 1 diabetes mellitus                       ICD-10   
-#> 2 E109  Type 1 diabetes mellitus Without complications ICD-10   
+#> 1 E109  Type 1 diabetes mellitus Without complications ICD-10   
 
 # Multiple codes
 MAP("X40J4", "X40J5", from = "Read 3", to = "ICD-10")
 #> Warning: ! The following codes were not found in the mapping table:
 #> • `X40J5`
-#> Warning: ! The following codes were not found in the lookup table:
-#> • `O240`
-#> <codeminer_codelist>: 2 codes
+#> <codeminer_codelist>: 1 code
 #> Code type: "ICD-10"
 #> 
-#> # A tibble: 2 × 3
+#> # A tibble: 1 × 3
 #>   code  description                                    code_type
 #>   <chr> <chr>                                          <chr>    
-#> 1 E10   Type 1 diabetes mellitus                       ICD-10   
-#> 2 E109  Type 1 diabetes mellitus Without complications ICD-10   
+#> 1 E109  Type 1 diabetes mellitus Without complications ICD-10   
 
 # || separated
 MAP("X40J4 || X40J5", from = "Read 3", to = "ICD-10")
 #> Warning: ! The following codes were not found in the mapping table:
 #> • `X40J5`
-#> Warning: ! The following codes were not found in the lookup table:
-#> • `O240`
-#> <codeminer_codelist>: 2 codes
+#> <codeminer_codelist>: 1 code
 #> Code type: "ICD-10"
 #> 
-#> # A tibble: 2 × 3
+#> # A tibble: 1 × 3
 #>   code  description                                    code_type
 #>   <chr> <chr>                                          <chr>    
-#> 1 E10   Type 1 diabetes mellitus                       ICD-10   
-#> 2 E109  Type 1 diabetes mellitus Without complications ICD-10   
+#> 1 E109  Type 1 diabetes mellitus Without complications ICD-10   
 
 # Data frame input (from is optional)
 df <- data.frame(
@@ -150,32 +141,23 @@ df <- data.frame(
 MAP(df, to = "ICD-10")
 #> Warning: ! The following codes were not found in the mapping table:
 #> • `X40J5`
-#> Warning: ! The following codes were not found in the lookup table:
-#> • `O240`
-#> <codeminer_codelist>: 2 codes
+#> <codeminer_codelist>: 1 code
 #> Code type: "ICD-10"
 #> 
-#> # A tibble: 2 × 3
+#> # A tibble: 1 × 3
 #>   code  description                                    code_type
 #>   <chr> <chr>                                          <chr>    
-#> 1 E10   Type 1 diabetes mellitus                       ICD-10   
-#> 2 E109  Type 1 diabetes mellitus Without complications ICD-10   
+#> 1 E109  Type 1 diabetes mellitus Without complications ICD-10   
 
 # Return the mapping table itself
 MAP("all", from = "Read 3", to = "ICD-10")
-#> # A tibble: 36 × 8
-#>    from  to    mapping_status refine_flag add_code_flag element_num block_num
-#>    <chr> <chr> <chr>          <chr>       <chr>         <chr>       <chr>    
-#>  1 X40J4 E109  D              C           P             0           0        
-#>  2 X40J4 E10   A              M           P             0           0        
-#>  3 X40J4 O240  R              C           C             0           0        
-#>  4 C10.. E149  D              C           C             0           0        
-#>  5 C10.. E14   A              M           P             0           0        
-#>  6 C10.. E109  R              C           C             0           0        
-#>  7 C10.. E119  R              C           C             0           0        
-#>  8 C10.. E129  R              C           C             0           0        
-#>  9 C10.. E139  R              C           C             0           0        
-#> 10 C10.. O249  R              C           C             0           0        
-#> # ℹ 26 more rows
+#> # A tibble: 5 × 8
+#>   from  to    mapping_status refine_flag add_code_flag element_num block_num
+#>   <chr> <chr> <chr>          <chr>       <chr>         <chr>       <chr>    
+#> 1 X40J4 E109  D              C           P             0           0        
+#> 2 C10.. E149  D              C           C             0           0        
+#> 3 XaIP9 L721  D              C           C             0           0        
+#> 4 XE0e0 N390  D              C           P             0           0        
+#> 5 XE0Uc I10   D              C           C             0           0        
 #> # ℹ 1 more variable: icd10_dagger_asterisk <chr>
 ```

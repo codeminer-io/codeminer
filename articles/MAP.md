@@ -25,35 +25,27 @@ to map a vector of codes from one clinical coding system to another:
 MAP(codes = "X40J4", from = "Read 3", to = "ICD-10")
 #> ℹ Using 'UKB v4' as latest version
 #> ℹ Using 'UKB v4' as latest version
-#> Warning: ! The following codes were not found in the lookup table:
-#> • `O240`
-#> <codeminer_codelist>: 2 codes
+#> <codeminer_codelist>: 1 code
+#> 
 #> Code type: "ICD-10"
-#> # A tibble: 2 × 3
+#> # A tibble: 1 × 3
 #>   code  description                                    code_type
 #>   <chr> <chr>                                          <chr>    
-#> 1 E10   Type 1 diabetes mellitus                       ICD-10   
-#> 2 E109  Type 1 diabetes mellitus Without complications ICD-10
+#> 1 E109  Type 1 diabetes mellitus Without complications ICD-10
 ```
 
 Use `MAP("all")` to return the entire mapping table:
 
 ``` r
 MAP("all", from = "Read 3", to = "ICD-10")
-#> # A tibble: 36 × 8
-#>    from  to    mapping_status refine_flag add_code_flag element_num block_num
-#>    <chr> <chr> <chr>          <chr>       <chr>         <chr>       <chr>    
-#>  1 X40J4 E109  D              C           P             0           0        
-#>  2 X40J4 E10   A              M           P             0           0        
-#>  3 X40J4 O240  R              C           C             0           0        
-#>  4 C10.. E149  D              C           C             0           0        
-#>  5 C10.. E14   A              M           P             0           0        
-#>  6 C10.. E109  R              C           C             0           0        
-#>  7 C10.. E119  R              C           C             0           0        
-#>  8 C10.. E129  R              C           C             0           0        
-#>  9 C10.. E139  R              C           C             0           0        
-#> 10 C10.. O249  R              C           C             0           0        
-#> # ℹ 26 more rows
+#> # A tibble: 5 × 8
+#>   from  to    mapping_status refine_flag add_code_flag element_num block_num
+#>   <chr> <chr> <chr>          <chr>       <chr>         <chr>       <chr>    
+#> 1 X40J4 E109  D              C           P             0           0        
+#> 2 C10.. E149  D              C           C             0           0        
+#> 3 XaIP9 L721  D              C           C             0           0        
+#> 4 XE0e0 N390  D              C           P             0           0        
+#> 5 XE0Uc I10   D              C           C             0           0        
 #> # ℹ 1 more variable: icd10_dagger_asterisk <chr>
 ```
 
@@ -68,14 +60,10 @@ includes `mapping_status` and `refine_flag` columns:
 ``` r
 MAP("all", from = "Read 3", to = "ICD-10") |>
   filter(from == "XaIP9")
-#> # A tibble: 5 × 8
+#> # A tibble: 1 × 8
 #>   from  to    mapping_status refine_flag add_code_flag element_num block_num
 #>   <chr> <chr> <chr>          <chr>       <chr>         <chr>       <chr>    
 #> 1 XaIP9 L721  D              C           C             0           0        
-#> 2 XaIP9 H028  R              C           C             0           0        
-#> 3 XaIP9 N508  R              C           C             0           0        
-#> 4 XaIP9 N608  R              C           C             0           0        
-#> 5 XaIP9 N948  R              C           C             0           0        
 #> # ℹ 1 more variable: icd10_dagger_asterisk <chr>
 ```
 
@@ -86,17 +74,13 @@ and ‘N948’):
 
 ``` r
 MAP("XaIP9", from = "Read 3", to = "ICD-10")
-#> <codeminer_codelist>: 5 codes
+#> <codeminer_codelist>: 1 code
 #> Code type: "ICD-10"
 #> 
-#> # A tibble: 5 × 3
-#>   code  description                                                    code_type
-#>   <chr> <chr>                                                          <chr>    
-#> 1 H028  Other specified disorders of eyelid                            ICD-10   
-#> 2 L721  Trichilemmal cyst                                              ICD-10   
-#> 3 N508  Other specified disorders of male genital organs               ICD-10   
-#> 4 N608  Other benign mammary dysplasias                                ICD-10   
-#> 5 N948  Other specified conditions associated with female genital org… ICD-10
+#> # A tibble: 1 × 3
+#>   code  description       code_type
+#>   <chr> <chr>             <chr>    
+#> 1 L721  Trichilemmal cyst ICD-10
 ```
 
 ------------------------------------------------------------------------

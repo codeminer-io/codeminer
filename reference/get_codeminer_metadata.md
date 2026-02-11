@@ -36,7 +36,7 @@ requested, a named list of data frames.
 create_dummy_database()
 #> ✔ Dummy database ready to use!
 #> ℹ To reconnect to your previous database:
-#>   `Sys.setenv(CODEMINER_DB_PATH = "/tmp/RtmpCHrX3n/file1c36453fc6d.duckdb")`
+#>   `Sys.setenv(CODEMINER_DB_PATH = "/tmp/RtmpYbnbrI/file1c3622bf8a03.duckdb")`
 #>   `codeminer_connect()`
 get_codeminer_metadata()
 #> $lookup
@@ -77,17 +77,28 @@ get_codeminer_metadata()
 #> 8      Read 3_ICD-10_UKB v4         Read 3       ICD-10      UKB v4   read_code
 #> 9       Read 3_OPCS4_UKB v4         Read 3        OPCS4      UKB v4   read_code
 #> 10     Read 3_Read 2_UKB v4         Read 3       Read 2      UKB v4 READV3_CODE
-#>           to_col                                         map_source col_filters
-#> 1          ICD10 https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592        <NA>
-#> 2       bnf_code https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592        <NA>
-#> 3      icd9_code https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592        <NA>
-#> 4     icd10_code https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592        <NA>
-#> 5  opcs_4.2_code https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592        <NA>
-#> 6    READV3_CODE https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592        <NA>
-#> 7      icd9_code https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592        <NA>
-#> 8     icd10_code https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592        <NA>
-#> 9     opcs4_code https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592        <NA>
-#> 10   READV2_CODE https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592        <NA>
+#>           to_col                                         map_source
+#> 1          ICD10 https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592
+#> 2       bnf_code https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592
+#> 3      icd9_code https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592
+#> 4     icd10_code https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592
+#> 5  opcs_4.2_code https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592
+#> 6    READV3_CODE https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592
+#> 7      icd9_code https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592
+#> 8     icd10_code https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592
+#> 9     opcs4_code https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592
+#> 10   READV2_CODE https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592
+#>                                                                                                                                                                                                                                                                                                            col_filters
+#> 1                                                                                                                                                                                                                                                                                                                 <NA>
+#> 2                                                                                                                                                                                                                                                                                                                 <NA>
+#> 3                                                                                                                                                                                                                                                                                                                 <NA>
+#> 4                                                                                                                                                                                                                   {"icd10_code_def":{"values":["1","15","3","5","7","8","2"],"defaults":["1","15","3","5","7","8"]}}
+#> 5                                                                                                                                                                                                                                                                                                                 <NA>
+#> 6                                                                                                                                                                                                                                                                     {"IS_ASSURED":{"values":["1"],"defaults":["1"]}}
+#> 7                                                                                                                                                                                                                                                                                                                 <NA>
+#> 8  {"mapping_status":{"values":["E","G","D","R","A","U"],"defaults":["E","G","D"]},"refine_flag":{"values":["C","P","M"],"defaults":["C","P"]},"element_num":{"values":["0","1","2","3"],"defaults":["0"]},"block_num":{"values":["0","1","2","3","4","5","6","7","8","9","10","11","12","13","14"],"defaults":["0"]}}
+#> 9                                                                                                                                                                                                                                                                                                                 <NA>
+#> 10                                                                                                                                                                                                                                                                    {"IS_ASSURED":{"values":["1"],"defaults":["1"]}}
 #> 
 #> $relationship
 #>      relationship_table_name code_type relationship_version from_col to_col
@@ -170,16 +181,27 @@ get_codeminer_metadata(c("lookup", "mapping"))
 #> 8      Read 3_ICD-10_UKB v4         Read 3       ICD-10      UKB v4   read_code
 #> 9       Read 3_OPCS4_UKB v4         Read 3        OPCS4      UKB v4   read_code
 #> 10     Read 3_Read 2_UKB v4         Read 3       Read 2      UKB v4 READV3_CODE
-#>           to_col                                         map_source col_filters
-#> 1          ICD10 https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592        <NA>
-#> 2       bnf_code https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592        <NA>
-#> 3      icd9_code https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592        <NA>
-#> 4     icd10_code https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592        <NA>
-#> 5  opcs_4.2_code https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592        <NA>
-#> 6    READV3_CODE https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592        <NA>
-#> 7      icd9_code https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592        <NA>
-#> 8     icd10_code https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592        <NA>
-#> 9     opcs4_code https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592        <NA>
-#> 10   READV2_CODE https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592        <NA>
+#>           to_col                                         map_source
+#> 1          ICD10 https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592
+#> 2       bnf_code https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592
+#> 3      icd9_code https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592
+#> 4     icd10_code https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592
+#> 5  opcs_4.2_code https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592
+#> 6    READV3_CODE https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592
+#> 7      icd9_code https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592
+#> 8     icd10_code https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592
+#> 9     opcs4_code https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592
+#> 10   READV2_CODE https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592
+#>                                                                                                                                                                                                                                                                                                            col_filters
+#> 1                                                                                                                                                                                                                                                                                                                 <NA>
+#> 2                                                                                                                                                                                                                                                                                                                 <NA>
+#> 3                                                                                                                                                                                                                                                                                                                 <NA>
+#> 4                                                                                                                                                                                                                   {"icd10_code_def":{"values":["1","15","3","5","7","8","2"],"defaults":["1","15","3","5","7","8"]}}
+#> 5                                                                                                                                                                                                                                                                                                                 <NA>
+#> 6                                                                                                                                                                                                                                                                     {"IS_ASSURED":{"values":["1"],"defaults":["1"]}}
+#> 7                                                                                                                                                                                                                                                                                                                 <NA>
+#> 8  {"mapping_status":{"values":["E","G","D","R","A","U"],"defaults":["E","G","D"]},"refine_flag":{"values":["C","P","M"],"defaults":["C","P"]},"element_num":{"values":["0","1","2","3"],"defaults":["0"]},"block_num":{"values":["0","1","2","3","4","5","6","7","8","9","10","11","12","13","14"],"defaults":["0"]}}
+#> 9                                                                                                                                                                                                                                                                                                                 <NA>
+#> 10                                                                                                                                                                                                                                                                    {"IS_ASSURED":{"values":["1"],"defaults":["1"]}}
 #> 
 ```
