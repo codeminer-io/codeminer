@@ -155,6 +155,65 @@ test_that("get_relationship_table() col_filters = NULL unfiltered", {
   expect_gte(nrow(unfiltered), nrow(filtered))
 })
 
+# col_filters stored during ingestion -----------------------------------------
+
+test_that("SNOMED CT lookup has active_description col_filter", {
+  # Add SNOMED CT data to the dummy database
+  suppressMessages(
+    add_snomed_ct_uk_monolith(
+      path = dummy_snomed_ct_uk_monolith_path(),
+      tables = "sct_lookup"
+    )
+  )
+
+  # Verify col_filters metadata is stored
+  con <- connect_to_db()
+  meta <- get_codeminer_metadata("lookup", con = con) |>
+    dplyr::filter(code_type == "SNOMED CT") |>
+    dplyr::collect()
+  expect_false(is.na(meta$col_filters))
+
+  # Verify get_lookup_table works with default col_filters
+  result <- get_lookup_table("SNOMED CT") |> dplyr::collect()
+  expect_true("active_description" %in% names(result))
+  expect_true(nrow(result) > 0)
+})
+
+test_that("Read 2 -> ICD-10 col_filter excludes icd10_code_def '2'", {
+  default <- get_mapping_table("Read 2", "ICD-10") |> dplyr::collect()
+  unfiltered <- get_mapping_table("Read 2", "ICD-10", col_filters = NULL) |>
+    dplyr::collect()
+  # Dummy data has icd10_code_def == 2 rows that should be excluded by default
+  expect_gt(nrow(unfiltered), nrow(default))
+  expect_false("2" %in% as.character(default$icd10_code_def))
+  expect_true("2" %in% as.character(unfiltered$icd10_code_def))
+})
+
+test_that("Read 2 -> Read 3 col_filter keeps only IS_ASSURED == 1", {
+  default <- get_mapping_table("Read 2", "Read 3") |> dplyr::collect()
+  unfiltered <- get_mapping_table("Read 2", "Read 3", col_filters = NULL) |>
+    dplyr::collect()
+  expect_gt(nrow(unfiltered), nrow(default))
+  expect_true(all(as.character(default$IS_ASSURED) == "1"))
+})
+
+test_that("Read 3 -> ICD-10 col_filter applies mapping_status filter", {
+  default <- get_mapping_table("Read 3", "ICD-10") |> dplyr::collect()
+  unfiltered <- get_mapping_table("Read 3", "ICD-10", col_filters = NULL) |>
+    dplyr::collect()
+  expect_gt(nrow(unfiltered), nrow(default))
+  # Default keeps only E, G, D
+  expect_true(all(default$mapping_status %in% c("E", "G", "D")))
+})
+
+test_that("Read 3 -> Read 2 col_filter keeps only IS_ASSURED == 1", {
+  default <- get_mapping_table("Read 3", "Read 2") |> dplyr::collect()
+  unfiltered <- get_mapping_table("Read 3", "Read 2", col_filters = NULL) |>
+    dplyr::collect()
+  expect_gt(nrow(unfiltered), nrow(default))
+  expect_true(all(as.character(default$IS_ASSURED) == "1"))
+})
+
 # Internal callers still work ------------------------------------------------
 
 test_that("CODES() still works after get_lookup_table() refactor", {

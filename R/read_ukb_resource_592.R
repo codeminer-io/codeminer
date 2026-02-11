@@ -652,7 +652,13 @@ process_read_v2_icd10 <- function(.df, ukb_version, ukb_source) {
         map_version = ukb_version,
         from_col = "read_code",
         to_col = "icd10_code",
-        map_source = ukb_source
+        map_source = ukb_source,
+        col_filters = list(
+          icd10_code_def = list(
+            values = c("1", "15", "3", "5", "7", "8", "2"),
+            defaults = c("1", "15", "3", "5", "7", "8")
+          )
+        )
       )
     )
   )
@@ -684,7 +690,10 @@ process_read_v2_read_ctv3 <- function(.df, ukb_version, ukb_source) {
         map_version = ukb_version,
         from_col = "READV2_CODE",
         to_col = "READV3_CODE",
-        map_source = ukb_source
+        map_source = ukb_source,
+        col_filters = list(
+          IS_ASSURED = list(values = c("1"), defaults = c("1"))
+        )
       )
     )
   )
@@ -758,7 +767,25 @@ process_read_ctv3_icd10 <- function(.df, ukb_version, ukb_source) {
         map_version = ukb_version,
         from_col = "read_code",
         to_col = "icd10_code",
-        map_source = ukb_source
+        map_source = ukb_source,
+        col_filters = list(
+          mapping_status = list(
+            values = c("E", "G", "D", "R", "A", "U"),
+            defaults = c("E", "G", "D")
+          ),
+          refine_flag = list(
+            values = c("C", "P", "M"),
+            defaults = c("C", "P")
+          ),
+          element_num = list(
+            values = as.character(0:3),
+            defaults = c("0")
+          ),
+          block_num = list(
+            values = as.character(0:14),
+            defaults = c("0")
+          )
+        )
       )
     )
   )
@@ -790,7 +817,10 @@ process_read_ctv3_read_v2 <- function(.df, ukb_version, ukb_source) {
         map_version = ukb_version,
         from_col = "READV3_CODE",
         to_col = "READV2_CODE",
-        map_source = ukb_source
+        map_source = ukb_source,
+        col_filters = list(
+          IS_ASSURED = list(values = c("1"), defaults = c("1"))
+        )
       )
     )
   )

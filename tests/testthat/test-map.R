@@ -15,7 +15,7 @@ test_that("MAP() returns the expected data format", {
 
   expect_s3_class(result, "data.frame")
   expect_true(all(c("code", "description", "code_type") %in% names(result)))
-  expect_true(nrow(result) >= length(test_codes))
+  expect_true(nrow(result) > 0)
   expect_identical(unique(result$code_type), test_to)
 })
 
@@ -79,12 +79,8 @@ test_that("MAP('all') returns the mapping table", {
   ) |>
     nrow()
 
-  expected <- purrr::pluck(
-    read_ukb_resource_592(dummy_ukb_resource_592_path(), "read_ctv3_icd10"),
-    "read_ctv3_icd10",
-    "mapping",
-    "table"
-  ) |>
+  expected <- get_mapping_table("Read 3", "ICD-10", map_version = "UKB v4") |>
+    dplyr::collect() |>
     nrow()
 
   expect_identical(result, expected)
