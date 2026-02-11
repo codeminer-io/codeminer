@@ -46,6 +46,8 @@ test_that("CODES handles versions correctly", {
     test_table,
     lookup_metadata(test_type, lookup_version = test_version)
   )
+  # Clear cached "latest" so it re-resolves to the newly added version
+  codeminer_clear_versions(lookup = test_type)
 
   v2_result <- CODES(
     "all",
