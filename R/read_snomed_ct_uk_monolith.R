@@ -222,7 +222,11 @@ read_snomed_ct_uk_monolith <- function(
       lookup_description_col = "term_description",
       lookup_source = source,
       preferred_description_col = "typeId_description",
-      preferred_description_indicator = "900000000000003001"
+      preferred_description_indicator = "900000000000003001",
+      col_filters = list(
+        active_concept = list(values = c("0", "1"), defaults = c("0", "1")),
+        active_description = list(values = c("0", "1"), defaults = c("1"))
+      )
     )
 
     result$sct_lookup <- list(
