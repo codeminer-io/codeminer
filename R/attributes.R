@@ -38,6 +38,10 @@ ATTRIBUTES_FOR <- function(
   check_relationship_types(relationship_types)
   check_logical_scalar(preferred_description_only, "preferred_description_only")
 
+  if (!is.null(relationship_types)) {
+    relationship_types <- strip_comments(relationship_types)
+  }
+
   # Collect and validate input
   collected <- collect_codes_input(
     ...,
@@ -84,6 +88,10 @@ HAS_ATTRIBUTES <- function(
   check_version(relationship_version)
   check_relationship_types(relationship_types)
   check_logical_scalar(preferred_description_only, "preferred_description_only")
+
+  if (!is.null(relationship_types)) {
+    relationship_types <- strip_comments(relationship_types)
+  }
 
   # Collect and validate input
   collected <- collect_codes_input(
