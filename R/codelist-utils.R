@@ -187,3 +187,17 @@ parse_codes <- function(codes_vec) {
 
   as_codelist(parsed)
 }
+
+#' Strip `<<>>` comments from code strings
+#'
+#' Extracts just the code portion from strings that may contain `<< description >>`
+#' comments. Uses the same regex pattern as [parse_codes()].
+#'
+#' @param x Character vector of codes, possibly with `<< >>` comments.
+#' @return Character vector with comments stripped.
+#' @keywords internal
+#' @noRd
+strip_comments <- function(x) {
+  stringr::str_remove(x, "\\s*<<.*?>>$") |>
+    stringr::str_trim()
+}

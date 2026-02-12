@@ -91,6 +91,39 @@ test_that("ATTRIBUTES_FOR() and HAS_ATTRIBUTES() filter by relationship_types", 
   expect_identical(has_result$code, "code1")
 })
 
+test_that("relationship_types with <<>> comments works the same as bare codes", {
+  test_type <- "dummy_attr_types"
+
+  # With bare codes (from previous test setup)
+  bare <- ATTRIBUTES_FOR(
+    "code1",
+    relationship_types = "has attribute",
+    type = test_type
+  )
+
+  # With <<>> comments
+  commented <- ATTRIBUTES_FOR(
+    "code1",
+    relationship_types = "has attribute <<Has attribute (attribute)>>",
+    type = test_type
+  )
+
+  expect_identical(bare$code, commented$code)
+
+  # HAS_ATTRIBUTES too
+  bare_has <- HAS_ATTRIBUTES(
+    "attr2",
+    relationship_types = "has property",
+    type = test_type
+  )
+  commented_has <- HAS_ATTRIBUTES(
+    "attr2",
+    relationship_types = "has property <<Has property>>",
+    type = test_type
+  )
+  expect_identical(bare_has$code, commented_has$code)
+})
+
 test_that("ATTRIBUTES_FOR() only returns immediate attributes (max_depth = 1)", {
   test_type <- "dummy_attr2"
 
