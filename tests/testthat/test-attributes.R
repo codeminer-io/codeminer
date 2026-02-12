@@ -131,12 +131,14 @@ test_that("relationship_types accepts a plain data.frame with code column", {
 test_that("relationship_types with <<>> comments works the same as bare codes", {
   test_type <- "dummy_attr_types"
 
+  # With bare codes (from previous test setup)
   bare <- ATTRIBUTES_FOR(
     "code1",
     relationship_types = "has attribute",
     type = test_type
   )
 
+  # With <<>> comments
   commented <- ATTRIBUTES_FOR(
     "code1",
     relationship_types = "has attribute <<Has attribute (attribute)>>",
@@ -145,6 +147,7 @@ test_that("relationship_types with <<>> comments works the same as bare codes", 
 
   expect_identical(bare$code, commented$code)
 
+  # HAS_ATTRIBUTES too
   bare_has <- HAS_ATTRIBUTES(
     "attr2",
     relationship_types = "has property",
