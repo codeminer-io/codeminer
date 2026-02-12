@@ -109,6 +109,39 @@ test_that("collect_codes_input errors with non-character non-df input", {
   )
 })
 
+# strip_comments() -----------------------------------------------------------
+
+test_that("strip_comments strips <<>> descriptions", {
+  expect_equal(
+    strip_comments("363698007 <<Finding site (attribute)>>"),
+    "363698007"
+  )
+})
+
+test_that("strip_comments is a no-op for bare codes", {
+  expect_equal(strip_comments("363698007"), "363698007")
+})
+
+test_that("strip_comments works with strings containing spaces", {
+  expect_equal(
+    strip_comments("has attribute <<Has attribute (attribute)>>"),
+    "has attribute"
+  )
+})
+
+test_that("strip_comments works with a vector", {
+  result <- strip_comments(c(
+    "363698007 <<Finding site (attribute)>>",
+    "116680003",
+    "has attribute <<Has attribute>>",
+    "364075005 <<Heart rate (observable entity)>>"
+  ))
+  expect_equal(
+    result,
+    c("363698007", "116680003", "has attribute", "364075005")
+  )
+})
+
 test_that("collect_codes_input errors with multiple data frames", {
   df1 <- data.frame(code = "E10", code_type = "ICD-10")
   df2 <- data.frame(code = "E11", code_type = "ICD-10")
