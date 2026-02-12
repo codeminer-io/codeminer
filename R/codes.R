@@ -246,19 +246,6 @@ check_depth <- function(depth, call = rlang::caller_env()) {
   }
 }
 
-check_relationship_types <- function(
-  relationship_types,
-  call = rlang::caller_env()
-) {
-  if (
-    !is.null(relationship_types) && !rlang::is_character(relationship_types)
-  ) {
-    codeminer_abort(
-      "{.arg relationship_types} must be NULL or a character vector, not {typeof(relationship_types)}",
-      call = call
-    )
-  }
-}
 
 check_pattern <- function(pattern, call = rlang::caller_env()) {
   if (!rlang::is_string(pattern)) {

@@ -35,8 +35,10 @@ HAS_ATTRIBUTES(
 
 \item{relationship_version}{Relationship table version (character).}
 
-\item{relationship_types}{Character vector of relationship types to filter
-by. If \code{NULL} (default), all relationship types are included.}
+\item{relationship_types}{Relationship types to filter by. Can be a character
+vector, a \code{codeminer_codelist} (e.g. from \code{\link[=CODES]{CODES()}}), or a data frame with
+a \code{code} column. Supports \verb{<<description>>} comments. If \code{NULL} (default),
+all relationship types are included.}
 
 \item{preferred_description_only}{Logical. If \code{TRUE}, return only preferred
 descriptions.}

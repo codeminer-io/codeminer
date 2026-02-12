@@ -143,6 +143,96 @@ collect_codes_input <- function(
   return(list(codes = codes_vec, code_type = NULL))
 }
 
+#' Strip `<<>>` comments from code strings
+#'
+#' Extracts just the code portion from strings that may contain `<< description >>`
+#' comments.
+#'
+#' @param x Character vector of codes, possibly with `<< >>` comments.
+#' @return Character vector with comments stripped.
+#' @keywords internal
+#' @noRd
+strip_comments <- function(x) {
+  stringr::str_remove(x, "\\s*<<.*?>>$") |>
+    stringr::str_trim()
+}
+
+#' Resolve relationship_types input to a character vector
+#'
+#' Normalises `relationship_types` from various input types (NULL, character,
+#' data frame, codelist) to a character vector suitable for database filtering.
+#' Replaces the previous `check_relationship_types()` + `strip_comments()`
+#' two-step.
+#'
+#' @param relationship_types Relationship types input. Can be NULL, a character
+#'   vector, a `codeminer_codelist`, or a data frame with a `code` column.
+#' @param expected_type Optional expected code type. If the input is a data
+#'   frame with a `code_type` column, its value is validated against this.
+#' @param call The calling environment for error messages.
+#' @return NULL (if input is NULL) or a character vector of relationship types.
+#' @keywords internal
+#' @noRd
+resolve_relationship_types <- function(
+  relationship_types,
+  expected_type = NULL,
+  call = rlang::caller_env()
+) {
+  if (is.null(relationship_types)) {
+    return(NULL)
+  }
+
+  # Extract codes from codelist/data.frame
+  if (is.data.frame(relationship_types)) {
+    if (!"code" %in% names(relationship_types)) {
+      # nolint next: object_usage_linter.
+      available_cols <- names(relationship_types)
+      codeminer_abort(
+        c(
+          "{.arg relationship_types} data frame must have a {.field code} column.",
+          "i" = "Available columns: {.field {available_cols}}"
+        ),
+        call = call
+      )
+    }
+
+    # Validate code_type matches if both are available
+    if (
+      !is.null(expected_type) &&
+        "code_type" %in% names(relationship_types)
+    ) {
+      df_type <- unique(relationship_types$code_type)
+      df_type <- df_type[!is.na(df_type)]
+      if (length(df_type) == 1 && df_type != expected_type) {
+        codeminer_abort(
+          c(
+            "Conflicting code types in {.arg relationship_types}.",
+            "x" = "Data frame has {.field code_type}: {.val {df_type}}",
+            "x" = "Expected: {.val {expected_type}}",
+            "i" = "Relationship types should come from the same coding system as the codes being queried."
+          ),
+          call = call
+        )
+      }
+    }
+
+    relationship_types <- relationship_types$code
+  }
+
+  if (!is.character(relationship_types)) {
+    # nolint next: object_usage_linter.
+    input_class <- class(relationship_types)
+    codeminer_abort(
+      c(
+        "{.arg relationship_types} must be NULL, a character vector, or a data frame with a {.field code} column.",
+        "x" = "Got {.cls {input_class}}."
+      ),
+      call = call
+    )
+  }
+
+  strip_comments(relationship_types)
+}
+
 #' Parse codes - split on || and extract << >> comments
 #'
 #' @param codes_vec Character vector of codes, possibly with << >> comments
