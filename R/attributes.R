@@ -7,8 +7,10 @@
 #' - `HAS_ATTRIBUTES()` returns codes that have the specified attribute codes
 #'
 #' @param ... Codes to start from. Supports flexible input like [CODES()].
-#' @param relationship_types Character vector of relationship types to filter
-#'   by. If `NULL` (default), all relationship types are included.
+#' @param relationship_types Relationship types to filter by. Can be a character
+#'   vector, a `codeminer_codelist` (e.g. from [CODES()]), or a data frame with
+#'   a `code` column. Supports `<<description>>` comments. If `NULL` (default),
+#'   all relationship types are included.
 #' @inheritParams CHILDREN
 #' @family Code relationships
 #' @return A data frame of codes and descriptions
@@ -35,12 +37,7 @@ ATTRIBUTES_FOR <- function(
 ) {
   check_version(lookup_version)
   check_version(relationship_version)
-  check_relationship_types(relationship_types)
   check_logical_scalar(preferred_description_only, "preferred_description_only")
-
-  if (!is.null(relationship_types)) {
-    relationship_types <- strip_comments(relationship_types)
-  }
 
   # Collect and validate input
   collected <- collect_codes_input(
@@ -54,6 +51,11 @@ ATTRIBUTES_FOR <- function(
   if (!is.null(collected$code_type)) {
     type <- collected$code_type
   }
+
+  relationship_types <- resolve_relationship_types(
+    relationship_types,
+    expected_type = type
+  )
 
   graph_closure_codes(
     codes = codes_vec,
@@ -86,12 +88,7 @@ HAS_ATTRIBUTES <- function(
 ) {
   check_version(lookup_version)
   check_version(relationship_version)
-  check_relationship_types(relationship_types)
   check_logical_scalar(preferred_description_only, "preferred_description_only")
-
-  if (!is.null(relationship_types)) {
-    relationship_types <- strip_comments(relationship_types)
-  }
 
   # Collect and validate input
   collected <- collect_codes_input(
@@ -105,6 +102,11 @@ HAS_ATTRIBUTES <- function(
   if (!is.null(collected$code_type)) {
     type <- collected$code_type
   }
+
+  relationship_types <- resolve_relationship_types(
+    relationship_types,
+    expected_type = type
+  )
 
   graph_closure_codes(
     codes = codes_vec,

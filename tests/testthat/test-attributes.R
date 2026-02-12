@@ -91,6 +91,43 @@ test_that("ATTRIBUTES_FOR() and HAS_ATTRIBUTES() filter by relationship_types", 
   expect_identical(has_result$code, "code1")
 })
 
+test_that("relationship_types accepts a codelist object", {
+  test_type <- "dummy_attr_types"
+
+  # Use a codelist (as returned by CODES()) for relationship_types
+  rel_cl <- as_codelist(data.frame(
+    code = "has attribute",
+    description = "Has attribute",
+    code_type = test_type
+  ))
+
+  result <- ATTRIBUTES_FOR(
+    "code1",
+    relationship_types = rel_cl,
+    type = test_type
+  )
+  expect_identical(sort(result$code), c("attr1", "attr3"))
+
+  has_result <- HAS_ATTRIBUTES(
+    "attr1",
+    relationship_types = rel_cl,
+    type = test_type
+  )
+  expect_identical(has_result$code, "code1")
+})
+
+test_that("relationship_types accepts a plain data.frame with code column", {
+  test_type <- "dummy_attr_types"
+
+  rel_df <- data.frame(code = "has property")
+  result <- ATTRIBUTES_FOR(
+    "code1",
+    relationship_types = rel_df,
+    type = test_type
+  )
+  expect_identical(result$code, "attr2")
+})
+
 test_that("relationship_types with <<>> comments works the same as bare codes", {
   test_type <- "dummy_attr_types"
 
@@ -122,6 +159,30 @@ test_that("relationship_types with <<>> comments works the same as bare codes", 
     type = test_type
   )
   expect_identical(bare_has$code, commented_has$code)
+})
+
+test_that("relationship_types errors for mismatched code_type", {
+  test_type <- "dummy_attr_types"
+
+  wrong_cl <- as_codelist(data.frame(
+    code = "has attribute",
+    description = "Attr",
+    code_type = "ICD-10"
+  ))
+
+  expect_error(
+    ATTRIBUTES_FOR("code1", relationship_types = wrong_cl, type = test_type),
+    "Conflicting code types"
+  )
+})
+
+test_that("relationship_types errors for invalid input type", {
+  test_type <- "dummy_attr_types"
+
+  expect_error(
+    ATTRIBUTES_FOR("code1", relationship_types = 123, type = test_type),
+    "must be NULL, a character vector, or a data frame.*code.*column"
+  )
 })
 
 test_that("ATTRIBUTES_FOR() only returns immediate attributes (max_depth = 1)", {
