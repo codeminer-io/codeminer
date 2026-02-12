@@ -89,8 +89,10 @@ or codes that have specific attributes.</p>
 
 
 <dt id="arg-relationship-types">relationship_types<a class="anchor" aria-label="anchor" href="#arg-relationship-types"></a></dt>
-<dd><p>Character vector of relationship types to filter
-by. If <code>NULL</code> (default), all relationship types are included.</p></dd>
+<dd><p>Relationship types to filter by. Can be a character
+vector, a <code>codeminer_codelist</code> (e.g. from <code><a href="CODES.html">CODES()</a></code>), or a data frame with
+a <code>code</code> column. Supports <code>&lt;&lt;description&gt;&gt;</code> comments. If <code>NULL</code> (default),
+all relationship types are included.</p></dd>
 
 
 <dt id="arg-preferred-description-only">preferred_description_only<a class="anchor" aria-label="anchor" href="#arg-preferred-description-only"></a></dt>
@@ -124,7 +126,7 @@ descriptions.</p></dd>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="create_dummy_database.html">create_dummy_database</a></span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Dummy database ready to use!</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> To reconnect to your previous database:</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>   `Sys.setenv(CODEMINER_DB_PATH = "/tmp/Rtmp6USdZ1/file19da5b14a537")`</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>   `Sys.setenv(CODEMINER_DB_PATH = "/tmp/RtmpXyzdMY/file19d4f694040")`</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>   `codeminer_connect()`</span>
 <span class="r-in"><span><span class="co"># ATTRIBUTES_FOR returns attributes for codes</span></span></span>
 <span class="r-in"><span><span class="co"># HAS_ATTRIBUTES returns codes that have the specified attributes</span></span></span>

@@ -48,8 +48,11 @@ HAS_ATTRIBUTES(
 
 - relationship_types:
 
-  Character vector of relationship types to filter by. If `NULL`
-  (default), all relationship types are included.
+  Relationship types to filter by. Can be a character vector, a
+  `codeminer_codelist` (e.g. from
+  [`CODES()`](https://codeminer-io.github.io/codeminer/reference/CODES.md)),
+  or a data frame with a `code` column. Supports `<<description>>`
+  comments. If `NULL` (default), all relationship types are included.
 
 - preferred_description_only:
 
@@ -84,7 +87,7 @@ Other Code relationships:
 create_dummy_database()
 #> ✔ Dummy database ready to use!
 #> ℹ To reconnect to your previous database:
-#>   `Sys.setenv(CODEMINER_DB_PATH = "/tmp/Rtmp6USdZ1/file19da5b14a537")`
+#>   `Sys.setenv(CODEMINER_DB_PATH = "/tmp/RtmpXyzdMY/file19d4f694040")`
 #>   `codeminer_connect()`
 # ATTRIBUTES_FOR returns attributes for codes
 # HAS_ATTRIBUTES returns codes that have the specified attributes
