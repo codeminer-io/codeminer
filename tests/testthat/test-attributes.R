@@ -185,6 +185,18 @@ test_that("relationship_types errors for invalid input type", {
   )
 })
 
+test_that("misspelled named parameter in ... is caught, not silently swallowed", {
+  test_type <- "dummy_attr_types"
+
+  # `relationship =` is an ambiguous prefix for both `relationship_types` and
+  # `relationship_version`, so R puts it into `...` silently. Without this
+  # check, the function would return unfiltered results with no error.
+  expect_error(
+    HAS_ATTRIBUTES("attr1", relationship = "has attribute", type = test_type),
+    "Unexpected named argument"
+  )
+})
+
 test_that("ATTRIBUTES_FOR() only returns immediate attributes (max_depth = 1)", {
   test_type <- "dummy_attr2"
 

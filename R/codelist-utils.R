@@ -41,6 +41,21 @@ collect_codes_input <- function(
   # Collect all inputs using rlang::list2() to support !!! splicing
   args <- rlang::list2(...)
 
+  # Named args in ... almost always indicate a misspelled parameter name
+  # (e.g. `relationship =` silently failing to match `relationship_types`).
+  # nolint next: object_usage_linter.
+  named_args <- names(args)[nzchar(names(args))]
+  if (length(named_args) > 0) {
+    codeminer_abort(
+      c(
+        "Unexpected named argument{?s} in {.code ...}: {.arg {named_args}}.",
+        "i" = "The {.code ...} argument only accepts code inputs (character vectors or a codelist).",
+        "i" = "Did you mean to use a named parameter of this function?"
+      ),
+      call = call
+    )
+  }
+
   # Empty input case
   if (length(args) == 0) {
     if (!allow_empty) {
