@@ -87,7 +87,7 @@ Codes may be explored with:
 
 ```{r CODES}
 CODES(
-  codes = c("E10", "E11"),
+  c("E10", "E11"),
   type = "ICD-10"
 )
 ```
