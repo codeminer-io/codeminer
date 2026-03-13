@@ -48,7 +48,7 @@ test_that("MAP fails for missing mapping table", {
 test_that("`MAP()` warns about missing codes in the coding system being mapped from", {
   expect_warning(
     MAP(
-      codes = c("foo", "bar"),
+      c("foo", "bar"),
       from = "Read 3",
       to = "ICD-10"
     ),

@@ -109,6 +109,19 @@ test_that("collect_codes_input errors with non-character non-df input", {
   )
 })
 
+test_that("collect_codes_input errors for named args in ...", {
+  # Single named arg (simulates misspelled parameter like `relationship =`)
+  expect_error(
+    collect_codes_input(relationship = "has attribute"),
+    "Unexpected named argument"
+  )
+  # Named arg alongside valid codes
+  expect_error(
+    collect_codes_input("E10", type_filter = "foo"),
+    "Unexpected named argument"
+  )
+})
+
 # strip_comments() -----------------------------------------------------------
 
 test_that("strip_comments strips <<>> descriptions", {
