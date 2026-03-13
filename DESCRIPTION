@@ -53,7 +53,6 @@ Imports:
     withr,
     rappdirs
 Suggests:
-    PheWAS,
     covr,
     jsonlite,
     knitr,
@@ -62,7 +61,6 @@ Suggests:
     testthat (>= 3.0.0),
     trud
 Remotes:
-    github::rmgpanw/ukbwranglr,
-    github::PheWAS/PheWAS
+    github::rmgpanw/ukbwranglr
 VignetteBuilder: knitr
 Config/testthat/edition: 3
