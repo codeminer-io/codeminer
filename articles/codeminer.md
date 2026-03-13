@@ -48,9 +48,9 @@ of data frames:
 # Create a temporary database with dummy data
 (db_path <- create_dummy_database())
 #> ✔ Dummy database ready to use!
-#> [1] "/tmp/RtmpJKRKUk/file255d350072c5.duckdb"
+#> [1] "/tmp/RtmpxOBg1v/file2ba023893359.duckdb"
 Sys.getenv("CODEMINER_DB_PATH")
-#> [1] "/tmp/RtmpJKRKUk/file255d350072c5.duckdb"
+#> [1] "/tmp/RtmpxOBg1v/file2ba023893359.duckdb"
 ```
 
 `codeminer` resolves the database location using the following
@@ -84,7 +84,7 @@ connection status with
 ``` r
 codeminer_status()
 #> ℹ Workbench active
-#>   Main: /tmp/RtmpJKRKUk/file255d350072c5.duckdb
+#>   Main: /tmp/RtmpxOBg1v/file2ba023893359.duckdb
 #>   Extra: not attached
 ```
 
@@ -99,7 +99,7 @@ Codes may be explored with:
 
 ``` r
 CODES(
-  codes = c("E10", "E11"),
+  c("E10", "E11"),
   type = "ICD-10"
 )
 #> ℹ Using 'UKB v4' as latest version

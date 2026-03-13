@@ -22,7 +22,7 @@ Use [`MAP()`](https://codeminer-io.github.io/codeminer/reference/MAP.md)
 to map a vector of codes from one clinical coding system to another:
 
 ``` r
-MAP(codes = "X40J4", from = "Read 3", to = "ICD-10")
+MAP("X40J4", from = "Read 3", to = "ICD-10")
 #> ℹ Using 'UKB v4' as latest version
 #> ℹ Using 'UKB v4' as latest version
 #> <codeminer_codelist>: 1 code
