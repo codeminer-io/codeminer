@@ -42,9 +42,18 @@ reference:
       - get_snomed_ct_uk_monolith
       - read_snomed_ct_uk_monolith
       - add_snomed_ct_uk_monolith
-      - read_all_lkps_maps
-      - build_all_lkps_maps
-      - all_lkps_maps_to_db
+      - get_ukb_codings
+      - read_ukb_codings
+      - add_ukb_codings
+      - get_phecode
+      - read_phecode
+      - add_phecode
+      - get_nhsbsa_bnf_snomed
+      - read_nhsbsa_bnf_snomed
+      - add_nhsbsa_bnf_snomed
+      - get_nhs_data_migration
+      - read_nhs_data_migration
+      - add_nhs_data_migration
       - build_database
       - dummy_ukb_resource_592_path
       - create_dummy_database
@@ -73,12 +82,4 @@ reference:
     desc: Miscellaneous utility functions.
   - contents:
       - infix_setops
-      - codeminer_metadata
-      - get_bnf_from_open_prescribing
-      - get_nhsbsa_snomed_bnf
-      - get_ukb_self_report_med_to_atc_map
-      - get_phecode_definitions
-      - get_phecode_icd9_map
-      - get_phecode_icd10_map
-      - with_code_type_helpers
-      - start_api
+      - with_type
