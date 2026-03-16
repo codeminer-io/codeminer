@@ -1,6 +1,6 @@
 # PUBLIC ------------------------------------------------------------------
 
-## all_lkps_maps ------------
+## UKB codings ----------------------------------------------------------------
 
 #' Dummy UK Biobank codings file path
 #'
@@ -35,61 +35,6 @@ read_ukb_codings_dummy <- function() {
     col_types = readr::cols(.default = "c")
   )
 }
-
-#' Read dummy UK Biobank resource 592 into R
-#'
-#' Reads a dummy [UK Biobank resource
-#' 592](https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592) excel spreadsheet
-#' into R.
-#'
-#' @return A named list of tibbles.
-#' @export
-#' @family Dummy data
-#' @examples
-#' read_all_lkps_maps_dummy()
-read_all_lkps_maps_dummy <- function() {
-  read_all_lkps_maps(path = dummy_ukb_resource_592_path())
-}
-
-#' Create a dummy all_lkps_maps
-#'
-#' A thin convenience wrapper around [build_all_lkps_maps()], using dummy data
-#' included with this package.
-#'
-#' @return A named list of tibbles.
-#' @export
-#'
-#' @family Dummy data
-#' @seealso [build_all_lkps_maps()]
-#' @examples
-#' build_all_lkps_maps_dummy()
-build_all_lkps_maps_dummy <- function() {
-  suppressMessages(build_all_lkps_maps(
-    all_lkps_maps = read_all_lkps_maps_dummy(),
-    ukb_codings = read_ukb_codings_dummy(),
-    bnf_lkp = NULL,
-    bnf_dmd = NULL,
-    self_report_med_to_atc_map = NULL,
-    snomed_ct_uk_monolith = NULL,
-    phecode_1_2_lkp = dummy_phecode_lkp_path(),
-    icd10_phecode_1_2 = dummy_icd10_phecode_map_path(),
-    icd9_phecode_1_2 = NULL
-  ))
-}
-
-#' Set up a dummy all_lkps_maps database
-#'
-#' @param db_path Path to the database file. Defaults to a temporary file.
-#' @return Returns the \code{db_path} invisibly
-#' @export
-#' @family Dummy data
-#' @examples
-#' dummy_all_lkps_maps_db()
-dummy_all_lkps_maps_db <- function(db_path = tempfile(fileext = ".db")) {
-  maps <- build_all_lkps_maps_dummy()
-  all_lkps_maps_to_db(all_lkps_maps = maps, db_path = db_path)
-}
-
 
 ## Phecodes ----------------------------------------------------------------
 

@@ -38,7 +38,6 @@ Imports:
     duckdb,
     fs,
     glue,
-    magrittr,
     purrr,
     readr,
     readxl,
@@ -56,7 +55,6 @@ Suggests:
     covr,
     jsonlite,
     knitr,
-    plumber,
     rmarkdown,
     testthat (>= 3.0.0),
     trud

@@ -145,15 +145,12 @@ make_lkp_from_ukb_codings <- function(
   ukb_codings,
   Coding,
   Value_col_new_name,
-  Meaning_col_new_nae = "description"
+  Meaning_col_new_name = "description"
 ) {
   result <- ukb_codings[ukb_codings$Coding == Coding, -1]
 
-  result <- ukbwranglr:::rename_cols(
-    df = result,
-    old_colnames = c("Value", "Meaning"),
-    new_colnames = c(Value_col_new_name, Meaning_col_new_nae)
-  )
+  names(result)[names(result) == "Value"] <- Value_col_new_name
+  names(result)[names(result) == "Meaning"] <- Meaning_col_new_name
 
   return(result)
 }
