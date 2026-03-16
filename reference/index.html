@@ -255,24 +255,87 @@
 
         <dt>
 
-          <code><a href="read_all_lkps_maps.html">read_all_lkps_maps()</a></code>
+          <code><a href="get_ukb_codings.html">get_ukb_codings()</a></code>
 
         </dt>
-        <dd>Read UK Biobank resource 592 into a named list</dd>
+        <dd>Download the UK Biobank codings file</dd>
 
         <dt>
 
-          <code><a href="build_all_lkps_maps.html">build_all_lkps_maps()</a></code>
+          <code><a href="read_ukb_codings.html">read_ukb_codings()</a></code>
 
         </dt>
-        <dd>Build named list of clinical code look up and mapping tables</dd>
+        <dd>Read UK Biobank codings file into lookup tables</dd>
 
         <dt>
 
-          <code><a href="all_lkps_maps_to_db.html">all_lkps_maps_to_db()</a></code>
+          <code><a href="add_ukb_codings.html">add_ukb_codings()</a></code>
 
         </dt>
-        <dd>Build a Duckdb database of clinical code look up and mapping tables</dd>
+        <dd>Add UK Biobank codings tables to CodeMiner database</dd>
+
+        <dt>
+
+          <code><a href="get_phecode.html">get_phecode()</a></code>
+
+        </dt>
+        <dd>Download Phecode 1.2 files</dd>
+
+        <dt>
+
+          <code><a href="read_phecode.html">read_phecode()</a></code>
+
+        </dt>
+        <dd>Read Phecode 1.2 files into lookup and mapping tables</dd>
+
+        <dt>
+
+          <code><a href="add_phecode.html">add_phecode()</a></code>
+
+        </dt>
+        <dd>Add Phecode 1.2 tables to CodeMiner database</dd>
+
+        <dt>
+
+          <code><a href="get_nhsbsa_bnf_snomed.html">get_nhsbsa_bnf_snomed()</a></code>
+
+        </dt>
+        <dd>Download the NHSBSA BNF-SNOMED mapping file</dd>
+
+        <dt>
+
+          <code><a href="read_nhsbsa_bnf_snomed.html">read_nhsbsa_bnf_snomed()</a></code>
+
+        </dt>
+        <dd>Read the NHSBSA BNF-SNOMED mapping file into a mapping table</dd>
+
+        <dt>
+
+          <code><a href="add_nhsbsa_bnf_snomed.html">add_nhsbsa_bnf_snomed()</a></code>
+
+        </dt>
+        <dd>Add NHSBSA BNF-SNOMED mapping table to CodeMiner database</dd>
+
+        <dt>
+
+          <code><a href="get_nhs_data_migration.html">get_nhs_data_migration()</a></code>
+
+        </dt>
+        <dd>Get NHS Data Migration mapping tables from NHS TRUD</dd>
+
+        <dt>
+
+          <code><a href="read_nhs_data_migration.html">read_nhs_data_migration()</a></code>
+
+        </dt>
+        <dd>Read NHS Data Migration mapping tables into R</dd>
+
+        <dt>
+
+          <code><a href="add_nhs_data_migration.html">add_nhs_data_migration()</a></code>
+
+        </dt>
+        <dd>Add NHS Data Migration mapping tables to CodeMiner database</dd>
 
         <dt>
 
@@ -397,20 +460,6 @@
 
       <dl><dt>
 
-          <code><a href="build_all_lkps_maps_dummy.html">build_all_lkps_maps_dummy()</a></code>
-
-        </dt>
-        <dd>Create a dummy all_lkps_maps</dd>
-
-        <dt>
-
-          <code><a href="read_all_lkps_maps_dummy.html">read_all_lkps_maps_dummy()</a></code>
-
-        </dt>
-        <dd>Read dummy UK Biobank resource 592 into R</dd>
-
-        <dt>
-
           <code><a href="read_icd10_phecode_map_dummy.html">read_icd10_phecode_map_dummy()</a></code>
 
         </dt>
@@ -429,13 +478,6 @@
 
         </dt>
         <dd>Read dummy UK Biobank codings into R</dd>
-
-        <dt>
-
-          <code><a href="dummy_all_lkps_maps_db.html">dummy_all_lkps_maps_db()</a></code>
-
-        </dt>
-        <dd>Set up a dummy all_lkps_maps database</dd>
 
         <dt>
 
@@ -504,66 +546,10 @@
 
         <dt>
 
-          <code><a href="codeminer_metadata.html">codeminer_metadata()</a></code>
+          <code><a href="with_type.html">with_type()</a></code> <code><a href="with_type.html">icd10()</a></code> <code><a href="with_type.html">icd9()</a></code> <code><a href="with_type.html">read3()</a></code> <code><a href="with_type.html">read2()</a></code> <code><a href="with_type.html">sct()</a></code> <code><a href="with_type.html">opcs4()</a></code> <code><a href="with_type.html">phecode()</a></code> <code><a href="with_type.html">read2_drugs()</a></code> <code><a href="with_type.html">bnf()</a></code> <code><a href="with_type.html">dmd()</a></code> <code><a href="with_type.html">data_coding_3()</a></code> <code><a href="with_type.html">data_coding_4()</a></code> <code><a href="with_type.html">data_coding_5()</a></code> <code><a href="with_type.html">data_coding_6()</a></code>
 
         </dt>
-        <dd>Metadata</dd>
-
-        <dt>
-
-          <code><a href="get_bnf_from_open_prescribing.html">get_bnf_from_open_prescribing()</a></code>
-
-        </dt>
-        <dd>Get the BNF terminology from OpenPrescribing</dd>
-
-        <dt>
-
-          <code><a href="get_nhsbsa_snomed_bnf.html">get_nhsbsa_snomed_bnf()</a></code>
-
-        </dt>
-        <dd>Download and read the NHSBSA BNF_SNOMED mapping file</dd>
-
-        <dt>
-
-          <code><a href="get_ukb_self_report_med_to_atc_map.html">get_ukb_self_report_med_to_atc_map()</a></code>
-
-        </dt>
-        <dd>Download and read a UKB welf-reported medication code to ATC mapping file</dd>
-
-        <dt>
-
-          <code><a href="get_phecode_definitions.html">get_phecode_definitions()</a></code>
-
-        </dt>
-        <dd>Download the Phecode 1.2 definitions file</dd>
-
-        <dt>
-
-          <code><a href="get_phecode_icd9_map.html">get_phecode_icd9_map()</a></code>
-
-        </dt>
-        <dd>Download the Phecode 1.2 to ICD9 mapping file</dd>
-
-        <dt>
-
-          <code><a href="get_phecode_icd10_map.html">get_phecode_icd10_map()</a></code>
-
-        </dt>
-        <dd>Download the Phecode 1.2 to ICD10 (beta) mapping file</dd>
-
-        <dt>
-
-          <code><a href="with_code_type_helpers.html">icd10()</a></code> <code><a href="with_code_type_helpers.html">icd9()</a></code> <code><a href="with_code_type_helpers.html">read3()</a></code> <code><a href="with_code_type_helpers.html">read2()</a></code> <code><a href="with_code_type_helpers.html">sct()</a></code> <code><a href="with_code_type_helpers.html">opcs4()</a></code> <code><a href="with_code_type_helpers.html">phecode()</a></code> <code><a href="with_code_type_helpers.html">read2_drugs()</a></code> <code><a href="with_code_type_helpers.html">bnf()</a></code> <code><a href="with_code_type_helpers.html">dmd()</a></code> <code><a href="with_code_type_helpers.html">data_coding_3()</a></code> <code><a href="with_code_type_helpers.html">data_coding_4()</a></code> <code><a href="with_code_type_helpers.html">data_coding_5()</a></code> <code><a href="with_code_type_helpers.html">data_coding_6()</a></code> <code><a href="with_code_type_helpers.html">medcode_aurum()</a></code> <code><a href="with_code_type_helpers.html">prodcode_aurum()</a></code>
-
-        </dt>
-        <dd>With Code Type Functions</dd>
-
-        <dt>
-
-          <code><a href="start_api.html">start_api()</a></code>
-
-        </dt>
-        <dd>Start Plumber API</dd>
+        <dd>Set code type context</dd>
       </dl></div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>
