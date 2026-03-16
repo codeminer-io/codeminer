@@ -69,6 +69,7 @@ reference:
       - remove_relationship_table
       - relationship_metadata
       - update_relationship_metadata
+      - get_codeminer_metadata
 
   - title: Dummy data
     desc: Dummy data for tests.
