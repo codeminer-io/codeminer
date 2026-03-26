@@ -17,7 +17,7 @@ split_double_pipe <- function(x) {
 #' Collect and validate codes input from ... argument
 #'
 #' Not a user-side function. Exported for use by packages that build on top of
-#' codeminer (e.g. codeminer.api). Most users should not need to call this
+#' codeminer. Most users should not need to call this
 #' directly.
 #'
 #' Collects codes from the `...` argument, validates them, and returns a

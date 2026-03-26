@@ -30,7 +30,7 @@ A list with two elements:
 }
 \description{
 Not a user-side function. Exported for use by packages that build on top of
-codeminer (e.g. codeminer.api). Most users should not need to call this
+codeminer. Most users should not need to call this
 directly.
 }
 \details{
