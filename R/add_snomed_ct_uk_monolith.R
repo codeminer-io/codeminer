@@ -92,6 +92,31 @@ add_snomed_ct_uk_monolith <- function(
   .icd10_refset_id = "999002271000000101",
   .opcs4_refset_id = "999002321000000109"
 ) {
+  if (is.null(version)) {
+    version <- basename(path)
+  }
+
+  expected_names <- c(
+    sct_lookup = paste("SNOMED CT", version, sep = "_"),
+    sct_relationship = paste("SNOMED CT", "relationship", version, sep = "_"),
+    sct_icd10 = paste("SNOMED CT", "ICD-10", version, sep = "_"),
+    sct_opcs4 = paste("SNOMED CT", "OPCS4", version, sep = "_")
+  )
+  expected_types <- c(
+    sct_lookup = "lookup",
+    sct_relationship = "relationship",
+    sct_icd10 = "mapping",
+    sct_opcs4 = "mapping"
+  )
+
+  sel <- names(expected_names) %in% tables
+  if (tables_all_exist(expected_names[sel], expected_types[sel])) {
+    codeminer_inform(
+      "All requested SNOMED CT tables already exist for version {.val {version}}, skipping."
+    )
+    return(invisible(NULL))
+  }
+
   snomed_data <- read_snomed_ct_uk_monolith(
     path = path,
     tables = tables,

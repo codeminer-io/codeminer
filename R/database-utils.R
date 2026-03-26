@@ -554,6 +554,43 @@ table_exists <- function(con, tbl_name) {
   return(tbl_name %in% existing_tables)
 }
 
+# Check whether all specified tables already exist in the database metadata.
+# Returns TRUE if every table is found, FALSE otherwise.
+# Used by add_*_trud() wrappers to skip expensive read operations.
+tables_all_exist <- function(table_names, types) {
+  db <- db_path()
+  if (!file.exists(db)) {
+    return(FALSE)
+  }
+
+  con <- DBI::dbConnect(duckdb::duckdb(), db, read_only = TRUE)
+  on.exit(DBI::dbDisconnect(con, shutdown = TRUE))
+
+  for (i in seq_along(table_names)) {
+    meta_tbl <- codeminer_metadata_table_names[[types[[i]]]]
+    if (!table_exists(con, meta_tbl)) {
+      return(FALSE)
+    }
+
+    id_col <- switch(
+      types[[i]],
+      lookup = "lookup_table_name",
+      mapping = "mapping_table_name",
+      relationship = "relationship_table_name"
+    )
+
+    query <- glue::glue_sql(
+      "SELECT 1 FROM {`meta_tbl`} WHERE {`id_col`} = {table_names[[i]]} LIMIT 1",
+      .con = con
+    )
+    if (nrow(DBI::dbGetQuery(con, query)) == 0) {
+      return(FALSE)
+    }
+  }
+
+  TRUE
+}
+
 # Helper to check if the database is valid or throw an error
 check_database <- function(con) {
   error_msg <- c(

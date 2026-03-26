@@ -30,6 +30,27 @@ add_read3_trud <- function(
   version = NULL,
   source = "https://isd.digital.nhs.uk/trud/"
 ) {
+  if (is.null(version)) {
+    version <- basename(path)
+  }
+
+  expected_names <- c(
+    read3_lkp = paste("read3", version, sep = "_"),
+    read3_relationship = paste("read3", "relationship", version, sep = "_")
+  )
+  expected_types <- c(
+    read3_lkp = "lookup",
+    read3_relationship = "relationship"
+  )
+
+  sel <- names(expected_names) %in% tables
+  if (tables_all_exist(expected_names[sel], expected_types[sel])) {
+    codeminer_inform(
+      "All requested Read 3 tables already exist for version {.val {version}}, skipping."
+    )
+    return(invisible(NULL))
+  }
+
   read3_data <- read_read3_trud(
     path = path,
     tables = tables,

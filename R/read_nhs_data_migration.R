@@ -80,12 +80,15 @@ read_nhs_data_migration <- function(
   }
 
   # Locate the clinically assured mapping tables directory
-  clinically_assured_dir <- file.path(
-    path,
-    "Mapping Tables",
-    "Updated",
-    "Clinically Assured"
-  )
+  clinically_assured_dir <- file.path(path, "Updated", "Clinically Assured")
+  if (!dir.exists(clinically_assured_dir)) {
+    clinically_assured_dir <- file.path(
+      path,
+      "Mapping Tables",
+      "Updated",
+      "Clinically Assured"
+    )
+  }
 
   if (!dir.exists(clinically_assured_dir)) {
     cli::cli_abort(c(
