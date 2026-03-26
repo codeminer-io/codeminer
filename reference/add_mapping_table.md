@@ -59,7 +59,7 @@ mapping_table
 # Using a temporary database
 Sys.setenv(CODEMINER_DB_PATH = tempfile())
 build_database()
-#> Creating new database at /tmp/RtmpDe6Y0f/file1db6f579ec9
+#> Creating new database at /tmp/RtmpeQmS6z/file1c6e7588af18
 add_mapping_table(mapping_table, mapping_metadata("capital", "lowercase", map_version = "v3"))
 #> ✔ Mapping table capital_lowercase_v3 added successfully.
 ```

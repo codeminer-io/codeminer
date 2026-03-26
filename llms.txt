@@ -265,6 +265,30 @@ clinical coding systems.
   : Read NHS Data Migration mapping tables into R
 - [`add_nhs_data_migration()`](https://codeminer-io.github.io/codeminer/reference/add_nhs_data_migration.md)
   : Add NHS Data Migration mapping tables to CodeMiner database
+- [`get_icd10_trud()`](https://codeminer-io.github.io/codeminer/reference/get_icd10_trud.md)
+  : Get ICD-10 coding system files from NHS TRUD
+- [`read_icd10_trud()`](https://codeminer-io.github.io/codeminer/reference/read_icd10_trud.md)
+  : Read ICD-10 coding files into R
+- [`add_icd10_trud()`](https://codeminer-io.github.io/codeminer/reference/add_icd10_trud.md)
+  : Add ICD-10 lookup table to CodeMiner database
+- [`get_opcs4_trud()`](https://codeminer-io.github.io/codeminer/reference/get_opcs4_trud.md)
+  : Get OPCS-4 coding system files from NHS TRUD
+- [`read_opcs4_trud()`](https://codeminer-io.github.io/codeminer/reference/read_opcs4_trud.md)
+  : Read OPCS-4 coding files into R
+- [`add_opcs4_trud()`](https://codeminer-io.github.io/codeminer/reference/add_opcs4_trud.md)
+  : Add OPCS-4 lookup table to CodeMiner database
+- [`get_read3_trud()`](https://codeminer-io.github.io/codeminer/reference/get_read3_trud.md)
+  : Get Read 3 (CTV3) coding system files from NHS TRUD
+- [`read_read3_trud()`](https://codeminer-io.github.io/codeminer/reference/read_read3_trud.md)
+  : Read Read 3 (CTV3) coding files into R
+- [`add_read3_trud()`](https://codeminer-io.github.io/codeminer/reference/add_read3_trud.md)
+  : Add Read 3 (CTV3) tables to CodeMiner database
+- [`get_read2_trud()`](https://codeminer-io.github.io/codeminer/reference/get_read2_trud.md)
+  : Get Read 2 coding system files from NHS TRUD
+- [`read_read2_trud()`](https://codeminer-io.github.io/codeminer/reference/read_read2_trud.md)
+  : Read Read 2 coding files into R
+- [`add_read2_trud()`](https://codeminer-io.github.io/codeminer/reference/add_read2_trud.md)
+  : Add Read 2 tables to CodeMiner database
 - [`build_database()`](https://codeminer-io.github.io/codeminer/reference/build_database.md)
   : Build the Codeminer database
 - [`dummy_ukb_resource_592_path()`](https://codeminer-io.github.io/codeminer/reference/dummy_ukb_resource_592_path.md)
