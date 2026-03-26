@@ -83,3 +83,4 @@ reference:
   - contents:
       - infix_setops
       - with_type
+      - collect_codes_input
