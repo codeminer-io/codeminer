@@ -29,9 +29,12 @@ A list with two elements:
 }
 }
 \description{
-This helper function collects codes from the \code{...} argument, validates them,
-and returns a standardized list containing the codes vector and code_type.
-Handles empty input, single data frames, character vectors, and || separated
-strings.
+Not a user-side function. Exported for use by packages that build on top of
+codeminer (e.g. codeminer.api). Most users should not need to call this
+directly.
 }
-\keyword{internal}
+\details{
+Collects codes from the \code{...} argument, validates them, and returns a
+standardised list containing the codes vector and code_type. Handles empty
+input, single data frames, character vectors, and || separated strings.
+}

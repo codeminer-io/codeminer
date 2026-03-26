@@ -16,10 +16,13 @@ split_double_pipe <- function(x) {
 
 #' Collect and validate codes input from ... argument
 #'
-#' This helper function collects codes from the `...` argument, validates them,
-#' and returns a standardized list containing the codes vector and code_type.
-#' Handles empty input, single data frames, character vectors, and || separated
-#' strings.
+#' Not a user-side function. Exported for use by packages that build on top of
+#' codeminer (e.g. codeminer.api). Most users should not need to call this
+#' directly.
+#'
+#' Collects codes from the `...` argument, validates them, and returns a
+#' standardised list containing the codes vector and code_type. Handles empty
+#' input, single data frames, character vectors, and || separated strings.
 #'
 #' @param ... Code inputs - can be character vectors, a single data frame, or
 #'   empty
@@ -31,7 +34,7 @@ split_double_pipe <- function(x) {
 #'   - `codes`: Character vector of codes
 #'   - `code_type`: String code type (or NULL if not determinable)
 #'
-#' @keywords internal
+#' @export
 collect_codes_input <- function(
   ...,
   type = NULL,
