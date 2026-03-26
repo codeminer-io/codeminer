@@ -66,19 +66,19 @@ create_dummy_read3_dir <- function(.envir = parent.frame()) {
   v3_dir <- file.path(dir, "V3")
   dir.create(v3_dir)
 
-  # Concept.v3: code|status|type|related_code  (C=active, R=retired)
+  # Columns: code, status, type, related_code (C = active, R = retired)
   writeLines(
     c("X40J5|C|P|", "X40J6|C|P|", "X40J7|R|P|"),
     file.path(v3_dir, "Concept.v3")
   )
 
-  # Descrip.v3: code|description_id|desc_type  (P=preferred, S=synonym)
+  # Columns: code, description_id, desc_type (P = preferred, S = synonym)
   writeLines(
     c("X40J5|D001|P", "X40J5|D002|S", "X40J6|D003|P", "X40J7|D004|P"),
     file.path(v3_dir, "Descrip.v3")
   )
 
-  # Terms.v3: description_id|term_type|term|alt1|alt2  (C=clinical, O=obsolete)
+  # Columns: description_id, term_type, term, alt1, alt2 (C = clinical, O = obsolete)
   writeLines(
     c(
       "D001|C|Disorder of organ||",
@@ -89,7 +89,7 @@ create_dummy_read3_dir <- function(.envir = parent.frame()) {
     file.path(v3_dir, "Terms.v3")
   )
 
-  # V3hier.v3: child_code|parent_code|relationship_type
+  # Columns: child_code, parent_code, relationship_type
   writeLines(
     c("X40J5|X40J6|01", "X40J6|X40J7|01"),
     file.path(v3_dir, "V3hier.v3")
