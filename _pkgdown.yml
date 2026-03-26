@@ -54,6 +54,18 @@ reference:
       - get_nhs_data_migration
       - read_nhs_data_migration
       - add_nhs_data_migration
+      - get_icd10_trud
+      - read_icd10_trud
+      - add_icd10_trud
+      - get_opcs4_trud
+      - read_opcs4_trud
+      - add_opcs4_trud
+      - get_read3_trud
+      - read_read3_trud
+      - add_read3_trud
+      - get_read2_trud
+      - read_read2_trud
+      - add_read2_trud
       - build_database
       - dummy_ukb_resource_592_path
       - create_dummy_database
