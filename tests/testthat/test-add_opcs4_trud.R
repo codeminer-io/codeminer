@@ -1,5 +1,8 @@
 test_that("add_opcs4_trud() errors on nonexistent path", {
-  expect_error(add_opcs4_trud(path = "/nonexistent/path"), "Path does not exist")
+  expect_error(
+    add_opcs4_trud(path = "/nonexistent/path"),
+    "Path does not exist"
+  )
 })
 
 test_that("add_opcs4_trud() returns the read data invisibly", {

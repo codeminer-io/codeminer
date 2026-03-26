@@ -1,5 +1,8 @@
 test_that("add_read2_trud() errors on nonexistent path", {
-  expect_error(add_read2_trud(path = "/nonexistent/path"), "Path does not exist")
+  expect_error(
+    add_read2_trud(path = "/nonexistent/path"),
+    "Path does not exist"
+  )
 })
 
 test_that("add_read2_trud() returns the read data invisibly", {

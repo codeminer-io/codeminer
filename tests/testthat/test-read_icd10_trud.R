@@ -69,8 +69,14 @@ test_that("read_icd10_trud() derives version from directory name", {
 
 test_that("read_icd10_trud() uses custom source", {
   dir <- create_dummy_icd10_dir()
-  result <- suppressMessages(read_icd10_trud(dir, source = "https://custom.source/"))
-  expect_equal(result$icd10_lkp$lookup$metadata$lookup_source, "https://custom.source/")
+  result <- suppressMessages(read_icd10_trud(
+    dir,
+    source = "https://custom.source/"
+  ))
+  expect_equal(
+    result$icd10_lkp$lookup$metadata$lookup_source,
+    "https://custom.source/"
+  )
 })
 
 test_that("read_icd10_trud() accepts zip file input", {
@@ -83,22 +89,51 @@ test_that("read_icd10_trud() accepts zip file input", {
     c(
       paste(
         c(
-          "CODE", "ALT_CODE", "USAGE", "USAGE_UK", "DESCRIPTION",
-          "MODIFIER_4", "MODIFIER_5", "QUALIFIERS", "GENDER_MASK",
-          "MIN_AGE", "MAX_AGE", "TREE_DESCRIPTION"
+          "CODE",
+          "ALT_CODE",
+          "USAGE",
+          "USAGE_UK",
+          "DESCRIPTION",
+          "MODIFIER_4",
+          "MODIFIER_5",
+          "QUALIFIERS",
+          "GENDER_MASK",
+          "MIN_AGE",
+          "MAX_AGE",
+          "TREE_DESCRIPTION"
         ),
         collapse = "\t"
       ),
       paste(
-        c("E10", "E10", "M", "N", "Type 1 diabetes", "", "", "", "0", "0", "999", "Endo"),
+        c(
+          "E10",
+          "E10",
+          "M",
+          "N",
+          "Type 1 diabetes",
+          "",
+          "",
+          "",
+          "0",
+          "0",
+          "999",
+          "Endo"
+        ),
         collapse = "\t"
       )
     ),
-    file.path(release_dir, "Content", "ICD10_Edition5_CodesAndTitlesAndMetadata_GB.txt")
+    file.path(
+      release_dir,
+      "Content",
+      "ICD10_Edition5_CodesAndTitlesAndMetadata_GB.txt"
+    )
   )
 
   zip_path <- file.path(tmp, paste0(release_name, ".zip"))
-  withr::with_dir(tmp, utils::zip(zipfile = paste0(release_name, ".zip"), files = release_name))
+  withr::with_dir(
+    tmp,
+    utils::zip(zipfile = paste0(release_name, ".zip"), files = release_name)
+  )
 
   result <- suppressMessages(read_icd10_trud(zip_path))
 

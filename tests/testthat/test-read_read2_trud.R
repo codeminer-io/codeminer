@@ -21,8 +21,18 @@ test_that("read_read2_trud() errors when Mapping Tables directory missing", {
 test_that("read_read2_trud() errors when lookup file missing", {
   tmp <- withr::local_tempdir()
   # Create the directory structure but omit the lookup file
-  assured_dir <- file.path(tmp, "Mapping Tables", "Updated", "Clinically Assured")
-  not_assured_dir <- file.path(tmp, "Mapping Tables", "Updated", "Not Clinically Assured")
+  assured_dir <- file.path(
+    tmp,
+    "Mapping Tables",
+    "Updated",
+    "Clinically Assured"
+  )
+  not_assured_dir <- file.path(
+    tmp,
+    "Mapping Tables",
+    "Updated",
+    "Not Clinically Assured"
+  )
   dir.create(assured_dir, recursive = TRUE)
   dir.create(not_assured_dir, recursive = TRUE)
 
@@ -81,7 +91,10 @@ test_that("read_read2_trud() ctv3_read2 has correct structure", {
 
 test_that("read_read2_trud() tables argument selects subset", {
   dir <- create_dummy_read2_dir()
-  result <- suppressMessages(read_read2_trud(dir, tables = c("read2_lkp", "read2_ctv3")))
+  result <- suppressMessages(read_read2_trud(
+    dir,
+    tables = c("read2_lkp", "read2_ctv3")
+  ))
 
   expect_named(result, c("read2_lkp", "read2_ctv3"))
   expect_false("ctv3_read2" %in% names(result))
@@ -98,8 +111,18 @@ test_that("read_read2_trud() uses custom version", {
 
 test_that("read_read2_trud() errors when read2_ctv3 file missing", {
   tmp <- withr::local_tempdir()
-  assured_dir <- file.path(tmp, "Mapping Tables", "Updated", "Clinically Assured")
-  not_assured_dir <- file.path(tmp, "Mapping Tables", "Updated", "Not Clinically Assured")
+  assured_dir <- file.path(
+    tmp,
+    "Mapping Tables",
+    "Updated",
+    "Clinically Assured"
+  )
+  not_assured_dir <- file.path(
+    tmp,
+    "Mapping Tables",
+    "Updated",
+    "Not Clinically Assured"
+  )
   dir.create(assured_dir, recursive = TRUE)
   dir.create(not_assured_dir, recursive = TRUE)
 
@@ -123,8 +146,18 @@ test_that("read_read2_trud() accepts zip file input", {
   release_name <- "Read2_Dummy_Release"
   release_dir <- file.path(tmp, release_name)
 
-  assured_dir <- file.path(release_dir, "Mapping Tables", "Updated", "Clinically Assured")
-  not_assured_dir <- file.path(release_dir, "Mapping Tables", "Updated", "Not Clinically Assured")
+  assured_dir <- file.path(
+    release_dir,
+    "Mapping Tables",
+    "Updated",
+    "Clinically Assured"
+  )
+  not_assured_dir <- file.path(
+    release_dir,
+    "Mapping Tables",
+    "Updated",
+    "Not Clinically Assured"
+  )
   dir.create(assured_dir, recursive = TRUE)
   dir.create(not_assured_dir, recursive = TRUE)
 
@@ -151,7 +184,10 @@ test_that("read_read2_trud() accepts zip file input", {
   )
 
   zip_path <- file.path(tmp, paste0(release_name, ".zip"))
-  withr::with_dir(tmp, utils::zip(zipfile = paste0(release_name, ".zip"), files = release_name))
+  withr::with_dir(
+    tmp,
+    utils::zip(zipfile = paste0(release_name, ".zip"), files = release_name)
+  )
 
   result <- suppressMessages(read_read2_trud(zip_path))
 

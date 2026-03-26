@@ -14,27 +14,69 @@ create_dummy_icd10_dir <- function(.envir = parent.frame()) {
     c(
       paste(
         c(
-          "CODE", "ALT_CODE", "USAGE", "USAGE_UK", "DESCRIPTION",
-          "MODIFIER_4", "MODIFIER_5", "QUALIFIERS", "GENDER_MASK",
-          "MIN_AGE", "MAX_AGE", "TREE_DESCRIPTION"
-        ),
-        collapse = "\t"
-      ),
-      paste(
-        c("E10", "E10", "M", "N", "Type 1 diabetes mellitus", "", "", "", "0", "0", "999", "Endocrine"),
-        collapse = "\t"
-      ),
-      paste(
-        c(
-          "E11", "E11", "M", "N", "Type 2 diabetes mellitus",
-          "With renal complications", "", "", "0", "0", "999", "Endocrine"
+          "CODE",
+          "ALT_CODE",
+          "USAGE",
+          "USAGE_UK",
+          "DESCRIPTION",
+          "MODIFIER_4",
+          "MODIFIER_5",
+          "QUALIFIERS",
+          "GENDER_MASK",
+          "MIN_AGE",
+          "MAX_AGE",
+          "TREE_DESCRIPTION"
         ),
         collapse = "\t"
       ),
       paste(
         c(
-          "E12", "E12", "M", "N", "Malnutrition-related diabetes",
-          "", "With coma", "", "0", "0", "999", "Endocrine"
+          "E10",
+          "E10",
+          "M",
+          "N",
+          "Type 1 diabetes mellitus",
+          "",
+          "",
+          "",
+          "0",
+          "0",
+          "999",
+          "Endocrine"
+        ),
+        collapse = "\t"
+      ),
+      paste(
+        c(
+          "E11",
+          "E11",
+          "M",
+          "N",
+          "Type 2 diabetes mellitus",
+          "With renal complications",
+          "",
+          "",
+          "0",
+          "0",
+          "999",
+          "Endocrine"
+        ),
+        collapse = "\t"
+      ),
+      paste(
+        c(
+          "E12",
+          "E12",
+          "M",
+          "N",
+          "Malnutrition-related diabetes",
+          "",
+          "With coma",
+          "",
+          "0",
+          "0",
+          "999",
+          "Endocrine"
         ),
         collapse = "\t"
       )
@@ -101,8 +143,18 @@ create_dummy_read3_dir <- function(.envir = parent.frame()) {
 create_dummy_read2_dir <- function(.envir = parent.frame()) {
   dir <- withr::local_tempdir(.local_envir = .envir)
 
-  assured_dir <- file.path(dir, "Mapping Tables", "Updated", "Clinically Assured")
-  not_assured_dir <- file.path(dir, "Mapping Tables", "Updated", "Not Clinically Assured")
+  assured_dir <- file.path(
+    dir,
+    "Mapping Tables",
+    "Updated",
+    "Clinically Assured"
+  )
+  not_assured_dir <- file.path(
+    dir,
+    "Mapping Tables",
+    "Updated",
+    "Not Clinically Assured"
+  )
   dir.create(assured_dir, recursive = TRUE)
   dir.create(not_assured_dir, recursive = TRUE)
 
@@ -111,7 +163,10 @@ create_dummy_read2_dir <- function(.envir = parent.frame()) {
     c(
       paste(c("ReadCode", "Term", "ConceptId", "MapId"), collapse = "\t"),
       paste(c("1234", "Diabetes mellitus", "12345678", "1"), collapse = "\t"),
-      paste(c("1234", "DM (diabetes mellitus)", "12345678", "2"), collapse = "\t"),
+      paste(
+        c("1234", "DM (diabetes mellitus)", "12345678", "2"),
+        collapse = "\t"
+      ),
       paste(c("5678", "Hypertension", "87654321", "1"), collapse = "\t")
     ),
     file.path(not_assured_dir, "rctermsctmap_uk_20200401000001.txt")
@@ -120,7 +175,10 @@ create_dummy_read2_dir <- function(.envir = parent.frame()) {
   # rctctv3map: Read V2 -> CTV3 (tab-sep with header)
   writeLines(
     c(
-      paste(c("V2_CONCEPTID", "CTV3_CONCEPTID", "MAPPING_TYPE"), collapse = "\t"),
+      paste(
+        c("V2_CONCEPTID", "CTV3_CONCEPTID", "MAPPING_TYPE"),
+        collapse = "\t"
+      ),
       paste(c("1234", "X40J5", "P"), collapse = "\t"),
       paste(c("5678", "X40J6", "P"), collapse = "\t")
     ),
@@ -130,7 +188,10 @@ create_dummy_read2_dir <- function(.envir = parent.frame()) {
   # ctv3rctmap: CTV3 -> Read V2 (tab-sep with header)
   writeLines(
     c(
-      paste(c("CTV3_CONCEPTID", "V2_CONCEPTID", "MAPPING_TYPE"), collapse = "\t"),
+      paste(
+        c("CTV3_CONCEPTID", "V2_CONCEPTID", "MAPPING_TYPE"),
+        collapse = "\t"
+      ),
       paste(c("X40J5", "1234", "P"), collapse = "\t"),
       paste(c("X40J6", "5678", "P"), collapse = "\t")
     ),

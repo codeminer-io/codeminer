@@ -48,8 +48,14 @@ test_that("read_opcs4_trud() derives version from directory name", {
 
 test_that("read_opcs4_trud() uses custom source", {
   dir <- create_dummy_opcs4_dir()
-  result <- suppressMessages(read_opcs4_trud(dir, source = "https://custom.source/"))
-  expect_equal(result$opcs4_lkp$lookup$metadata$lookup_source, "https://custom.source/")
+  result <- suppressMessages(read_opcs4_trud(
+    dir,
+    source = "https://custom.source/"
+  ))
+  expect_equal(
+    result$opcs4_lkp$lookup$metadata$lookup_source,
+    "https://custom.source/"
+  )
 })
 
 test_that("read_opcs4_trud() accepts zip file input", {
@@ -64,7 +70,10 @@ test_that("read_opcs4_trud() accepts zip file input", {
   )
 
   zip_path <- file.path(tmp, paste0(release_name, ".zip"))
-  withr::with_dir(tmp, utils::zip(zipfile = paste0(release_name, ".zip"), files = release_name))
+  withr::with_dir(
+    tmp,
+    utils::zip(zipfile = paste0(release_name, ".zip"), files = release_name)
+  )
 
   result <- suppressMessages(read_opcs4_trud(zip_path))
 

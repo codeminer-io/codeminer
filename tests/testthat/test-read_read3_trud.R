@@ -59,11 +59,17 @@ test_that("read_read3_trud() includes only preferred + clinical descriptions", {
 
 test_that("read_read3_trud() read3_relationship has correct structure", {
   dir <- create_dummy_read3_dir()
-  result <- suppressMessages(read_read3_trud(dir, tables = "read3_relationship"))
+  result <- suppressMessages(read_read3_trud(
+    dir,
+    tables = "read3_relationship"
+  ))
 
   expect_true("relationship" %in% names(result$read3_relationship))
   expect_s3_class(result$read3_relationship$relationship$table, "data.frame")
-  expect_equal(result$read3_relationship$relationship$metadata$code_type, "read3")
+  expect_equal(
+    result$read3_relationship$relationship$metadata$code_type,
+    "read3"
+  )
   expect_equal(
     result$read3_relationship$relationship$metadata$child_parent_relationship_code,
     "01"
@@ -72,7 +78,10 @@ test_that("read_read3_trud() read3_relationship has correct structure", {
 
 test_that("read_read3_trud() relationship table has expected rows", {
   dir <- create_dummy_read3_dir()
-  result <- suppressMessages(read_read3_trud(dir, tables = "read3_relationship"))
+  result <- suppressMessages(read_read3_trud(
+    dir,
+    tables = "read3_relationship"
+  ))
   tbl <- result$read3_relationship$relationship$table
 
   expect_equal(nrow(tbl), 2L)
@@ -91,7 +100,10 @@ test_that("read_read3_trud() uses custom version", {
   dir <- create_dummy_read3_dir()
   result <- suppressMessages(read_read3_trud(dir, version = "CTV3_v25"))
   expect_equal(result$read3_lkp$lookup$metadata$lookup_version, "CTV3_v25")
-  expect_equal(result$read3_relationship$relationship$metadata$relationship_version, "CTV3_v25")
+  expect_equal(
+    result$read3_relationship$relationship$metadata$relationship_version,
+    "CTV3_v25"
+  )
 })
 
 test_that("read_read3_trud() accepts zip file input", {
@@ -107,7 +119,10 @@ test_that("read_read3_trud() accepts zip file input", {
   writeLines(c("X40J5|X40J6|01"), file.path(v3_dir, "V3hier.v3"))
 
   zip_path <- file.path(tmp, paste0(release_name, ".zip"))
-  withr::with_dir(tmp, utils::zip(zipfile = paste0(release_name, ".zip"), files = release_name))
+  withr::with_dir(
+    tmp,
+    utils::zip(zipfile = paste0(release_name, ".zip"), files = release_name)
+  )
 
   result <- suppressMessages(read_read3_trud(zip_path))
 
