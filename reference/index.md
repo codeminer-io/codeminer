@@ -183,3 +183,5 @@ Miscellaneous utility functions.
   [`data_coding_5()`](https://codeminer-io.github.io/codeminer/reference/with_type.md)
   [`data_coding_6()`](https://codeminer-io.github.io/codeminer/reference/with_type.md)
   : Set code type context
+- [`collect_codes_input()`](https://codeminer-io.github.io/codeminer/reference/collect_codes_input.md)
+  : Collect and validate codes input from ... argument

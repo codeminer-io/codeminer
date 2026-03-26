@@ -1,9 +1,7 @@
 # Collect and validate codes input from ... argument
 
-This helper function collects codes from the `...` argument, validates
-them, and returns a standardized list containing the codes vector and
-code_type. Handles empty input, single data frames, character vectors,
-and \|\| separated strings.
+Not a user-side function. Exported for use by packages that build on top
+of codeminer. Most users should not need to call this directly.
 
 ## Usage
 
@@ -41,3 +39,10 @@ A list with two elements:
 - `codes`: Character vector of codes
 
 - `code_type`: String code type (or NULL if not determinable)
+
+## Details
+
+Collects codes from the `...` argument, validates them, and returns a
+standardised list containing the codes vector and code_type. Handles
+empty input, single data frames, character vectors, and \|\| separated
+strings.

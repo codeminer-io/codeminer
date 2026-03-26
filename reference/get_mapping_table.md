@@ -82,7 +82,7 @@ Other Clinical code lookups and mappings:
 create_dummy_database()
 #> ✔ Dummy database ready to use!
 #> ℹ To reconnect to your previous database:
-#>   `Sys.setenv(CODEMINER_DB_PATH = "/tmp/RtmpGZ1UM7/file1cd74ad4383a.duckdb")`
+#>   `Sys.setenv(CODEMINER_DB_PATH = "/tmp/RtmpDe6Y0f/file1db63a7fc794.duckdb")`
 #>   `codeminer_connect()`
 
 # Get the full Read 3 to ICD-10 mapping table
