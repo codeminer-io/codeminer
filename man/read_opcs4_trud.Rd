@@ -23,12 +23,13 @@ derived from the zip file or directory name.}
 \item{source}{Character string for the data source URL or description.}
 }
 \value{
-A named list with element \code{opcs4_lkp}, containing:
+A named list with elements:
 \itemize{
-\item \code{lookup}: a list with \code{table} (data.table) and \code{metadata} (list)
+\item \code{opcs4_lkp}: lookup table with \code{table} (data.table) and \code{metadata}
+\item \code{opcs4_relationship}: parent-child hierarchy derived from code structure
 }
 
-The \code{table} has columns \code{opcs4_code} and \code{description}.
+The lookup \code{table} has columns \code{opcs4_code} and \code{description}.
 }
 \description{
 Reads the OPCS-4 codes and descriptions from a local copy of the TRUD

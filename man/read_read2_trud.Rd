@@ -6,7 +6,7 @@
 \usage{
 read_read2_trud(
   path,
-  tables = c("read2_lkp", "read2_ctv3", "ctv3_read2"),
+  tables = c("read2_lkp", "read2_relationship", "read2_ctv3", "ctv3_read2"),
   version = NULL,
   source =
     "https://isd.digital.nhs.uk/trud/users/guest/filters/0/categories/9/items/9/releases"
@@ -22,11 +22,13 @@ read_read2_trud(
 \item{tables}{Character vector of table names to read. Available tables:
 \itemize{
 \item \code{"read2_lkp"} — Read V2 lookup (codes and descriptions)
+\item \code{"read2_relationship"} — parent-child hierarchy derived from code
+structure (requires \code{"read2_lkp"})
 \item \code{"read2_ctv3"} — Read V2 to CTV3 cross-mapping
 \item \code{"ctv3_read2"} — CTV3 to Read V2 cross-mapping
 }
 
-By default, all three tables are read.}
+By default, all tables are read.}
 
 \item{version}{Character string for the version label. If \code{NULL} (default),
 derived from the zip file or directory name.}

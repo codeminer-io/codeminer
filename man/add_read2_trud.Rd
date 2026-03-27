@@ -6,7 +6,7 @@
 \usage{
 add_read2_trud(
   path = get_read2_trud(),
-  tables = c("read2_lkp", "read2_ctv3", "ctv3_read2"),
+  tables = c("read2_lkp", "read2_relationship", "read2_ctv3", "ctv3_read2"),
   version = NULL,
   source =
     "https://isd.digital.nhs.uk/trud/users/guest/filters/0/categories/9/items/9/releases"
@@ -31,10 +31,10 @@ Invisibly returns the result from \code{\link[=read_read2_trud]{read_read2_trud(
 list of tables with metadata).
 }
 \description{
-Reads Read V2 lookup and cross-mapping files from the NHS Data Migration
-release and adds them to the active CodeMiner database. This is a
-convenience wrapper around \code{\link[=read_read2_trud]{read_read2_trud()}} that automatically calls
-\code{\link[=add_lookup_table]{add_lookup_table()}} and \code{\link[=add_mapping_table]{add_mapping_table()}}.
+Reads Read V2 lookup, relationship, and cross-mapping files from the NHS
+Data Migration release and adds them to the active CodeMiner database. This
+is a convenience wrapper around \code{\link[=read_read2_trud]{read_read2_trud()}} that automatically calls
+\code{\link[=add_lookup_table]{add_lookup_table()}}, \code{\link[=add_relationship_table]{add_relationship_table()}}, and \code{\link[=add_mapping_table]{add_mapping_table()}}.
 }
 \examples{
 \dontrun{

@@ -24,9 +24,10 @@ Invisibly returns the result from \code{\link[=read_icd10_trud]{read_icd10_trud(
 list of tables with metadata).
 }
 \description{
-Reads ICD-10 Edition 5 files and adds the lookup table to the active
-CodeMiner database. This is a convenience wrapper around \code{\link[=read_icd10_trud]{read_icd10_trud()}}
-that automatically calls \code{\link[=add_lookup_table]{add_lookup_table()}}.
+Reads ICD-10 Edition 5 files and adds the lookup and relationship tables to
+the active CodeMiner database. This is a convenience wrapper around
+\code{\link[=read_icd10_trud]{read_icd10_trud()}} that automatically calls \code{\link[=add_lookup_table]{add_lookup_table()}} and
+\code{\link[=add_relationship_table]{add_relationship_table()}}.
 }
 \examples{
 \dontrun{
