@@ -23,13 +23,14 @@ derived from the zip file or directory name.}
 \item{source}{Character string for the data source URL or description.}
 }
 \value{
-A named list with element \code{icd10_lkp}, containing:
+A named list with elements:
 \itemize{
-\item \code{lookup}: a list with \code{table} (data.table) and \code{metadata} (list)
+\item \code{icd10_lkp}: lookup table with \code{table} (data.table) and \code{metadata}
+\item \code{icd10_relationship}: parent-child hierarchy derived from code structure
 }
 
-The \code{table} has columns including \code{CODE}, \code{DESCRIPTION}, and others from
-the source file. \code{DESCRIPTION} is augmented with \code{MODIFIER_4} or
+The lookup \code{table} has columns including \code{CODE}, \code{DESCRIPTION}, and others
+from the source file. \code{DESCRIPTION} is augmented with \code{MODIFIER_4} or
 \code{MODIFIER_5} where present.
 }
 \description{

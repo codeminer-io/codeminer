@@ -11,7 +11,7 @@ test_that("add_opcs4_trud() returns the read data invisibly", {
 
   result <- suppressMessages(add_opcs4_trud(path = dir, version = "test_v1"))
 
-  expect_named(result, "opcs4_lkp")
+  expect_named(result, c("opcs4_lkp", "opcs4_relationship"))
   expect_s3_class(result$opcs4_lkp$lookup$table, "data.frame")
 })
 

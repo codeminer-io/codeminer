@@ -11,7 +11,7 @@ test_that("add_icd10_trud() returns the read data invisibly", {
 
   result <- suppressMessages(add_icd10_trud(path = dir, version = "test_v1"))
 
-  expect_named(result, "icd10_lkp")
+  expect_named(result, c("icd10_lkp", "icd10_relationship"))
   expect_s3_class(result$icd10_lkp$lookup$table, "data.frame")
 })
 

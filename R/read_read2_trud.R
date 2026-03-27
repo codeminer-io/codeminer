@@ -8,10 +8,12 @@
 #'   * An **unzipped directory** containing the `Mapping Tables` subdirectory
 #' @param tables Character vector of table names to read. Available tables:
 #'   * `"read2_lkp"` — Read V2 lookup (codes and descriptions)
+#'   * `"read2_relationship"` — parent-child hierarchy derived from code
+#'     structure (requires `"read2_lkp"`)
 #'   * `"read2_ctv3"` — Read V2 to CTV3 cross-mapping
 #'   * `"ctv3_read2"` — CTV3 to Read V2 cross-mapping
 #'
-#'   By default, all three tables are read.
+#'   By default, all tables are read.
 #' @param version Character string for the version label. If `NULL` (default),
 #'   derived from the zip file or directory name.
 #' @param source Character string for the data source URL or description.
@@ -33,15 +35,20 @@
 #' }
 read_read2_trud <- function(
   path,
-  tables = c("read2_lkp", "read2_ctv3", "ctv3_read2"),
+  tables = c("read2_lkp", "read2_relationship", "read2_ctv3", "ctv3_read2"),
   version = NULL,
   source = "https://isd.digital.nhs.uk/trud/users/guest/filters/0/categories/9/items/9/releases"
 ) {
   rlang::arg_match(
     tables,
-    values = c("read2_lkp", "read2_ctv3", "ctv3_read2"),
+    values = c("read2_lkp", "read2_relationship", "read2_ctv3", "ctv3_read2"),
     multiple = TRUE
   )
+
+  # read2_relationship requires read2_lkp to derive hierarchy from codes
+  if ("read2_relationship" %in% tables && !"read2_lkp" %in% tables) {
+    tables <- c("read2_lkp", tables)
+  }
 
   if (!file.exists(path) && !dir.exists(path)) {
     cli::cli_abort("Path does not exist: {.path {path}}")
@@ -133,6 +140,41 @@ read_read2_trud <- function(
       lookup = list(
         table = read2_lkp_table,
         metadata = read2_lkp_metadata
+      )
+    )
+  }
+
+  if ("read2_relationship" %in% tables) {
+    cli::cli_inform(
+      "Deriving Read 2 parent-child hierarchy from code structure..."
+    )
+
+    read2_relationship <- read2_lkp_table$ReadCode |>
+      # Remove trailing padding dots, preserving leading/internal dots
+      stringr::str_replace("\\.+$", "") |>
+      build_prefix_hierarchy_len()
+
+    # Re-pad codes to 5 chars with trailing dots
+    if (nrow(read2_relationship) > 0) {
+      read2_relationship <- read2_relationship |>
+        dplyr::mutate(dplyr::across(
+          dplyr::all_of(c("from", "to")),
+          \(x) stringr::str_pad(x, 5, pad = ".", side = "right")
+        ))
+    }
+
+    result$read2_relationship <- list(
+      relationship = list(
+        table = read2_relationship,
+        metadata = relationship_metadata(
+          code_type = "read2",
+          relationship_version = version,
+          from_col = "from",
+          to_col = "to",
+          type_col = "type",
+          child_parent_relationship_code = "is a",
+          relationship_source = source
+        )
       )
     )
   }

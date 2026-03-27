@@ -42,11 +42,28 @@ test_that("read_read2_trud() errors when lookup file missing", {
   )
 })
 
-test_that("read_read2_trud() returns all three tables by default", {
+test_that("read_read2_trud() returns all tables by default", {
   dir <- create_dummy_read2_dir()
   result <- suppressMessages(read_read2_trud(dir))
 
-  expect_named(result, c("read2_lkp", "read2_ctv3", "ctv3_read2"))
+  expect_true(all(
+    c("read2_lkp", "read2_relationship", "read2_ctv3", "ctv3_read2") %in%
+      names(result)
+  ))
+})
+
+test_that("read_read2_trud() read2_relationship has correct structure", {
+  dir <- create_dummy_read2_dir()
+  result <- suppressMessages(read_read2_trud(
+    dir,
+    tables = "read2_relationship"
+  ))
+
+  expect_true("read2_relationship" %in% names(result))
+  rel <- result$read2_relationship$relationship
+  expect_s3_class(rel$table, "data.frame")
+  expect_equal(rel$metadata$code_type, "read2")
+  expect_equal(rel$metadata$child_parent_relationship_code, "is a")
 })
 
 test_that("read_read2_trud() read2_lkp has correct structure", {
@@ -191,6 +208,9 @@ test_that("read_read2_trud() accepts zip file input", {
 
   result <- suppressMessages(read_read2_trud(zip_path))
 
-  expect_named(result, c("read2_lkp", "read2_ctv3", "ctv3_read2"))
+  expect_named(
+    result,
+    c("read2_lkp", "read2_relationship", "read2_ctv3", "ctv3_read2")
+  )
   expect_gt(nrow(result$read2_lkp$lookup$table), 0)
 })

@@ -1,8 +1,9 @@
 #' Add ICD-10 lookup table to CodeMiner database
 #'
-#' Reads ICD-10 Edition 5 files and adds the lookup table to the active
-#' CodeMiner database. This is a convenience wrapper around [read_icd10_trud()]
-#' that automatically calls [add_lookup_table()].
+#' Reads ICD-10 Edition 5 files and adds the lookup and relationship tables to
+#' the active CodeMiner database. This is a convenience wrapper around
+#' [read_icd10_trud()] that automatically calls [add_lookup_table()] and
+#' [add_relationship_table()].
 #'
 #' @param path Path to the ICD-10 release (zip file or unzipped directory).
 #'   Default uses [get_icd10_trud()] to download the latest release.
@@ -29,9 +30,18 @@ add_icd10_trud <- function(
     version <- basename(path)
   }
 
-  if (tables_all_exist(paste("ICD-10", version, sep = "_"), "lookup")) {
+  expected_names <- c(
+    icd10_lkp = paste("ICD-10", version, sep = "_"),
+    icd10_relationship = paste("ICD-10", "relationship", version, sep = "_")
+  )
+  expected_types <- c(
+    icd10_lkp = "lookup",
+    icd10_relationship = "relationship"
+  )
+
+  if (tables_all_exist(expected_names, expected_types)) {
     codeminer_inform(
-      "ICD-10 lookup table already exists for version {.val {version}}, skipping."
+      "All ICD-10 tables already exist for version {.val {version}}, skipping."
     )
     return(invisible(NULL))
   }
@@ -41,6 +51,12 @@ add_icd10_trud <- function(
     version = version,
     source = source
   )
+
+  # Only add tables that don't already exist
+  missing <- !purrr::map2_lgl(expected_names, expected_types, \(n, t) {
+    tables_all_exist(n, t)
+  })
+  icd10_data <- icd10_data[names(expected_names)[missing]]
 
   add_tables_to_database(icd10_data)
 

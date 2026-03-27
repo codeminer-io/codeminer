@@ -11,7 +11,10 @@ test_that("add_read2_trud() returns the read data invisibly", {
 
   result <- suppressMessages(add_read2_trud(path = dir, version = "test_v1"))
 
-  expect_named(result, c("read2_lkp", "read2_ctv3", "ctv3_read2"))
+  expect_named(
+    result,
+    c("read2_lkp", "read2_relationship", "read2_ctv3", "ctv3_read2")
+  )
   expect_s3_class(result$read2_lkp$lookup$table, "data.frame")
 })
 
