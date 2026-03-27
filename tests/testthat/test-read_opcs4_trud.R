@@ -28,9 +28,11 @@ test_that("read_opcs4_trud() reads the correct columns", {
   tbl <- result$opcs4_lkp$lookup$table
 
   expect_true("opcs4_code" %in% names(tbl))
+  expect_true("opcs4_code_dotted" %in% names(tbl))
   expect_true("description" %in% names(tbl))
   expect_equal(nrow(tbl), 3L)
-  expect_equal(tbl$opcs4_code[[1]], "A01")
+  expect_equal(tbl$opcs4_code[[1]], "A011")
+  expect_equal(tbl$opcs4_code_dotted[[1]], "A01.1")
   expect_equal(tbl$description[[1]], "Excision of gallbladder")
 })
 
@@ -76,7 +78,7 @@ test_that("read_opcs4_trud() accepts zip file input", {
   dir.create(release_dir)
 
   writeLines(
-    c("A01\tExcision of organ", "A02\tIncision of organ"),
+    c("A01.1\tExcision of organ", "A02.3\tIncision of organ"),
     file.path(release_dir, "OPCS411 CodesAndTitles.txt")
   )
 

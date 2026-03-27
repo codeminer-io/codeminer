@@ -14,9 +14,10 @@
 #'   * `icd10_lkp`: lookup table with `table` (data.table) and `metadata`
 #'   * `icd10_relationship`: parent-child hierarchy derived from code structure
 #'
-#'   The lookup `table` has columns including `CODE`, `DESCRIPTION`, and others
-#'   from the source file. `DESCRIPTION` is augmented with `MODIFIER_4` or
-#'   `MODIFIER_5` where present.
+#'   The lookup `table` has columns including `CODE`, `ALT_CODE` (dot-stripped,
+#'   used as the primary code column), `DESCRIPTION`, and others from the source
+#'   file. `DESCRIPTION` is augmented with `MODIFIER_4` or `MODIFIER_5` where
+#'   present.
 #'
 #' @seealso [add_icd10_trud()], [get_icd10_trud()]
 #' @export
@@ -123,13 +124,13 @@ read_icd10_trud <- function(
   icd10_metadata <- lookup_metadata(
     code_type = "ICD-10",
     lookup_version = version,
-    lookup_code_col = "CODE",
+    lookup_code_col = "ALT_CODE",
     lookup_description_col = "DESCRIPTION",
     lookup_source = source
   )
 
   # Derive parent-child hierarchy from code structure
-  icd10_relationship <- build_prefix_hierarchy_len(icd10_table$CODE)
+  icd10_relationship <- build_prefix_hierarchy_len(icd10_table$ALT_CODE)
 
   list(
     icd10_lkp = list(

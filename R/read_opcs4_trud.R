@@ -14,7 +14,8 @@
 #'   * `opcs4_lkp`: lookup table with `table` (data.table) and `metadata`
 #'   * `opcs4_relationship`: parent-child hierarchy derived from code structure
 #'
-#'   The lookup `table` has columns `opcs4_code` and `description`.
+#'   The lookup `table` has columns `opcs4_code` (dot-stripped),
+#'   `opcs4_code_dotted` (original format with dot), and `description`.
 #'
 #' @seealso [add_opcs4_trud()], [get_opcs4_trud()]
 #' @export
@@ -104,9 +105,14 @@ read_opcs4_trud <- function(
     opcs4_files[[1]],
     sep = "\t",
     header = FALSE,
-    col.names = c("opcs4_code", "description"),
+    col.names = c("opcs4_code_dotted", "description"),
     colClasses = "character"
   )
+
+  opcs4_table <- opcs4_table |>
+    dplyr::mutate(
+      opcs4_code = gsub(".", "", .data$opcs4_code_dotted, fixed = TRUE)
+    )
 
   opcs4_metadata <- lookup_metadata(
     code_type = "OPCS4",

@@ -33,7 +33,7 @@ test_that("read_icd10_trud() augments DESCRIPTION with MODIFIER_4", {
   result <- suppressMessages(read_icd10_trud(dir))
   tbl <- result$icd10_lkp$lookup$table
 
-  e11 <- tbl[tbl$CODE == "E11", ]
+  e11 <- tbl[tbl$ALT_CODE == "E113", ]
   expect_match(e11$DESCRIPTION, "With renal complications")
 })
 
@@ -42,7 +42,7 @@ test_that("read_icd10_trud() augments DESCRIPTION with MODIFIER_5", {
   result <- suppressMessages(read_icd10_trud(dir))
   tbl <- result$icd10_lkp$lookup$table
 
-  e12 <- tbl[tbl$CODE == "E12", ]
+  e12 <- tbl[tbl$ALT_CODE == "E120", ]
   expect_match(e12$DESCRIPTION, "With coma")
 })
 
@@ -51,7 +51,7 @@ test_that("read_icd10_trud() does not modify DESCRIPTION when no modifier", {
   result <- suppressMessages(read_icd10_trud(dir))
   tbl <- result$icd10_lkp$lookup$table
 
-  e10 <- tbl[tbl$CODE == "E10", ]
+  e10 <- tbl[tbl$ALT_CODE == "E10", ]
   expect_equal(e10$DESCRIPTION, "Type 1 diabetes mellitus")
 })
 
@@ -117,7 +117,7 @@ test_that("read_icd10_trud() accepts zip file input", {
       ),
       paste(
         c(
-          "E10",
+          "E10.-",
           "E10",
           "M",
           "N",
