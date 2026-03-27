@@ -84,14 +84,14 @@ test_that("CODES fails for wrong argument types", {
 test_that("CODES fails for missing type", {
   expect_error(
     CODES("all", type = "idontexist"),
-    "Code type 'idontexist' not found"
+    "not found in lookup metadata"
   )
 })
 
 test_that("CODES fails for wrong lookup_version", {
   expect_error(
     CODES("all", type = "ICD-10", lookup_version = "nope"),
-    "No lookup metadata found for 'ICD-10' version 'nope'"
+    "No lookup metadata found for.*ICD-10.*version.*nope"
   )
 })
 

@@ -126,12 +126,34 @@ resolve_versioned_metadata <- function(
 ) {
   # Check code_type exists
   if (!(code_type_val %in% meta[[code_type_col]])) {
-    hint <- if (!is.null(add_fun_name)) {
-      c("i" = "Did you add the {type_label} table with {.fun {add_fun_name}}?")
+    available <- unique(meta[[code_type_col]])
+
+    if (length(available) == 0) {
+      # Database has no types at all — hint about adding tables
+      hint <- if (!is.null(add_fun_name)) {
+        c(
+          "i" = "Did you add the {type_label} table with {.fun {add_fun_name}}?"
+        )
+      }
+    } else {
+      # Show available types
+      if (length(available) > 6) {
+        n_more <- length(available) - 6
+        hint <- c(
+          "i" = "Available code types: {.val {available[1:6]}}, and {n_more} more",
+          "i" = "Check available types with {.code get_codeminer_metadata(\"{type_label}\")}"
+        )
+      } else {
+        hint <- c(
+          "i" = "Available code types: {.val {available}}",
+          "i" = "Check available types with {.code get_codeminer_metadata(\"{type_label}\")}"
+        )
+      }
     }
+
     codeminer_abort(
       c(
-        "Code type '{code_type_val}' not found in {type_label} metadata.",
+        "Code type {.val {code_type_val}} not found in {type_label} metadata.",
         hint
       ),
       call = call
@@ -165,8 +187,12 @@ resolve_versioned_metadata <- function(
   this_meta <- filtered[filtered[[version_col]] == version_val, ]
 
   if (nrow(this_meta) == 0) {
+    available_versions <- unique(filtered[[version_col]])
     codeminer_abort(
-      "No {type_label} metadata found for '{code_type_val}' version '{version_val}'",
+      c(
+        "No {type_label} metadata found for {.val {code_type_val}} version {.val {version_val}}",
+        "i" = "Available versions for {.val {code_type_val}}: {.val {available_versions}}"
+      ),
       call = call
     )
   }
