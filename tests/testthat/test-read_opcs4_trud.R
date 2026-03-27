@@ -14,7 +14,7 @@ test_that("read_opcs4_trud() returns correct structure", {
   dir <- create_dummy_opcs4_dir()
   result <- suppressMessages(read_opcs4_trud(dir))
 
-  expect_named(result, "opcs4_lkp")
+  expect_true("opcs4_lkp" %in% names(result))
   expect_true("lookup" %in% names(result$opcs4_lkp))
   expect_true("table" %in% names(result$opcs4_lkp$lookup))
   expect_true("metadata" %in% names(result$opcs4_lkp$lookup))
@@ -32,6 +32,17 @@ test_that("read_opcs4_trud() reads the correct columns", {
   expect_equal(nrow(tbl), 3L)
   expect_equal(tbl$opcs4_code[[1]], "A01")
   expect_equal(tbl$description[[1]], "Excision of gallbladder")
+})
+
+test_that("read_opcs4_trud() returns relationship table", {
+  dir <- create_dummy_opcs4_dir()
+  result <- suppressMessages(read_opcs4_trud(dir))
+
+  expect_true("opcs4_relationship" %in% names(result))
+  rel <- result$opcs4_relationship$relationship
+  expect_s3_class(rel$table, "data.frame")
+  expect_equal(rel$metadata$code_type, "OPCS4")
+  expect_equal(rel$metadata$child_parent_relationship_code, "is a")
 })
 
 test_that("read_opcs4_trud() uses custom version", {
@@ -77,6 +88,6 @@ test_that("read_opcs4_trud() accepts zip file input", {
 
   result <- suppressMessages(read_opcs4_trud(zip_path))
 
-  expect_named(result, "opcs4_lkp")
+  expect_true("opcs4_lkp" %in% names(result))
   expect_gt(nrow(result$opcs4_lkp$lookup$table), 0)
 })

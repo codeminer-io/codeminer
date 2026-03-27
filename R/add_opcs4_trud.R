@@ -1,8 +1,9 @@
 #' Add OPCS-4 lookup table to CodeMiner database
 #'
-#' Reads OPCS-4 files and adds the lookup table to the active CodeMiner
-#' database. This is a convenience wrapper around [read_opcs4_trud()] that
-#' automatically calls [add_lookup_table()].
+#' Reads OPCS-4 files and adds the lookup and relationship tables to the active
+#' CodeMiner database. This is a convenience wrapper around [read_opcs4_trud()]
+#' that automatically calls [add_lookup_table()] and
+#' [add_relationship_table()].
 #'
 #' @param path Path to the OPCS-4 release (zip file or unzipped directory).
 #'   Default uses [get_opcs4_trud()] to download the latest release.

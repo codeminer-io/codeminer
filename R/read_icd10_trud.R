@@ -10,11 +10,12 @@
 #'   derived from the zip file or directory name.
 #' @param source Character string for the data source URL or description.
 #'
-#' @return A named list with element `icd10_lkp`, containing:
-#'   * `lookup`: a list with `table` (data.table) and `metadata` (list)
+#' @return A named list with elements:
+#'   * `icd10_lkp`: lookup table with `table` (data.table) and `metadata`
+#'   * `icd10_relationship`: parent-child hierarchy derived from code structure
 #'
-#'   The `table` has columns including `CODE`, `DESCRIPTION`, and others from
-#'   the source file. `DESCRIPTION` is augmented with `MODIFIER_4` or
+#'   The lookup `table` has columns including `CODE`, `DESCRIPTION`, and others
+#'   from the source file. `DESCRIPTION` is augmented with `MODIFIER_4` or
 #'   `MODIFIER_5` where present.
 #'
 #' @seealso [add_icd10_trud()], [get_icd10_trud()]
@@ -127,11 +128,28 @@ read_icd10_trud <- function(
     lookup_source = source
   )
 
+  # Derive parent-child hierarchy from code structure
+  icd10_relationship <- build_prefix_hierarchy_len(icd10_table$CODE)
+
   list(
     icd10_lkp = list(
       lookup = list(
         table = icd10_table,
         metadata = icd10_metadata
+      )
+    ),
+    icd10_relationship = list(
+      relationship = list(
+        table = icd10_relationship,
+        metadata = relationship_metadata(
+          code_type = "ICD-10",
+          relationship_version = version,
+          from_col = "from",
+          to_col = "to",
+          type_col = "type",
+          child_parent_relationship_code = "is a",
+          relationship_source = source
+        )
       )
     )
   )

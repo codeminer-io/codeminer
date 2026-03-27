@@ -10,10 +10,11 @@
 #'   derived from the zip file or directory name.
 #' @param source Character string for the data source URL or description.
 #'
-#' @return A named list with element `opcs4_lkp`, containing:
-#'   * `lookup`: a list with `table` (data.table) and `metadata` (list)
+#' @return A named list with elements:
+#'   * `opcs4_lkp`: lookup table with `table` (data.table) and `metadata`
+#'   * `opcs4_relationship`: parent-child hierarchy derived from code structure
 #'
-#'   The `table` has columns `opcs4_code` and `description`.
+#'   The lookup `table` has columns `opcs4_code` and `description`.
 #'
 #' @seealso [add_opcs4_trud()], [get_opcs4_trud()]
 #' @export
@@ -115,11 +116,28 @@ read_opcs4_trud <- function(
     lookup_source = source
   )
 
+  # Derive parent-child hierarchy from code structure
+  opcs4_relationship <- build_prefix_hierarchy_len(opcs4_table$opcs4_code)
+
   list(
     opcs4_lkp = list(
       lookup = list(
         table = opcs4_table,
         metadata = opcs4_metadata
+      )
+    ),
+    opcs4_relationship = list(
+      relationship = list(
+        table = opcs4_relationship,
+        metadata = relationship_metadata(
+          code_type = "OPCS4",
+          relationship_version = version,
+          from_col = "from",
+          to_col = "to",
+          type_col = "type",
+          child_parent_relationship_code = "is a",
+          relationship_source = source
+        )
       )
     )
   )

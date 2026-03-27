@@ -1,9 +1,9 @@
 #' Add Read 2 tables to CodeMiner database
 #'
-#' Reads Read V2 lookup and cross-mapping files from the NHS Data Migration
-#' release and adds them to the active CodeMiner database. This is a
-#' convenience wrapper around [read_read2_trud()] that automatically calls
-#' [add_lookup_table()] and [add_mapping_table()].
+#' Reads Read V2 lookup, relationship, and cross-mapping files from the NHS
+#' Data Migration release and adds them to the active CodeMiner database. This
+#' is a convenience wrapper around [read_read2_trud()] that automatically calls
+#' [add_lookup_table()], [add_relationship_table()], and [add_mapping_table()].
 #'
 #' @param path Path to the NHS Data Migration release (zip file or unzipped
 #'   directory). Default uses [get_read2_trud()] to download the latest
@@ -28,7 +28,7 @@
 #' }
 add_read2_trud <- function(
   path = get_read2_trud(),
-  tables = c("read2_lkp", "read2_ctv3", "ctv3_read2"),
+  tables = c("read2_lkp", "read2_relationship", "read2_ctv3", "ctv3_read2"),
   version = NULL,
   source = "https://isd.digital.nhs.uk/trud/users/guest/filters/0/categories/9/items/9/releases"
 ) {
@@ -38,11 +38,13 @@ add_read2_trud <- function(
 
   expected_names <- c(
     read2_lkp = paste("read2", version, sep = "_"),
+    read2_relationship = paste("read2", "relationship", version, sep = "_"),
     read2_ctv3 = paste("read2", "read3", version, sep = "_"),
     ctv3_read2 = paste("read3", "read2", version, sep = "_")
   )
   expected_types <- c(
     read2_lkp = "lookup",
+    read2_relationship = "relationship",
     read2_ctv3 = "mapping",
     ctv3_read2 = "mapping"
   )

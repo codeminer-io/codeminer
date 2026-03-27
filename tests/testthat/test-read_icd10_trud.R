@@ -14,7 +14,7 @@ test_that("read_icd10_trud() returns correct structure", {
   dir <- create_dummy_icd10_dir()
   result <- suppressMessages(read_icd10_trud(dir))
 
-  expect_named(result, "icd10_lkp")
+  expect_true("icd10_lkp" %in% names(result))
   expect_true("lookup" %in% names(result$icd10_lkp))
   expect_true("table" %in% names(result$icd10_lkp$lookup))
   expect_true("metadata" %in% names(result$icd10_lkp$lookup))
@@ -53,6 +53,17 @@ test_that("read_icd10_trud() does not modify DESCRIPTION when no modifier", {
 
   e10 <- tbl[tbl$CODE == "E10", ]
   expect_equal(e10$DESCRIPTION, "Type 1 diabetes mellitus")
+})
+
+test_that("read_icd10_trud() returns relationship table", {
+  dir <- create_dummy_icd10_dir()
+  result <- suppressMessages(read_icd10_trud(dir))
+
+  expect_true("icd10_relationship" %in% names(result))
+  rel <- result$icd10_relationship$relationship
+  expect_s3_class(rel$table, "data.frame")
+  expect_equal(rel$metadata$code_type, "ICD-10")
+  expect_equal(rel$metadata$child_parent_relationship_code, "is a")
 })
 
 test_that("read_icd10_trud() uses custom version", {
@@ -137,7 +148,7 @@ test_that("read_icd10_trud() accepts zip file input", {
 
   result <- suppressMessages(read_icd10_trud(zip_path))
 
-  expect_named(result, "icd10_lkp")
+  expect_true("icd10_lkp" %in% names(result))
   expect_gt(nrow(result$icd10_lkp$lookup$table), 0)
   # version derived from zip filename
   expect_equal(
