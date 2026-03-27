@@ -8,7 +8,7 @@ local copy of the NHS Data Migration release (TRUD item 9).
 ``` r
 read_read2_trud(
   path,
-  tables = c("read2_lkp", "read2_ctv3", "ctv3_read2"),
+  tables = c("read2_lkp", "read2_relationship", "read2_ctv3", "ctv3_read2"),
   version = NULL,
   source =
     "https://isd.digital.nhs.uk/trud/users/guest/filters/0/categories/9/items/9/releases"
@@ -33,11 +33,14 @@ read_read2_trud(
 
   - `"read2_lkp"` — Read V2 lookup (codes and descriptions)
 
+  - `"read2_relationship"` — parent-child hierarchy derived from code
+    structure (requires `"read2_lkp"`)
+
   - `"read2_ctv3"` — Read V2 to CTV3 cross-mapping
 
   - `"ctv3_read2"` — CTV3 to Read V2 cross-mapping
 
-  By default, all three tables are read.
+  By default, all tables are read.
 
 - version:
 

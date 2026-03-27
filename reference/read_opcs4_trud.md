@@ -35,11 +35,14 @@ read_opcs4_trud(
 
 ## Value
 
-A named list with element `opcs4_lkp`, containing:
+A named list with elements:
 
-- `lookup`: a list with `table` (data.table) and `metadata` (list)
+- `opcs4_lkp`: lookup table with `table` (data.table) and `metadata`
 
-The `table` has columns `opcs4_code` and `description`.
+- `opcs4_relationship`: parent-child hierarchy derived from code
+  structure
+
+The lookup `table` has columns `opcs4_code` and `description`.
 
 ## See also
 

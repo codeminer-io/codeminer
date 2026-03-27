@@ -1,10 +1,12 @@
 # Add OPCS-4 lookup table to CodeMiner database
 
-Reads OPCS-4 files and adds the lookup table to the active CodeMiner
-database. This is a convenience wrapper around
+Reads OPCS-4 files and adds the lookup and relationship tables to the
+active CodeMiner database. This is a convenience wrapper around
 [`read_opcs4_trud()`](https://codeminer-io.github.io/codeminer/reference/read_opcs4_trud.md)
 that automatically calls
-[`add_lookup_table()`](https://codeminer-io.github.io/codeminer/reference/add_lookup_table.md).
+[`add_lookup_table()`](https://codeminer-io.github.io/codeminer/reference/add_lookup_table.md)
+and
+[`add_relationship_table()`](https://codeminer-io.github.io/codeminer/reference/add_relationship_table.md).
 
 ## Usage
 

@@ -48,9 +48,9 @@ of data frames:
 # Create a temporary database with dummy data
 (db_path <- create_dummy_database())
 #> ✔ Dummy database ready to use!
-#> [1] "/tmp/RtmpSI0Fno/file28aaf6777e6.duckdb"
+#> [1] "/tmp/Rtmp0S0jFc/file285c11b27912.duckdb"
 Sys.getenv("CODEMINER_DB_PATH")
-#> [1] "/tmp/RtmpSI0Fno/file28aaf6777e6.duckdb"
+#> [1] "/tmp/Rtmp0S0jFc/file285c11b27912.duckdb"
 ```
 
 `codeminer` resolves the database location using the following
@@ -84,7 +84,7 @@ connection status with
 ``` r
 codeminer_status()
 #> ℹ Workbench active
-#>   Main: /tmp/RtmpSI0Fno/file28aaf6777e6.duckdb
+#>   Main: /tmp/Rtmp0S0jFc/file285c11b27912.duckdb
 #>   Extra: not attached
 ```
 

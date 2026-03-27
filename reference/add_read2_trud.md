@@ -1,11 +1,12 @@
 # Add Read 2 tables to CodeMiner database
 
-Reads Read V2 lookup and cross-mapping files from the NHS Data Migration
-release and adds them to the active CodeMiner database. This is a
-convenience wrapper around
+Reads Read V2 lookup, relationship, and cross-mapping files from the NHS
+Data Migration release and adds them to the active CodeMiner database.
+This is a convenience wrapper around
 [`read_read2_trud()`](https://codeminer-io.github.io/codeminer/reference/read_read2_trud.md)
 that automatically calls
-[`add_lookup_table()`](https://codeminer-io.github.io/codeminer/reference/add_lookup_table.md)
+[`add_lookup_table()`](https://codeminer-io.github.io/codeminer/reference/add_lookup_table.md),
+[`add_relationship_table()`](https://codeminer-io.github.io/codeminer/reference/add_relationship_table.md),
 and
 [`add_mapping_table()`](https://codeminer-io.github.io/codeminer/reference/add_mapping_table.md).
 
@@ -14,7 +15,7 @@ and
 ``` r
 add_read2_trud(
   path = get_read2_trud(),
-  tables = c("read2_lkp", "read2_ctv3", "ctv3_read2"),
+  tables = c("read2_lkp", "read2_relationship", "read2_ctv3", "ctv3_read2"),
   version = NULL,
   source =
     "https://isd.digital.nhs.uk/trud/users/guest/filters/0/categories/9/items/9/releases"

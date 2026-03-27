@@ -1,10 +1,12 @@
 # Add ICD-10 lookup table to CodeMiner database
 
-Reads ICD-10 Edition 5 files and adds the lookup table to the active
-CodeMiner database. This is a convenience wrapper around
+Reads ICD-10 Edition 5 files and adds the lookup and relationship tables
+to the active CodeMiner database. This is a convenience wrapper around
 [`read_icd10_trud()`](https://codeminer-io.github.io/codeminer/reference/read_icd10_trud.md)
 that automatically calls
-[`add_lookup_table()`](https://codeminer-io.github.io/codeminer/reference/add_lookup_table.md).
+[`add_lookup_table()`](https://codeminer-io.github.io/codeminer/reference/add_lookup_table.md)
+and
+[`add_relationship_table()`](https://codeminer-io.github.io/codeminer/reference/add_relationship_table.md).
 
 ## Usage
 

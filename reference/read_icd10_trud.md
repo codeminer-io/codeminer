@@ -35,13 +35,16 @@ read_icd10_trud(
 
 ## Value
 
-A named list with element `icd10_lkp`, containing:
+A named list with elements:
 
-- `lookup`: a list with `table` (data.table) and `metadata` (list)
+- `icd10_lkp`: lookup table with `table` (data.table) and `metadata`
 
-The `table` has columns including `CODE`, `DESCRIPTION`, and others from
-the source file. `DESCRIPTION` is augmented with `MODIFIER_4` or
-`MODIFIER_5` where present.
+- `icd10_relationship`: parent-child hierarchy derived from code
+  structure
+
+The lookup `table` has columns including `CODE`, `DESCRIPTION`, and
+others from the source file. `DESCRIPTION` is augmented with
+`MODIFIER_4` or `MODIFIER_5` where present.
 
 ## See also
 
