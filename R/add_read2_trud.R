@@ -64,6 +64,14 @@ add_read2_trud <- function(
     source = source
   )
 
+  # Only add tables that don't already exist
+  missing <- !purrr::map2_lgl(
+    expected_names[sel],
+    expected_types[sel],
+    \(n, t) tables_all_exist(n, t)
+  )
+  read2_data <- read2_data[names(expected_names[sel])[missing]]
+
   add_tables_to_database(read2_data)
 
   invisible(read2_data)

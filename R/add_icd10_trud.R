@@ -30,9 +30,18 @@ add_icd10_trud <- function(
     version <- basename(path)
   }
 
-  if (tables_all_exist(paste("ICD-10", version, sep = "_"), "lookup")) {
+  expected_names <- c(
+    icd10_lkp = paste("ICD-10", version, sep = "_"),
+    icd10_relationship = paste("ICD-10", "relationship", version, sep = "_")
+  )
+  expected_types <- c(
+    icd10_lkp = "lookup",
+    icd10_relationship = "relationship"
+  )
+
+  if (tables_all_exist(expected_names, expected_types)) {
     codeminer_inform(
-      "ICD-10 lookup table already exists for version {.val {version}}, skipping."
+      "All ICD-10 tables already exist for version {.val {version}}, skipping."
     )
     return(invisible(NULL))
   }
@@ -42,6 +51,12 @@ add_icd10_trud <- function(
     version = version,
     source = source
   )
+
+  # Only add tables that don't already exist
+  missing <- !purrr::map2_lgl(expected_names, expected_types, \(n, t) {
+    tables_all_exist(n, t)
+  })
+  icd10_data <- icd10_data[names(expected_names)[missing]]
 
   add_tables_to_database(icd10_data)
 
