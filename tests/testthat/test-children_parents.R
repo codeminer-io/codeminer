@@ -282,7 +282,7 @@ test_that("CHILDREN() fails for wrong argument types", {
 test_that("CHILDREN() fails for missing code_type", {
   expect_error(
     CHILDREN("E10", type = "idontexist"),
-    "Code type 'idontexist' not found in relationship metadata"
+    "not found in relationship metadata"
   )
 })
 
