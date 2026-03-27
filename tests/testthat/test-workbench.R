@@ -1,5 +1,12 @@
 # codeminer_connect() -------------------------------------------------------
 
+test_that("codeminer_connect() errors when explicit path does not exist", {
+  expect_error(
+    codeminer_connect(main = "/nonexistent/path/to/database.duckdb"),
+    "Database file not found"
+  )
+})
+
 test_that("codeminer_connect() creates a valid persistent connection", {
   temp_db <- local_build_temp_database()
 

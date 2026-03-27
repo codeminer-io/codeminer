@@ -32,6 +32,29 @@ add_read2_trud <- function(
   version = NULL,
   source = "https://isd.digital.nhs.uk/trud/users/guest/filters/0/categories/9/items/9/releases"
 ) {
+  if (is.null(version)) {
+    version <- basename(path)
+  }
+
+  expected_names <- c(
+    read2_lkp = paste("read2", version, sep = "_"),
+    read2_ctv3 = paste("read2", "read3", version, sep = "_"),
+    ctv3_read2 = paste("read3", "read2", version, sep = "_")
+  )
+  expected_types <- c(
+    read2_lkp = "lookup",
+    read2_ctv3 = "mapping",
+    ctv3_read2 = "mapping"
+  )
+
+  sel <- names(expected_names) %in% tables
+  if (tables_all_exist(expected_names[sel], expected_types[sel])) {
+    codeminer_inform(
+      "All requested Read 2 tables already exist for version {.val {version}}, skipping."
+    )
+    return(invisible(NULL))
+  }
+
   read2_data <- read_read2_trud(
     path = path,
     tables = tables,

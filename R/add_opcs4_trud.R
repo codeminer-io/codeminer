@@ -25,6 +25,17 @@ add_opcs4_trud <- function(
   version = NULL,
   source = "https://isd.digital.nhs.uk/trud/"
 ) {
+  if (is.null(version)) {
+    version <- basename(path)
+  }
+
+  if (tables_all_exist(paste("OPCS4", version, sep = "_"), "lookup")) {
+    codeminer_inform(
+      "OPCS-4 lookup table already exists for version {.val {version}}, skipping."
+    )
+    return(invisible(NULL))
+  }
+
   opcs4_data <- read_opcs4_trud(
     path = path,
     version = version,

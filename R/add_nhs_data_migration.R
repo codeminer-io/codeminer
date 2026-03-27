@@ -31,6 +31,27 @@ add_nhs_data_migration <- function(
   version = NULL,
   source = "https://isd.digital.nhs.uk/trud/users/guest/filters/0/categories/9/items/9/releases"
 ) {
+  if (is.null(version)) {
+    version <- basename(path)
+  }
+
+  expected_names <- c(
+    ctv3sctmap2 = paste("read3", "sct", version, sep = "_"),
+    rcsctmap2 = paste("read2", "sct", version, sep = "_")
+  )
+  expected_types <- c(
+    ctv3sctmap2 = "mapping",
+    rcsctmap2 = "mapping"
+  )
+
+  sel <- names(expected_names) %in% tables
+  if (tables_all_exist(expected_names[sel], expected_types[sel])) {
+    codeminer_inform(
+      "All requested NHS Data Migration tables already exist for version {.val {version}}, skipping."
+    )
+    return(invisible(NULL))
+  }
+
   migration_data <- read_nhs_data_migration(
     path = path,
     tables = tables,

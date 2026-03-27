@@ -25,6 +25,17 @@ add_icd10_trud <- function(
   version = NULL,
   source = "https://isd.digital.nhs.uk/trud/"
 ) {
+  if (is.null(version)) {
+    version <- basename(path)
+  }
+
+  if (tables_all_exist(paste("ICD-10", version, sep = "_"), "lookup")) {
+    codeminer_inform(
+      "ICD-10 lookup table already exists for version {.val {version}}, skipping."
+    )
+    return(invisible(NULL))
+  }
+
   icd10_data <- read_icd10_trud(
     path = path,
     version = version,

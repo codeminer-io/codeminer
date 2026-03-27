@@ -76,13 +76,13 @@ read_read3_trud <- function(
         "i" = "The zip file should contain a single top-level directory"
       ))
     }
-    if (length(extracted_dirs) > 1) {
-      cli::cli_abort(c(
-        "x" = "Multiple directories found in extracted zip",
-        "i" = "Expected a single top-level directory, found: {.file {basename(extracted_dirs)}}"
-      ))
+    if (length(extracted_dirs) == 1) {
+      path <- extracted_dirs[[1]]
+    } else {
+      # V3 is one of several top-level directories (e.g. Document, Testdata,
+      # V3, Vaf) — use the extract root so file.path(path, "V3") works
+      path <- extract_dir
     }
-    path <- extracted_dirs[[1]]
     cli::cli_inform("Using extracted directory: {.path {basename(path)}}")
   }
 

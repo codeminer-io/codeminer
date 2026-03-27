@@ -82,7 +82,10 @@ read_read2_trud <- function(
     version <- basename(path)
   }
 
-  updated_dir <- file.path(path, "Mapping Tables", "Updated")
+  updated_dir <- file.path(path, "Updated")
+  if (!dir.exists(updated_dir)) {
+    updated_dir <- file.path(path, "Mapping Tables", "Updated")
+  }
 
   if (!dir.exists(updated_dir)) {
     cli::cli_abort(c(

@@ -55,6 +55,16 @@ codeminer_connect <- function(main = NULL, extra = NULL) {
   .codeminer_env$db_paths <- list()
 
   # Attach main (read-only)
+  if (main_was_explicit && !file.exists(main)) {
+    codeminer_abort(c(
+      "Database file not found at {.file {main}}.",
+      "i" = paste(
+        "To create a new database, use",
+        "{.code Sys.setenv(CODEMINER_DB_PATH = ...)} then",
+        "{.fun build_database}."
+      )
+    ))
+  }
   if (file.exists(main)) {
     DBI::dbExecute(
       .codeminer_env$con,

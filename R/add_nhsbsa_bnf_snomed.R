@@ -25,6 +25,13 @@ add_nhsbsa_bnf_snomed <- function(
   version = "v0",
   source = "https://www.nhsbsa.nhs.uk/prescription-data/understanding-our-data/bnf-snomed-mapping"
 ) {
+  if (tables_all_exist(paste("bnf", "dmd", version, sep = "_"), "mapping")) {
+    codeminer_inform(
+      "NHSBSA BNF-SNOMED mapping table already exists for version {.val {version}}, skipping."
+    )
+    return(invisible(NULL))
+  }
+
   nhsbsa_data <- read_nhsbsa_bnf_snomed(
     path = path,
     version = version,
