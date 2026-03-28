@@ -70,10 +70,28 @@ test_that("read_snomed_ct_uk_monolith() filters mappings correctly", {
   )
 
   # Check ICD-10 table has correct refset and no blocks
-  expect_true(all(
-    result$sct_icd10$mapping$table$refsetId == "999002271000000101"
-  ))
-  expect_false(any(grepl("#", result$sct_icd10$mapping$table$mapTarget)))
+  icd10_tbl <- result$sct_icd10$mapping$table
+  expect_true(all(icd10_tbl$refsetId == "999002271000000101"))
+  expect_false(any(grepl("#", icd10_tbl$mapTarget)))
+
+  # Check dagger/asterisk stripped from mapTarget into separate column
+  expect_true("icd10_dagger_asterisk" %in% names(icd10_tbl))
+  expect_false(any(grepl("[AD]$", icd10_tbl$mapTarget)))
+
+  # MS (24700007) should have dagger flag stripped
+  ms_row <- icd10_tbl[icd10_tbl$referencedComponentId == "24700007", ]
+  expect_equal(ms_row$mapTarget, "G35")
+  expect_equal(ms_row$icd10_dagger_asterisk, "D")
+
+  # Optic neuritis (66760008) should have asterisk flag stripped
+  on_row <- icd10_tbl[icd10_tbl$referencedComponentId == "66760008", ]
+  expect_equal(on_row$mapTarget, "H46")
+  expect_equal(on_row$icd10_dagger_asterisk, "A")
+
+  # Chronic pharyngitis (140004) should have no flag
+  cp_row <- icd10_tbl[icd10_tbl$referencedComponentId == "140004", ]
+  expect_equal(cp_row$mapTarget, "J312")
+  expect_true(is.na(cp_row$icd10_dagger_asterisk))
 
   # Check OPCS-4 table has correct refset and no blocks
   expect_true(all(
