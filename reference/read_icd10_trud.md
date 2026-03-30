@@ -42,7 +42,8 @@ A named list with elements:
 - `icd10_relationship`: parent-child hierarchy derived from code
   structure
 
-The lookup `table` has columns including `CODE`, `DESCRIPTION`, and
+The lookup `table` has columns including `CODE`, `ALT_CODE`
+(dot-stripped, used as the primary code column), `DESCRIPTION`, and
 others from the source file. `DESCRIPTION` is augmented with
 `MODIFIER_4` or `MODIFIER_5` where present.
 

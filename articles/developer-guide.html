@@ -261,34 +261,44 @@ by other diseases)</li>
 <thead><tr class="header">
 <th>SNOMED CT Concept</th>
 <th>ICD-10 Code</th>
+<th>Dagger/Asterisk</th>
 </tr></thead>
 <tbody>
 <tr class="odd">
 <td>Multiple sclerosis (24700007)</td>
-<td>G35</td>
+<td>G35D</td>
+<td>D (dagger)</td>
 </tr>
 <tr class="even">
 <td>Relapsing remitting MS (426373005)</td>
 <td>G35</td>
+<td>—</td>
 </tr>
 <tr class="odd">
 <td>Secondary progressive MS (425500002)</td>
 <td>G35</td>
+<td>—</td>
 </tr>
 <tr class="even">
 <td>Optic neuritis (66760008)</td>
-<td>H46</td>
+<td>H46A</td>
+<td>A (asterisk)</td>
 </tr>
 <tr class="odd">
 <td>~Optic neuritis due to MS~ (000001000)</td>
 <td>H46</td>
+<td>—</td>
 </tr>
 <tr class="even">
 <td>Chronic pharyngitis (140004)</td>
 <td>J312</td>
+<td>—</td>
 </tr>
 </tbody>
 </table>
+<p>The dagger/asterisk suffix is stripped from <code>mapTarget</code>
+during processing and stored in a separate
+<code>icd10_dagger_asterisk</code> column.</p>
 </div>
 <div class="section level5">
 <h5 id="opcs-4-mappings">OPCS-4 Mappings<a class="anchor" aria-label="anchor" href="#opcs-4-mappings"></a>

@@ -42,7 +42,8 @@ A named list with elements:
 - `opcs4_relationship`: parent-child hierarchy derived from code
   structure
 
-The lookup `table` has columns `opcs4_code` and `description`.
+The lookup `table` has columns `opcs4_code` (dot-stripped),
+`opcs4_code_dotted` (original format with dot), and `description`.
 
 ## See also
 
