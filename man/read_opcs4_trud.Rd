@@ -29,7 +29,8 @@ A named list with elements:
 \item \code{opcs4_relationship}: parent-child hierarchy derived from code structure
 }
 
-The lookup \code{table} has columns \code{opcs4_code} and \code{description}.
+The lookup \code{table} has columns \code{opcs4_code} (dot-stripped),
+\code{opcs4_code_dotted} (original format with dot), and \code{description}.
 }
 \description{
 Reads the OPCS-4 codes and descriptions from a local copy of the TRUD

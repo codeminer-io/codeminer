@@ -29,9 +29,10 @@ A named list with elements:
 \item \code{icd10_relationship}: parent-child hierarchy derived from code structure
 }
 
-The lookup \code{table} has columns including \code{CODE}, \code{DESCRIPTION}, and others
-from the source file. \code{DESCRIPTION} is augmented with \code{MODIFIER_4} or
-\code{MODIFIER_5} where present.
+The lookup \code{table} has columns including \code{CODE}, \code{ALT_CODE} (dot-stripped,
+used as the primary code column), \code{DESCRIPTION}, and others from the source
+file. \code{DESCRIPTION} is augmented with \code{MODIFIER_4} or \code{MODIFIER_5} where
+present.
 }
 \description{
 Reads the ICD-10 Edition 5 codes and descriptions from a local copy of the

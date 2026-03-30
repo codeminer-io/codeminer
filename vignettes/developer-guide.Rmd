@@ -146,14 +146,16 @@ The dataset includes these mappings:
 
 #### ICD-10 Mappings
 
-| SNOMED CT Concept | ICD-10 Code |
-|-------------------|-------------|
-| Multiple sclerosis (24700007) | G35 |
-| Relapsing remitting MS (426373005) | G35 |
-| Secondary progressive MS (425500002) | G35 |
-| Optic neuritis (66760008) | H46 |
-| ~Optic neuritis due to MS~ (000001000) | H46 |
-| Chronic pharyngitis (140004) | J312 |
+| SNOMED CT Concept | ICD-10 Code | Dagger/Asterisk |
+|-------------------|-------------|-----------------|
+| Multiple sclerosis (24700007) | G35D | D (dagger) |
+| Relapsing remitting MS (426373005) | G35 | — |
+| Secondary progressive MS (425500002) | G35 | — |
+| Optic neuritis (66760008) | H46A | A (asterisk) |
+| ~Optic neuritis due to MS~ (000001000) | H46 | — |
+| Chronic pharyngitis (140004) | J312 | — |
+
+The dagger/asterisk suffix is stripped from `mapTarget` during processing and stored in a separate `icd10_dagger_asterisk` column.
 
 #### OPCS-4 Mappings
 

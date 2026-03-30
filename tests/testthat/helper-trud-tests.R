@@ -31,7 +31,7 @@ create_dummy_icd10_dir <- function(.envir = parent.frame()) {
       ),
       paste(
         c(
-          "E10",
+          "E10.-",
           "E10",
           "M",
           "N",
@@ -48,8 +48,8 @@ create_dummy_icd10_dir <- function(.envir = parent.frame()) {
       ),
       paste(
         c(
-          "E11",
-          "E11",
+          "E11.3",
+          "E113",
           "M",
           "N",
           "Type 2 diabetes mellitus",
@@ -65,8 +65,8 @@ create_dummy_icd10_dir <- function(.envir = parent.frame()) {
       ),
       paste(
         c(
-          "E12",
-          "E12",
+          "E12.0",
+          "E120",
           "M",
           "N",
           "Malnutrition-related diabetes",
@@ -90,12 +90,12 @@ create_dummy_icd10_dir <- function(.envir = parent.frame()) {
 create_dummy_opcs4_dir <- function(.envir = parent.frame()) {
   dir <- withr::local_tempdir(.local_envir = .envir)
 
-  # Tab-separated, NO header, 2 columns: opcs4_code, description
+  # Tab-separated, NO header, 2 columns: opcs4_code_dotted, description
   writeLines(
     c(
-      "A01\tExcision of gallbladder",
-      "A02\tTotal excision of liver",
-      "A03\tPartial excision of liver"
+      "A01.1\tExcision of gallbladder",
+      "A02.3\tTotal excision of liver",
+      "A03.5\tPartial excision of liver"
     ),
     file.path(dir, "OPCS411 CodesAndTitles Nov 2025 V1.0.txt")
   )

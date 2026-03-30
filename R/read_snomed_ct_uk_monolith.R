@@ -274,6 +274,15 @@ read_snomed_ct_uk_monolith <- function(
       dplyr::filter(
         .data$refsetId == .env$.icd10_refset_id,
         !stringr::str_detect(.data$mapTarget, "#")
+      ) |>
+      # Separate trailing dagger (D) / asterisk (A) flag from ICD-10 codes
+      dplyr::mutate(
+        icd10_dagger_asterisk = dplyr::case_when(
+          stringr::str_detect(.data$mapTarget, "A$") ~ "A",
+          stringr::str_detect(.data$mapTarget, "D$") ~ "D",
+          TRUE ~ NA_character_
+        ),
+        mapTarget = stringr::str_remove(.data$mapTarget, "[AD]$")
       )
 
     sct_icd10_metadata <- mapping_metadata(
