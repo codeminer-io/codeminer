@@ -32,6 +32,7 @@ Imports:
     DBI,
     assertthat,
     data.table,
+    dbplyr,
     dplyr,
     httr2,
     cli,
