@@ -332,8 +332,6 @@ Dummy data for tests.
   : Read dummy Phecode definitions file into R
 - [`read_ukb_codings_dummy()`](https://codeminer-io.github.io/codeminer/reference/read_ukb_codings_dummy.md)
   : Read dummy UK Biobank codings into R
-- [`dummy_clinical_events_tidy()`](https://codeminer-io.github.io/codeminer/reference/dummy_clinical_events_tidy.md)
-  : Dummy UK Biobank clinical events, tidied
 - [`dummy_icd10_phecode_map_path()`](https://codeminer-io.github.io/codeminer/reference/dummy_icd10_phecode_map_path.md)
   : Dummy Phecode Map 1.2 with ICD-10 codes (beta) file path
 - [`dummy_phecode_lkp_path()`](https://codeminer-io.github.io/codeminer/reference/dummy_phecode_lkp_path.md)

@@ -80,7 +80,7 @@ Other Clinical code lookups and mappings:
 create_dummy_database()
 #> ✔ Dummy database ready to use!
 #> ℹ To reconnect to your previous database:
-#>   `Sys.setenv(CODEMINER_DB_PATH = "/tmp/Rtmp7fg0Bd/file1c7d5fda3e8a.duckdb")`
+#>   `Sys.setenv(CODEMINER_DB_PATH = "/tmp/Rtmp7pbrDX/file1af676cc560b.duckdb")`
 #>   `codeminer_connect()`
 
 # Get the full ICD-10 lookup table
