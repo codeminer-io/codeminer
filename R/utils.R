@@ -45,10 +45,6 @@ NULL
 }
 
 
-# CONSTANTS ---------------------------------------------------------------
-
-UPDATE_CODE_SELECTION_MATCHING_VARS <- c("disease", "code_type", "code")
-
 # PRIVATE -----------------------------------------------------------------
 
 read_excel_to_named_list <- function(
@@ -153,44 +149,6 @@ make_lkp_from_ukb_codings <- function(
   names(result)[names(result) == "Meaning"] <- Meaning_col_new_name
 
   return(result)
-}
-
-#' Pre-populate a list of codes with category labels from an existing codelist
-#'
-#' To be used with \code{\link{runCodeMapper}}. The data frame returned by this
-#' app is for a single disease and should have an empty 'category' column. If
-#' the user uploads a (valid) clinical code list then the 'categories' will be
-#' lifted over, matching on 'disease', 'code_type' and 'code'.
-#'
-#' @param current_selection A data frame, as returned by
-#'   \code{\link{runCodeMapper}}.
-#' @param previous_codelist A data frame of clinical codes. Must meet the
-#'   requirements of \code{\link}
-#'
-#' @return A data frame.
-#' @noRd
-update_code_selection <- function(current_selection, previous_codelist) {
-  # validate previous_codelist
-  ukbwranglr::validate_clinical_codes(previous_codelist)
-
-  # copy over previous categories and mark these codes as selected
-  current_selection |>
-    dplyr::left_join(
-      previous_codelist,
-      # match on these columns (NB, does not include 'description' or author')
-      by = UPDATE_CODE_SELECTION_MATCHING_VARS,
-      suffix = c("", "_TOREMOVE")
-    ) |>
-    dplyr::mutate(
-      "category" = .data[["category_TOREMOVE"]],
-      "selected" = dplyr::case_when(
-        (!is.na(.data[["category"]])) |
-          (.data[["category"]] != "") ~
-          "Yes",
-        TRUE ~ ""
-      )
-    ) |>
-    dplyr::select(-tidyselect::ends_with("_TOREMOVE"))
 }
 
 #' Download a file

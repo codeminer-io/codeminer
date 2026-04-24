@@ -32,6 +32,7 @@ Imports:
     DBI,
     assertthat,
     data.table,
+    dbplyr,
     dplyr,
     httr2,
     cli,
@@ -47,7 +48,6 @@ Imports:
     tibble,
     tidyr,
     tidyselect,
-    ukbwranglr,
     utils,
     withr,
     rappdirs
@@ -58,7 +58,5 @@ Suggests:
     rmarkdown,
     testthat (>= 3.0.0),
     trud
-Remotes:
-    github::rmgpanw/ukbwranglr
 VignetteBuilder: knitr
 Config/testthat/edition: 3

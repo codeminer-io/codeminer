@@ -302,12 +302,6 @@
     },
     "18": {
       "@type": "SoftwareApplication",
-      "identifier": "ukbwranglr",
-      "name": "ukbwranglr",
-      "sameAs": "https://github.com/rmgpanw/ukbwranglr"
-    },
-    "19": {
-      "@type": "SoftwareApplication",
       "identifier": "utils",
       "name": "utils"
     },

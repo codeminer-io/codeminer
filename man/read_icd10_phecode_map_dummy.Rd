@@ -19,7 +19,6 @@ read_icd10_phecode_map_dummy()
 }
 \seealso{
 Other Dummy data: 
-\code{\link{dummy_clinical_events_tidy}()},
 \code{\link{dummy_icd10_phecode_map_path}()},
 \code{\link{dummy_phecode_lkp_path}()},
 \code{\link{dummy_ukb_codings_path}()},
