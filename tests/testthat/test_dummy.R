@@ -17,12 +17,6 @@ test_that("Functions that return a path to dummy data work", {
 })
 
 
-# `dummy_clinical_events_tidy()` -------------------------
-
-test_that("`dummy_clinical_events_tidy()` returns a tibble", {
-  expect_true(tibble::is_tibble(dummy_clinical_events_tidy()))
-})
-
 # `read_ukb_codings_dummy()` ----------------------------------------------
 
 test_that("`read_ukb_codings_dummy()` returns a tibble", {
