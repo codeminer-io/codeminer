@@ -47,6 +47,28 @@ NULL
 
 # PRIVATE -----------------------------------------------------------------
 
+#' Strip the X placeholder from 3-char ICD-10 categories
+#'
+#' In TRUD, codes like `J46` are encoded as `J46X` so that all codes share a
+#' uniform 4-char width; the trailing `X` is a filler with no semantic value.
+#' Without stripping, such codes are orphaned in the prefix-derived
+#' relationship table (no 3-char `J46` parent exists) and break
+#' `DESCRIPTION() |> CHILDREN()` flows. The same normalisation is needed for
+#' SNOMED-to-ICD-10 `mapTarget` values so they join cleanly to the ICD-10
+#' lookup.
+#'
+#' Uses a strict regex (`^[A-Z][0-9]{2}X$`) so only the placeholder pattern is
+#' touched; codes where `X` carries meaning (or codes of other shapes) are
+#' returned unchanged.
+#'
+#' @param codes Character vector of ICD-10 codes (undotted form).
+#' @return `codes` with the X placeholder stripped where applicable.
+#' @keywords internal
+#' @noRd
+strip_icd10_x_placeholder <- function(codes) {
+  stringr::str_remove(codes, "(?<=^[A-Z][0-9]{2})X$")
+}
+
 read_excel_to_named_list <- function(
   path,
   to_include = NULL,

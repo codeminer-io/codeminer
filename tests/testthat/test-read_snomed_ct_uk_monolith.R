@@ -78,6 +78,10 @@ test_that("read_snomed_ct_uk_monolith() filters mappings correctly", {
   expect_true("icd10_dagger_asterisk" %in% names(icd10_tbl))
   expect_false(any(grepl("[AD]$", icd10_tbl$mapTarget)))
 
+  # X placeholder for 3-char categories also stripped (e.g. J46X -> J46), so
+  # mapTarget joins cleanly to the ICD-10 lookup
+  expect_false(any(grepl("^[A-Z][0-9]{2}X$", icd10_tbl$mapTarget)))
+
   # MS (24700007) should have dagger flag stripped
   ms_row <- icd10_tbl[icd10_tbl$referencedComponentId == "24700007", ]
   expect_equal(ms_row$mapTarget, "G35")

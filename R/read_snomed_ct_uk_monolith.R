@@ -275,14 +275,18 @@ read_snomed_ct_uk_monolith <- function(
         .data$refsetId == .env$.icd10_refset_id,
         !stringr::str_detect(.data$mapTarget, "#")
       ) |>
-      # Separate trailing dagger (D) / asterisk (A) flag from ICD-10 codes
+      # Separate trailing dagger (D) / asterisk (A) flag from ICD-10 codes,
+      # then strip the X placeholder used to pad 3-char categories so the
+      # mapTarget joins cleanly to the ICD-10 lookup. A/D are stripped first
+      # because they are appended after the X (e.g., J46XA).
       dplyr::mutate(
         icd10_dagger_asterisk = dplyr::case_when(
           stringr::str_detect(.data$mapTarget, "A$") ~ "A",
           stringr::str_detect(.data$mapTarget, "D$") ~ "D",
           TRUE ~ NA_character_
         ),
-        mapTarget = stringr::str_remove(.data$mapTarget, "[AD]$")
+        mapTarget = stringr::str_remove(.data$mapTarget, "[AD]$"),
+        mapTarget = strip_icd10_x_placeholder(.data$mapTarget)
       )
 
     sct_icd10_metadata <- mapping_metadata(

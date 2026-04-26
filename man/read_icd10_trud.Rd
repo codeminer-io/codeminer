@@ -32,7 +32,9 @@ A named list with elements:
 The lookup \code{table} has columns including \code{CODE}, \code{ALT_CODE} (dot-stripped,
 used as the primary code column), \code{DESCRIPTION}, and others from the source
 file. \code{DESCRIPTION} is augmented with \code{MODIFIER_4} or \code{MODIFIER_5} where
-present.
+present. The trailing \code{X} placeholder used to pad 3-char categories to a
+4-char width is stripped from \code{ALT_CODE} (e.g., \code{J46X} becomes \code{J46}); the
+original \code{CODE} column is left unchanged.
 }
 \description{
 Reads the ICD-10 Edition 5 codes and descriptions from a local copy of the

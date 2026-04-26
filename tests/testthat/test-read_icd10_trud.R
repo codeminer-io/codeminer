@@ -25,7 +25,85 @@ test_that("read_icd10_trud() returns correct structure", {
 test_that("read_icd10_trud() reads all rows", {
   dir <- create_dummy_icd10_dir()
   result <- suppressMessages(read_icd10_trud(dir))
-  expect_equal(nrow(result$icd10_lkp$lookup$table), 3L)
+  expect_equal(nrow(result$icd10_lkp$lookup$table), 4L)
+})
+
+test_that("read_icd10_trud() strips X placeholder from ALT_CODE", {
+  dir <- create_dummy_icd10_dir()
+  result <- suppressMessages(read_icd10_trud(dir))
+  tbl <- result$icd10_lkp$lookup$table
+
+  expect_true("J46" %in% tbl$ALT_CODE)
+  expect_false("J46X" %in% tbl$ALT_CODE)
+})
+
+test_that("read_icd10_trud() preserves CODE column unchanged", {
+  dir <- create_dummy_icd10_dir()
+  result <- suppressMessages(read_icd10_trud(dir))
+  tbl <- result$icd10_lkp$lookup$table
+
+  j46 <- tbl[tbl$ALT_CODE == "J46", ]
+  expect_equal(j46$CODE, "J46.X")
+})
+
+test_that("read_icd10_trud() does not strip X-suffix from non-placeholder codes", {
+  dir <- create_dummy_icd10_dir()
+  result <- suppressMessages(read_icd10_trud(dir))
+  tbl <- result$icd10_lkp$lookup$table
+
+  expect_true("E113" %in% tbl$ALT_CODE)
+  expect_true("E120" %in% tbl$ALT_CODE)
+})
+
+test_that("read_icd10_trud() does not produce X-suffixed codes in the relationship table", {
+  dir <- create_dummy_icd10_dir()
+  result <- suppressMessages(read_icd10_trud(dir))
+  rel <- result$icd10_relationship$relationship$table
+
+  expect_false(any(grepl("^[A-Z][0-9]{2}X$", rel$from)))
+  expect_false(any(grepl("^[A-Z][0-9]{2}X$", rel$to)))
+})
+
+test_that("read_icd10_trud() errors on duplicate ALT_CODE after stripping", {
+  dir <- withr::local_tempdir()
+  content_dir <- file.path(dir, "Content")
+  dir.create(content_dir)
+
+  writeLines(
+    c(
+      paste(
+        c(
+          "CODE",
+          "ALT_CODE",
+          "USAGE",
+          "USAGE_UK",
+          "DESCRIPTION",
+          "MODIFIER_4",
+          "MODIFIER_5",
+          "QUALIFIERS",
+          "GENDER_MASK",
+          "MIN_AGE",
+          "MAX_AGE",
+          "TREE_DESCRIPTION"
+        ),
+        collapse = "\t"
+      ),
+      paste(
+        c("J46.-", "J46", "M", "N", "Cat", "", "", "", "0", "0", "999", "R"),
+        collapse = "\t"
+      ),
+      paste(
+        c("J46.X", "J46X", "M", "N", "Stat", "", "", "", "0", "0", "999", "R"),
+        collapse = "\t"
+      )
+    ),
+    file.path(content_dir, "ICD10_Edition5_CodesAndTitlesAndMetadata_GB.txt")
+  )
+
+  expect_error(
+    suppressMessages(read_icd10_trud(dir)),
+    "Duplicate.*ALT_CODE"
+  )
 })
 
 test_that("read_icd10_trud() augments DESCRIPTION with MODIFIER_4", {
