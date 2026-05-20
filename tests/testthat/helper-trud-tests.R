@@ -142,6 +142,57 @@ create_dummy_read3_dir <- function(.envir = parent.frame()) {
 
 create_dummy_read2_dir <- function(.envir = parent.frame()) {
   dir <- withr::local_tempdir(.local_envir = .envir)
+  v2_dir <- file.path(dir, "Standard", "V2")
+  dir.create(v2_dir, recursive = TRUE)
+
+  # DESC.DBF — Read code (CC) -> term id with TERMTYPE (P/S) and CCSTATUS (C/R).
+  # Code "1234." has a preferred and a synonym term; "5678." is active with a
+  # single preferred term; "9999." is retired with a single preferred term.
+  desc <- data.frame(
+    CC = c("1234.", "1234.", "5678.", "9999."),
+    TERMID = c("00001", "11001", "00002", "00003"),
+    TERMTYPE = c("P", "S", "P", "P"),
+    CCSTATUS = c("C", "C", "C", "R"),
+    stringsAsFactors = FALSE
+  )
+  foreign::write.dbf(desc, file.path(v2_dir, "DESC.DBF"))
+
+  # Term.dbf — TERMID -> TERM30 / TERM60 (covers every TERMID in DESC.DBF).
+  term <- data.frame(
+    TERMID = c("00001", "11001", "00002", "00003"),
+    TERM30 = c(
+      "Diabetes mellitus",
+      "DM (diabetes mellitus)",
+      "Hypertension",
+      "Retired condition"
+    ),
+    TERM60 = c(
+      "Diabetes mellitus",
+      "DM (diabetes mellitus)",
+      "Hypertension",
+      "Retired condition"
+    ),
+    stringsAsFactors = FALSE
+  )
+  foreign::write.dbf(term, file.path(v2_dir, "Term.dbf"))
+
+  # TERM198.DBF — TERMID -> longer term form, only present for some terms
+  # (those whose full description exceeds the 60-char form). Here we provide
+  # a longer form for one of the terms to exercise the coalesce logic.
+  term198 <- data.frame(
+    TERMID = c("00001"),
+    TERM198 = c(
+      "Diabetes mellitus, full long-form description for verification"
+    ),
+    stringsAsFactors = FALSE
+  )
+  foreign::write.dbf(term198, file.path(v2_dir, "TERM198.DBF"))
+
+  dir
+}
+
+create_dummy_nhs_data_migration_dir <- function(.envir = parent.frame()) {
+  dir <- withr::local_tempdir(.local_envir = .envir)
 
   assured_dir <- file.path(
     dir,
@@ -149,51 +200,85 @@ create_dummy_read2_dir <- function(.envir = parent.frame()) {
     "Updated",
     "Clinically Assured"
   )
-  not_assured_dir <- file.path(
-    dir,
-    "Mapping Tables",
-    "Updated",
-    "Not Clinically Assured"
-  )
   dir.create(assured_dir, recursive = TRUE)
-  dir.create(not_assured_dir, recursive = TRUE)
 
-  # rctermsctmap: ReadCode|Term|ConceptId|MapId (tab-sep with header)
+  # ctv3sctmap2: CTV3 -> SNOMED CT (clinically assured)
   writeLines(
     c(
-      paste(c("ReadCode", "Term", "ConceptId", "MapId"), collapse = "\t"),
-      paste(c("1234", "Diabetes mellitus", "12345678", "1"), collapse = "\t"),
       paste(
-        c("1234", "DM (diabetes mellitus)", "12345678", "2"),
+        c(
+          "MapId",
+          "MapVersion",
+          "ConceptId",
+          "DescriptionId",
+          "CTV3_TERMID",
+          "CTV3_CONCEPTID",
+          "MapStatus"
+        ),
         collapse = "\t"
       ),
-      paste(c("5678", "Hypertension", "87654321", "1"), collapse = "\t")
+      paste(
+        c("M1", "1", "12345678", "1111", "Y0001", "X40J5", "1"),
+        collapse = "\t"
+      ),
+      paste(
+        c("M2", "1", "87654321", "2222", "Y0002", "X40J6", "1"),
+        collapse = "\t"
+      )
     ),
-    file.path(not_assured_dir, "rctermsctmap_uk_20200401000001.txt")
+    file.path(assured_dir, "ctv3sctmap2_uk_20200401000001.txt")
   )
 
-  # rctctv3map: Read V2 -> CTV3 (tab-sep with header)
+  # rcsctmap2: Read V2 -> SNOMED CT (clinically assured)
+  writeLines(
+    c(
+      paste(
+        c(
+          "MapId",
+          "ReadCode",
+          "TermCode",
+          "ConceptId",
+          "DescriptionId",
+          "IS_ASSURED",
+          "EffectiveDate",
+          "MapStatus"
+        ),
+        collapse = "\t"
+      ),
+      paste(
+        c("M1", "1234.", "00", "12345678", "1111", "1", "20200401", "1"),
+        collapse = "\t"
+      ),
+      paste(
+        c("M2", "5678.", "00", "87654321", "2222", "1", "20200401", "1"),
+        collapse = "\t"
+      )
+    ),
+    file.path(assured_dir, "rcsctmap2_uk_20200401000001.txt")
+  )
+
+  # rctctv3map: Read V2 -> CTV3
   writeLines(
     c(
       paste(
         c("V2_CONCEPTID", "CTV3_CONCEPTID", "MAPPING_TYPE"),
         collapse = "\t"
       ),
-      paste(c("1234", "X40J5", "P"), collapse = "\t"),
-      paste(c("5678", "X40J6", "P"), collapse = "\t")
+      paste(c("1234.", "X40J5", "P"), collapse = "\t"),
+      paste(c("5678.", "X40J6", "P"), collapse = "\t")
     ),
     file.path(assured_dir, "rctctv3map_uk_20200401000001.txt")
   )
 
-  # ctv3rctmap: CTV3 -> Read V2 (tab-sep with header)
+  # ctv3rctmap: CTV3 -> Read V2
   writeLines(
     c(
       paste(
         c("CTV3_CONCEPTID", "V2_CONCEPTID", "MAPPING_TYPE"),
         collapse = "\t"
       ),
-      paste(c("X40J5", "1234", "P"), collapse = "\t"),
-      paste(c("X40J6", "5678", "P"), collapse = "\t")
+      paste(c("X40J5", "1234.", "P"), collapse = "\t"),
+      paste(c("X40J6", "5678.", "P"), collapse = "\t")
     ),
     file.path(assured_dir, "ctv3rctmap_uk_20200401000002.txt")
   )

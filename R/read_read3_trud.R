@@ -3,8 +3,11 @@
 #' Reads the Read Codes Version 3 (CTV3) lookup and relationship tables from a
 #' local copy of the TRUD release files (item 19).
 #'
-#' Only active codes (status not `"R"`) with preferred (`"P"`) and clinical
-#' (`"C"`) descriptions are included in the lookup table.
+#' All rows from the source concept / description / term files are retained
+#' (including retired codes, synonyms, and non-clinical term types). Query-time
+#' filtering to active concepts and clinical terms is handled by the
+#' `col_filters` entry in the lookup metadata; preferred-vs-synonym is handled
+#' via `preferred_description_col`.
 #'
 #' @param path Path to the Read 3 release. Can be:
 #'   * A **zip file** (e.g., from [get_read3_trud()])
@@ -128,24 +131,34 @@ read_read3_trud <- function(
       colClasses = "character"
     )
 
-    # Active codes only (status != "R"), preferred descriptions (P), clinical terms (C)
     read3_lkp_table <- concept |>
-      dplyr::filter(.data$status != "R") |>
-      dplyr::inner_join(
-        descrip |> dplyr::filter(.data$desc_type == "P"),
-        by = "code"
-      ) |>
-      dplyr::inner_join(
-        terms |> dplyr::filter(.data$term_type == "C"),
-        by = "description_id"
-      )
+      dplyr::inner_join(descrip, by = "code") |>
+      dplyr::inner_join(terms, by = "description_id") |>
+      data.table::as.data.table()
+
+    status_values <- sort(unique(read3_lkp_table$status))
+    term_type_values <- sort(unique(read3_lkp_table$term_type))
 
     read3_lkp_metadata <- lookup_metadata(
-      code_type = "read3",
+      code_type = "Read v3",
       lookup_version = version,
       lookup_code_col = "code",
       lookup_description_col = "term",
-      lookup_source = source
+      lookup_source = source,
+      preferred_description_col = "desc_type",
+      preferred_description_indicator = "P",
+      col_filters = list(
+        # NHS Concept.v3 status codes: C = Current (active);
+        # E = Extinct, O = Optional, R = Redundant (all inactive).
+        status = list(
+          values = status_values,
+          defaults = "C"
+        ),
+        term_type = list(
+          values = term_type_values,
+          defaults = "C"
+        )
+      )
     )
 
     result$read3_lkp <- list(
@@ -168,7 +181,7 @@ read_read3_trud <- function(
     )
 
     read3_relationship_metadata <- relationship_metadata(
-      code_type = "read3",
+      code_type = "Read v3",
       relationship_version = version,
       from_col = "child_code",
       to_col = "parent_code",

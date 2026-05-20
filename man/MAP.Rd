@@ -64,24 +64,24 @@ temp_db <- tempfile(fileext = ".duckdb")
 create_dummy_database(temp_db)
 
 # Single code
-MAP("X40J4", from = "Read 3", to = "ICD-10")
+MAP("X40J4", from = "Read v3", to = "ICD-10")
 
 # Multiple codes
-MAP("X40J4", "X40J5", from = "Read 3", to = "ICD-10")
+MAP("X40J4", "X40J5", from = "Read v3", to = "ICD-10")
 
 # || separated
-MAP("X40J4 || X40J5", from = "Read 3", to = "ICD-10")
+MAP("X40J4 || X40J5", from = "Read v3", to = "ICD-10")
 
 # Data frame input (from is optional)
 df <- data.frame(
   code = c("X40J4", "X40J5"),
   description = c("Desc 1", "Desc 2"),
-  code_type = c("Read 3", "Read 3")
+  code_type = c("Read v3", "Read v3")
 )
 MAP(df, to = "ICD-10")
 
 # Return the mapping table itself
-MAP("all", from = "Read 3", to = "ICD-10")
+MAP("all", from = "Read v3", to = "ICD-10")
 }
 \seealso{
 \code{\link[=add_mapping_table]{add_mapping_table()}} for adding new mapping tables to the codeminer

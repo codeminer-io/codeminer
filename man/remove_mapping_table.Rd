@@ -7,7 +7,7 @@
 remove_mapping_table(from_code_type, to_code_type, map_version)
 }
 \arguments{
-\item{from_code_type}{The source coding system (e.g. \code{"Read 3"}).}
+\item{from_code_type}{The source coding system (e.g. \code{"Read v3"}).}
 
 \item{to_code_type}{The target coding system (e.g. \code{"ICD-10"}).}
 

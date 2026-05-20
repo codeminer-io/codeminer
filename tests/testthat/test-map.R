@@ -3,7 +3,7 @@ suppressMessages(create_dummy_database(.local = TRUE))
 
 test_that("MAP() returns the expected data format", {
   test_codes <- c("C10..", "XE0Uc", "C10..", "C10..", "XE0Uc")
-  test_from <- "Read 3"
+  test_from <- "Read v3"
   test_to <- "ICD-10"
 
   result <- MAP(
@@ -21,11 +21,11 @@ test_that("MAP() returns the expected data format", {
 
 test_that("MAP fails for wrong argument types", {
   expect_error(
-    MAP("foo", from = c("ICD-10", "icd11", "icd12"), to = "Read 3"),
+    MAP("foo", from = c("ICD-10", "icd11", "icd12"), to = "Read v3"),
     "`from` must be a string"
   )
   expect_error(
-    MAP("foo", from = "Read 3", to = c("ICD-10", "icd11", "icd12")),
+    MAP("foo", from = "Read v3", to = c("ICD-10", "icd11", "icd12")),
     "`to` must be a string"
   )
 })
@@ -36,11 +36,11 @@ test_that("MAP fails for missing mapping table", {
     "not found in mapping metadata"
   )
   expect_error(
-    MAP("foo", from = "Read 3", to = "idontexist"),
+    MAP("foo", from = "Read v3", to = "idontexist"),
     "not found in mapping metadata"
   )
   expect_error(
-    MAP("foo", from = "Read 3", to = "ICD-10", map_version = "nope"),
+    MAP("foo", from = "Read v3", to = "ICD-10", map_version = "nope"),
     "No mapping metadata found"
   )
 })
@@ -49,7 +49,7 @@ test_that("`MAP()` warns about missing codes in the coding system being mapped f
   expect_warning(
     MAP(
       c("foo", "bar"),
-      from = "Read 3",
+      from = "Read v3",
       to = "ICD-10"
     ),
     "The following codes were not found in the mapping table",
@@ -61,7 +61,7 @@ test_that("MAP() swaps `to` and `from` if necessary and warns", {
   # ICD-10 -> Read 3 is still expected to work, because MAP() swaps the direction if necessary
   test_codes <- c("E129", "E109", "E14", "L721", "I13") # ICD-10 codes
   test_from <- "ICD-10"
-  test_to <- "Read 3"
+  test_to <- "Read v3"
 
   expect_warning(
     result <- MAP(test_codes, from = test_from, to = test_to),
@@ -73,13 +73,13 @@ test_that("MAP() swaps `to` and `from` if necessary and warns", {
 test_that("MAP('all') returns the mapping table", {
   result <- MAP(
     "all",
-    from = "Read 3",
+    from = "Read v3",
     to = "ICD-10",
     map_version = "UKB v4"
   ) |>
     nrow()
 
-  expected <- get_mapping_table("Read 3", "ICD-10", map_version = "UKB v4") |>
+  expected <- get_mapping_table("Read v3", "ICD-10", map_version = "UKB v4") |>
     dplyr::collect() |>
     nrow()
 
@@ -87,7 +87,7 @@ test_that("MAP('all') returns the mapping table", {
 })
 
 test_that("MAP handles versions correctly", {
-  test_from <- "Read 3"
+  test_from <- "Read v3"
   test_to <- "ICD-10"
   test_version <- "UKB v5"
 

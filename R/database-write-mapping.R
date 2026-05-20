@@ -103,7 +103,7 @@ add_mapping_table <- function(table, metadata) {
 #'
 #' Removes a mapping table and its metadata entry from the database.
 #'
-#' @param from_code_type The source coding system (e.g. `"Read 3"`).
+#' @param from_code_type The source coding system (e.g. `"Read v3"`).
 #' @param to_code_type The target coding system (e.g. `"ICD-10"`).
 #' @param map_version The version to remove (e.g. `"UKB v4"`).
 #'
@@ -145,7 +145,7 @@ remove_mapping_table <- function(from_code_type, to_code_type, map_version) {
 #' Updates metadata fields for an existing mapping table without re-adding the
 #' data. Currently supports updating `col_filters`.
 #'
-#' @param from_code_type The source coding system (e.g. `"Read 3"`).
+#' @param from_code_type The source coding system (e.g. `"Read v3"`).
 #' @param to_code_type The target coding system (e.g. `"ICD-10"`).
 #' @param map_version The version to update. Use `"latest"` (default) to
 #'   update the most recent version.

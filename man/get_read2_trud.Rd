@@ -27,20 +27,26 @@ files. Default is \code{FALSE}.}
 is \code{FALSE}.}
 }
 \value{
-File path to the downloaded NHS Data Migration zip file (invisibly).
+File path to the downloaded NHS Read Browser zip file (invisibly).
 }
 \description{
-Downloads the NHS Data Migration release (TRUD item 9), which contains the
-Read V2 lookup and Read 2/CTV3 cross-mapping files.
+Downloads the NHS Read Browser release (TRUD item 8), which contains the
+canonical Read V2 terminology files (FoxPro DBF format) under
+\verb{Standard/V2/}.
 }
 \details{
-This is a convenience wrapper around \code{\link[=get_nhs_data_migration]{get_nhs_data_migration()}}, since both
-the Read 2 files and the NHS Data Migration mapping tables come from the same
-TRUD item.
-
 This function requires a valid NHS TRUD API key set as the environment
-variable \code{TRUD_API_KEY}. You must also be subscribed to item 9 on the NHS
+variable \code{TRUD_API_KEY}. You must also be subscribed to item 8 on the NHS
 TRUD website.
+
+The NHS Read Browser supersedes the Read 2 lookup files that were previously
+read from the NHS Data Migration release (TRUD item 9). Item 8 is the
+canonical Read V2 terminology and contains the complete set of Read codes
+(including codes without a SNOMED CT mapping), along with a preferred /
+synonym indicator (\code{TERMTYPE}) that the migration files lacked.
+
+The Read 2 ↔ CTV3 cross-mapping tables remain in TRUD item 9 and are
+available via \code{\link[=get_nhs_data_migration]{get_nhs_data_migration()}} / \code{\link[=read_nhs_data_migration]{read_nhs_data_migration()}}.
 }
 \examples{
 \dontrun{

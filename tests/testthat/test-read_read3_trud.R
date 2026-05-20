@@ -30,31 +30,40 @@ test_that("read_read3_trud() read3_lkp has correct structure", {
   dir <- create_dummy_read3_dir()
   result <- suppressMessages(read_read3_trud(dir, tables = "read3_lkp"))
 
-  expect_true("lookup" %in% names(result$read3_lkp))
+  meta <- result$read3_lkp$lookup$metadata
   expect_s3_class(result$read3_lkp$lookup$table, "data.frame")
-  expect_equal(result$read3_lkp$lookup$metadata$code_type, "read3")
-  expect_equal(result$read3_lkp$lookup$metadata$lookup_code_col, "code")
-  expect_equal(result$read3_lkp$lookup$metadata$lookup_description_col, "term")
+  expect_equal(meta$code_type, "Read v3")
+  expect_equal(meta$lookup_code_col, "code")
+  expect_equal(meta$lookup_description_col, "term")
+  expect_equal(meta$preferred_description_col, "desc_type")
+  expect_equal(meta$preferred_description_indicator, "P")
 })
 
-test_that("read_read3_trud() excludes retired codes from lookup", {
+test_that("read_read3_trud() read3_lkp retains retired codes, synonyms, and non-clinical terms", {
   dir <- create_dummy_read3_dir()
   result <- suppressMessages(read_read3_trud(dir, tables = "read3_lkp"))
   tbl <- result$read3_lkp$lookup$table
 
-  # X40J7 is retired (status = "R") and should be excluded
-  expect_false("X40J7" %in% tbl$code)
+  # Retired code X40J7 should be present
+  expect_true("X40J7" %in% tbl$code)
+  # Synonym desc_type ("S") and non-clinical term_type ("O") should be present
+  expect_setequal(unique(tbl$desc_type), c("P", "S"))
+  expect_setequal(unique(tbl$status), c("C", "R"))
+  expect_setequal(unique(tbl$term_type), c("C", "O"))
 })
 
-test_that("read_read3_trud() includes only preferred + clinical descriptions", {
+test_that("read_read3_trud() col_filters default to active codes + clinical terms", {
   dir <- create_dummy_read3_dir()
   result <- suppressMessages(read_read3_trud(dir, tables = "read3_lkp"))
-  tbl <- result$read3_lkp$lookup$table
+  cf <- deserialise_col_filters(
+    result$read3_lkp$lookup$metadata$col_filters
+  )
 
-  # X40J5 has preferred (P) + clinical (C) → "Disorder of organ"
-  # Synonym (S) and obsolete (O) entries should not appear
-  expect_equal(nrow(tbl[tbl$code == "X40J5", ]), 1L)
-  expect_equal(tbl$term[tbl$code == "X40J5"], "Disorder of organ")
+  expect_setequal(names(cf), c("status", "term_type"))
+  expect_equal(cf$status$defaults, "C")
+  expect_setequal(cf$status$values, c("C", "R"))
+  expect_equal(cf$term_type$defaults, "C")
+  expect_setequal(cf$term_type$values, c("C", "O"))
 })
 
 test_that("read_read3_trud() read3_relationship has correct structure", {
@@ -68,7 +77,7 @@ test_that("read_read3_trud() read3_relationship has correct structure", {
   expect_s3_class(result$read3_relationship$relationship$table, "data.frame")
   expect_equal(
     result$read3_relationship$relationship$metadata$code_type,
-    "read3"
+    "Read v3"
   )
   expect_equal(
     result$read3_relationship$relationship$metadata$child_parent_relationship_code,

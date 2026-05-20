@@ -27,7 +27,7 @@
 #' }
 add_nhs_data_migration <- function(
   path = get_nhs_data_migration(),
-  tables = c("ctv3sctmap2", "rcsctmap2"),
+  tables = c("ctv3sctmap2", "rcsctmap2", "read2_ctv3", "ctv3_read2"),
   version = NULL,
   source = "https://isd.digital.nhs.uk/trud/users/guest/filters/0/categories/9/items/9/releases"
 ) {
@@ -36,12 +36,16 @@ add_nhs_data_migration <- function(
   }
 
   expected_names <- c(
-    ctv3sctmap2 = paste("read3", "sct", version, sep = "_"),
-    rcsctmap2 = paste("read2", "sct", version, sep = "_")
+    ctv3sctmap2 = paste("Read v3", "sct", version, sep = "_"),
+    rcsctmap2 = paste("Read v2", "sct", version, sep = "_"),
+    read2_ctv3 = paste("Read v2", "Read v3", version, sep = "_"),
+    ctv3_read2 = paste("Read v3", "Read v2", version, sep = "_")
   )
   expected_types <- c(
     ctv3sctmap2 = "mapping",
-    rcsctmap2 = "mapping"
+    rcsctmap2 = "mapping",
+    read2_ctv3 = "mapping",
+    ctv3_read2 = "mapping"
   )
 
   sel <- names(expected_names) %in% tables

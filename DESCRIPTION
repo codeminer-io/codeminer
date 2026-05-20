@@ -53,6 +53,7 @@ Imports:
     rappdirs
 Suggests:
     covr,
+    foreign,
     jsonlite,
     knitr,
     rmarkdown,

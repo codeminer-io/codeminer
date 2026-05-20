@@ -99,7 +99,7 @@ test_that("CODES can return multiple descriptions for the same code", {
   test_code <- "X40J4"
   result <- CODES(
     test_code,
-    type = "Read 3",
+    type = "Read v3",
     preferred_description_only = FALSE
   )
   expect_equal(nrow(result), 5)
@@ -110,7 +110,7 @@ test_that("CODES can return only the preferred description", {
   test_code <- "X40J4"
   result <- CODES(
     test_code,
-    type = "Read 3",
+    type = "Read v3",
     preferred_description_only = TRUE
   )
   expect_equal(nrow(result), 1)
@@ -157,7 +157,7 @@ test_that("CODES validates type when returning codelist as-is", {
 
   # Should error with conflicting type
   expect_error(
-    CODES(cl, type = "Read 3"),
+    CODES(cl, type = "Read v3"),
     "Conflicting.*type"
   )
 })

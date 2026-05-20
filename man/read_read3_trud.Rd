@@ -44,8 +44,11 @@ Reads the Read Codes Version 3 (CTV3) lookup and relationship tables from a
 local copy of the TRUD release files (item 19).
 }
 \details{
-Only active codes (status not \code{"R"}) with preferred (\code{"P"}) and clinical
-(\code{"C"}) descriptions are included in the lookup table.
+All rows from the source concept / description / term files are retained
+(including retired codes, synonyms, and non-clinical term types). Query-time
+filtering to active concepts and clinical terms is handled by the
+\code{col_filters} entry in the lookup metadata; preferred-vs-synonym is handled
+via \code{preferred_description_col}.
 }
 \examples{
 \dontrun{

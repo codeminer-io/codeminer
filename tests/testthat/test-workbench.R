@@ -170,9 +170,9 @@ test_that("codeminer_set_version() stores relationship pins", {
 test_that("codeminer_set_version() stores mapping pins", {
   local_build_temp_database()
 
-  codeminer_set_version(mapping = c("Read 3 > ICD-10" = "UKB v4"))
+  codeminer_set_version(mapping = c("Read v3 > ICD-10" = "UKB v4"))
   expect_equal(
-    .codeminer_env$active_versions$mapping[["Read 3 > ICD-10"]],
+    .codeminer_env$active_versions$mapping[["Read v3 > ICD-10"]],
     "UKB v4"
   )
 })
@@ -181,18 +181,18 @@ test_that("codeminer_set_version() normalizes mapping key spacing", {
   local_build_temp_database()
 
   # No spaces around >
-  codeminer_set_version(mapping = c("Read 3>ICD-10" = "UKB v4"))
+  codeminer_set_version(mapping = c("Read v3>ICD-10" = "UKB v4"))
   expect_equal(
-    .codeminer_env$active_versions$mapping[["Read 3 > ICD-10"]],
+    .codeminer_env$active_versions$mapping[["Read v3 > ICD-10"]],
     "UKB v4"
   )
 
   codeminer_clear_versions()
 
   # Extra spaces around >
-  codeminer_set_version(mapping = c("Read 3  >   ICD-10" = "UKB v4"))
+  codeminer_set_version(mapping = c("Read v3  >   ICD-10" = "UKB v4"))
   expect_equal(
-    .codeminer_env$active_versions$mapping[["Read 3 > ICD-10"]],
+    .codeminer_env$active_versions$mapping[["Read v3 > ICD-10"]],
     "UKB v4"
   )
 })
@@ -211,10 +211,10 @@ test_that("codeminer_set_version() merges with existing pins", {
   local_build_temp_database()
 
   codeminer_set_version(lookup = c("ICD-10" = "UKB v4"))
-  codeminer_set_version(lookup = c("Read 3" = "UKB v4"))
+  codeminer_set_version(lookup = c("Read v3" = "UKB v4"))
 
   expect_equal(.codeminer_env$active_versions$lookup[["ICD-10"]], "UKB v4")
-  expect_equal(.codeminer_env$active_versions$lookup[["Read 3"]], "UKB v4")
+  expect_equal(.codeminer_env$active_versions$lookup[["Read v3"]], "UKB v4")
 })
 
 test_that("codeminer_set_version() overwrites existing pin for same key", {
@@ -289,7 +289,7 @@ test_that("codeminer_clear_versions() selectively clears by type", {
   local_build_temp_database()
 
   codeminer_set_version(
-    lookup = c("ICD-10" = "UKB v4", "Read 3" = "UKB v4"),
+    lookup = c("ICD-10" = "UKB v4", "Read v3" = "UKB v4"),
     relationship = c("ICD-10" = "UKB v4")
   )
 
@@ -297,7 +297,7 @@ test_that("codeminer_clear_versions() selectively clears by type", {
   codeminer_clear_versions(lookup = "ICD-10")
   expect_null(.codeminer_env$active_versions[["lookup"]][["ICD-10"]])
   expect_equal(
-    .codeminer_env$active_versions[["lookup"]][["Read 3"]],
+    .codeminer_env$active_versions[["lookup"]][["Read v3"]],
     "UKB v4"
   )
   expect_equal(
@@ -376,12 +376,12 @@ test_that("pinned mapping version overrides 'latest' resolution", {
   suppressMessages(local_build_temp_dummy_database())
 
   con <- get_db_con()
-  meta <- get_metadata_for_mapping(con, "Read 3", "ICD-10", "latest")
+  meta <- get_metadata_for_mapping(con, "Read v3", "ICD-10", "latest")
   expect_equal(meta$map_version, "UKB v4")
 
   # Pin the mapping version
-  codeminer_set_version(mapping = c("Read 3 > ICD-10" = "UKB v4"))
-  meta_pinned <- get_metadata_for_mapping(con, "Read 3", "ICD-10", "latest")
+  codeminer_set_version(mapping = c("Read v3 > ICD-10" = "UKB v4"))
+  meta_pinned <- get_metadata_for_mapping(con, "Read v3", "ICD-10", "latest")
   expect_equal(meta_pinned$map_version, "UKB v4")
 })
 

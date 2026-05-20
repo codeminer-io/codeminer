@@ -48,11 +48,11 @@ icd9 <- function(code) with_type("icd9", code)
 
 #' @rdname with_type
 #' @export
-read3 <- function(code) with_type("read3", code)
+read3 <- function(code) with_type("Read v3", code)
 
 #' @rdname with_type
 #' @export
-read2 <- function(code) with_type("read2", code)
+read2 <- function(code) with_type("Read v2", code)
 
 #' @rdname with_type
 #' @export
@@ -68,7 +68,7 @@ phecode <- function(code) with_type("phecode", code)
 
 #' @rdname with_type
 #' @export
-read2_drugs <- function(code) with_type("read2_drugs", code)
+read2_drugs <- function(code) with_type("Read v2 drugs", code)
 
 #' @rdname with_type
 #' @export

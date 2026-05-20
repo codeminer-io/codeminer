@@ -1,47 +1,61 @@
 #' Read Read 2 coding files into R
 #'
-#' Reads the Read V2 lookup and Read 2/CTV3 cross-mapping tables from a local
-#' copy of the NHS Data Migration release (TRUD item 9).
+#' Reads the Read V2 lookup and relationship tables from a local copy of the
+#' NHS Read Browser release (TRUD item 8), which ships the canonical Read V2
+#' terminology files in FoxPro DBF format under `Standard/V2/`.
 #'
-#' @param path Path to the NHS Data Migration release. Can be:
+#' The lookup is built by joining `DESC.DBF` (codes, term ids, `TERMTYPE`,
+#' `CCSTATUS`) with `Term.dbf` (the 30- and 60-character term forms) and
+#' left-joining `TERM198.DBF` (the longer term forms, where present). A
+#' composed `term` column prefers `TERM198` when available and falls back to
+#' `TERM60`.
+#'
+#' All rows from the source `DESC.DBF` table are retained, including codes
+#' with `TERMTYPE = "S"` (synonyms) and `CCSTATUS != "C"` (non-active codes).
+#' Query-time filtering to active codes and preferred terms is handled by the
+#' `preferred_description_col` and `col_filters` entries in the lookup
+#' metadata.
+#'
+#' The Read 2 ↔ CTV3 mapping tables (`rctctv3map_uk`, `ctv3rctmap_uk`) live in
+#' the NHS Data Migration release (TRUD item 9) and are available via
+#' [read_nhs_data_migration()].
+#'
+#' @param path Path to the NHS Read Browser release. Can be:
 #'   * A **zip file** (e.g., from [get_read2_trud()])
-#'   * An **unzipped directory** containing the `Mapping Tables` subdirectory
+#'   * An **unzipped directory** containing the `Standard/V2` subdirectory
 #' @param tables Character vector of table names to read. Available tables:
-#'   * `"read2_lkp"` — Read V2 lookup (codes and descriptions)
+#'   * `"read2_lkp"` — Read V2 lookup (codes, descriptions, term type, status)
 #'   * `"read2_relationship"` — parent-child hierarchy derived from code
 #'     structure (requires `"read2_lkp"`)
-#'   * `"read2_ctv3"` — Read V2 to CTV3 cross-mapping
-#'   * `"ctv3_read2"` — CTV3 to Read V2 cross-mapping
 #'
-#'   By default, all tables are read.
+#'   By default, both tables are read.
 #' @param version Character string for the version label. If `NULL` (default),
 #'   derived from the zip file or directory name.
 #' @param source Character string for the data source URL or description.
 #'
 #' @return A named list with elements corresponding to requested tables, each
 #'   containing:
-#'   * `lookup` or `mapping`: a list with `table` (data.table) and `metadata`
-#'     (list)
+#'   * `lookup` or `relationship`: a list with `table` (data.table) and
+#'     `metadata` (list)
 #'
-#' @seealso [add_read2_trud()], [get_read2_trud()]
+#' @seealso [add_read2_trud()], [get_read2_trud()], [read_nhs_data_migration()]
 #' @export
 #' @examples
 #' \dontrun{
 #' path <- get_read2_trud()
 #' result <- read_read2_trud(path)
 #' result$read2_lkp$lookup$table
-#' result$read2_ctv3$mapping$table
-#' result$ctv3_read2$mapping$table
+#' result$read2_relationship$relationship$table
 #' }
 read_read2_trud <- function(
   path,
-  tables = c("read2_lkp", "read2_relationship", "read2_ctv3", "ctv3_read2"),
+  tables = c("read2_lkp", "read2_relationship"),
   version = NULL,
-  source = "https://isd.digital.nhs.uk/trud/users/guest/filters/0/categories/9/items/9/releases"
+  source = "https://isd.digital.nhs.uk/trud/users/authenticated/filters/0/categories/9/items/8/releases"
 ) {
   rlang::arg_match(
     tables,
-    values = c("read2_lkp", "read2_relationship", "read2_ctv3", "ctv3_read2"),
+    values = c("read2_lkp", "read2_relationship"),
     multiple = TRUE
   )
 
@@ -50,11 +64,18 @@ read_read2_trud <- function(
     tables <- c("read2_lkp", tables)
   }
 
+  rlang::check_installed(
+    "foreign",
+    reason = "to read the NHS Read Browser DBF files."
+  )
+
   if (!file.exists(path) && !dir.exists(path)) {
     cli::cli_abort("Path does not exist: {.path {path}}")
   }
 
-  # Handle zip input — extract on-demand
+  # Handle zip input — extract on-demand. The Read Browser archive expands to
+  # several sibling top-level dirs (Scottish/, Standard/, Document/, ...), so
+  # we use the extract directory itself as the working path.
   if (
     file.exists(path) &&
       !dir.exists(path) &&
@@ -64,76 +85,83 @@ read_read2_trud <- function(
       version <- basename(path)
     }
 
-    cli::cli_inform("Extracting NHS Data Migration from zip file...")
+    cli::cli_inform("Extracting NHS Read Browser from zip file...")
     extract_dir <- file.path(tempdir(), "codeminer_read2_extract")
     if (!dir.exists(extract_dir)) {
       dir.create(extract_dir, recursive = TRUE)
     }
     utils::unzip(path, exdir = extract_dir, overwrite = TRUE)
 
-    extracted_dirs <- list.dirs(
-      extract_dir,
-      recursive = FALSE,
-      full.names = TRUE
-    )
-    if (length(extracted_dirs) == 0) {
-      cli::cli_abort(c(
-        "x" = "No directory found after extracting zip",
-        "i" = "The zip file should contain a single top-level directory"
-      ))
-    }
-    path <- extracted_dirs[[1]]
+    path <- extract_dir
   }
 
   if (is.null(version)) {
     version <- basename(path)
   }
 
-  updated_dir <- file.path(path, "Updated")
-  if (!dir.exists(updated_dir)) {
-    updated_dir <- file.path(path, "Mapping Tables", "Updated")
-  }
-
-  if (!dir.exists(updated_dir)) {
+  v2_dir <- file.path(path, "Standard", "V2")
+  if (!dir.exists(v2_dir)) {
     cli::cli_abort(c(
-      "x" = "Expected subdirectory not found: {.file {updated_dir}}",
-      "i" = "Check that the path points to a valid NHS Data Migration release directory."
+      "x" = "Expected subdirectory {.file Standard/V2} not found under {.path {path}}",
+      "i" = "Check that the path points to a valid NHS Read Browser release directory."
     ))
   }
-
-  not_assured_dir <- file.path(updated_dir, "Not Clinically Assured")
-  clinically_assured_dir <- file.path(updated_dir, "Clinically Assured")
 
   result <- list()
 
   if ("read2_lkp" %in% tables) {
-    cli::cli_inform("Loading Read V2 lookup...")
-
-    lkp_files <- list.files(
-      not_assured_dir,
-      pattern = "^rctermsctmap_uk_",
-      full.names = TRUE
+    cli::cli_inform(
+      "Loading Read V2 lookup (DESC.DBF + Term.dbf + TERM198.DBF)..."
     )
 
-    if (length(lkp_files) == 0) {
-      cli::cli_abort(c(
-        "x" = "Could not find Read V2 lookup file (rctermsctmap_uk_*.txt)",
-        "i" = "Expected under: {.file {not_assured_dir}}"
-      ))
+    desc_path <- file.path(v2_dir, "DESC.DBF")
+    term_path <- file.path(v2_dir, "Term.dbf")
+    term198_path <- file.path(v2_dir, "TERM198.DBF")
+
+    for (p in c(desc_path, term_path, term198_path)) {
+      if (!file.exists(p)) {
+        cli::cli_abort(c(
+          "x" = "Required file not found: {.file {basename(p)}}",
+          "i" = "Expected at: {.file {v2_dir}}"
+        ))
+      }
     }
 
-    read2_lkp_table <- data.table::fread(
-      lkp_files[[1]],
-      sep = "\t",
-      colClasses = "character"
-    )
+    desc <- foreign::read.dbf(desc_path, as.is = TRUE)
+    term <- foreign::read.dbf(term_path, as.is = TRUE)
+    term198 <- foreign::read.dbf(term198_path, as.is = TRUE)
+
+    # Term.dbf has all term ids with TERM30/TERM60 (full coverage of DESC).
+    # TERM198.DBF only contains the subset of terms longer than 60 chars,
+    # so it is brought in via left join. The composed `term` column prefers
+    # TERM198 when present and falls back to TERM60.
+    read2_lkp_table <- desc |>
+      dplyr::inner_join(
+        term[, c("TERMID", "TERM30", "TERM60")],
+        by = "TERMID"
+      ) |>
+      dplyr::left_join(term198, by = "TERMID") |>
+      dplyr::mutate(
+        term = dplyr::coalesce(.data$TERM198, .data$TERM60)
+      ) |>
+      data.table::as.data.table()
+
+    ccstatus_values <- sort(unique(read2_lkp_table$CCSTATUS))
 
     read2_lkp_metadata <- lookup_metadata(
-      code_type = "read2",
+      code_type = "Read v2",
       lookup_version = version,
-      lookup_code_col = "ReadCode",
-      lookup_description_col = "Term",
-      lookup_source = source
+      lookup_code_col = "CC",
+      lookup_description_col = "term",
+      lookup_source = source,
+      preferred_description_col = "TERMTYPE",
+      preferred_description_indicator = "P",
+      col_filters = list(
+        CCSTATUS = list(
+          values = ccstatus_values,
+          defaults = "C"
+        )
+      )
     )
 
     result$read2_lkp <- list(
@@ -149,12 +177,11 @@ read_read2_trud <- function(
       "Deriving Read 2 parent-child hierarchy from code structure..."
     )
 
-    read2_relationship <- read2_lkp_table$ReadCode |>
-      # Remove trailing padding dots, preserving leading/internal dots
+    read2_relationship <- read2_lkp_table$CC |>
+      unique() |>
       stringr::str_replace("\\.+$", "") |>
       build_prefix_hierarchy_len()
 
-    # Re-pad codes to 5 chars with trailing dots
     if (nrow(read2_relationship) > 0) {
       read2_relationship <- read2_relationship |>
         dplyr::mutate(dplyr::across(
@@ -167,7 +194,7 @@ read_read2_trud <- function(
       relationship = list(
         table = read2_relationship,
         metadata = relationship_metadata(
-          code_type = "read2",
+          code_type = "Read v2",
           relationship_version = version,
           from_col = "from",
           to_col = "to",
@@ -175,84 +202,6 @@ read_read2_trud <- function(
           child_parent_relationship_code = "is a",
           relationship_source = source
         )
-      )
-    )
-  }
-
-  if ("read2_ctv3" %in% tables) {
-    cli::cli_inform("Loading Read V2 to CTV3 cross-mapping...")
-
-    r2c3_files <- list.files(
-      clinically_assured_dir,
-      pattern = "^rctctv3map_uk_",
-      full.names = TRUE
-    )
-
-    if (length(r2c3_files) == 0) {
-      cli::cli_abort(c(
-        "x" = "Could not find Read V2 to CTV3 mapping file (rctctv3map_uk_*.txt)",
-        "i" = "Expected under: {.file {clinically_assured_dir}}"
-      ))
-    }
-
-    read2_ctv3_table <- data.table::fread(
-      r2c3_files[[1]],
-      sep = "\t",
-      colClasses = "character"
-    )
-
-    read2_ctv3_metadata <- mapping_metadata(
-      from_code_type = "read2",
-      to_code_type = "read3",
-      map_version = version,
-      from_col = "V2_CONCEPTID",
-      to_col = "CTV3_CONCEPTID",
-      map_source = source
-    )
-
-    result$read2_ctv3 <- list(
-      mapping = list(
-        table = read2_ctv3_table,
-        metadata = read2_ctv3_metadata
-      )
-    )
-  }
-
-  if ("ctv3_read2" %in% tables) {
-    cli::cli_inform("Loading CTV3 to Read V2 cross-mapping...")
-
-    c3r2_files <- list.files(
-      clinically_assured_dir,
-      pattern = "^ctv3rctmap_uk_",
-      full.names = TRUE
-    )
-
-    if (length(c3r2_files) == 0) {
-      cli::cli_abort(c(
-        "x" = "Could not find CTV3 to Read V2 mapping file (ctv3rctmap_uk_*.txt)",
-        "i" = "Expected under: {.file {clinically_assured_dir}}"
-      ))
-    }
-
-    ctv3_read2_table <- data.table::fread(
-      c3r2_files[[1]],
-      sep = "\t",
-      colClasses = "character"
-    )
-
-    ctv3_read2_metadata <- mapping_metadata(
-      from_code_type = "read3",
-      to_code_type = "read2",
-      map_version = version,
-      from_col = "CTV3_CONCEPTID",
-      to_col = "V2_CONCEPTID",
-      map_source = source
-    )
-
-    result$ctv3_read2 <- list(
-      mapping = list(
-        table = ctv3_read2_table,
-        metadata = ctv3_read2_metadata
       )
     )
   }

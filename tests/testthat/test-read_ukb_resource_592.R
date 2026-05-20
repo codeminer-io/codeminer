@@ -101,7 +101,7 @@ test_that("`extend_read_v2_icd10_from_ukb592()` works as expected", {
     mapping = list(
       table = .df,
       metadata = list(
-        from_code_type = "Read 2",
+        from_code_type = "Read v2",
         to_code_type = "ICD-10"
       )
     )
@@ -117,7 +117,7 @@ test_that("`extend_read_v2_icd10_from_ukb592()` works as expected", {
   # Check metadata is preserved
   expect_equal(
     result$mapping$metadata$from_code_type,
-    "Read 2"
+    "Read v2"
   )
 
   expect_equal(
