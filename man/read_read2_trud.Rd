@@ -47,6 +47,12 @@ NHS Read Browser release (TRUD item 8), which ships the canonical Read V2
 terminology files in FoxPro DBF format under \verb{Standard/V2/}.
 }
 \details{
+The lookup is built by joining \code{DESC.DBF} (codes, term ids, \code{TERMTYPE},
+\code{CCSTATUS}) with \code{Term.dbf} (the 30- and 60-character term forms) and
+left-joining \code{TERM198.DBF} (the longer term forms, where present). A
+composed \code{term} column prefers \code{TERM198} when available and falls back to
+\code{TERM60}.
+
 All rows from the source \code{DESC.DBF} table are retained, including codes
 with \code{TERMTYPE = "S"} (synonyms) and \code{CCSTATUS != "C"} (non-active codes).
 Query-time filtering to active codes and preferred terms is handled by the

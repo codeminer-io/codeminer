@@ -114,22 +114,29 @@ read_read2_trud <- function(
       "Loading Read V2 lookup (DESC.DBF + Term.dbf + TERM198.DBF)..."
     )
 
-    desc_path <- file.path(v2_dir, "DESC.DBF")
-    term_path <- file.path(v2_dir, "Term.dbf")
-    term198_path <- file.path(v2_dir, "TERM198.DBF")
-
-    for (p in c(desc_path, term_path, term198_path)) {
-      if (!file.exists(p)) {
+    # NHS Read Browser ships these with uppercase `.DBF` extensions, but
+    # foreign::write.dbf() produces lowercase `.dbf` — so look up by
+    # case-insensitive pattern to support both real data and test fixtures.
+    find_dbf <- function(name) {
+      pattern <- paste0("^", name, "$")
+      files <- list.files(
+        v2_dir,
+        pattern = pattern,
+        full.names = TRUE,
+        ignore.case = TRUE
+      )
+      if (length(files) == 0) {
         cli::cli_abort(c(
-          "x" = "Required file not found: {.file {basename(p)}}",
+          "x" = "Required file not found: {.file {name}}",
           "i" = "Expected at: {.file {v2_dir}}"
         ))
       }
+      files[[1]]
     }
 
-    desc <- foreign::read.dbf(desc_path, as.is = TRUE)
-    term <- foreign::read.dbf(term_path, as.is = TRUE)
-    term198 <- foreign::read.dbf(term198_path, as.is = TRUE)
+    desc <- foreign::read.dbf(find_dbf("DESC.DBF"), as.is = TRUE)
+    term <- foreign::read.dbf(find_dbf("Term.dbf"), as.is = TRUE)
+    term198 <- foreign::read.dbf(find_dbf("TERM198.DBF"), as.is = TRUE)
 
     # Term.dbf has all term ids with TERM30/TERM60 (full coverage of DESC).
     # TERM198.DBF only contains the subset of terms longer than 60 chars,
