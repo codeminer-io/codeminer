@@ -45,7 +45,10 @@ A named list with elements:
 The lookup `table` has columns including `CODE`, `ALT_CODE`
 (dot-stripped, used as the primary code column), `DESCRIPTION`, and
 others from the source file. `DESCRIPTION` is augmented with
-`MODIFIER_4` or `MODIFIER_5` where present.
+`MODIFIER_4` or `MODIFIER_5` where present. The trailing `X` placeholder
+used to pad 3-char categories to a 4-char width is stripped from
+`ALT_CODE` (e.g., `J46X` becomes `J46`); the original `CODE` column is
+left unchanged.
 
 ## See also
 

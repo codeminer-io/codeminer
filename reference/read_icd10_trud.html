@@ -80,7 +80,9 @@ derived from the zip file or directory name.</p></dd>
 </ul><p>The lookup <code>table</code> has columns including <code>CODE</code>, <code>ALT_CODE</code> (dot-stripped,
 used as the primary code column), <code>DESCRIPTION</code>, and others from the source
 file. <code>DESCRIPTION</code> is augmented with <code>MODIFIER_4</code> or <code>MODIFIER_5</code> where
-present.</p>
+present. The trailing <code>X</code> placeholder used to pad 3-char categories to a
+4-char width is stripped from <code>ALT_CODE</code> (e.g., <code>J46X</code> becomes <code>J46</code>); the
+original <code>CODE</code> column is left unchanged.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
