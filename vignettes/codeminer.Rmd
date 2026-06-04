@@ -160,7 +160,7 @@ codeminer_set_version(
 
 # Pin a mapping version (use "from > to" format for the key)
 codeminer_set_version(
-  mapping = c("Read 3 > ICD-10" = "UKB v4")
+  mapping = c("Read v3 > ICD-10" = "UKB v4")
 )
 ```
 
@@ -204,7 +204,7 @@ For reproducible analysis, you can store your version pins in a configuration fi
 ```
 code_type,lookup,relationship
 ICD-10,UKB v4,UKB v4
-Read 3,UKB v4,UKB v4
+Read v3,UKB v4,UKB v4
 SNOMED CT,GPS v1,GPS v1
 ```
 
@@ -222,9 +222,9 @@ Mapping pins use a `"from > to"` key format and are best stored in a separate fi
 
 ```json
 {
-  "lookup": {"ICD-10": "UKB v4", "Read 3": "UKB v4"},
+  "lookup": {"ICD-10": "UKB v4", "Read v3": "UKB v4"},
   "relationship": {"ICD-10": "UKB v4"},
-  "mapping": {"Read 3 > ICD-10": "UKB v4"}
+  "mapping": {"Read v3 > ICD-10": "UKB v4"}
 }
 ```
 
@@ -285,7 +285,7 @@ CODES("all", type = "SNOMED CT", col_filters = list(active_concept = c("0")))
 
 An important design point: **each table type has its own independent col_filters**. This matters most for `MAP()`, which touches two table types:
 
-1. The **mapping table** (e.g., Read 3 → ICD-10) may have filters like `mapping_status`
+1. The **mapping table** (e.g., Read v3 → ICD-10) may have filters like `mapping_status`
 2. The **target lookup table** (e.g., ICD-10) may have filters like `active_concept`
 
 When you call `MAP(col_filters = ...)`, this controls only the mapping table. The target lookup table uses its own default filters when looking up descriptions. This is intentional — the two tables have different filterable columns and different semantics.

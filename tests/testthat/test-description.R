@@ -39,11 +39,11 @@ test_that("DESCRIPTION() can be configured to be case insenstive", {
 test_that("DESCRIPTION() can return codes with a secondary description that matches the search string", {
   preferred_only <- DESCRIPTION(
     "IDDM",
-    "Read 3",
+    "Read v3",
     preferred_description_only = TRUE
   )
   expect_equal(nrow(preferred_only), 1)
 
-  all_desc <- DESCRIPTION("IDDM", "Read 3", preferred_description_only = FALSE)
+  all_desc <- DESCRIPTION("IDDM", "Read v3", preferred_description_only = FALSE)
   expect_true(nrow(all_desc) > 1)
 })

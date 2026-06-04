@@ -302,7 +302,7 @@ codeminer_init_extra <- function(path) {
 #' [codeminer_clear_versions()] or [codeminer_disconnect()].
 #'
 #' @param lookup Named character vector of lookup versions, keyed by code type.
-#'   E.g. `c("ICD-10" = "v42", "Read 3" = "v1")`.
+#'   E.g. `c("ICD-10" = "v42", "Read v3" = "v1")`.
 #' @param relationship Named character vector of relationship versions, keyed
 #'   by code type.
 #' @param mapping Named character vector of mapping versions, keyed by
@@ -327,7 +327,7 @@ codeminer_init_extra <- function(path) {
 #' \dontrun{
 #' # Pin lookup versions for multiple code types
 #' codeminer_set_version(
-#'   lookup = c("ICD-10" = "v42", "Read 3" = "v1")
+#'   lookup = c("ICD-10" = "v42", "Read v3" = "v1")
 #' )
 #'
 #' # Pin mapping version for a specific pair

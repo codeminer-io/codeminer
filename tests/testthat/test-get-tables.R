@@ -54,12 +54,12 @@ test_that("get_lookup_table() col_filters = NULL returns unfiltered", {
 # get_mapping_table() -------------------------------------------------------
 
 test_that("get_mapping_table() returns a lazy tbl without explicit con", {
-  result <- get_mapping_table("Read 3", "ICD-10")
+  result <- get_mapping_table("Read v3", "ICD-10")
   expect_s3_class(result, "tbl_lazy")
 })
 
 test_that("get_mapping_table() returns standardised columns plus extras", {
-  result <- get_mapping_table("Read 3", "ICD-10") |> dplyr::collect()
+  result <- get_mapping_table("Read v3", "ICD-10") |> dplyr::collect()
   expect_true(all(c("from", "to") %in% names(result)))
   expect_true(nrow(result) > 0)
   # Should have more columns than just from/to
@@ -68,7 +68,7 @@ test_that("get_mapping_table() returns standardised columns plus extras", {
 
 test_that("get_mapping_table() respects explicit version", {
   result <- get_mapping_table(
-    "Read 3",
+    "Read v3",
     "ICD-10",
     map_version = "UKB v4"
   ) |>
@@ -78,7 +78,7 @@ test_that("get_mapping_table() respects explicit version", {
 
 test_that("get_mapping_table() resolves 'latest' version", {
   result <- get_mapping_table(
-    "Read 3",
+    "Read v3",
     "ICD-10",
     map_version = "latest"
   ) |>
@@ -88,7 +88,7 @@ test_that("get_mapping_table() resolves 'latest' version", {
 
 test_that("get_mapping_table() accepts explicit con", {
   con <- connect_to_db()
-  result <- get_mapping_table("Read 3", "ICD-10", con = con) |>
+  result <- get_mapping_table("Read v3", "ICD-10", con = con) |>
     dplyr::collect()
   expect_true(nrow(result) > 0)
 })
@@ -98,8 +98,8 @@ test_that("get_mapping_table() errors for unknown code types", {
 })
 
 test_that("get_mapping_table() col_filters = NULL returns unfiltered", {
-  filtered <- get_mapping_table("Read 3", "ICD-10") |> dplyr::collect()
-  unfiltered <- get_mapping_table("Read 3", "ICD-10", col_filters = NULL) |>
+  filtered <- get_mapping_table("Read v3", "ICD-10") |> dplyr::collect()
+  unfiltered <- get_mapping_table("Read v3", "ICD-10", col_filters = NULL) |>
     dplyr::collect()
   expect_gte(nrow(unfiltered), nrow(filtered))
 })
@@ -180,8 +180,8 @@ test_that("SNOMED CT lookup has active_description col_filter", {
 })
 
 test_that("Read 2 -> ICD-10 col_filter excludes icd10_code_def '2'", {
-  default <- get_mapping_table("Read 2", "ICD-10") |> dplyr::collect()
-  unfiltered <- get_mapping_table("Read 2", "ICD-10", col_filters = NULL) |>
+  default <- get_mapping_table("Read v2", "ICD-10") |> dplyr::collect()
+  unfiltered <- get_mapping_table("Read v2", "ICD-10", col_filters = NULL) |>
     dplyr::collect()
   # Dummy data has icd10_code_def == 2 rows that should be excluded by default
   expect_gt(nrow(unfiltered), nrow(default))
@@ -190,16 +190,16 @@ test_that("Read 2 -> ICD-10 col_filter excludes icd10_code_def '2'", {
 })
 
 test_that("Read 2 -> Read 3 col_filter keeps only IS_ASSURED == 1", {
-  default <- get_mapping_table("Read 2", "Read 3") |> dplyr::collect()
-  unfiltered <- get_mapping_table("Read 2", "Read 3", col_filters = NULL) |>
+  default <- get_mapping_table("Read v2", "Read v3") |> dplyr::collect()
+  unfiltered <- get_mapping_table("Read v2", "Read v3", col_filters = NULL) |>
     dplyr::collect()
   expect_gt(nrow(unfiltered), nrow(default))
   expect_true(all(as.character(default$IS_ASSURED) == "1"))
 })
 
 test_that("Read 3 -> ICD-10 col_filter applies mapping_status filter", {
-  default <- get_mapping_table("Read 3", "ICD-10") |> dplyr::collect()
-  unfiltered <- get_mapping_table("Read 3", "ICD-10", col_filters = NULL) |>
+  default <- get_mapping_table("Read v3", "ICD-10") |> dplyr::collect()
+  unfiltered <- get_mapping_table("Read v3", "ICD-10", col_filters = NULL) |>
     dplyr::collect()
   expect_gt(nrow(unfiltered), nrow(default))
   # Default keeps only E, G, D
@@ -207,8 +207,8 @@ test_that("Read 3 -> ICD-10 col_filter applies mapping_status filter", {
 })
 
 test_that("Read 3 -> Read 2 col_filter keeps only IS_ASSURED == 1", {
-  default <- get_mapping_table("Read 3", "Read 2") |> dplyr::collect()
-  unfiltered <- get_mapping_table("Read 3", "Read 2", col_filters = NULL) |>
+  default <- get_mapping_table("Read v3", "Read v2") |> dplyr::collect()
+  unfiltered <- get_mapping_table("Read v3", "Read v2", col_filters = NULL) |>
     dplyr::collect()
   expect_gt(nrow(unfiltered), nrow(default))
   expect_true(all(as.character(default$IS_ASSURED) == "1"))
@@ -223,7 +223,7 @@ test_that("CODES() still works after get_lookup_table() refactor", {
 })
 
 test_that("MAP() still works after get_mapping_table() refactor", {
-  result <- MAP("X40J4", from = "Read 3", to = "ICD-10")
+  result <- MAP("X40J4", from = "Read v3", to = "ICD-10")
   expect_s3_class(result, "codeminer_codelist")
   expect_true(nrow(result) > 0)
 })

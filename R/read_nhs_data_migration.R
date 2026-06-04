@@ -1,7 +1,7 @@
 #' Read NHS Data Migration mapping tables into R
 #'
-#' Reads the clinically assured Read V2 and CTV3 to SNOMED CT mapping tables
-#' from the NHS Data Migration release.
+#' Reads the clinically assured Read V2 ↔ CTV3 ↔ SNOMED CT mapping tables
+#' from the NHS Data Migration release (TRUD item 9).
 #'
 #' @param path Path to the NHS Data Migration release. Can be:
 #'   * A **zip file** (e.g., from [get_nhs_data_migration()])
@@ -9,8 +9,10 @@
 #' @param tables Character vector of table names to read. Available tables:
 #'   * `"ctv3sctmap2"` — CTV3 (Read 3) to SNOMED CT clinically assured mapping
 #'   * `"rcsctmap2"` — Read V2 to SNOMED CT clinically assured mapping
+#'   * `"read2_ctv3"` — Read V2 to CTV3 (Read 3) cross-mapping
+#'   * `"ctv3_read2"` — CTV3 (Read 3) to Read V2 cross-mapping
 #'
-#'   By default, both tables are read.
+#'   By default, all tables are read.
 #' @param version Character string for the version label. If `NULL` (default),
 #'   derived from the zip file or directory name.
 #' @param source Character string for the data source URL or description.
@@ -27,16 +29,18 @@
 #' result <- read_nhs_data_migration(path)
 #' result$ctv3sctmap2$mapping$table
 #' result$rcsctmap2$mapping$table
+#' result$read2_ctv3$mapping$table
+#' result$ctv3_read2$mapping$table
 #' }
 read_nhs_data_migration <- function(
   path,
-  tables = c("ctv3sctmap2", "rcsctmap2"),
+  tables = c("ctv3sctmap2", "rcsctmap2", "read2_ctv3", "ctv3_read2"),
   version = NULL,
   source = "https://isd.digital.nhs.uk/trud/users/guest/filters/0/categories/9/items/9/releases"
 ) {
   rlang::arg_match(
     tables,
-    values = c("ctv3sctmap2", "rcsctmap2"),
+    values = c("ctv3sctmap2", "rcsctmap2", "read2_ctv3", "ctv3_read2"),
     multiple = TRUE
   )
 
@@ -97,45 +101,67 @@ read_nhs_data_migration <- function(
     ))
   }
 
-  # Known file names for the two tables
-  file_map <- c(
-    ctv3sctmap2 = "ctv3sctmap2_uk_20200401000001.txt",
-    rcsctmap2 = "rcsctmap2_uk_20200401000001.txt"
+  # File name patterns for each table (date suffix varies between releases)
+  file_patterns <- c(
+    ctv3sctmap2 = "^ctv3sctmap2_uk_",
+    rcsctmap2 = "^rcsctmap2_uk_",
+    read2_ctv3 = "^rctctv3map_uk_",
+    ctv3_read2 = "^ctv3rctmap_uk_"
   )
 
   result <- list()
 
   for (tbl in tables) {
-    file_path <- file.path(clinically_assured_dir, file_map[[tbl]])
+    matched <- list.files(
+      clinically_assured_dir,
+      pattern = file_patterns[[tbl]],
+      full.names = TRUE
+    )
 
-    if (!file.exists(file_path)) {
+    if (length(matched) == 0) {
       cli::cli_abort(c(
-        "x" = "File not found: {.file {file_map[[tbl]]}}",
-        "i" = "Expected at: {.file {clinically_assured_dir}}"
+        "x" = "Could not find {.val {tbl}} file (pattern: {.val {file_patterns[[tbl]]}})",
+        "i" = "Expected under: {.file {clinically_assured_dir}}"
       ))
     }
 
     tbl_data <- data.table::fread(
-      file_path,
+      matched[[1]],
       sep = "\t",
       colClasses = "character"
     )
 
-    if (tbl == "ctv3sctmap2") {
-      meta <- mapping_metadata(
-        from_code_type = "read3",
+    meta <- switch(
+      tbl,
+      ctv3sctmap2 = mapping_metadata(
+        from_code_type = "Read v3",
         to_code_type = "sct",
         map_version = version,
         map_source = source
-      )
-    } else {
-      meta <- mapping_metadata(
-        from_code_type = "read2",
+      ),
+      rcsctmap2 = mapping_metadata(
+        from_code_type = "Read v2",
         to_code_type = "sct",
         map_version = version,
         map_source = source
+      ),
+      read2_ctv3 = mapping_metadata(
+        from_code_type = "Read v2",
+        to_code_type = "Read v3",
+        map_version = version,
+        from_col = "V2_CONCEPTID",
+        to_col = "CTV3_CONCEPTID",
+        map_source = source
+      ),
+      ctv3_read2 = mapping_metadata(
+        from_code_type = "Read v3",
+        to_code_type = "Read v2",
+        map_version = version,
+        from_col = "CTV3_CONCEPTID",
+        to_col = "V2_CONCEPTID",
+        map_source = source
       )
-    }
+    )
 
     result[[tbl]] <- list(
       mapping = list(

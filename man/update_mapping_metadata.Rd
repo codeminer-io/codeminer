@@ -13,7 +13,7 @@ update_mapping_metadata(
 )
 }
 \arguments{
-\item{from_code_type}{The source coding system (e.g. \code{"Read 3"}).}
+\item{from_code_type}{The source coding system (e.g. \code{"Read v3"}).}
 
 \item{to_code_type}{The target coding system (e.g. \code{"ICD-10"}).}
 

@@ -8,7 +8,7 @@ codeminer_set_version(lookup = NULL, relationship = NULL, mapping = NULL)
 }
 \arguments{
 \item{lookup}{Named character vector of lookup versions, keyed by code type.
-E.g. \code{c("ICD-10" = "v42", "Read 3" = "v1")}.}
+E.g. \code{c("ICD-10" = "v42", "Read v3" = "v1")}.}
 
 \item{relationship}{Named character vector of relationship versions, keyed
 by code type.}
@@ -40,7 +40,7 @@ New pins are merged with existing ones. To replace all pins, call
 \dontrun{
 # Pin lookup versions for multiple code types
 codeminer_set_version(
-  lookup = c("ICD-10" = "v42", "Read 3" = "v1")
+  lookup = c("ICD-10" = "v42", "Read v3" = "v1")
 )
 
 # Pin mapping version for a specific pair

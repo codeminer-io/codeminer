@@ -82,7 +82,7 @@ create_dummy_database()
 Look up Read 3 codes for hypertension:
 
 ``` r
-htn_read3 <- DESCRIPTION("Hypertension", code_type = "Read 3")
+htn_read3 <- DESCRIPTION("Hypertension", code_type = "Read v3")
 #> ℹ Using 'UKB v4' as latest version
 #> ℹ Using 'UKB v4' as latest version
 htn_read3
@@ -97,7 +97,7 @@ Map these to ICD10:
 ``` r
 htn_icd10 <- MAP(
   codes = htn_read3$code,
-  from = "Read 3",
+  from = "Read v3",
   to = "ICD-10"
 )
 #> ℹ Using 'UKB v4' as latest version

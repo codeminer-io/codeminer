@@ -23,8 +23,8 @@ test_that("add_read3_trud() adds both tables to database", {
   suppressMessages(add_read3_trud(path = dir, version = "test_v1"))
 
   con <- connect_to_db()
-  expect_true(table_exists(con, "read3_test_v1"))
-  expect_true(table_exists(con, "read3_relationship_test_v1"))
+  expect_true(table_exists(con, "Read v3_test_v1"))
+  expect_true(table_exists(con, "Read v3_relationship_test_v1"))
 })
 
 test_that("add_read3_trud() tables argument passed through to read_read3_trud()", {

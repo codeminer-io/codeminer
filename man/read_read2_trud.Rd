@@ -6,29 +6,27 @@
 \usage{
 read_read2_trud(
   path,
-  tables = c("read2_lkp", "read2_relationship", "read2_ctv3", "ctv3_read2"),
+  tables = c("read2_lkp", "read2_relationship"),
   version = NULL,
   source =
-    "https://isd.digital.nhs.uk/trud/users/guest/filters/0/categories/9/items/9/releases"
+    "https://isd.digital.nhs.uk/trud/users/authenticated/filters/0/categories/9/items/8/releases"
 )
 }
 \arguments{
-\item{path}{Path to the NHS Data Migration release. Can be:
+\item{path}{Path to the NHS Read Browser release. Can be:
 \itemize{
 \item A \strong{zip file} (e.g., from \code{\link[=get_read2_trud]{get_read2_trud()}})
-\item An \strong{unzipped directory} containing the \verb{Mapping Tables} subdirectory
+\item An \strong{unzipped directory} containing the \code{Standard/V2} subdirectory
 }}
 
 \item{tables}{Character vector of table names to read. Available tables:
 \itemize{
-\item \code{"read2_lkp"} — Read V2 lookup (codes and descriptions)
+\item \code{"read2_lkp"} — Read V2 lookup (codes, descriptions, term type, status)
 \item \code{"read2_relationship"} — parent-child hierarchy derived from code
 structure (requires \code{"read2_lkp"})
-\item \code{"read2_ctv3"} — Read V2 to CTV3 cross-mapping
-\item \code{"ctv3_read2"} — CTV3 to Read V2 cross-mapping
 }
 
-By default, all tables are read.}
+By default, both tables are read.}
 
 \item{version}{Character string for the version label. If \code{NULL} (default),
 derived from the zip file or directory name.}
@@ -39,23 +37,40 @@ derived from the zip file or directory name.}
 A named list with elements corresponding to requested tables, each
 containing:
 \itemize{
-\item \code{lookup} or \code{mapping}: a list with \code{table} (data.table) and \code{metadata}
-(list)
+\item \code{lookup} or \code{relationship}: a list with \code{table} (data.table) and
+\code{metadata} (list)
 }
 }
 \description{
-Reads the Read V2 lookup and Read 2/CTV3 cross-mapping tables from a local
-copy of the NHS Data Migration release (TRUD item 9).
+Reads the Read V2 lookup and relationship tables from a local copy of the
+NHS Read Browser release (TRUD item 8), which ships the canonical Read V2
+terminology files in FoxPro DBF format under \verb{Standard/V2/}.
+}
+\details{
+The lookup is built by joining \code{DESC.DBF} (codes, term ids, \code{TERMTYPE},
+\code{CCSTATUS}) with \code{Term.dbf} (the 30- and 60-character term forms) and
+left-joining \code{TERM198.DBF} (the longer term forms, where present). A
+composed \code{term} column prefers \code{TERM198} when available and falls back to
+\code{TERM60}.
+
+All rows from the source \code{DESC.DBF} table are retained, including codes
+with \code{TERMTYPE = "S"} (synonyms) and \code{CCSTATUS != "C"} (non-active codes).
+Query-time filtering to active codes and preferred terms is handled by the
+\code{preferred_description_col} and \code{col_filters} entries in the lookup
+metadata.
+
+The Read 2 ↔ CTV3 mapping tables (\code{rctctv3map_uk}, \code{ctv3rctmap_uk}) live in
+the NHS Data Migration release (TRUD item 9) and are available via
+\code{\link[=read_nhs_data_migration]{read_nhs_data_migration()}}.
 }
 \examples{
 \dontrun{
 path <- get_read2_trud()
 result <- read_read2_trud(path)
 result$read2_lkp$lookup$table
-result$read2_ctv3$mapping$table
-result$ctv3_read2$mapping$table
+result$read2_relationship$relationship$table
 }
 }
 \seealso{
-\code{\link[=add_read2_trud]{add_read2_trud()}}, \code{\link[=get_read2_trud]{get_read2_trud()}}
+\code{\link[=add_read2_trud]{add_read2_trud()}}, \code{\link[=get_read2_trud]{get_read2_trud()}}, \code{\link[=read_nhs_data_migration]{read_nhs_data_migration()}}
 }

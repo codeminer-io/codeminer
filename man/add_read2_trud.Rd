@@ -6,19 +6,19 @@
 \usage{
 add_read2_trud(
   path = get_read2_trud(),
-  tables = c("read2_lkp", "read2_relationship", "read2_ctv3", "ctv3_read2"),
+  tables = c("read2_lkp", "read2_relationship"),
   version = NULL,
   source =
-    "https://isd.digital.nhs.uk/trud/users/guest/filters/0/categories/9/items/9/releases"
+    "https://isd.digital.nhs.uk/trud/users/authenticated/filters/0/categories/9/items/8/releases"
 )
 }
 \arguments{
-\item{path}{Path to the NHS Data Migration release (zip file or unzipped
+\item{path}{Path to the NHS Read Browser release (zip file or unzipped
 directory). Default uses \code{\link[=get_read2_trud]{get_read2_trud()}} to download the latest
 release.}
 
 \item{tables}{Character vector of table names to add. See
-\code{\link[=read_read2_trud]{read_read2_trud()}} for available tables. By default, adds all three
+\code{\link[=read_read2_trud]{read_read2_trud()}} for available tables. By default, adds both
 tables.}
 
 \item{version}{Character string for the version label. If \code{NULL} (default),
@@ -31,10 +31,14 @@ Invisibly returns the result from \code{\link[=read_read2_trud]{read_read2_trud(
 list of tables with metadata).
 }
 \description{
-Reads Read V2 lookup, relationship, and cross-mapping files from the NHS
-Data Migration release and adds them to the active CodeMiner database. This
-is a convenience wrapper around \code{\link[=read_read2_trud]{read_read2_trud()}} that automatically calls
-\code{\link[=add_lookup_table]{add_lookup_table()}}, \code{\link[=add_relationship_table]{add_relationship_table()}}, and \code{\link[=add_mapping_table]{add_mapping_table()}}.
+Reads Read V2 lookup and relationship files from the NHS Read Browser
+release (TRUD item 8) and adds them to the active CodeMiner database. This
+is a convenience wrapper around \code{\link[=read_read2_trud]{read_read2_trud()}} that automatically
+calls \code{\link[=add_lookup_table]{add_lookup_table()}} and \code{\link[=add_relationship_table]{add_relationship_table()}}.
+}
+\details{
+The Read 2 ↔ CTV3 cross-mapping tables (\code{rctctv3map_uk}, \code{ctv3rctmap_uk})
+live in TRUD item 9 and are added via \code{\link[=add_nhs_data_migration]{add_nhs_data_migration()}}.
 }
 \examples{
 \dontrun{
@@ -44,5 +48,5 @@ add_read2_trud(tables = "read2_lkp")
 }
 }
 \seealso{
-\code{\link[=read_read2_trud]{read_read2_trud()}}, \code{\link[=get_read2_trud]{get_read2_trud()}}
+\code{\link[=read_read2_trud]{read_read2_trud()}}, \code{\link[=get_read2_trud]{get_read2_trud()}}, \code{\link[=add_nhs_data_migration]{add_nhs_data_migration()}}
 }

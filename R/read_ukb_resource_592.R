@@ -569,7 +569,7 @@ process_read_v2_lkp <- function(.df, ukb_version, ukb_source) {
     lookup = list(
       table = .df,
       metadata = lookup_metadata(
-        code_type = "Read 2",
+        code_type = "Read v2",
         lookup_version = ukb_version,
         lookup_code_col = "read_code",
         lookup_description_col = "term_description",
@@ -581,7 +581,7 @@ process_read_v2_lkp <- function(.df, ukb_version, ukb_source) {
     relationship = list(
       table = relationship,
       metadata = relationship_metadata(
-        code_type = "Read 2",
+        code_type = "Read v2",
         relationship_version = ukb_version,
         from_col = "from",
         to_col = "to",
@@ -598,7 +598,7 @@ process_read_v2_drugs_lkp <- function(.df, ukb_version, ukb_source) {
     lookup = list(
       table = .df,
       metadata = lookup_metadata(
-        code_type = "Read 2, drugs",
+        code_type = "Read v2 drugs",
         lookup_version = ukb_version,
         lookup_code_col = "read_code",
         lookup_description_col = "term_description",
@@ -615,7 +615,7 @@ process_read_v2_drugs_bnf <- function(.df, ukb_version, ukb_source) {
     mapping = list(
       table = .df,
       metadata = mapping_metadata(
-        from_code_type = "Read 2, drugs",
+        from_code_type = "Read v2 drugs",
         to_code_type = "BNF",
         map_version = ukb_version,
         from_col = "read_code",
@@ -631,7 +631,7 @@ process_read_v2_icd9 <- function(.df, ukb_version, ukb_source) {
     mapping = list(
       table = .df,
       metadata = mapping_metadata(
-        from_code_type = "Read 2",
+        from_code_type = "Read v2",
         to_code_type = "ICD-9",
         map_version = ukb_version,
         from_col = "read_code",
@@ -647,7 +647,7 @@ process_read_v2_icd10 <- function(.df, ukb_version, ukb_source) {
     mapping = list(
       table = .df,
       metadata = mapping_metadata(
-        from_code_type = "Read 2",
+        from_code_type = "Read v2",
         to_code_type = "ICD-10",
         map_version = ukb_version,
         from_col = "read_code",
@@ -669,7 +669,7 @@ process_read_v2_opcs4 <- function(.df, ukb_version, ukb_source) {
     mapping = list(
       table = .df,
       metadata = mapping_metadata(
-        from_code_type = "Read 2",
+        from_code_type = "Read v2",
         to_code_type = "OPCS4",
         map_version = ukb_version,
         from_col = "read_code",
@@ -685,8 +685,8 @@ process_read_v2_read_ctv3 <- function(.df, ukb_version, ukb_source) {
     mapping = list(
       table = .df,
       metadata = mapping_metadata(
-        from_code_type = "Read 2",
-        to_code_type = "Read 3",
+        from_code_type = "Read v2",
+        to_code_type = "Read v3",
         map_version = ukb_version,
         from_col = "READV2_CODE",
         to_col = "READV3_CODE",
@@ -704,7 +704,7 @@ process_read_ctv3_lkp <- function(.df, ukb_version, ukb_source) {
     lookup = list(
       table = .df,
       metadata = lookup_metadata(
-        code_type = "Read 3",
+        code_type = "Read v3",
         lookup_version = ukb_version,
         lookup_code_col = "read_code",
         lookup_description_col = "term_description",
@@ -721,7 +721,7 @@ process_read_ctv3_icd9 <- function(.df, ukb_version, ukb_source) {
     mapping = list(
       table = .df,
       metadata = mapping_metadata(
-        from_code_type = "Read 3",
+        from_code_type = "Read v3",
         to_code_type = "ICD-9",
         map_version = ukb_version,
         from_col = "read_code",
@@ -762,7 +762,7 @@ process_read_ctv3_icd10 <- function(.df, ukb_version, ukb_source) {
     mapping = list(
       table = .df,
       metadata = mapping_metadata(
-        from_code_type = "Read 3",
+        from_code_type = "Read v3",
         to_code_type = "ICD-10",
         map_version = ukb_version,
         from_col = "read_code",
@@ -796,7 +796,7 @@ process_read_ctv3_opcs4 <- function(.df, ukb_version, ukb_source) {
     mapping = list(
       table = .df,
       metadata = mapping_metadata(
-        from_code_type = "Read 3",
+        from_code_type = "Read v3",
         to_code_type = "OPCS4",
         map_version = ukb_version,
         from_col = "read_code",
@@ -812,8 +812,8 @@ process_read_ctv3_read_v2 <- function(.df, ukb_version, ukb_source) {
     mapping = list(
       table = .df,
       metadata = mapping_metadata(
-        from_code_type = "Read 3",
-        to_code_type = "Read 2",
+        from_code_type = "Read v3",
+        to_code_type = "Read v2",
         map_version = ukb_version,
         from_col = "READV3_CODE",
         to_col = "READV2_CODE",

@@ -84,7 +84,7 @@ test_that("collect_codes_input validates type matches codelist", {
 
   # Should error with conflicting type
   expect_error(
-    collect_codes_input(cl, type = "Read 3"),
+    collect_codes_input(cl, type = "Read v3"),
     "Conflicting.*type"
   )
 })

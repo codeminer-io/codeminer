@@ -35,8 +35,8 @@ add_read3_trud <- function(
   }
 
   expected_names <- c(
-    read3_lkp = paste("read3", version, sep = "_"),
-    read3_relationship = paste("read3", "relationship", version, sep = "_")
+    read3_lkp = paste("Read v3", version, sep = "_"),
+    read3_relationship = paste("Read v3", "relationship", version, sep = "_")
   )
   expected_types <- c(
     read3_lkp = "lookup",

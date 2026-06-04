@@ -1,44 +1,108 @@
-test_that("get_read2_trud() delegates to get_nhs_data_migration()", {
-  called_with <- list()
+test_that("get_read2_trud() validates release argument", {
+  expect_error(
+    get_read2_trud(release = c("latest", "other")),
+    "must be a non-empty character string"
+  )
+  expect_error(
+    get_read2_trud(release = ""),
+    "must be a non-empty character string"
+  )
+  expect_error(
+    get_read2_trud(release = 123),
+    "must be a non-empty character string"
+  )
+})
+
+test_that("get_read2_trud() validates dir_path exists", {
+  expect_error(
+    get_read2_trud(dir_path = "/nonexistent/path"),
+    "Directory does not exist"
+  )
+})
+
+test_that("get_read2_trud() skips download if zip exists", {
+  temp_dir <- withr::local_tempdir()
+  dummy_zip <- file.path(temp_dir, "nhs_readbrowser.zip")
+  file.create(dummy_zip)
 
   local_mocked_bindings(
-    get_nhs_data_migration = function(dir_path, release, overwrite, quiet) {
-      called_with <<- list(
-        dir_path = dir_path,
-        release = release,
-        overwrite = overwrite,
-        quiet = quiet
-      )
-      invisible("dummy_path.zip")
+    get_item_metadata = function(item, release_scope) {
+      mock_trud_metadata("nhs_readbrowser.zip")
     },
-    .package = "codeminer"
+    .package = "trud"
   )
 
   result <- get_read2_trud(
-    dir_path = tempdir(),
-    release = "latest",
+    dir_path = temp_dir,
     overwrite = FALSE,
     quiet = TRUE
   )
 
-  expect_identical(result, "dummy_path.zip")
-  expect_equal(called_with$dir_path, tempdir())
-  expect_equal(called_with$release, "latest")
-  expect_false(called_with$overwrite)
-  expect_true(called_with$quiet)
+  expect_type(result, "character")
+  expect_true(file.exists(result))
+  expect_identical(result, dummy_zip)
 })
 
-test_that("get_read2_trud() passes overwrite = TRUE to get_nhs_data_migration()", {
-  called_overwrite <- NULL
+test_that("get_read2_trud() downloads when file absent", {
+  temp_dir <- withr::local_tempdir()
 
   local_mocked_bindings(
-    get_nhs_data_migration = function(dir_path, release, overwrite, quiet) {
-      called_overwrite <<- overwrite
-      invisible("dummy.zip")
+    get_item_metadata = function(item, release_scope) {
+      mock_trud_metadata("nhs_readbrowser.zip")
     },
-    .package = "codeminer"
+    download_item = function(item, directory, release, overwrite) {
+      zip <- file.path(directory, "nhs_readbrowser.zip")
+      file.create(zip)
+      invisible(zip)
+    },
+    .package = "trud"
   )
 
-  get_read2_trud(overwrite = TRUE, quiet = TRUE)
-  expect_true(called_overwrite)
+  result <- get_read2_trud(dir_path = temp_dir, quiet = TRUE)
+
+  expect_type(result, "character")
+  expect_true(file.exists(result))
+})
+
+test_that("get_read2_trud() re-downloads when overwrite = TRUE", {
+  temp_dir <- withr::local_tempdir()
+  dummy_zip <- file.path(temp_dir, "nhs_readbrowser.zip")
+  file.create(dummy_zip)
+
+  download_called <- FALSE
+
+  local_mocked_bindings(
+    get_item_metadata = function(item, release_scope) {
+      mock_trud_metadata("nhs_readbrowser.zip")
+    },
+    download_item = function(item, directory, release, overwrite) {
+      download_called <<- TRUE
+      invisible(file.path(directory, "nhs_readbrowser.zip"))
+    },
+    .package = "trud"
+  )
+
+  get_read2_trud(dir_path = temp_dir, overwrite = TRUE, quiet = TRUE)
+
+  expect_true(download_called)
+})
+
+test_that("get_read2_trud() errors when specific release not found", {
+  temp_dir <- withr::local_tempdir()
+
+  local_mocked_bindings(
+    get_item_metadata = function(item, release_scope) {
+      mock_trud_metadata("nhs_readbrowser.zip")
+    },
+    .package = "trud"
+  )
+
+  expect_error(
+    get_read2_trud(
+      dir_path = temp_dir,
+      release = "nonexistent",
+      quiet = TRUE
+    ),
+    "not found"
+  )
 })

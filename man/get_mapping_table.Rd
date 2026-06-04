@@ -44,7 +44,7 @@ returned by \code{\link[=MAP]{MAP()}}.
 create_dummy_database()
 
 # Get the full Read 3 to ICD-10 mapping table
-get_mapping_table("Read 3", "ICD-10") |> dplyr::collect()
+get_mapping_table("Read v3", "ICD-10") |> dplyr::collect()
 }
 \seealso{
 \code{\link[=MAP]{MAP()}} for standardised codelist output,
