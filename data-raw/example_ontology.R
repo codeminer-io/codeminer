@@ -77,6 +77,7 @@ create_example_data <- function() {
     lookup_version = versions,
     lookup_code_col = "code",
     lookup_description_col = "description",
+    lookup_category_col = NA_character_,
     lookup_source = "example_data",
     preferred_description_col = NA_character_,
     preferred_description_indicator = NA_character_
@@ -87,6 +88,7 @@ create_example_data <- function() {
     lookup_version = versions,
     lookup_code_col = "code",
     lookup_description_col = "description",
+    lookup_category_col = NA_character_,
     lookup_source = "example_data",
     preferred_description_col = NA_character_,
     preferred_description_indicator = NA_character_

@@ -14,6 +14,68 @@ test_that("find_snomed_file errors on missing file", {
   expect_error(find_snomed_file(tmp, "MissingFile"), "Could not find file")
 })
 
+test_that("snomed_attach_category derives category from active FSN", {
+  tbl <- data.frame(
+    conceptId = c("1", "1", "2", "2"),
+    typeId_description = c(
+      "900000000000003001", # FSN
+      "900000000000013009", # synonym
+      "900000000000003001",
+      "900000000000013009"
+    ),
+    term_description = c(
+      "Hypertensive disorder (disorder)",
+      "Hypertensive disorder",
+      "Has active ingredient (attribute)",
+      "Has active ingredient"
+    ),
+    active_description = c("1", "1", "1", "1"),
+    active_concept = c("1", "1", "1", "1"),
+    stringsAsFactors = FALSE
+  )
+
+  out <- snomed_attach_category(tbl)
+
+  expect_equal(
+    out$category,
+    c("Disorder", "Disorder", "Attribute", "Attribute")
+  )
+})
+
+test_that("snomed_attach_category marks inactive concepts as 'Inactive'", {
+  tbl <- data.frame(
+    conceptId = c("1", "2"),
+    typeId_description = c("900000000000003001", "900000000000003001"),
+    term_description = c(
+      "Retired disorder (disorder)",
+      "Active disorder (disorder)"
+    ),
+    active_description = c("0", "1"),
+    active_concept = c("0", "1"),
+    stringsAsFactors = FALSE
+  )
+
+  out <- snomed_attach_category(tbl)
+
+  expect_equal(out$category[out$conceptId == "1"], "Inactive")
+  expect_equal(out$category[out$conceptId == "2"], "Disorder")
+})
+
+test_that("snomed_attach_category returns NA for FSNs with no parenthetical", {
+  tbl <- data.frame(
+    conceptId = "1",
+    typeId_description = "900000000000003001",
+    term_description = "Hypertensive disorder",
+    active_description = "1",
+    active_concept = "1",
+    stringsAsFactors = FALSE
+  )
+
+  out <- snomed_attach_category(tbl)
+
+  expect_true(is.na(out$category))
+})
+
 # Main function tests -----------------------------------------------------
 
 test_that("read_snomed_ct_uk_monolith() returns all tables by default", {
@@ -59,6 +121,26 @@ test_that("read_snomed_ct_uk_monolith() tables argument works", {
   expect_equal(names(result), c("sct_lookup", "sct_icd10"))
   expect_false("sct_relationship" %in% names(result))
   expect_false("sct_opcs4" %in% names(result))
+})
+
+test_that("read_snomed_ct_uk_monolith() attaches FSN-derived category to lookup", {
+  result <- suppressMessages(
+    read_snomed_ct_uk_monolith(
+      dummy_snomed_ct_uk_monolith_path(),
+      tables = "sct_lookup"
+    )
+  )
+
+  tbl <- result$sct_lookup$lookup$table
+  meta <- result$sct_lookup$lookup$metadata
+
+  expect_true("category" %in% names(tbl))
+  expect_equal(meta$lookup_category_col, "category")
+
+  # Both the FSN and synonym rows for MS should carry the FSN-derived category
+  ms_rows <- tbl[tbl$conceptId == "24700007", ]
+  expect_true(nrow(ms_rows) >= 1)
+  expect_true(all(ms_rows$category == "Disorder"))
 })
 
 test_that("read_snomed_ct_uk_monolith() filters mappings correctly", {

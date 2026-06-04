@@ -304,9 +304,9 @@ CODES_LIKE <- function(
 #' Get the full lookup table for a code type
 #'
 #' Returns a lazy `dplyr::tbl()` containing the lookup table with standardised
-#' column names (`code`, `description`, `code_type`, `preferred_description`)
-#' plus all additional columns from the underlying database table. Call
-#' [dplyr::collect()] to materialise the result.
+#' column names (`code`, `description`, `code_type`, `preferred_description`,
+#' `category`) plus all additional columns from the underlying database table.
+#' Call [dplyr::collect()] to materialise the result.
 #'
 #' This is useful for inspecting columns beyond the standard codelist output
 #' returned by [CODES()] and [DESCRIPTION()].
@@ -319,8 +319,9 @@ CODES_LIKE <- function(
 #' @param call The calling environment. Passed to [codeminer_abort].
 #'
 #' @return A lazy `dplyr::tbl()` with standardised columns (`code`,
-#'   `description`, `code_type`, `preferred_description`) plus all other
-#'   columns from the underlying table.
+#'   `description`, `code_type`, `preferred_description`, `category`) plus all
+#'   other columns from the underlying table. `category` is `NA` for code
+#'   systems without a populated category source.
 #' @export
 #' @family Clinical code lookups and mappings
 #' @seealso [CODES()] for standardised codelist output,
@@ -373,6 +374,17 @@ get_lookup_table <- function(
     )
   } else {
     tbl <- dplyr::mutate(tbl, preferred_description = TRUE)
+  }
+
+  if (!is.na(this_meta$lookup_category_col)) {
+    tbl <- dplyr::rename(
+      tbl,
+      category = .env$this_meta$lookup_category_col,
+    )
+  } else {
+    # CAST through SQL so DuckDB types the column as VARCHAR rather than
+    # inferring INTEGER from an untyped NULL literal.
+    tbl <- dplyr::mutate(tbl, category = dplyr::sql("CAST(NULL AS VARCHAR)"))
   }
 
   return(tbl)

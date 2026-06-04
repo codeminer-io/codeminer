@@ -26,14 +26,15 @@ workbench connection.}
 }
 \value{
 A lazy \code{dplyr::tbl()} with standardised columns (\code{code},
-\code{description}, \code{code_type}, \code{preferred_description}) plus all other
-columns from the underlying table.
+\code{description}, \code{code_type}, \code{preferred_description}, \code{category}) plus all
+other columns from the underlying table. \code{category} is \code{NA} for code
+systems without a populated category source.
 }
 \description{
 Returns a lazy \code{dplyr::tbl()} containing the lookup table with standardised
-column names (\code{code}, \code{description}, \code{code_type}, \code{preferred_description})
-plus all additional columns from the underlying database table. Call
-\code{\link[dplyr:compute]{dplyr::collect()}} to materialise the result.
+column names (\code{code}, \code{description}, \code{code_type}, \code{preferred_description},
+\code{category}) plus all additional columns from the underlying database table.
+Call \code{\link[dplyr:compute]{dplyr::collect()}} to materialise the result.
 }
 \details{
 This is useful for inspecting columns beyond the standard codelist output

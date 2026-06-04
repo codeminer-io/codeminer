@@ -141,6 +141,7 @@ read_icd10_trud <- function(
     lookup_version = version,
     lookup_code_col = "ALT_CODE",
     lookup_description_col = "DESCRIPTION",
+    lookup_category_col = "TREE_DESCRIPTION",
     lookup_source = source
   )
 

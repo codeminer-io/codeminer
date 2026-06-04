@@ -13,10 +13,34 @@ test_that("get_lookup_table() returns a lazy tbl without explicit con", {
 })
 test_that("get_lookup_table() returns standardised columns plus extras", {
   result <- get_lookup_table("ICD-10") |> dplyr::collect()
-  expect_true(all(c("code", "description", "code_type") %in% names(result)))
+  expect_true(all(
+    c(
+      "code",
+      "description",
+      "code_type",
+      "preferred_description",
+      "category"
+    ) %in%
+      names(result)
+  ))
   expect_true(nrow(result) > 0)
   # Should have more columns than just the standard ones
   expect_true(ncol(result) > 3)
+})
+
+test_that("get_lookup_table() exposes BNF chapter as `category`", {
+  result <- get_lookup_table("BNF") |> dplyr::collect()
+  expect_true("category" %in% names(result))
+  # BNF_Chapter has been renamed to `category` via metadata
+  expect_false("BNF_Chapter" %in% names(result))
+  expect_true(any(!is.na(result$category)))
+})
+
+test_that("get_lookup_table() returns NA category when no source column is mapped", {
+  # Read v3 does not have a category source yet — `category` should be all NA
+  result <- get_lookup_table("Read v3") |> dplyr::collect()
+  expect_true("category" %in% names(result))
+  expect_true(all(is.na(result$category)))
 })
 
 test_that("get_lookup_table() respects explicit version", {

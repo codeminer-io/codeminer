@@ -133,6 +133,18 @@ test_that("read_icd10_trud() does not modify DESCRIPTION when no modifier", {
   expect_equal(e10$DESCRIPTION, "Type 1 diabetes mellitus")
 })
 
+test_that("read_icd10_trud() retains TREE_DESCRIPTION as the category source", {
+  dir <- create_dummy_icd10_dir()
+  result <- suppressMessages(read_icd10_trud(dir))
+  tbl <- result$icd10_lkp$lookup$table
+  meta <- result$icd10_lkp$lookup$metadata
+
+  expect_true("TREE_DESCRIPTION" %in% names(tbl))
+  expect_equal(meta$lookup_category_col, "TREE_DESCRIPTION")
+  expect_equal(tbl[tbl$ALT_CODE == "E10", ]$TREE_DESCRIPTION, "Endocrine")
+  expect_equal(tbl[tbl$ALT_CODE == "J46", ]$TREE_DESCRIPTION, "Respiratory")
+})
+
 test_that("read_icd10_trud() returns relationship table", {
   dir <- create_dummy_icd10_dir()
   result <- suppressMessages(read_icd10_trud(dir))
