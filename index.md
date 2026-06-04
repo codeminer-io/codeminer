@@ -16,6 +16,7 @@ You can install the development version from
 [GitHub](https://github.com/) with:
 
 ``` r
+
 # install.packages("pak")
 pak::pak("codeminer-io/codeminer")
 ```
@@ -30,6 +31,7 @@ First, build a local resource containing lookup and mapping tables for
 various clinical codings systems. A dummy dataset is used here:
 
 ``` r
+
 library(codeminer)
 create_dummy_database()
 #> Creating new database at
@@ -66,7 +68,8 @@ create_dummy_database()
 Look up Read 3 codes for hypertension:
 
 ``` r
-htn_read3 <- DESCRIPTION("Hypertension", code_type = "Read 3")
+
+htn_read3 <- DESCRIPTION("Hypertension", code_type = "Read v3")
 #> ℹ Using 'UKB v4' as latest version
 #> ℹ Using 'UKB v4' as latest version
 htn_read3
@@ -79,9 +82,10 @@ htn_read3
 Map these to ICD10:
 
 ``` r
+
 htn_icd10 <- MAP(
   codes = htn_read3$code,
-  from = "Read 3",
+  from = "Read v3",
   to = "ICD-10"
 )
 #> ℹ Using 'UKB v4' as latest version
@@ -116,6 +120,7 @@ Install a [recent version of R](https://www.r-project.org/) (`>= 4.5.0`)
 and install [`pak`](https://pak.r-lib.org/) for package management:
 
 ``` r
+
 install.packages("pak")
 ```
 
@@ -133,6 +138,7 @@ into your IDE.
     local `codeminer` directory:
 
     ``` r
+
     pak::local_install_dev_deps()
     ```
 
@@ -148,6 +154,7 @@ into your IDE.
     an R session:
 
     ``` r
+
     devtools::check()
     ```
 

@@ -36,7 +36,7 @@ requested, a named list of data frames.
 create_dummy_database()
 #> ✔ Dummy database ready to use!
 #> ℹ To reconnect to your previous database:
-#>   `Sys.setenv(CODEMINER_DB_PATH = "/tmp/Rtmp7pbrDX/file1af6118e0f7d.duckdb")`
+#>   `Sys.setenv(CODEMINER_DB_PATH = "/tmp/RtmpZh0trq/file1bc55aa90ee2.duckdb")`
 #>   `codeminer_connect()`
 get_codeminer_metadata()
 #> $lookup
@@ -45,9 +45,9 @@ get_codeminer_metadata()
 #> 2          DM+D_UKB v4          DM+D         UKB v4      concept_id
 #> 3         ICD-9_UKB v4         ICD-9         UKB v4            ICD9
 #> 4        ICD-10_UKB v4        ICD-10         UKB v4        ALT_CODE
-#> 5        Read 2_UKB v4        Read 2         UKB v4       read_code
-#> 6 Read 2, drugs_UKB v4 Read 2, drugs         UKB v4       read_code
-#> 7        Read 3_UKB v4        Read 3         UKB v4       read_code
+#> 5       Read v2_UKB v4       Read v2         UKB v4       read_code
+#> 6 Read v2 drugs_UKB v4 Read v2 drugs         UKB v4       read_code
+#> 7       Read v3_UKB v4       Read v3         UKB v4       read_code
 #>   lookup_description_col                                      lookup_source
 #> 1            Description https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592
 #> 2                   term https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592
@@ -68,15 +68,15 @@ get_codeminer_metadata()
 #> $mapping
 #>          mapping_table_name from_code_type to_code_type map_version    from_col
 #> 1       ICD-9_ICD-10_UKB v4          ICD-9       ICD-10      UKB v4        ICD9
-#> 2  Read 2, drugs_BNF_UKB v4  Read 2, drugs          BNF      UKB v4   read_code
-#> 3       Read 2_ICD-9_UKB v4         Read 2        ICD-9      UKB v4   read_code
-#> 4      Read 2_ICD-10_UKB v4         Read 2       ICD-10      UKB v4   read_code
-#> 5       Read 2_OPCS4_UKB v4         Read 2        OPCS4      UKB v4   read_code
-#> 6      Read 2_Read 3_UKB v4         Read 2       Read 3      UKB v4 READV2_CODE
-#> 7       Read 3_ICD-9_UKB v4         Read 3        ICD-9      UKB v4   read_code
-#> 8      Read 3_ICD-10_UKB v4         Read 3       ICD-10      UKB v4   read_code
-#> 9       Read 3_OPCS4_UKB v4         Read 3        OPCS4      UKB v4   read_code
-#> 10     Read 3_Read 2_UKB v4         Read 3       Read 2      UKB v4 READV3_CODE
+#> 2  Read v2 drugs_BNF_UKB v4  Read v2 drugs          BNF      UKB v4   read_code
+#> 3      Read v2_ICD-9_UKB v4        Read v2        ICD-9      UKB v4   read_code
+#> 4     Read v2_ICD-10_UKB v4        Read v2       ICD-10      UKB v4   read_code
+#> 5      Read v2_OPCS4_UKB v4        Read v2        OPCS4      UKB v4   read_code
+#> 6    Read v2_Read v3_UKB v4        Read v2      Read v3      UKB v4 READV2_CODE
+#> 7      Read v3_ICD-9_UKB v4        Read v3        ICD-9      UKB v4   read_code
+#> 8     Read v3_ICD-10_UKB v4        Read v3       ICD-10      UKB v4   read_code
+#> 9      Read v3_OPCS4_UKB v4        Read v3        OPCS4      UKB v4   read_code
+#> 10   Read v3_Read v2_UKB v4        Read v3      Read v2      UKB v4 READV3_CODE
 #>           to_col                                         map_source
 #> 1          ICD10 https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592
 #> 2       bnf_code https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592
@@ -101,11 +101,11 @@ get_codeminer_metadata()
 #> 10                                                                                                                                                                                                                                                                    {"IS_ASSURED":{"values":["1"],"defaults":["1"]}}
 #> 
 #> $relationship
-#>      relationship_table_name code_type relationship_version from_col to_col
-#> 1    BNF_relationship_UKB v4       BNF               UKB v4     from     to
-#> 2  ICD-9_relationship_UKB v4     ICD-9               UKB v4     from     to
-#> 3 ICD-10_relationship_UKB v4    ICD-10               UKB v4     from     to
-#> 4 Read 2_relationship_UKB v4    Read 2               UKB v4     from     to
+#>       relationship_table_name code_type relationship_version from_col to_col
+#> 1     BNF_relationship_UKB v4       BNF               UKB v4     from     to
+#> 2   ICD-9_relationship_UKB v4     ICD-9               UKB v4     from     to
+#> 3  ICD-10_relationship_UKB v4    ICD-10               UKB v4     from     to
+#> 4 Read v2_relationship_UKB v4   Read v2               UKB v4     from     to
 #>   type_col child_parent_relationship_code
 #> 1     type                           is a
 #> 2     type                           is a
@@ -123,9 +123,9 @@ get_codeminer_metadata("lookup")
 #> 2          DM+D_UKB v4          DM+D         UKB v4      concept_id
 #> 3         ICD-9_UKB v4         ICD-9         UKB v4            ICD9
 #> 4        ICD-10_UKB v4        ICD-10         UKB v4        ALT_CODE
-#> 5        Read 2_UKB v4        Read 2         UKB v4       read_code
-#> 6 Read 2, drugs_UKB v4 Read 2, drugs         UKB v4       read_code
-#> 7        Read 3_UKB v4        Read 3         UKB v4       read_code
+#> 5       Read v2_UKB v4       Read v2         UKB v4       read_code
+#> 6 Read v2 drugs_UKB v4 Read v2 drugs         UKB v4       read_code
+#> 7       Read v3_UKB v4       Read v3         UKB v4       read_code
 #>   lookup_description_col                                      lookup_source
 #> 1            Description https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592
 #> 2                   term https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592
@@ -149,9 +149,9 @@ get_codeminer_metadata(c("lookup", "mapping"))
 #> 2          DM+D_UKB v4          DM+D         UKB v4      concept_id
 #> 3         ICD-9_UKB v4         ICD-9         UKB v4            ICD9
 #> 4        ICD-10_UKB v4        ICD-10         UKB v4        ALT_CODE
-#> 5        Read 2_UKB v4        Read 2         UKB v4       read_code
-#> 6 Read 2, drugs_UKB v4 Read 2, drugs         UKB v4       read_code
-#> 7        Read 3_UKB v4        Read 3         UKB v4       read_code
+#> 5       Read v2_UKB v4       Read v2         UKB v4       read_code
+#> 6 Read v2 drugs_UKB v4 Read v2 drugs         UKB v4       read_code
+#> 7       Read v3_UKB v4       Read v3         UKB v4       read_code
 #>   lookup_description_col                                      lookup_source
 #> 1            Description https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592
 #> 2                   term https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592
@@ -172,15 +172,15 @@ get_codeminer_metadata(c("lookup", "mapping"))
 #> $mapping
 #>          mapping_table_name from_code_type to_code_type map_version    from_col
 #> 1       ICD-9_ICD-10_UKB v4          ICD-9       ICD-10      UKB v4        ICD9
-#> 2  Read 2, drugs_BNF_UKB v4  Read 2, drugs          BNF      UKB v4   read_code
-#> 3       Read 2_ICD-9_UKB v4         Read 2        ICD-9      UKB v4   read_code
-#> 4      Read 2_ICD-10_UKB v4         Read 2       ICD-10      UKB v4   read_code
-#> 5       Read 2_OPCS4_UKB v4         Read 2        OPCS4      UKB v4   read_code
-#> 6      Read 2_Read 3_UKB v4         Read 2       Read 3      UKB v4 READV2_CODE
-#> 7       Read 3_ICD-9_UKB v4         Read 3        ICD-9      UKB v4   read_code
-#> 8      Read 3_ICD-10_UKB v4         Read 3       ICD-10      UKB v4   read_code
-#> 9       Read 3_OPCS4_UKB v4         Read 3        OPCS4      UKB v4   read_code
-#> 10     Read 3_Read 2_UKB v4         Read 3       Read 2      UKB v4 READV3_CODE
+#> 2  Read v2 drugs_BNF_UKB v4  Read v2 drugs          BNF      UKB v4   read_code
+#> 3      Read v2_ICD-9_UKB v4        Read v2        ICD-9      UKB v4   read_code
+#> 4     Read v2_ICD-10_UKB v4        Read v2       ICD-10      UKB v4   read_code
+#> 5      Read v2_OPCS4_UKB v4        Read v2        OPCS4      UKB v4   read_code
+#> 6    Read v2_Read v3_UKB v4        Read v2      Read v3      UKB v4 READV2_CODE
+#> 7      Read v3_ICD-9_UKB v4        Read v3        ICD-9      UKB v4   read_code
+#> 8     Read v3_ICD-10_UKB v4        Read v3       ICD-10      UKB v4   read_code
+#> 9      Read v3_OPCS4_UKB v4        Read v3        OPCS4      UKB v4   read_code
+#> 10   Read v3_Read v2_UKB v4        Read v3      Read v2      UKB v4 READV3_CODE
 #>           to_col                                         map_source
 #> 1          ICD10 https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592
 #> 2       bnf_code https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592

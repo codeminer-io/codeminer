@@ -12,7 +12,7 @@ remove_mapping_table(from_code_type, to_code_type, map_version)
 
 - from_code_type:
 
-  The source coding system (e.g. `"Read 3"`).
+  The source coding system (e.g. `"Read v3"`).
 
 - to_code_type:
 

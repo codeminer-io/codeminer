@@ -19,7 +19,7 @@ update_mapping_metadata(
 
 - from_code_type:
 
-  The source coding system (e.g. `"Read 3"`).
+  The source coding system (e.g. `"Read v3"`).
 
 - to_code_type:
 

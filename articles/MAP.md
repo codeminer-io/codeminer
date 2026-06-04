@@ -1,6 +1,7 @@
 # Mapping between clinical coding systems
 
 ``` r
+
 library(codeminer)
 library(dplyr)
 #> 
@@ -22,7 +23,8 @@ Use [`MAP()`](https://codeminer-io.github.io/codeminer/reference/MAP.md)
 to map a vector of codes from one clinical coding system to another:
 
 ``` r
-MAP("X40J4", from = "Read 3", to = "ICD-10")
+
+MAP("X40J4", from = "Read v3", to = "ICD-10")
 #> ℹ Using 'UKB v4' as latest version
 #> ℹ Using 'UKB v4' as latest version
 #> <codeminer_codelist>: 1 code
@@ -37,7 +39,8 @@ MAP("X40J4", from = "Read 3", to = "ICD-10")
 Use `MAP("all")` to return the entire mapping table:
 
 ``` r
-MAP("all", from = "Read 3", to = "ICD-10")
+
+MAP("all", from = "Read v3", to = "ICD-10")
 #> # A tibble: 5 × 8
 #>   from  to    mapping_status refine_flag add_code_flag element_num block_num
 #>   <chr> <chr> <chr>          <chr>       <chr>         <chr>       <chr>    
@@ -54,11 +57,12 @@ MAP("all", from = "Read 3", to = "ICD-10")
 Mapping between different clinical coding systems is not perfect and
 should be manually reviewed. Some mapping tables list multiple possible
 code mappings, with a separate column indicating the type of
-mapping.[¹](#fn1) For example, the Read 3 to ICD10 mapping table
-includes `mapping_status` and `refine_flag` columns:
+mapping.[^1] For example, the Read v3 to ICD10 mapping table includes
+`mapping_status` and `refine_flag` columns:
 
 ``` r
-MAP("all", from = "Read 3", to = "ICD-10") |>
+
+MAP("all", from = "Read v3", to = "ICD-10") |>
   filter(from == "XaIP9")
 #> # A tibble: 1 × 8
 #>   from  to    mapping_status refine_flag add_code_flag element_num block_num
@@ -68,12 +72,13 @@ MAP("all", from = "Read 3", to = "ICD-10") |>
 ```
 
 It is important to decide which mappings to include. For example, if no
-filters are applied then the Read 3 code for sebaceous cyst ‘XaIP9’ will
-map to a number of ICD10 codes, some of which are sex-specific (‘N508’
-and ‘N948’):
+filters are applied then the Read v3 code for sebaceous cyst ‘XaIP9’
+will map to a number of ICD10 codes, some of which are sex-specific
+(‘N508’ and ‘N948’):
 
 ``` r
-MAP("XaIP9", from = "Read 3", to = "ICD-10")
+
+MAP("XaIP9", from = "Read v3", to = "ICD-10")
 #> <codeminer_codelist>: 1 code
 #> Code type: "ICD-10"
 #> 
@@ -83,8 +88,6 @@ MAP("XaIP9", from = "Read 3", to = "ICD-10")
 #> 1 L721  Trichilemmal cyst ICD-10
 ```
 
-------------------------------------------------------------------------
-
-1.  Refer to the accompanying documentation for [UKB resource
+[^1]: Refer to the accompanying documentation for [UKB resource
     592](https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592) for further
     details.

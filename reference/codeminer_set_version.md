@@ -18,7 +18,7 @@ codeminer_set_version(lookup = NULL, relationship = NULL, mapping = NULL)
 - lookup:
 
   Named character vector of lookup versions, keyed by code type. E.g.
-  `c("ICD-10" = "v42", "Read 3" = "v1")`.
+  `c("ICD-10" = "v42", "Read v3" = "v1")`.
 
 - relationship:
 
@@ -68,7 +68,7 @@ Other Workbench management:
 if (FALSE) { # \dontrun{
 # Pin lookup versions for multiple code types
 codeminer_set_version(
-  lookup = c("ICD-10" = "v42", "Read 3" = "v1")
+  lookup = c("ICD-10" = "v42", "Read v3" = "v1")
 )
 
 # Pin mapping version for a specific pair

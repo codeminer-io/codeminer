@@ -1,6 +1,7 @@
 # Introduction to codeminer
 
 ``` r
+
 library(codeminer)
 ```
 
@@ -18,8 +19,8 @@ This vignette demonstrates the above using dummy data included with the
 package.
 
 Also included are functions for mapping between different clinical
-coding systems, and using Phecodes(Denny, Bastarache, and Roden 2016; Wu
-et al. 2019) with UK Biobank data. See vignettes
+coding systems, and using Phecodes(Denny et al. 2016; Wu et al. 2019)
+with UK Biobank data. See vignettes
 [`vignette('MAP')`](https://codeminer-io.github.io/codeminer/articles/MAP.md)
 `vignette('caliber')` and `vignette('phecodes')` for further
 information.
@@ -45,12 +46,13 @@ The tables are imported into R, reformatted, and stored as a named list
 of data frames:
 
 ``` r
+
 # Create a temporary database with dummy data
 (db_path <- create_dummy_database())
 #> ✔ Dummy database ready to use!
-#> [1] "/tmp/Rtmp9khwUR/file26b865586fda.duckdb"
+#> [1] "/tmp/RtmpQd7i2x/file27a15483bfc7.duckdb"
 Sys.getenv("CODEMINER_DB_PATH")
-#> [1] "/tmp/Rtmp9khwUR/file26b865586fda.duckdb"
+#> [1] "/tmp/RtmpQd7i2x/file27a15483bfc7.duckdb"
 ```
 
 `codeminer` resolves the database location using the following
@@ -72,6 +74,7 @@ with
 [`codeminer_connect()`](https://codeminer-io.github.io/codeminer/reference/codeminer_connect.md):
 
 ``` r
+
 codeminer_connect(main = "/path/to/codeminer-database.duckdb")
 ```
 
@@ -82,9 +85,10 @@ connection status with
 [`codeminer_status()`](https://codeminer-io.github.io/codeminer/reference/codeminer_status.md):
 
 ``` r
+
 codeminer_status()
 #> ℹ Workbench active
-#>   Main: /tmp/Rtmp9khwUR/file26b865586fda.duckdb
+#>   Main: /tmp/RtmpQd7i2x/file27a15483bfc7.duckdb
 #>   Extra: not attached
 ```
 
@@ -98,6 +102,7 @@ Codes may be explored with:
   look up descriptions for a set of code in the given code system type
 
 ``` r
+
 CODES(
   c("E10", "E11"),
   type = "ICD-10"
@@ -116,6 +121,7 @@ CODES(
 - `DESCRIPTION():` search for codes that match a description
 
 ``` r
+
 DESCRIPTION(pattern = "cyst", type = "ICD-10")
 #> <codeminer_codelist>: 2 codes
 #> Code type: "ICD-10"
@@ -141,6 +147,7 @@ Each requires a data frame and a metadata object created with the
 corresponding `*_metadata()` constructor:
 
 ``` r
+
 custom_lookup <- data.frame(
   code = c("CUSTOM1", "CUSTOM2"),
   description = c("Custom code 1", "Custom code 2")
@@ -170,6 +177,7 @@ To remove a table, use the corresponding `remove_*_table()` function
 with the same identifying keys:
 
 ``` r
+
 remove_lookup_table("custom_codes", "v1")
 #> ✔ Lookup table custom_codes_v1 removed.
 ```
@@ -184,15 +192,16 @@ Use
 to inspect the tables currently in the database:
 
 ``` r
+
 get_codeminer_metadata("lookup")
 #>      lookup_table_name     code_type lookup_version lookup_code_col
 #> 1           BNF_UKB v4           BNF         UKB v4        BNF_Code
 #> 2          DM+D_UKB v4          DM+D         UKB v4      concept_id
 #> 3         ICD-9_UKB v4         ICD-9         UKB v4            ICD9
 #> 4        ICD-10_UKB v4        ICD-10         UKB v4        ALT_CODE
-#> 5        Read 2_UKB v4        Read 2         UKB v4       read_code
-#> 6 Read 2, drugs_UKB v4 Read 2, drugs         UKB v4       read_code
-#> 7        Read 3_UKB v4        Read 3         UKB v4       read_code
+#> 5       Read v2_UKB v4       Read v2         UKB v4       read_code
+#> 6 Read v2 drugs_UKB v4 Read v2 drugs         UKB v4       read_code
+#> 7       Read v3_UKB v4       Read v3         UKB v4       read_code
 #>   lookup_description_col                                      lookup_source
 #> 1            Description https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592
 #> 2                   term https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592
@@ -224,6 +233,7 @@ You can override this for the current session with
 [`codeminer_set_version()`](https://codeminer-io.github.io/codeminer/reference/codeminer_set_version.md):
 
 ``` r
+
 # Pin lookup and relationship versions for a code type
 codeminer_set_version(
   lookup       = c("ICD-10" = "UKB v4"),
@@ -232,7 +242,7 @@ codeminer_set_version(
 
 # Pin a mapping version (use "from > to" format for the key)
 codeminer_set_version(
-  mapping = c("Read 3 > ICD-10" = "UKB v4")
+  mapping = c("Read v3 > ICD-10" = "UKB v4")
 )
 ```
 
@@ -240,6 +250,7 @@ Pins only affect the default `"latest"` resolution. Explicit version
 arguments always take precedence:
 
 ``` r
+
 # This uses the pinned version for ICD-10:
 CODES("E10", type = "ICD-10")
 #> <codeminer_codelist>: 1 code
@@ -265,12 +276,14 @@ To clear all version selections and return to automatic `"latest"`
 resolution:
 
 ``` r
+
 codeminer_clear_versions()
 ```
 
 You can also clear versions selectively by code type:
 
 ``` r
+
 # Clear only the ICD-10 lookup version
 codeminer_clear_versions(lookup = "ICD-10")
 
@@ -293,10 +306,11 @@ configuration file and load them at the start of a session.
 
     code_type,lookup,relationship
     ICD-10,UKB v4,UKB v4
-    Read 3,UKB v4,UKB v4
+    Read v3,UKB v4,UKB v4
     SNOMED CT,GPS v1,GPS v1
 
 ``` r
+
 cfg <- read.csv("codeminer_versions.csv")
 codeminer_set_version(
   lookup       = setNames(cfg$lookup, cfg$code_type),
@@ -311,13 +325,14 @@ separate file or in JSON:
 
 ``` json
 {
-  "lookup": {"ICD-10": "UKB v4", "Read 3": "UKB v4"},
+  "lookup": {"ICD-10": "UKB v4", "Read v3": "UKB v4"},
   "relationship": {"ICD-10": "UKB v4"},
-  "mapping": {"Read 3 > ICD-10": "UKB v4"}
+  "mapping": {"Read v3 > ICD-10": "UKB v4"}
 }
 ```
 
 ``` r
+
 cfg <- jsonlite::fromJSON("codeminer_versions.json")
 codeminer_set_version(
   lookup       = unlist(cfg$lookup),
@@ -341,6 +356,7 @@ filterable column has an entry with `values` (all valid options) and
 `defaults` (applied when no override is given):
 
 ``` r
+
 # When adding a lookup table with filters
 add_lookup_table(
   my_snomed_lookup,
@@ -367,6 +383,7 @@ All query functions accept a `col_filters` parameter with three options:
 - **A named list**: apply explicit filters for this call only
 
 ``` r
+
 # Default: only active concepts (from metadata defaults)
 CODES("all", type = "SNOMED CT")
 
@@ -384,7 +401,7 @@ col_filters**. This matters most for
 [`MAP()`](https://codeminer-io.github.io/codeminer/reference/MAP.md),
 which touches two table types:
 
-1.  The **mapping table** (e.g., Read 3 → ICD-10) may have filters like
+1.  The **mapping table** (e.g., Read v3 → ICD-10) may have filters like
     `mapping_status`
 2.  The **target lookup table** (e.g., ICD-10) may have filters like
     `active_concept`
@@ -397,6 +414,7 @@ filterable columns and different semantics.
 To override filters on the target lookup as well, use session pinning:
 
 ``` r
+
 # Pin lookup filters for SNOMED CT
 codeminer_set_col_filters(
   lookup = list("SNOMED CT" = list(active_concept = c("0", "1")))
@@ -411,6 +429,7 @@ MAP("24700007", from = "SNOMED CT", to = "ICD-10")
 Like version pinning, you can pin col_filters for the entire session:
 
 ``` r
+
 # Pin: include inactive SNOMED concepts
 codeminer_set_col_filters(
   lookup = list("SNOMED CT" = list(active_concept = c("0", "1")))
@@ -426,6 +445,7 @@ For a scoped override, use
 [`with_col_filters()`](https://codeminer-io.github.io/codeminer/reference/with_col_filters.md):
 
 ``` r
+
 # Temporarily include inactive concepts for this block only
 result <- with_col_filters(
   {
@@ -442,6 +462,7 @@ If you need to add or change filters on an existing table without
 re-adding the data:
 
 ``` r
+
 update_lookup_metadata(
   "SNOMED CT",
   col_filters = list(
@@ -456,6 +477,7 @@ update_lookup_metadata(
 returns all registered filters, useful for building UIs:
 
 ``` r
+
 # Just defaults (for applying)
 get_col_filters(defaults_only = TRUE)
 
@@ -468,7 +490,7 @@ Association Studies as a Tool to Advance Precision Medicine.” *Annual
 Review of Genomics and Human Genetics* 17 (August): 353–73.
 <https://doi.org/10.1146/annurev-genom-090314-024956>.
 
-Wu, Patrick, Aliya Gifford, Xiangrui Meng, Xue Li, Harry Campbell, Tim
-Varley, Juan Zhao, et al. 2019. “Mapping ICD-10 and ICD-10-CM Codes to
-Phecodes: Workflow Development and Initial Evaluation.” *JMIR medical
-informatics* 7 (4): e14325. <https://doi.org/10.2196/14325>.
+Wu, Patrick, Aliya Gifford, Xiangrui Meng, et al. 2019. “Mapping ICD-10
+and ICD-10-CM Codes to Phecodes: Workflow Development and Initial
+Evaluation.” *JMIR medical informatics* 7 (4): e14325.
+<https://doi.org/10.2196/14325>.

@@ -13,7 +13,7 @@ for each table.
 ``` r
 add_nhs_data_migration(
   path = get_nhs_data_migration(),
-  tables = c("ctv3sctmap2", "rcsctmap2"),
+  tables = c("ctv3sctmap2", "rcsctmap2", "read2_ctv3", "ctv3_read2"),
   version = NULL,
   source =
     "https://isd.digital.nhs.uk/trud/users/guest/filters/0/categories/9/items/9/releases"
