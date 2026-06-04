@@ -79,6 +79,24 @@ create_dummy_icd10_dir <- function(.envir = parent.frame()) {
           "Endocrine"
         ),
         collapse = "\t"
+      ),
+      # Row 4: 3-char category encoded with X placeholder (e.g. J46X -> J46)
+      paste(
+        c(
+          "J46.X",
+          "J46X",
+          "M",
+          "N",
+          "Status asthmaticus",
+          "",
+          "",
+          "",
+          "0",
+          "0",
+          "999",
+          "Respiratory"
+        ),
+        collapse = "\t"
       )
     ),
     file.path(content_dir, "ICD10_Edition5_CodesAndTitlesAndMetadata_GB.txt")

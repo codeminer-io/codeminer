@@ -17,7 +17,9 @@
 #'   The lookup `table` has columns including `CODE`, `ALT_CODE` (dot-stripped,
 #'   used as the primary code column), `DESCRIPTION`, and others from the source
 #'   file. `DESCRIPTION` is augmented with `MODIFIER_4` or `MODIFIER_5` where
-#'   present.
+#'   present. The trailing `X` placeholder used to pad 3-char categories to a
+#'   4-char width is stripped from `ALT_CODE` (e.g., `J46X` becomes `J46`); the
+#'   original `CODE` column is left unchanged.
 #'
 #' @seealso [add_icd10_trud()], [get_icd10_trud()]
 #' @export
@@ -108,6 +110,19 @@ read_icd10_trud <- function(
     sep = "\t",
     colClasses = "character"
   )
+
+  # Strip trailing `X` placeholder from 3-char categories (e.g. J46X -> J46) so
+  # they are not orphaned in the prefix-derived relationship table.
+  icd10_table <- icd10_table |>
+    dplyr::mutate(ALT_CODE = strip_icd10_x_placeholder(.data$ALT_CODE))
+
+  if (anyDuplicated(icd10_table$ALT_CODE)) {
+    dups <- icd10_table$ALT_CODE[duplicated(icd10_table$ALT_CODE)]
+    cli::cli_abort(c(
+      "x" = "Duplicate {.field ALT_CODE} values after stripping the X placeholder",
+      "i" = "Affected codes: {.val {unique(dups)}}"
+    ))
+  }
 
   # Augment DESCRIPTION with modifier columns where present
   icd10_table <- icd10_table |>
