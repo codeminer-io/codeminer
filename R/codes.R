@@ -376,10 +376,14 @@ get_lookup_table <- function(
     tbl <- dplyr::mutate(tbl, preferred_description = TRUE)
   }
 
-  if (!is.na(this_meta$lookup_category_col)) {
+  # NULL covers databases built before `lookup_category_col` was added to
+  # `required_lookup_metadata_columns()` — they have no such column in the
+  # metadata table until `build_database()` is re-run to migrate the schema.
+  category_col <- this_meta$lookup_category_col
+  if (!is.null(category_col) && !is.na(category_col)) {
     tbl <- dplyr::rename(
       tbl,
-      category = .env$this_meta$lookup_category_col,
+      category = .env$category_col,
     )
   } else {
     # CAST through SQL so DuckDB types the column as VARCHAR rather than
