@@ -16,8 +16,8 @@
 #' @param sheets Character vector of sheet names to read. See
 #'   [read_ukb_resource_592()] for available sheet names. By default, reads all
 #'   17 sheets.
-#' @param ukb_version Version label for the UKB resource (default: `"UKB v4"`).
-#' @param ukb_source Source URL or description for the UKB resource.
+#' @param version Version label for the UKB resource (default: `"UKB v4"`).
+#' @param source Source URL or description for the UKB resource.
 #'
 #' @returns Invisibly returns the result from [read_ukb_resource_592()] (a named
 #'   list of tables with metadata).
@@ -88,14 +88,14 @@ add_ukb_resource_592 <- function(
     "read_ctv3_opcs4",
     "read_ctv3_read_v2"
   ),
-  ukb_version = "UKB v4",
-  ukb_source = "https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592"
+  version = "UKB v4",
+  source = "https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592"
 ) {
   ukb_resource_592 <- read_ukb_resource_592(
     path = path,
     sheets = sheets,
-    ukb_version = ukb_version,
-    ukb_source = ukb_source
+    version = version,
+    source = source
   )
 
   add_tables_to_database(

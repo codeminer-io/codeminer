@@ -10,8 +10,8 @@ read_ukb_resource_592(
     "read_v2_drugs_lkp", "read_v2_drugs_bnf", "read_v2_icd9", "read_v2_icd10",
     "read_v2_opcs4", "read_v2_read_ctv3", "read_ctv3_lkp", "read_ctv3_icd9",
     "read_ctv3_icd10", "read_ctv3_opcs4", "read_ctv3_read_v2"),
-  ukb_version = "UKB v4",
-  ukb_source = "https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592"
+  version = "UKB v4",
+  source = "https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592"
 )
 }
 \arguments{
@@ -28,9 +28,9 @@ read_ukb_resource_592(
 \code{"read_ctv3_read_v2"}
 }}
 
-\item{ukb_version}{Version label for the UKB resource (default: \code{"UKB v4"}).}
+\item{version}{Version label for the UKB resource (default: \code{"UKB v4"}).}
 
-\item{ukb_source}{Source URL or description for the UKB resource.}
+\item{source}{Source URL or description for the UKB resource.}
 }
 \value{
 A named list where each element corresponds to a requested sheet.
