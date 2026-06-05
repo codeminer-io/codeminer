@@ -36,7 +36,7 @@ requested, a named list of data frames.
 create_dummy_database()
 #> ✔ Dummy database ready to use!
 #> ℹ To reconnect to your previous database:
-#>   `Sys.setenv(CODEMINER_DB_PATH = "/tmp/Rtmpc15fMD/file1b4d56412b3f.duckdb")`
+#>   `Sys.setenv(CODEMINER_DB_PATH = "/tmp/RtmpYst3Tv/file1b1554663881.duckdb")`
 #>   `codeminer_connect()`
 get_codeminer_metadata()
 #> $lookup
@@ -48,22 +48,30 @@ get_codeminer_metadata()
 #> 5       Read v2_UKB v4       Read v2         UKB v4       read_code
 #> 6 Read v2 drugs_UKB v4 Read v2 drugs         UKB v4       read_code
 #> 7       Read v3_UKB v4       Read v3         UKB v4       read_code
-#>   lookup_description_col                                      lookup_source
-#> 1            Description https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592
-#> 2                   term https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592
-#> 3       DESCRIPTION_ICD9 https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592
-#> 4            DESCRIPTION https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592
-#> 5       term_description https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592
-#> 6       term_description https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592
-#> 7       term_description https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592
-#>   preferred_description_col preferred_description_indicator col_filters
-#> 1                      <NA>                            <NA>        <NA>
-#> 2                      <NA>                            <NA>        <NA>
-#> 3                      <NA>                            <NA>        <NA>
-#> 4                      <NA>                            <NA>        <NA>
-#> 5                 term_code                              00        <NA>
-#> 6                      <NA>                            <NA>        <NA>
-#> 7          description_type                               P        <NA>
+#>   lookup_description_col lookup_category_col
+#> 1            Description         BNF_Chapter
+#> 2                   term                <NA>
+#> 3       DESCRIPTION_ICD9                <NA>
+#> 4            DESCRIPTION                <NA>
+#> 5       term_description                <NA>
+#> 6       term_description                <NA>
+#> 7       term_description                <NA>
+#>                                        lookup_source preferred_description_col
+#> 1 https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592                      <NA>
+#> 2 https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592                      <NA>
+#> 3 https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592                      <NA>
+#> 4 https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592                      <NA>
+#> 5 https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592                 term_code
+#> 6 https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592                      <NA>
+#> 7 https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592          description_type
+#>   preferred_description_indicator col_filters
+#> 1                            <NA>        <NA>
+#> 2                            <NA>        <NA>
+#> 3                            <NA>        <NA>
+#> 4                            <NA>        <NA>
+#> 5                              00        <NA>
+#> 6                            <NA>        <NA>
+#> 7                               P        <NA>
 #> 
 #> $mapping
 #>          mapping_table_name from_code_type to_code_type map_version    from_col
@@ -126,22 +134,30 @@ get_codeminer_metadata("lookup")
 #> 5       Read v2_UKB v4       Read v2         UKB v4       read_code
 #> 6 Read v2 drugs_UKB v4 Read v2 drugs         UKB v4       read_code
 #> 7       Read v3_UKB v4       Read v3         UKB v4       read_code
-#>   lookup_description_col                                      lookup_source
-#> 1            Description https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592
-#> 2                   term https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592
-#> 3       DESCRIPTION_ICD9 https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592
-#> 4            DESCRIPTION https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592
-#> 5       term_description https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592
-#> 6       term_description https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592
-#> 7       term_description https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592
-#>   preferred_description_col preferred_description_indicator col_filters
-#> 1                      <NA>                            <NA>        <NA>
-#> 2                      <NA>                            <NA>        <NA>
-#> 3                      <NA>                            <NA>        <NA>
-#> 4                      <NA>                            <NA>        <NA>
-#> 5                 term_code                              00        <NA>
-#> 6                      <NA>                            <NA>        <NA>
-#> 7          description_type                               P        <NA>
+#>   lookup_description_col lookup_category_col
+#> 1            Description         BNF_Chapter
+#> 2                   term                <NA>
+#> 3       DESCRIPTION_ICD9                <NA>
+#> 4            DESCRIPTION                <NA>
+#> 5       term_description                <NA>
+#> 6       term_description                <NA>
+#> 7       term_description                <NA>
+#>                                        lookup_source preferred_description_col
+#> 1 https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592                      <NA>
+#> 2 https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592                      <NA>
+#> 3 https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592                      <NA>
+#> 4 https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592                      <NA>
+#> 5 https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592                 term_code
+#> 6 https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592                      <NA>
+#> 7 https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592          description_type
+#>   preferred_description_indicator col_filters
+#> 1                            <NA>        <NA>
+#> 2                            <NA>        <NA>
+#> 3                            <NA>        <NA>
+#> 4                            <NA>        <NA>
+#> 5                              00        <NA>
+#> 6                            <NA>        <NA>
+#> 7                               P        <NA>
 get_codeminer_metadata(c("lookup", "mapping"))
 #> $lookup
 #>      lookup_table_name     code_type lookup_version lookup_code_col
@@ -152,22 +168,30 @@ get_codeminer_metadata(c("lookup", "mapping"))
 #> 5       Read v2_UKB v4       Read v2         UKB v4       read_code
 #> 6 Read v2 drugs_UKB v4 Read v2 drugs         UKB v4       read_code
 #> 7       Read v3_UKB v4       Read v3         UKB v4       read_code
-#>   lookup_description_col                                      lookup_source
-#> 1            Description https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592
-#> 2                   term https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592
-#> 3       DESCRIPTION_ICD9 https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592
-#> 4            DESCRIPTION https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592
-#> 5       term_description https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592
-#> 6       term_description https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592
-#> 7       term_description https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592
-#>   preferred_description_col preferred_description_indicator col_filters
-#> 1                      <NA>                            <NA>        <NA>
-#> 2                      <NA>                            <NA>        <NA>
-#> 3                      <NA>                            <NA>        <NA>
-#> 4                      <NA>                            <NA>        <NA>
-#> 5                 term_code                              00        <NA>
-#> 6                      <NA>                            <NA>        <NA>
-#> 7          description_type                               P        <NA>
+#>   lookup_description_col lookup_category_col
+#> 1            Description         BNF_Chapter
+#> 2                   term                <NA>
+#> 3       DESCRIPTION_ICD9                <NA>
+#> 4            DESCRIPTION                <NA>
+#> 5       term_description                <NA>
+#> 6       term_description                <NA>
+#> 7       term_description                <NA>
+#>                                        lookup_source preferred_description_col
+#> 1 https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592                      <NA>
+#> 2 https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592                      <NA>
+#> 3 https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592                      <NA>
+#> 4 https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592                      <NA>
+#> 5 https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592                 term_code
+#> 6 https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592                      <NA>
+#> 7 https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592          description_type
+#>   preferred_description_indicator col_filters
+#> 1                            <NA>        <NA>
+#> 2                            <NA>        <NA>
+#> 3                            <NA>        <NA>
+#> 4                            <NA>        <NA>
+#> 5                              00        <NA>
+#> 6                            <NA>        <NA>
+#> 7                               P        <NA>
 #> 
 #> $mapping
 #>          mapping_table_name from_code_type to_code_type map_version    from_col

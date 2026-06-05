@@ -19,6 +19,17 @@ tables with associated metadata.
   [`glue::glue_sql()`](https://glue.tidyverse.org/reference/glue_sql.html)
   for parameterised SQL queries
 - Use `dplyr` / `dbplyr` for lazy table operations where possible
+- Prefer tidyverse packages already in Imports (`dplyr`, `purrr`,
+  `stringr`, `tidyr`, `tibble`) over base R equivalents where they read
+  more clearly —
+  e.g. [`purrr::map()`](https://purrr.tidyverse.org/reference/map.html)
+  rather than a `for` loop over rows,
+  [`stringr::str_sub()`](https://stringr.tidyverse.org/reference/str_sub.html)
+  rather than [`substr()`](https://rdrr.io/r/base/substr.html). Don’t
+  force tidyverse where base is genuinely simpler (vectorised
+  arithmetic, predicates, etc.)
+- Avoid superseded dplyr verbs (e.g. `transmute()`); use the current
+  equivalents (`mutate()` + `select()`)
 
 ## Testing and checks
 

@@ -50,6 +50,8 @@
 <li>Use <code>cli</code> for error handling (<code>codeminer_abort</code>, <code>codeminer_warn</code>, <code>codeminer_inform</code>)</li>
 <li>Use <code><a href="https://glue.tidyverse.org/reference/glue_sql.html" class="external-link">glue::glue_sql()</a></code> for parameterised SQL queries</li>
 <li>Use <code>dplyr</code> / <code>dbplyr</code> for lazy table operations where possible</li>
+<li>Prefer tidyverse packages already in Imports (<code>dplyr</code>, <code>purrr</code>, <code>stringr</code>, <code>tidyr</code>, <code>tibble</code>) over base R equivalents where they read more clearly — e.g. <code><a href="https://purrr.tidyverse.org/reference/map.html" class="external-link">purrr::map()</a></code> rather than a <code>for</code> loop over rows, <code><a href="https://stringr.tidyverse.org/reference/str_sub.html" class="external-link">stringr::str_sub()</a></code> rather than <code><a href="https://rdrr.io/r/base/substr.html" class="external-link">substr()</a></code>. Don’t force tidyverse where base is genuinely simpler (vectorised arithmetic, predicates, etc.)</li>
+<li>Avoid superseded dplyr verbs (e.g. <code>transmute()</code>); use the current equivalents (<code>mutate()</code> + <code>select()</code>)</li>
 </ul></div>
 <div class="section level2">
 <h2 id="testing-and-checks">Testing and checks<a class="anchor" aria-label="anchor" href="#testing-and-checks"></a></h2>

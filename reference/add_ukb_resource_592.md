@@ -25,8 +25,8 @@ add_ukb_resource_592(
     "read_v2_drugs_lkp", "read_v2_drugs_bnf", "read_v2_icd9", "read_v2_icd10",
     "read_v2_opcs4", "read_v2_read_ctv3", "read_ctv3_lkp", "read_ctv3_icd9",
     "read_ctv3_icd10", "read_ctv3_opcs4", "read_ctv3_read_v2"),
-  ukb_version = "UKB v4",
-  ukb_source = "https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592"
+  version = "UKB v4",
+  source = "https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592"
 )
 ```
 
@@ -44,11 +44,11 @@ add_ukb_resource_592(
   [`read_ukb_resource_592()`](https://codeminer-io.github.io/codeminer/reference/read_ukb_resource_592.md)
   for available sheet names. By default, reads all 17 sheets.
 
-- ukb_version:
+- version:
 
   Version label for the UKB resource (default: `"UKB v4"`).
 
-- ukb_source:
+- source:
 
   Source URL or description for the UKB resource.
 

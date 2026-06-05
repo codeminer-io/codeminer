@@ -3,8 +3,8 @@
 Returns a lazy
 [`dplyr::tbl()`](https://dplyr.tidyverse.org/reference/tbl.html)
 containing the lookup table with standardised column names (`code`,
-`description`, `code_type`, `preferred_description`) plus all additional
-columns from the underlying database table. Call
+`description`, `code_type`, `preferred_description`, `category`) plus
+all additional columns from the underlying database table. Call
 [`dplyr::collect()`](https://dplyr.tidyverse.org/reference/compute.html)
 to materialise the result.
 
@@ -50,8 +50,9 @@ get_lookup_table(
 
 A lazy [`dplyr::tbl()`](https://dplyr.tidyverse.org/reference/tbl.html)
 with standardised columns (`code`, `description`, `code_type`,
-`preferred_description`) plus all other columns from the underlying
-table.
+`preferred_description`, `category`) plus all other columns from the
+underlying table. `category` is `NA` for code systems without a
+populated category source.
 
 ## Details
 
@@ -80,13 +81,13 @@ Other Clinical code lookups and mappings:
 create_dummy_database()
 #> ✔ Dummy database ready to use!
 #> ℹ To reconnect to your previous database:
-#>   `Sys.setenv(CODEMINER_DB_PATH = "/tmp/Rtmpc15fMD/file1b4d32cd80fd.duckdb")`
+#>   `Sys.setenv(CODEMINER_DB_PATH = "/tmp/RtmpYst3Tv/file1b155c28936.duckdb")`
 #>   `codeminer_connect()`
 
 # Get the full ICD-10 lookup table
 get_lookup_table("ICD-10") |> dplyr::collect()
 #> ℹ Using 'UKB v4' as latest version
-#> # A tibble: 197 × 14
+#> # A tibble: 197 × 15
 #>    code  description  ICD10_CODE USAGE USAGE_UK MODIFIER_4 MODIFIER_5 QUALIFIERS
 #>    <chr> <chr>        <chr>      <chr> <chr>    <chr>      <chr>      <chr>     
 #>  1 A00   Cholera      A00        DEFA… 3        NA         NA         NA        
@@ -100,19 +101,21 @@ get_lookup_table("ICD-10") |> dplyr::collect()
 #>  9 A022  Localized s… A02.2      DEFA… 3        NA         NA         NA        
 #> 10 A028  Other speci… A02.8      DEFA… 3        NA         NA         NA        
 #> # ℹ 187 more rows
-#> # ℹ 6 more variables: GENDER_MASK <chr>, MIN_AGE <chr>, MAX_AGE <chr>,
-#> #   TREE_DESCRIPTION <chr>, code_type <chr>, preferred_description <lgl>
+#> # ℹ 7 more variables: GENDER_MASK <chr>, MIN_AGE <chr>, MAX_AGE <chr>,
+#> #   TREE_DESCRIPTION <chr>, code_type <chr>, preferred_description <lgl>,
+#> #   category <chr>
 
 # Inspect raw columns for specific codes
 result <- CODES("E10", "E11", type = "ICD-10")
 get_lookup_table("ICD-10") |>
   dplyr::filter(code %in% .env$result$code) |>
   dplyr::collect()
-#> # A tibble: 2 × 14
+#> # A tibble: 2 × 15
 #>   code  description   ICD10_CODE USAGE USAGE_UK MODIFIER_4 MODIFIER_5 QUALIFIERS
 #>   <chr> <chr>         <chr>      <chr> <chr>    <chr>      <chr>      <chr>     
 #> 1 E10   Type 1 diabe… E10        DEFA… 3        NA         NA         NA        
 #> 2 E11   Type 2 diabe… E11        DEFA… 3        NA         NA         NA        
-#> # ℹ 6 more variables: GENDER_MASK <chr>, MIN_AGE <chr>, MAX_AGE <chr>,
-#> #   TREE_DESCRIPTION <chr>, code_type <chr>, preferred_description <lgl>
+#> # ℹ 7 more variables: GENDER_MASK <chr>, MIN_AGE <chr>, MAX_AGE <chr>,
+#> #   TREE_DESCRIPTION <chr>, code_type <chr>, preferred_description <lgl>,
+#> #   category <chr>
 ```

@@ -14,6 +14,7 @@ lookup_metadata(
   ...,
   lookup_code_col = "code",
   lookup_description_col = "description",
+  lookup_category_col = NA_character_,
   lookup_source = NA_character_,
   preferred_description_col = NA_character_,
   preferred_description_indicator = NA_character_,
@@ -42,6 +43,15 @@ lookup_metadata(
 - lookup_description_col:
 
   The column name for the lookup description (default: "description")
+
+- lookup_category_col:
+
+  The column name carrying a per-code semantic category (e.g. ICD-10
+  chapter, SNOMED FSN class, BNF chapter). Surfaced as `category` by
+  [`get_lookup_table()`](https://codeminer-io.github.io/codeminer/reference/get_lookup_table.md)
+  for use by hierarchy / tree-rendering tooling. Default
+  `NA_character_`, in which case the `category` column is populated with
+  `NA`.
 
 - lookup_source:
 
@@ -105,6 +115,9 @@ lookup_metadata("ICD-10", lookup_version = "2023")
 #> 
 #> $lookup_description_col
 #> [1] "description"
+#> 
+#> $lookup_category_col
+#> [1] NA
 #> 
 #> $lookup_source
 #> [1] NA

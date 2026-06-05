@@ -79,7 +79,7 @@ requested, a named list of data frames.</p>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="create_dummy_database.html">create_dummy_database</a></span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Dummy database ready to use!</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> To reconnect to your previous database:</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>   `Sys.setenv(CODEMINER_DB_PATH = "/tmp/Rtmpc15fMD/file1b4d56412b3f.duckdb")`</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>   `Sys.setenv(CODEMINER_DB_PATH = "/tmp/RtmpYst3Tv/file1b1554663881.duckdb")`</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>   `codeminer_connect()`</span>
 <span class="r-in"><span><span class="fu">get_codeminer_metadata</span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $lookup</span>
@@ -91,22 +91,30 @@ requested, a named list of data frames.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 5       Read v2_UKB v4       Read v2         UKB v4       read_code</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 6 Read v2 drugs_UKB v4 Read v2 drugs         UKB v4       read_code</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 7       Read v3_UKB v4       Read v3         UKB v4       read_code</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   lookup_description_col                                      lookup_source</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1            Description https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2                   term https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3       DESCRIPTION_ICD9 https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4            DESCRIPTION https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5       term_description https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6       term_description https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 7       term_description https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   preferred_description_col preferred_description_indicator col_filters</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1                      &lt;NA&gt;                            &lt;NA&gt;        &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2                      &lt;NA&gt;                            &lt;NA&gt;        &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3                      &lt;NA&gt;                            &lt;NA&gt;        &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4                      &lt;NA&gt;                            &lt;NA&gt;        &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5                 term_code                              00        &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6                      &lt;NA&gt;                            &lt;NA&gt;        &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 7          description_type                               P        &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   lookup_description_col lookup_category_col</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1            Description         BNF_Chapter</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2                   term                &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3       DESCRIPTION_ICD9                &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4            DESCRIPTION                &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5       term_description                &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6       term_description                &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7       term_description                &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                                        lookup_source preferred_description_col</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592                      &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2 https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592                      &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3 https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592                      &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4 https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592                      &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5 https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592                 term_code</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6 https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592                      &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7 https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592          description_type</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   preferred_description_indicator col_filters</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1                            &lt;NA&gt;        &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2                            &lt;NA&gt;        &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3                            &lt;NA&gt;        &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4                            &lt;NA&gt;        &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5                              00        &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6                            &lt;NA&gt;        &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7                               P        &lt;NA&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $mapping</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>          mapping_table_name from_code_type to_code_type map_version    from_col</span>
@@ -169,22 +177,30 @@ requested, a named list of data frames.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 5       Read v2_UKB v4       Read v2         UKB v4       read_code</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 6 Read v2 drugs_UKB v4 Read v2 drugs         UKB v4       read_code</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 7       Read v3_UKB v4       Read v3         UKB v4       read_code</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   lookup_description_col                                      lookup_source</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1            Description https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2                   term https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3       DESCRIPTION_ICD9 https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4            DESCRIPTION https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5       term_description https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6       term_description https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 7       term_description https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   preferred_description_col preferred_description_indicator col_filters</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1                      &lt;NA&gt;                            &lt;NA&gt;        &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2                      &lt;NA&gt;                            &lt;NA&gt;        &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3                      &lt;NA&gt;                            &lt;NA&gt;        &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4                      &lt;NA&gt;                            &lt;NA&gt;        &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5                 term_code                              00        &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6                      &lt;NA&gt;                            &lt;NA&gt;        &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 7          description_type                               P        &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   lookup_description_col lookup_category_col</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1            Description         BNF_Chapter</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2                   term                &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3       DESCRIPTION_ICD9                &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4            DESCRIPTION                &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5       term_description                &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6       term_description                &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7       term_description                &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                                        lookup_source preferred_description_col</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592                      &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2 https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592                      &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3 https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592                      &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4 https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592                      &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5 https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592                 term_code</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6 https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592                      &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7 https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592          description_type</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   preferred_description_indicator col_filters</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1                            &lt;NA&gt;        &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2                            &lt;NA&gt;        &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3                            &lt;NA&gt;        &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4                            &lt;NA&gt;        &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5                              00        &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6                            &lt;NA&gt;        &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7                               P        &lt;NA&gt;</span>
 <span class="r-in"><span><span class="fu">get_codeminer_metadata</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"lookup"</span>, <span class="st">"mapping"</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $lookup</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>      lookup_table_name     code_type lookup_version lookup_code_col</span>
@@ -195,22 +211,30 @@ requested, a named list of data frames.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 5       Read v2_UKB v4       Read v2         UKB v4       read_code</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 6 Read v2 drugs_UKB v4 Read v2 drugs         UKB v4       read_code</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 7       Read v3_UKB v4       Read v3         UKB v4       read_code</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   lookup_description_col                                      lookup_source</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1            Description https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2                   term https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3       DESCRIPTION_ICD9 https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4            DESCRIPTION https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5       term_description https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6       term_description https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 7       term_description https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   preferred_description_col preferred_description_indicator col_filters</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1                      &lt;NA&gt;                            &lt;NA&gt;        &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2                      &lt;NA&gt;                            &lt;NA&gt;        &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3                      &lt;NA&gt;                            &lt;NA&gt;        &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4                      &lt;NA&gt;                            &lt;NA&gt;        &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5                 term_code                              00        &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6                      &lt;NA&gt;                            &lt;NA&gt;        &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 7          description_type                               P        &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   lookup_description_col lookup_category_col</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1            Description         BNF_Chapter</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2                   term                &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3       DESCRIPTION_ICD9                &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4            DESCRIPTION                &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5       term_description                &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6       term_description                &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7       term_description                &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                                        lookup_source preferred_description_col</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592                      &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2 https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592                      &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3 https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592                      &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4 https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592                      &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5 https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592                 term_code</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6 https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592                      &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7 https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592          description_type</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   preferred_description_indicator col_filters</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1                            &lt;NA&gt;        &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2                            &lt;NA&gt;        &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3                            &lt;NA&gt;        &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4                            &lt;NA&gt;        &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5                              00        &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6                            &lt;NA&gt;        &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7                               P        &lt;NA&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $mapping</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>          mapping_table_name from_code_type to_code_type map_version    from_col</span>

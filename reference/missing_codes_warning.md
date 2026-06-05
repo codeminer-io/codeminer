@@ -68,7 +68,7 @@ temp_db <- tempfile(fileext = ".duckdb")
 create_dummy_database(temp_db)
 #> ✔ Dummy database ready to use!
 #> ℹ To reconnect to your previous database:
-#>   `Sys.setenv(CODEMINER_DB_PATH = "/tmp/Rtmpc15fMD/file1b4d1479454.duckdb")`
+#>   `Sys.setenv(CODEMINER_DB_PATH = "/tmp/RtmpYst3Tv/file1b153a1c6230.duckdb")`
 #>   `codeminer_connect()`
 missing_codes <- table_type <- table_meta <- NULL
 
@@ -104,8 +104,10 @@ table_type
 table_meta
 #>   lookup_table_name code_type lookup_version lookup_code_col
 #> 4     ICD-10_UKB v4    ICD-10         UKB v4        ALT_CODE
-#>   lookup_description_col                                      lookup_source
-#> 4            DESCRIPTION https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592
-#>   preferred_description_col preferred_description_indicator col_filters
-#> 4                      <NA>                            <NA>        <NA>
+#>   lookup_description_col lookup_category_col
+#> 4            DESCRIPTION                <NA>
+#>                                        lookup_source preferred_description_col
+#> 4 https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592                      <NA>
+#>   preferred_description_indicator col_filters
+#> 4                            <NA>        <NA>
 ```
