@@ -215,11 +215,18 @@ read_snomed_ct_uk_monolith <- function(
       ) |>
       dplyr::rename("conceptId" = dplyr::all_of("conceptId_description"))
 
+    # Per-concept category derived from the FSN trailing parenthetical, e.g.
+    # "Hypertensive disorder (disorder)" -> "Disorder". Each SNOMED concept
+    # has at most one active FSN; non-FSN rows inherit the FSN-derived
+    # category via the join.
+    sct_lookup_table <- snomed_attach_category(sct_lookup_table)
+
     sct_lookup_metadata <- lookup_metadata(
       code_type = snomed_code_type,
       lookup_version = version,
       lookup_code_col = "conceptId",
       lookup_description_col = "term_description",
+      lookup_category_col = "category",
       lookup_source = source,
       preferred_description_col = "typeId_description",
       preferred_description_indicator = "900000000000003001",
@@ -387,4 +394,46 @@ fread_sct <- function(file_path) {
     colClasses = "character",
     quote = ""
   )
+}
+
+#' Attach a per-concept `category` derived from the active FSN
+#'
+#' Extracts the trailing parenthetical (e.g. "(disorder)") from each concept's
+#' active Fully Specified Name and sentence-cases it. Non-FSN rows for the
+#' same concept inherit the value via a left join on `conceptId`. Retired
+#' concepts (`active_concept == "0"`) are surfaced as `"Inactive"` so that
+#' hierarchy tooling can group retired codes instead of seeing `NA` (retired
+#' concepts often have no active FSN to derive a category from).
+#'
+#' @param sct_lookup_table The merged description/concept lookup table.
+#' @return The same table with a new `category` column.
+#' @noRd
+snomed_attach_category <- function(sct_lookup_table) {
+  fsn_type_id <- "900000000000003001"
+
+  fsn_categories <- sct_lookup_table |>
+    dplyr::filter(
+      .data$typeId_description == .env$fsn_type_id,
+      .data$active_description == "1"
+    ) |>
+    dplyr::mutate(
+      category = stringr::str_to_sentence(
+        stringr::str_match(
+          .data$term_description,
+          "\\(([^()]*)\\)\\s*$"
+        )[, 2]
+      )
+    ) |>
+    dplyr::distinct(.data$conceptId, .keep_all = TRUE) |>
+    dplyr::select(dplyr::all_of(c("conceptId", "category")))
+
+  sct_lookup_table |>
+    dplyr::left_join(fsn_categories, by = "conceptId") |>
+    dplyr::mutate(
+      category = dplyr::if_else(
+        !is.na(.data$active_concept) & .data$active_concept == "0",
+        "Inactive",
+        .data$category
+      )
+    )
 }

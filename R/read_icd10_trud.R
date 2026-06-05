@@ -136,11 +136,23 @@ read_icd10_trud <- function(
       )
     )
 
+  # Attach chapter as `category` by joining the static prefix -> chapter
+  # lookup on the 3-character prefix of ALT_CODE. TRUD's TREE_DESCRIPTION is
+  # a sparse leaf-level display label, not a chapter.
+  icd10_table <- icd10_table |>
+    dplyr::mutate(.prefix = stringr::str_sub(.data$ALT_CODE, 1, 3)) |>
+    dplyr::left_join(
+      icd10_chapter_lookup() |> dplyr::rename(category = "chapter"),
+      by = c(".prefix" = "prefix")
+    ) |>
+    dplyr::select(-".prefix")
+
   icd10_metadata <- lookup_metadata(
     code_type = "ICD-10",
     lookup_version = version,
     lookup_code_col = "ALT_CODE",
     lookup_description_col = "DESCRIPTION",
+    lookup_category_col = "category",
     lookup_source = source
   )
 

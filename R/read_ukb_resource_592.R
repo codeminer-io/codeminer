@@ -396,6 +396,7 @@ process_bnf_lkp <- function(.df, ukb_version, ukb_source) {
         lookup_version = ukb_version,
         lookup_code_col = "BNF_Code",
         lookup_description_col = "Description",
+        lookup_category_col = "BNF_Chapter",
         preferred_description_col = NA_character_,
         preferred_description_indicator = NA_character_,
         lookup_source = ukb_source,

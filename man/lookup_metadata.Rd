@@ -10,6 +10,7 @@ lookup_metadata(
   ...,
   lookup_code_col = "code",
   lookup_description_col = "description",
+  lookup_category_col = NA_character_,
   lookup_source = NA_character_,
   preferred_description_col = NA_character_,
   preferred_description_indicator = NA_character_,
@@ -26,6 +27,12 @@ lookup_metadata(
 \item{lookup_code_col}{The column name for the lookup code (default: "code")}
 
 \item{lookup_description_col}{The column name for the lookup description (default: "description")}
+
+\item{lookup_category_col}{The column name carrying a per-code semantic
+category (e.g. ICD-10 chapter, SNOMED FSN class, BNF chapter). Surfaced as
+\code{category} by \code{\link[=get_lookup_table]{get_lookup_table()}} for use by hierarchy / tree-rendering
+tooling. Default \code{NA_character_}, in which case the \code{category} column is
+populated with \code{NA}.}
 
 \item{lookup_source}{The source of the lookup metadata (default: \code{NA_character_})}
 

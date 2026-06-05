@@ -133,6 +133,23 @@ test_that("read_icd10_trud() does not modify DESCRIPTION when no modifier", {
   expect_equal(e10$DESCRIPTION, "Type 1 diabetes mellitus")
 })
 
+test_that("read_icd10_trud() attaches chapter as the category", {
+  dir <- create_dummy_icd10_dir()
+  result <- suppressMessages(read_icd10_trud(dir))
+  tbl <- result$icd10_lkp$lookup$table
+  meta <- result$icd10_lkp$lookup$metadata
+
+  # TREE_DESCRIPTION is retained as a source column (downstream tooling may
+  # still want it as a tree-display label), but the category is the chapter
+  # derived from the prefix lookup, not TREE_DESCRIPTION itself.
+  expect_true("TREE_DESCRIPTION" %in% names(tbl))
+  expect_true("category" %in% names(tbl))
+  expect_equal(meta$lookup_category_col, "category")
+  expect_equal(tbl[tbl$ALT_CODE == "E10", ]$category, "Endocrine")
+  expect_equal(tbl[tbl$ALT_CODE == "E113", ]$category, "Endocrine")
+  expect_equal(tbl[tbl$ALT_CODE == "J46", ]$category, "Respiratory")
+})
+
 test_that("read_icd10_trud() returns relationship table", {
   dir <- create_dummy_icd10_dir()
   result <- suppressMessages(read_icd10_trud(dir))

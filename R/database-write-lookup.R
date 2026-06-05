@@ -215,6 +215,11 @@ update_lookup_metadata <- function(
 #' @inheritParams rlang::args_dots_empty
 #' @param lookup_code_col The column name for the lookup code (default: "code")
 #' @param lookup_description_col The column name for the lookup description (default: "description")
+#' @param lookup_category_col The column name carrying a per-code semantic
+#'   category (e.g. ICD-10 chapter, SNOMED FSN class, BNF chapter). Surfaced as
+#'   `category` by [get_lookup_table()] for use by hierarchy / tree-rendering
+#'   tooling. Default `NA_character_`, in which case the `category` column is
+#'   populated with `NA`.
 #' @param lookup_source The source of the lookup metadata (default: `NA_character_`)
 #' @param preferred_description_col The name of the column that indicates the
 #'   preferred description. This is useful for lookup tables that have multiple
@@ -253,6 +258,7 @@ lookup_metadata <- function(
 
   lookup_code_col = "code",
   lookup_description_col = "description",
+  lookup_category_col = NA_character_,
   lookup_source = NA_character_,
   preferred_description_col = NA_character_,
   preferred_description_indicator = NA_character_,
@@ -277,6 +283,7 @@ lookup_metadata <- function(
     lookup_version = lookup_version,
     lookup_code_col = lookup_code_col,
     lookup_description_col = lookup_description_col,
+    lookup_category_col = lookup_category_col,
     lookup_source = lookup_source,
     preferred_description_col = preferred_description_col,
     preferred_description_indicator = preferred_description_indicator,

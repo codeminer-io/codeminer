@@ -11,6 +11,8 @@ codeminer is an R package for working with clinical coding systems (ICD-10, SNOM
 - Use `cli` for error handling (`codeminer_abort`, `codeminer_warn`, `codeminer_inform`)
 - Use `glue::glue_sql()` for parameterised SQL queries
 - Use `dplyr` / `dbplyr` for lazy table operations where possible
+- Prefer tidyverse packages already in Imports (`dplyr`, `purrr`, `stringr`, `tidyr`, `tibble`) over base R equivalents where they read more clearly — e.g. `purrr::map()` rather than a `for` loop over rows, `stringr::str_sub()` rather than `substr()`. Don't force tidyverse where base is genuinely simpler (vectorised arithmetic, predicates, etc.)
+- Avoid superseded dplyr verbs (e.g. `transmute()`); use the current equivalents (`mutate()` + `select()`)
 
 ## Testing and checks
 

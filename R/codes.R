@@ -304,9 +304,9 @@ CODES_LIKE <- function(
 #' Get the full lookup table for a code type
 #'
 #' Returns a lazy `dplyr::tbl()` containing the lookup table with standardised
-#' column names (`code`, `description`, `code_type`, `preferred_description`)
-#' plus all additional columns from the underlying database table. Call
-#' [dplyr::collect()] to materialise the result.
+#' column names (`code`, `description`, `code_type`, `preferred_description`,
+#' `category`) plus all additional columns from the underlying database table.
+#' Call [dplyr::collect()] to materialise the result.
 #'
 #' This is useful for inspecting columns beyond the standard codelist output
 #' returned by [CODES()] and [DESCRIPTION()].
@@ -319,8 +319,9 @@ CODES_LIKE <- function(
 #' @param call The calling environment. Passed to [codeminer_abort].
 #'
 #' @return A lazy `dplyr::tbl()` with standardised columns (`code`,
-#'   `description`, `code_type`, `preferred_description`) plus all other
-#'   columns from the underlying table.
+#'   `description`, `code_type`, `preferred_description`, `category`) plus all
+#'   other columns from the underlying table. `category` is `NA` for code
+#'   systems without a populated category source.
 #' @export
 #' @family Clinical code lookups and mappings
 #' @seealso [CODES()] for standardised codelist output,
@@ -358,21 +359,41 @@ get_lookup_table <- function(
   )
   tbl <- apply_col_filters(tbl, resolved, tbl_name = tbl_name, call = call)
 
-  tbl <- dplyr::select(
-    tbl,
-    code = .env$this_meta$lookup_code_col,
-    description = .env$this_meta$lookup_description_col,
-    dplyr::everything()
-  ) |>
+  # Do every column rename in a single innermost SELECT. dplyr::rename() chained
+  # after a mutate forces dbplyr to enumerate columns in the outer projection,
+  # which in DuckDB triggers case-folding of unquoted identifiers — so a source
+  # column like `CODE` collapses with the `ALT_CODE AS code` alias and tibble
+  # rejects the result. Keeping all renames in one SELECT lets the outer
+  # wrappers stay as `q01.*`, and the backend auto-disambiguates duplicates
+  # with `_1` suffixes.
+  # NULL on `lookup_category_col` covers pre-migration databases (the metadata
+  # column did not exist before #124).
+  category_col <- this_meta$lookup_category_col
+  renames <- c(
+    code = this_meta$lookup_code_col,
+    description = this_meta$lookup_description_col
+  )
+  if (!is.na(this_meta$preferred_description_col)) {
+    renames <- c(
+      renames,
+      preferred_description = this_meta$preferred_description_col
+    )
+  }
+  if (!is.null(category_col) && !is.na(category_col)) {
+    renames <- c(renames, category = category_col)
+  }
+
+  tbl <- dplyr::select(tbl, !!!renames, dplyr::everything()) |>
     dplyr::mutate(code_type = .env$type)
 
-  if (!is.na(this_meta$preferred_description_col)) {
-    tbl <- dplyr::rename(
-      tbl,
-      preferred_description = .env$this_meta$preferred_description_col,
-    )
-  } else {
+  if (is.na(this_meta$preferred_description_col)) {
     tbl <- dplyr::mutate(tbl, preferred_description = TRUE)
+  }
+  if (is.null(category_col) || is.na(category_col)) {
+    # `as.character(NA)` is dbplyr-translated to the backend's typed cast
+    # (e.g. DuckDB `TRY_CAST(NULL AS TEXT)`) so the column comes back `<chr>`
+    # rather than being inferred as integer from an untyped NULL.
+    tbl <- dplyr::mutate(tbl, category = as.character(NA))
   }
 
   return(tbl)
