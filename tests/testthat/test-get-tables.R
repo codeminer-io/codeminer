@@ -28,6 +28,41 @@ test_that("get_lookup_table() returns standardised columns plus extras", {
   expect_true(ncol(result) > 3)
 })
 
+test_that("get_lookup_table() tolerates source columns that case-fold onto standardised aliases", {
+  # Regression: a source column whose case-insensitive name matches a
+  # standardised alias (e.g. TRUD ICD-10 ships both `CODE` and `ALT_CODE`,
+  # and `ALT_CODE` is the lookup_code_col so it gets renamed to `code`).
+  # DuckDB folds unquoted identifiers, so an outer SELECT projecting both
+  # `code` and `CODE` collapses them and tibble blows up. The fix keeps all
+  # renames in one innermost SELECT so the outer wrappers stay `q01.*` and
+  # the backend auto-disambiguates duplicates with `_1` suffixes.
+  collision_tbl <- tibble::tibble(
+    CODE = c("X.0", "X.1"),
+    ALT_CODE = c("X0", "X1"),
+    DESCRIPTION = c("First", "Second"),
+    CATEGORY_LABEL = c("Cat A", "Cat B")
+  )
+
+  suppressMessages(add_lookup_table(
+    collision_tbl,
+    lookup_metadata(
+      "collision_type",
+      lookup_version = "v1",
+      lookup_code_col = "ALT_CODE",
+      lookup_description_col = "DESCRIPTION",
+      lookup_category_col = "CATEGORY_LABEL"
+    )
+  ))
+
+  result <- get_lookup_table("collision_type") |> dplyr::collect()
+
+  # `code` is the renamed ALT_CODE; the original CODE survives as CODE_1.
+  expect_true(all(c("code", "CODE_1", "category") %in% names(result)))
+  expect_equal(sort(result$code), c("X0", "X1"))
+  expect_equal(sort(result$CODE_1), c("X.0", "X.1"))
+  expect_equal(sort(result$category), c("Cat A", "Cat B"))
+})
+
 test_that("get_lookup_table() exposes BNF chapter as `category`", {
   result <- get_lookup_table("BNF") |> dplyr::collect()
   expect_true("category" %in% names(result))

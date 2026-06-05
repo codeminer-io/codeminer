@@ -359,36 +359,41 @@ get_lookup_table <- function(
   )
   tbl <- apply_col_filters(tbl, resolved, tbl_name = tbl_name, call = call)
 
-  tbl <- dplyr::select(
-    tbl,
-    code = .env$this_meta$lookup_code_col,
-    description = .env$this_meta$lookup_description_col,
-    dplyr::everything()
-  ) |>
-    dplyr::mutate(code_type = .env$type)
-
+  # Do every column rename in a single innermost SELECT. dplyr::rename() chained
+  # after a mutate forces dbplyr to enumerate columns in the outer projection,
+  # which in DuckDB triggers case-folding of unquoted identifiers — so a source
+  # column like `CODE` collapses with the `ALT_CODE AS code` alias and tibble
+  # rejects the result. Keeping all renames in one SELECT lets the outer
+  # wrappers stay as `q01.*`, and the backend auto-disambiguates duplicates
+  # with `_1` suffixes.
+  # NULL on `lookup_category_col` covers pre-migration databases (the metadata
+  # column did not exist before #124).
+  category_col <- this_meta$lookup_category_col
+  renames <- c(
+    code = this_meta$lookup_code_col,
+    description = this_meta$lookup_description_col
+  )
   if (!is.na(this_meta$preferred_description_col)) {
-    tbl <- dplyr::rename(
-      tbl,
-      preferred_description = .env$this_meta$preferred_description_col,
+    renames <- c(
+      renames,
+      preferred_description = this_meta$preferred_description_col
     )
-  } else {
-    tbl <- dplyr::mutate(tbl, preferred_description = TRUE)
+  }
+  if (!is.null(category_col) && !is.na(category_col)) {
+    renames <- c(renames, category = category_col)
   }
 
-  # NULL covers databases built before `lookup_category_col` was added to
-  # `required_lookup_metadata_columns()` — they have no such column in the
-  # metadata table until `build_database()` is re-run to migrate the schema.
-  category_col <- this_meta$lookup_category_col
-  if (!is.null(category_col) && !is.na(category_col)) {
-    tbl <- dplyr::rename(
-      tbl,
-      category = .env$category_col,
-    )
-  } else {
-    # CAST through SQL so DuckDB types the column as VARCHAR rather than
-    # inferring INTEGER from an untyped NULL literal.
-    tbl <- dplyr::mutate(tbl, category = dplyr::sql("CAST(NULL AS VARCHAR)"))
+  tbl <- dplyr::select(tbl, !!!renames, dplyr::everything()) |>
+    dplyr::mutate(code_type = .env$type)
+
+  if (is.na(this_meta$preferred_description_col)) {
+    tbl <- dplyr::mutate(tbl, preferred_description = TRUE)
+  }
+  if (is.null(category_col) || is.na(category_col)) {
+    # `as.character(NA)` is dbplyr-translated to the backend's typed cast
+    # (e.g. DuckDB `TRY_CAST(NULL AS TEXT)`) so the column comes back `<chr>`
+    # rather than being inferred as integer from an untyped NULL.
+    tbl <- dplyr::mutate(tbl, category = as.character(NA))
   }
 
   return(tbl)
