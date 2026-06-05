@@ -20,8 +20,8 @@
 #'   `"read_v2_icd10"`, `"read_v2_opcs4"`, `"read_v2_read_ctv3"`,
 #'   `"read_ctv3_icd9"`, `"read_ctv3_icd10"`, `"read_ctv3_opcs4"`,
 #'   `"read_ctv3_read_v2"`
-#' @param ukb_version Version label for the UKB resource (default: `"UKB v4"`).
-#' @param ukb_source Source URL or description for the UKB resource.
+#' @param version Version label for the UKB resource (default: `"UKB v4"`).
+#' @param source Source URL or description for the UKB resource.
 #'
 #' @returns A named list where each element corresponds to a requested sheet.
 #'   Each sheet contains:
@@ -97,8 +97,8 @@ read_ukb_resource_592 <- function(
     "read_ctv3_opcs4",
     "read_ctv3_read_v2"
   ),
-  ukb_version = "UKB v4",
-  ukb_source = "https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592"
+  version = "UKB v4",
+  source = "https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592"
 ) {
   # validate args
   if (!file.exists(path)) {
@@ -131,8 +131,8 @@ read_ukb_resource_592 <- function(
         read_ukb_resource_592_sheet(
           path = path,
           sheet = .x,
-          ukb_version = ukb_version,
-          ukb_source = ukb_source
+          version = version,
+          source = source
         )
       },
       .progress = TRUE
@@ -167,8 +167,8 @@ read_ukb_resource_592 <- function(
 read_ukb_resource_592_sheet <- function(
   path,
   sheet,
-  ukb_version,
-  ukb_source
+  version,
+  source
 ) {
   # Read excel sheet as type character
   .df <- readxl::read_excel(path = path, sheet = sheet, col_types = "text")
@@ -192,7 +192,7 @@ read_ukb_resource_592_sheet <- function(
 
   # Process - must return a named list with at least one of items "lookup",
   # "relationship" and/or "mapping"
-  ukb_592_processors()[[sheet]](.df, ukb_version, ukb_source)
+  ukb_592_processors()[[sheet]](.df, version, source)
 }
 
 # Process_ functions ------------------------------------------------------
@@ -219,7 +219,7 @@ ukb_592_processors <- function() {
   )
 }
 
-process_bnf_lkp <- function(.df, ukb_version, ukb_source) {
+process_bnf_lkp <- function(.df, version, source) {
   # Extend lookup table so that code column ("BNF_Code") includes BNF chapters,
   # sections, paragraphs etc
   lookup <- .df |>
@@ -393,47 +393,47 @@ process_bnf_lkp <- function(.df, ukb_version, ukb_source) {
       table = lookup,
       metadata = lookup_metadata(
         code_type = "BNF",
-        lookup_version = ukb_version,
+        lookup_version = version,
         lookup_code_col = "BNF_Code",
         lookup_description_col = "Description",
         preferred_description_col = NA_character_,
         preferred_description_indicator = NA_character_,
-        lookup_source = ukb_source,
+        lookup_source = source,
       )
     ),
     relationship = list(
       table = relationship,
       metadata = relationship_metadata(
         code_type = "BNF",
-        relationship_version = ukb_version,
+        relationship_version = version,
         from_col = "from",
         to_col = "to",
         type_col = "type",
         child_parent_relationship_code = "is a",
-        relationship_source = ukb_source
+        relationship_source = source
       )
     )
   )
 }
 
-process_dmd_lkp <- function(.df, ukb_version, ukb_source) {
+process_dmd_lkp <- function(.df, version, source) {
   list(
     lookup = list(
       table = .df,
       metadata = lookup_metadata(
         code_type = "DM+D",
-        lookup_version = ukb_version,
+        lookup_version = version,
         lookup_code_col = "concept_id",
         lookup_description_col = "term",
         preferred_description_col = NA_character_,
         preferred_description_indicator = NA_character_,
-        lookup_source = ukb_source,
+        lookup_source = source,
       )
     )
   )
 }
 
-process_icd9_lkp <- function(.df, ukb_version, ukb_source) {
+process_icd9_lkp <- function(.df, version, source) {
   # Create relationship table
   relationship <- .df$ICD9 |>
     build_prefix_hierarchy_len()
@@ -443,30 +443,30 @@ process_icd9_lkp <- function(.df, ukb_version, ukb_source) {
       table = .df,
       metadata = lookup_metadata(
         code_type = "ICD-9",
-        lookup_version = ukb_version,
+        lookup_version = version,
         lookup_code_col = "ICD9",
         lookup_description_col = "DESCRIPTION_ICD9",
         preferred_description_col = NA_character_,
         preferred_description_indicator = NA_character_,
-        lookup_source = ukb_source,
+        lookup_source = source,
       )
     ),
     relationship = list(
       table = relationship,
       metadata = relationship_metadata(
         code_type = "ICD-9",
-        relationship_version = ukb_version,
+        relationship_version = version,
         from_col = "from",
         to_col = "to",
         type_col = "type",
         child_parent_relationship_code = "is a",
-        relationship_source = ukb_source
+        relationship_source = source
       )
     )
   )
 }
 
-process_icd10_lkp <- function(.df, ukb_version, ukb_source) {
+process_icd10_lkp <- function(.df, version, source) {
   # Some ICD-10 descriptions include a modifier e.g. "E10" = "Type 1 diabetes
   # mellitus", whereas "E10.0" = "Type 1 diabetes mellitus with coma". "With
   # coma" is contained in the modifier columns "MODIFIER-4". See 'S27' for an
@@ -500,30 +500,30 @@ process_icd10_lkp <- function(.df, ukb_version, ukb_source) {
       table = lookup,
       metadata = lookup_metadata(
         code_type = "ICD-10",
-        lookup_version = ukb_version,
+        lookup_version = version,
         lookup_code_col = "ALT_CODE",
         lookup_description_col = "DESCRIPTION",
         preferred_description_col = NA_character_,
         preferred_description_indicator = NA_character_,
-        lookup_source = ukb_source,
+        lookup_source = source,
       )
     ),
     relationship = list(
       table = relationship,
       metadata = relationship_metadata(
         code_type = "ICD-10",
-        relationship_version = ukb_version,
+        relationship_version = version,
         from_col = "from",
         to_col = "to",
         type_col = "type",
         child_parent_relationship_code = "is a",
-        relationship_source = ukb_source
+        relationship_source = source
       )
     )
   )
 }
 
-process_icd9_icd10 <- function(.df, ukb_version, ukb_source) {
+process_icd9_icd10 <- function(.df, version, source) {
   # For ICD9 codes without an equivalent ICD10 code, the ICD10 code is recorded
   # as 'UNDEF', with `NA` for the description (and vice versa). This function
   # converts values of 'UNDEF' in the `ICD9` and `ICD10` columns to `NA`.
@@ -544,16 +544,16 @@ process_icd9_icd10 <- function(.df, ukb_version, ukb_source) {
       metadata = mapping_metadata(
         from_code_type = "ICD-9",
         to_code_type = "ICD-10",
-        map_version = ukb_version,
+        map_version = version,
         from_col = "ICD9",
         to_col = "ICD10",
-        map_source = ukb_source
+        map_source = source
       )
     )
   )
 }
 
-process_read_v2_lkp <- function(.df, ukb_version, ukb_source) {
+process_read_v2_lkp <- function(.df, version, source) {
   relationship <- .df$read_code |>
     # Removes only trailing padding dots from Read 2 codes, while preserving
     # leading or internal dots.
@@ -570,89 +570,89 @@ process_read_v2_lkp <- function(.df, ukb_version, ukb_source) {
       table = .df,
       metadata = lookup_metadata(
         code_type = "Read v2",
-        lookup_version = ukb_version,
+        lookup_version = version,
         lookup_code_col = "read_code",
         lookup_description_col = "term_description",
         preferred_description_col = "term_code",
         preferred_description_indicator = "00",
-        lookup_source = ukb_source
+        lookup_source = source
       )
     ),
     relationship = list(
       table = relationship,
       metadata = relationship_metadata(
         code_type = "Read v2",
-        relationship_version = ukb_version,
+        relationship_version = version,
         from_col = "from",
         to_col = "to",
         type_col = "type",
         child_parent_relationship_code = "is a",
-        relationship_source = ukb_source
+        relationship_source = source
       )
     )
   )
 }
 
-process_read_v2_drugs_lkp <- function(.df, ukb_version, ukb_source) {
+process_read_v2_drugs_lkp <- function(.df, version, source) {
   list(
     lookup = list(
       table = .df,
       metadata = lookup_metadata(
         code_type = "Read v2 drugs",
-        lookup_version = ukb_version,
+        lookup_version = version,
         lookup_code_col = "read_code",
         lookup_description_col = "term_description",
         preferred_description_col = NA_character_,
         preferred_description_indicator = NA_character_,
-        lookup_source = ukb_source
+        lookup_source = source
       )
     )
   )
 }
 
-process_read_v2_drugs_bnf <- function(.df, ukb_version, ukb_source) {
+process_read_v2_drugs_bnf <- function(.df, version, source) {
   list(
     mapping = list(
       table = .df,
       metadata = mapping_metadata(
         from_code_type = "Read v2 drugs",
         to_code_type = "BNF",
-        map_version = ukb_version,
+        map_version = version,
         from_col = "read_code",
         to_col = "bnf_code",
-        map_source = ukb_source
+        map_source = source
       )
     )
   )
 }
 
-process_read_v2_icd9 <- function(.df, ukb_version, ukb_source) {
+process_read_v2_icd9 <- function(.df, version, source) {
   list(
     mapping = list(
       table = .df,
       metadata = mapping_metadata(
         from_code_type = "Read v2",
         to_code_type = "ICD-9",
-        map_version = ukb_version,
+        map_version = version,
         from_col = "read_code",
         to_col = "icd9_code",
-        map_source = ukb_source
+        map_source = source
       )
     )
   )
 }
 
-process_read_v2_icd10 <- function(.df, ukb_version, ukb_source) {
+process_read_v2_icd10 <- function(.df, version, source) {
   list(
     mapping = list(
       table = .df,
       metadata = mapping_metadata(
         from_code_type = "Read v2",
         to_code_type = "ICD-10",
-        map_version = ukb_version,
+        map_version = version,
         from_col = "read_code",
         to_col = "icd10_code",
-        map_source = ukb_source,
+        map_source = source,
         col_filters = list(
           icd10_code_def = list(
             values = c("1", "15", "3", "5", "7", "8", "2"),
@@ -664,33 +664,33 @@ process_read_v2_icd10 <- function(.df, ukb_version, ukb_source) {
   )
 }
 
-process_read_v2_opcs4 <- function(.df, ukb_version, ukb_source) {
+process_read_v2_opcs4 <- function(.df, version, source) {
   list(
     mapping = list(
       table = .df,
       metadata = mapping_metadata(
         from_code_type = "Read v2",
         to_code_type = "OPCS4",
-        map_version = ukb_version,
+        map_version = version,
         from_col = "read_code",
         to_col = "opcs_4.2_code",
-        map_source = ukb_source
+        map_source = source
       )
     )
   )
 }
 
-process_read_v2_read_ctv3 <- function(.df, ukb_version, ukb_source) {
+process_read_v2_read_ctv3 <- function(.df, version, source) {
   list(
     mapping = list(
       table = .df,
       metadata = mapping_metadata(
         from_code_type = "Read v2",
         to_code_type = "Read v3",
-        map_version = ukb_version,
+        map_version = version,
         from_col = "READV2_CODE",
         to_col = "READV3_CODE",
-        map_source = ukb_source,
+        map_source = source,
         col_filters = list(
           IS_ASSURED = list(values = c("1"), defaults = c("1"))
         )
@@ -699,40 +699,40 @@ process_read_v2_read_ctv3 <- function(.df, ukb_version, ukb_source) {
   )
 }
 
-process_read_ctv3_lkp <- function(.df, ukb_version, ukb_source) {
+process_read_ctv3_lkp <- function(.df, version, source) {
   list(
     lookup = list(
       table = .df,
       metadata = lookup_metadata(
         code_type = "Read v3",
-        lookup_version = ukb_version,
+        lookup_version = version,
         lookup_code_col = "read_code",
         lookup_description_col = "term_description",
         preferred_description_col = "description_type",
         preferred_description_indicator = "P",
-        lookup_source = ukb_source
+        lookup_source = source
       )
     )
   )
 }
 
-process_read_ctv3_icd9 <- function(.df, ukb_version, ukb_source) {
+process_read_ctv3_icd9 <- function(.df, version, source) {
   list(
     mapping = list(
       table = .df,
       metadata = mapping_metadata(
         from_code_type = "Read v3",
         to_code_type = "ICD-9",
-        map_version = ukb_version,
+        map_version = version,
         from_col = "read_code",
         to_col = "icd9_code",
-        map_source = ukb_source
+        map_source = source
       )
     )
   )
 }
 
-process_read_ctv3_icd10 <- function(.df, ukb_version, ukb_source) {
+process_read_ctv3_icd10 <- function(.df, version, source) {
   # Remove 'D' and 'A' from the ends of ICD10 codes, and separate these into a
   # separate column called `icd10_dagger_asterisk`. The 'D' and 'A' indicate
   # whether the code is a 'dagger' or 'asterisk' respectively. However, these
@@ -764,10 +764,10 @@ process_read_ctv3_icd10 <- function(.df, ukb_version, ukb_source) {
       metadata = mapping_metadata(
         from_code_type = "Read v3",
         to_code_type = "ICD-10",
-        map_version = ukb_version,
+        map_version = version,
         from_col = "read_code",
         to_col = "icd10_code",
-        map_source = ukb_source,
+        map_source = source,
         col_filters = list(
           mapping_status = list(
             values = c("E", "G", "D", "R", "A", "U"),
@@ -791,33 +791,33 @@ process_read_ctv3_icd10 <- function(.df, ukb_version, ukb_source) {
   )
 }
 
-process_read_ctv3_opcs4 <- function(.df, ukb_version, ukb_source) {
+process_read_ctv3_opcs4 <- function(.df, version, source) {
   list(
     mapping = list(
       table = .df,
       metadata = mapping_metadata(
         from_code_type = "Read v3",
         to_code_type = "OPCS4",
-        map_version = ukb_version,
+        map_version = version,
         from_col = "read_code",
         to_col = "opcs4_code",
-        map_source = ukb_source
+        map_source = source
       )
     )
   )
 }
 
-process_read_ctv3_read_v2 <- function(.df, ukb_version, ukb_source) {
+process_read_ctv3_read_v2 <- function(.df, version, source) {
   list(
     mapping = list(
       table = .df,
       metadata = mapping_metadata(
         from_code_type = "Read v3",
         to_code_type = "Read v2",
-        map_version = ukb_version,
+        map_version = version,
         from_col = "READV3_CODE",
         to_col = "READV2_CODE",
-        map_source = ukb_source,
+        map_source = source,
         col_filters = list(
           IS_ASSURED = list(values = c("1"), defaults = c("1"))
         )
