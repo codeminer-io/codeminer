@@ -45,5 +45,6 @@ update_lookup_metadata(
 [`add_lookup_table()`](https://codeminer-io.github.io/codeminer/reference/add_lookup_table.md)
 
 Other Database management:
+[`migrate_database()`](https://codeminer-io.github.io/codeminer/reference/migrate_database.md),
 [`update_mapping_metadata()`](https://codeminer-io.github.io/codeminer/reference/update_mapping_metadata.md),
 [`update_relationship_metadata()`](https://codeminer-io.github.io/codeminer/reference/update_relationship_metadata.md)

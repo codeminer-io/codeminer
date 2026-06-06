@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="index.html">codeminer</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0.9004</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0.9005</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -53,6 +53,22 @@
 <li>Prefer tidyverse packages already in Imports (<code>dplyr</code>, <code>purrr</code>, <code>stringr</code>, <code>tidyr</code>, <code>tibble</code>) over base R equivalents where they read more clearly — e.g. <code><a href="https://purrr.tidyverse.org/reference/map.html" class="external-link">purrr::map()</a></code> rather than a <code>for</code> loop over rows, <code><a href="https://stringr.tidyverse.org/reference/str_sub.html" class="external-link">stringr::str_sub()</a></code> rather than <code><a href="https://rdrr.io/r/base/substr.html" class="external-link">substr()</a></code>. Don’t force tidyverse where base is genuinely simpler (vectorised arithmetic, predicates, etc.)</li>
 <li>Avoid superseded dplyr verbs (e.g. <code>transmute()</code>); use the current equivalents (<code>mutate()</code> + <code>select()</code>)</li>
 </ul></div>
+<div class="section level2">
+<h2 id="database-schema-changes">Database schema changes<a class="anchor" aria-label="anchor" href="#database-schema-changes"></a></h2>
+<p>The on-disk codeminer database carries a schema version separate from the package version. <code>current_schema_version()</code> lives in <code>R/schema.R</code>; a row in the <code>_db_metadata</code> table records which schema version a given DB is on. See <code>vignettes/developer-guide.Rmd</code> for the full gate behaviour and migration registry.</p>
+<p>When your change touches <strong>how data is stored</strong>, you MUST bump <code>current_schema_version()</code> and append a migration to <code>codeminer_migrations()</code>. Triggers:</p>
+<ul><li>Add/remove a column in <code>required_*_metadata_columns()</code> (lookup, mapping, relationship, or db)</li>
+<li>Add/remove/rename a metadata table</li>
+<li>Rename, retype, or change the semantics of any stored column</li>
+<li>Change the composition rule for <code>*_table_name</code> (e.g. how it is <code>paste</code>d)</li>
+<li>Change the on-disk serialisation of any field (e.g. the <code>col_filters</code> JSON shape)</li>
+</ul><p>When your change is <strong>R-side only</strong>, do NOT bump. Examples that do not warrant a bump:</p>
+<ul><li>Renaming columns at read time inside <code><a href="reference/get_lookup_table.html">get_lookup_table()</a></code> (the on-disk shape is unchanged)</li>
+<li>Bug fixes that don’t alter stored data</li>
+<li>New R functions, refactors, tests, docs</li>
+<li>Adding/changing function arguments that don’t change persisted data</li>
+</ul><p>Each migration declares a mode: <code>auto_additive</code> (the connect gate runs it silently), <code>manual_additive</code> (requires explicit <code><a href="reference/migrate_database.html">migrate_database()</a></code>), or <code>breaking</code> (requires <code><a href="reference/migrate_database.html">migrate_database()</a></code>, user may need to back up first). Default to the strictest mode that fits — better to ask for confirmation than to silently rewrite data.</p>
+</div>
 <div class="section level2">
 <h2 id="testing-and-checks">Testing and checks<a class="anchor" aria-label="anchor" href="#testing-and-checks"></a></h2>
 <ul><li>Tests use <code>testthat</code> (edition 3)</li>
