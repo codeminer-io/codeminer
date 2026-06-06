@@ -31,7 +31,6 @@ reference:
       - codeminer_set_col_filters
       - codeminer_clear_col_filters
       - with_col_filters
-      - codeminer_snapshot_extra
 
   - title: Database management
     desc: Build a local database with lookup and mapping tables for various clinical coding systems.
