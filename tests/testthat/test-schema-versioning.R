@@ -10,10 +10,12 @@
 #   * pending_migrations() validates the chain
 #   * codeminer_build_info() reflects packageDescription() fields
 
-# Helper: open a fresh write conn to the active DB and run `f(con)`.
+# Helper: open a write connection to the active DB and run `f(con)`. Uses
+# `connect_to_db(read_only = FALSE)` because that path detaches the
+# workbench's ATTACH first and re-attaches on exit — necessary on Windows,
+# where DuckDB refuses to open a file already held by another connection.
 with_write_conn <- function(f) {
-  con <- DBI::dbConnect(duckdb::duckdb(), Sys.getenv("CODEMINER_DB_PATH"))
-  on.exit(DBI::dbDisconnect(con, shutdown = TRUE))
+  con <- connect_to_db(read_only = FALSE)
   f(con)
 }
 
