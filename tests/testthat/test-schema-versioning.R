@@ -169,6 +169,122 @@ test_that("codeminer_connect() auto-migrates an unstamped DB via the gate", {
   })
 })
 
+test_that("codeminer_connect() refuses when the chain has a non-auto migration", {
+  local_build_temp_database()
+  with_write_conn(function(con) {
+    DBI::dbRemoveTable(con, codeminer_metadata_table_names$db)
+  })
+  codeminer_disconnect()
+
+  # Pretend the registry has a `breaking` v0 -> v1 migration. The gate
+  # should refuse rather than auto-running it.
+  testthat::local_mocked_bindings(
+    codeminer_migrations = function() {
+      list(
+        list(
+          from = 0L,
+          to = 1L,
+          mode = "breaking",
+          description = "fake breaking migration for tests",
+          up = function(con) stop("must not run")
+        )
+      )
+    }
+  )
+
+  expect_error(
+    suppressMessages(codeminer_connect()),
+    "non-auto"
+  )
+  codeminer_disconnect()
+})
+
+# ---- migrate_database(): refusal paths -----------------------------------
+
+test_that("migrate_database() refuses a DB stamped at a newer schema than the package", {
+  local_build_temp_database()
+  with_write_conn(function(con) {
+    DBI::dbExecute(con, "UPDATE _db_metadata SET schema_version = '99'")
+  })
+
+  expect_error(
+    suppressMessages(migrate_database()),
+    "newer than this codeminer"
+  )
+})
+
+test_that("migrate_database() refuses a DB stamped below min_readable_schema_version()", {
+  local_build_temp_database()
+  with_write_conn(function(con) {
+    DBI::dbExecute(con, "UPDATE _db_metadata SET schema_version = '-1'")
+  })
+
+  expect_error(
+    suppressMessages(migrate_database()),
+    "this codeminer requires"
+  )
+})
+
+# ---- pending_migrations(): chain validation -------------------------------
+
+test_that("pending_migrations() errors when no registered migrations cover the path", {
+  testthat::local_mocked_bindings(
+    codeminer_migrations = function() list()
+  )
+  expect_error(
+    pending_migrations(0L, 1L),
+    "No registered migrations"
+  )
+})
+
+test_that("pending_migrations() errors when the registered chain has a gap", {
+  testthat::local_mocked_bindings(
+    codeminer_migrations = function() {
+      list(
+        list(
+          from = 0L,
+          to = 1L,
+          mode = "auto_additive",
+          description = "v0->v1",
+          up = function(con) NULL
+        ),
+        # gap: missing v1 -> v2
+        list(
+          from = 2L,
+          to = 3L,
+          mode = "auto_additive",
+          description = "v2->v3",
+          up = function(con) NULL
+        )
+      )
+    }
+  )
+  expect_error(
+    pending_migrations(0L, 3L),
+    "chain is broken"
+  )
+})
+
+test_that("pending_migrations() errors when the chain stops short of the target", {
+  testthat::local_mocked_bindings(
+    codeminer_migrations = function() {
+      list(
+        list(
+          from = 0L,
+          to = 1L,
+          mode = "auto_additive",
+          description = "v0->v1",
+          up = function(con) NULL
+        )
+      )
+    }
+  )
+  expect_error(
+    pending_migrations(0L, 5L),
+    "chain stops at"
+  )
+})
+
 # ---- Provenance from packageDescription -----------------------------------
 
 test_that("codeminer_build_info() includes the package version", {
