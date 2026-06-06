@@ -66,6 +66,9 @@ codeminer_connect <- function(main = NULL, extra = NULL) {
     ))
   }
   if (file.exists(main)) {
+    # Gate the schema version BEFORE the read-only ATTACH so the migration
+    # path can open its own write connection without lock contention.
+    enforce_schema_gate(main)
     DBI::dbExecute(
       .codeminer_env$con,
       glue::glue_sql(

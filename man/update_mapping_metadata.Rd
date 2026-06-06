@@ -36,6 +36,7 @@ data. Currently supports updating \code{col_filters}.
 \code{\link[=mapping_metadata]{mapping_metadata()}}, \code{\link[=add_mapping_table]{add_mapping_table()}}
 
 Other Database management: 
+\code{\link{migrate_database}()},
 \code{\link{update_lookup_metadata}()},
 \code{\link{update_relationship_metadata}()}
 }

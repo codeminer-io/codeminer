@@ -265,11 +265,16 @@ test_that("MAP col_filters applies to mapping table", {
 
 # === Schema migration =======================================================
 
-test_that("build_database migrates schema for existing databases", {
+test_that("build_database() restores missing metadata columns on a pre-#128 (unstamped) database", {
   local_build_temp_database()
 
-  # Manually drop the col_filters column to simulate an old database
+  # Simulate a pre-#128 DB: drop the `_db_metadata` stamp table so the DB
+  # reads as schema v0, and drop a column that was added historically via
+  # the silent ALTER path (col_filters). The v0 -> v1 migration bundles
+  # the legacy `migrate_metadata_schema()` step which should add the
+  # missing column back.
   con <- connect_to_db(read_only = FALSE)
+  DBI::dbRemoveTable(con, codeminer_metadata_table_names$db)
   for (tbl in c(
     codeminer_metadata_table_names$lookup,
     codeminer_metadata_table_names$mapping,
@@ -278,10 +283,8 @@ test_that("build_database migrates schema for existing databases", {
     DBI::dbExecute(con, paste0("ALTER TABLE ", tbl, " DROP COLUMN col_filters"))
   }
 
-  # Rebuild (should add the column back via migration)
-  build_database(overwrite = FALSE)
+  suppressMessages(build_database(overwrite = FALSE))
 
-  # Verify col_filters column exists again
   con2 <- connect_to_db(read_only = FALSE)
   for (tbl in c(
     codeminer_metadata_table_names$lookup,
@@ -291,6 +294,8 @@ test_that("build_database migrates schema for existing databases", {
     fields <- DBI::dbListFields(con2, tbl)
     expect_true("col_filters" %in% fields, info = paste("Missing in", tbl))
   }
+  # And the DB should be stamped again.
+  expect_true(codeminer_metadata_table_names$db %in% DBI::dbListTables(con2))
 })
 
 # === update_*_metadata ======================================================

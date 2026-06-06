@@ -20,9 +20,12 @@ get_codeminer_metadata <- function(
   type = c("lookup", "mapping", "relationship"),
   con = NULL
 ) {
+  # `_db_metadata` is a single-row DB-level stamp, not a per-table index — it
+  # is intentionally excluded from `get_codeminer_metadata()`. Inspect it via
+  # `codeminer_status()` or by reading the table directly.
   type <- rlang::arg_match(
     type,
-    sort(names(codeminer_metadata_table_names)),
+    sort(setdiff(names(codeminer_metadata_table_names), "db")),
     multiple = TRUE
   )
 

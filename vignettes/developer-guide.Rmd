@@ -16,7 +16,97 @@ knitr::opts_chunk$set(
 
 # Overview
 
-This guide provides technical details for developers contributing to codeminer, including information about dummy datasets used for testing.
+This guide provides technical details for developers contributing to codeminer, including the on-disk data model, the schema-versioning contract, and the dummy datasets used for testing.
+
+# Data model
+
+codeminer stores everything in a single DuckDB file. The file holds the data tables for each code system (lookups, mappings, relationships) plus a small set of **metadata tables** that index them.
+
+## Index tables
+
+Three index tables, one per data-table flavour. Each row indexes one underlying data table; the `*_table_name` column is the primary key and matches the actual table name in the DB.
+
+| table | key field | purpose |
+|---|---|---|
+| `_lookup_metadata` | `lookup_table_name` | one row per lookup table. Records `code_type`, `lookup_version`, which column carries the code / description / category / preferred-description flag, the data source URL, and a JSON `col_filters` spec. |
+| `_mapping_metadata` | `mapping_table_name` | one row per `from -> to` mapping table. Records `from_code_type`, `to_code_type`, `map_version`, the from/to columns, the source URL, and `col_filters`. |
+| `_relationship_metadata` | `relationship_table_name` | one row per relationship table. Records `code_type`, `relationship_version`, the child / parent / type columns, the value that means "is a", the source URL, and `col_filters`. |
+
+The exact column lists live in `required_lookup_metadata_columns()`, `required_mapping_metadata_columns()`, and `required_relationship_metadata_columns()` — these are the source of truth and are checked in `build_database()`.
+
+## The `_db_metadata` stamp table
+
+A fourth metadata table — `_db_metadata` — is *DB-level state*, not a per-data-table index. It carries a single row describing the database itself:
+
+| column | purpose |
+|---|---|
+| `codeminer_version` | `packageVersion("codeminer")` at the time the DB was last built or migrated. |
+| `schema_version` | Integer. The codeminer-defined schema version this DB is on. Compared against `current_schema_version()` at every connect. |
+| `built_at` | ISO timestamp of the original build. Immutable. |
+| `last_migrated_at` | ISO timestamp of the most recent migration. `NA` until a migration first runs. |
+| `codeminer_source` | Where this codeminer was installed from (`"CRAN"`, `"GitHub"`, `"Local"`, …) — `packageDescription()$Source`. |
+| `codeminer_remote_type` / `codeminer_remote_host` / `codeminer_remote_repo` / `codeminer_remote_username` / `codeminer_remote_sha` | renv-style provenance fields. Populated when codeminer was installed via `devtools::install_github()` / `pak`/`remotes`; `NA` for CRAN or local installs. |
+
+`_db_metadata` is intentionally excluded from the user-facing `get_codeminer_metadata()` API — inspect it via `codeminer_status()` or by querying the table directly.
+
+# Schema versioning
+
+The on-disk database carries its own schema version, separate from the package version. The contract:
+
+* The package declares `current_schema_version()` (what fresh `build_database()` writes) and `min_readable_schema_version()` (the oldest schema this codeminer can still operate on).
+* Every codeminer DB has a `_db_metadata` row stamping which schema version produced it, when, by which codeminer version, and the install provenance.
+* On connect, codeminer compares the DB's stamp to the package's range and applies a gate.
+
+## Connect-time gate
+
+`codeminer_connect()` runs `enforce_schema_gate()` against the main DB before attaching. The behaviour:
+
+| DB stamp vs package | behaviour |
+|---|---|
+| `schema_version == current_schema_version()` | proceed silently |
+| in `[min_readable, current)`, **all** registered migrations on the chain are `auto_additive` | run them, bump the stamp, continue |
+| in `[min_readable, current)`, **any** registered migration is `manual_additive` or `breaking` | refuse with a clear pointer at `migrate_database()`; nothing silent |
+| `> current_schema_version()` | refuse: DB built with a newer codeminer; user must upgrade the package |
+| `< min_readable_schema_version()` | refuse: DB too old; user must run an older codeminer first |
+
+An *unstamped* DB (built before `_db_metadata` existed) is treated as `schema_version = 0` and walks the chain from there.
+
+## When to bump `current_schema_version()`
+
+Bump if and only if your change alters **what is stored on disk**. See `CLAUDE.md` for the full list of triggers and non-triggers. Examples that bump:
+
+| change | bump? | migration mode |
+|---|---|---|
+| New column in `required_lookup_metadata_columns()`, defaults to NULL | yes | `auto_additive` |
+| Same, but needs values backfilled from elsewhere | yes | `manual_additive` |
+| Rename a column in an existing metadata table | yes | `breaking` |
+| Change the `paste(code_type, lookup_version, ...)` rule | yes | `breaking` |
+| New top-level R function | no | — |
+| Change how `get_lookup_table()` renames columns at read time | no | — |
+
+## Registering a migration
+
+Append a record to the list returned by `codeminer_migrations()` (`R/migrate.R`) and bump `current_schema_version()`:
+
+```r
+list(
+  from = N - 1L,
+  to = N,
+  mode = "auto_additive",      # or "manual_additive" / "breaking"
+  description = "<one line, shown in inform/error>",
+  up = function(con) {
+    # idempotent SQL that brings a v(N-1) DB to vN
+  }
+)
+```
+
+Default to the strictest mode that fits — better to ask the user to confirm than to silently rewrite data.
+
+`migrate_database()` walks the chain from the DB's stamp to `current_schema_version()`. It refuses to run any non-auto migration without an explicit call (the connect gate refuses outright). A `dry_run = TRUE` flag prints the pending chain without applying it.
+
+## The compatibility window
+
+`min_readable_schema_version()` defines how far back this codeminer supports. Older DBs are hard-refused with a pointer at the last codeminer version that could read them. Bump `min_readable` only when carrying support for an old schema becomes a maintenance burden — never gratuitously, because doing so abandons users with DBs at older versions.
 
 # Dummy Data
 

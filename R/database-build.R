@@ -3,6 +3,7 @@ codeminer_metadata_table_names <- new.env(parent = emptyenv())
 codeminer_metadata_table_names$lookup <- "_lookup_metadata"
 codeminer_metadata_table_names$mapping <- "_mapping_metadata"
 codeminer_metadata_table_names$relationship <- "_relationship_metadata"
+codeminer_metadata_table_names$db <- "_db_metadata"
 lockEnvironment(codeminer_metadata_table_names, bindings = TRUE)
 
 #' Build the Codeminer database
@@ -29,16 +30,22 @@ build_database <- function(overwrite = FALSE) {
     codeminer_inform("Creating new database at {.file {db_path()}}")
   }
 
+  # Existing-DB-without-overwrite path: hand off to the migration runner,
+  # which walks any pending registered migrations. The v0 -> v1 migration
+  # creates any missing metadata tables and stamps the DB. Subsequent
+  # migrations follow the registered chain.
+  if (db_exists && !overwrite) {
+    migrate_database()
+    return(invisible(TRUE))
+  }
+
+  # Fresh build (or `overwrite = TRUE`): create everything from scratch and
+  # stamp directly at the current schema version. No migration chain.
   con <- connect_to_db(read_only = FALSE)
 
   if (db_exists && overwrite) {
     codeminer_inform("Removing existing tables from database")
-
-    # Get all table names
-    tables <- DBI::dbListTables(con)
-
-    # Drop each table
-    for (table in tables) {
+    for (table in DBI::dbListTables(con)) {
       DBI::dbRemoveTable(con, table)
     }
   }
@@ -46,11 +53,13 @@ build_database <- function(overwrite = FALSE) {
   create_lookup_metadata_table(con, overwrite = overwrite)
   create_mapping_metadata_table(con, overwrite = overwrite)
   create_relationship_metadata_table(con, overwrite = overwrite)
-
-  # Migrate existing metadata tables to add any new columns (e.g. col_filters)
-  if (db_exists && !overwrite) {
-    migrate_metadata_schema(con)
-  }
+  create_db_metadata_table(con, overwrite = overwrite)
+  DBI::dbWriteTable(
+    con,
+    name = codeminer_metadata_table_names$db,
+    value = codeminer_initial_stamp_row(),
+    append = TRUE
+  )
 
   invisible(TRUE)
 }
@@ -126,6 +135,32 @@ create_relationship_metadata_table <- function(con, overwrite = FALSE) {
       relationship_table_name = "VARCHAR PRIMARY KEY",
       relationship_fields
     ),
+    overwrite = overwrite
+  )
+}
+
+#' Create the `_db_metadata` table in the database
+#'
+#' Single-row table carrying the codeminer schema stamp + install provenance
+#' (`codeminer_version`, `schema_version`, `built_at`, `last_migrated_at`,
+#' and the renv-style `codeminer_remote_*` fields). Schema for the columns
+#' lives in [required_db_metadata_columns()].
+#'
+#' @param con Database connection, as returned by [DBI::dbConnect()]
+#' @param overwrite Logical indicating whether to overwrite an existing
+#'   table (default: `FALSE`).
+#'
+#' @return Invisible `TRUE` on success.
+#' @noRd
+create_db_metadata_table <- function(con, overwrite = FALSE) {
+  tbl_name <- codeminer_metadata_table_names$db
+  db_cols <- required_db_metadata_columns()
+  db_fields <- rep("VARCHAR", length(db_cols))
+  names(db_fields) <- db_cols
+  create_table(
+    con,
+    tbl_name = tbl_name,
+    fields = db_fields,
     overwrite = overwrite
   )
 }

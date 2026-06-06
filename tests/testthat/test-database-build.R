@@ -43,10 +43,12 @@ test_that("build_database() creates a valid codeminer database", {
   con <- connect_to_db()
   tables <- DBI::dbListTables(con)
   expect_type(tables, "character")
-  expect_length(tables, 3)
+  # Three index tables + the `_db_metadata` stamp table from #128.
+  expect_length(tables, 4)
   expect_true(lookup_metadata_name %in% tables)
   expect_true(mapping_metadata_name %in% tables)
   expect_true(relationship_metadata_name %in% tables)
+  expect_true(codeminer_metadata_table_names$db %in% tables)
 
   # Check table schema
   lookup_fields <- DBI::dbListFields(con, lookup_metadata_name)
