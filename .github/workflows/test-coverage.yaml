@@ -51,6 +51,14 @@ jobs:
           plugins: noop
           disable_search: true
           token: ${{ secrets.CODECOV_TOKEN }}
+          # Install the Codecov CLI via PyPI instead of downloading the
+          # signed binary. This sidesteps the GPG signature verification
+          # the binary path performs — the runner's keyring lacks
+          # Codecov's signing key, so binary verify fails with
+          # `Can't check signature: No public key` on main pushes.
+          # PR runs swallow the same error because fail_ci_if_error is
+          # gated on event type.
+          use_pypi: true
 
       - name: Show testthat output
         if: always()
