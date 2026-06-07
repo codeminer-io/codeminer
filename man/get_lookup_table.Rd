@@ -6,6 +6,7 @@
 \usage{
 get_lookup_table(
   type,
+  codes = NULL,
   lookup_version = "latest",
   col_filters = "default",
   con = NULL,
@@ -14,6 +15,11 @@ get_lookup_table(
 }
 \arguments{
 \item{type}{The code type for which to retrieve the lookup table.}
+
+\item{codes}{Optional character vector of codes to filter the result to.
+If \code{NULL} (default), all rows are returned. No warning is emitted for
+codes that are not present in the table; use \code{\link[=CODES]{CODES()}} for missing-code
+warnings.}
 
 \item{lookup_version}{The version to retrieve. Defaults to \code{"latest"}.}
 
@@ -46,11 +52,8 @@ create_dummy_database()
 # Get the full ICD-10 lookup table
 get_lookup_table("ICD-10") |> dplyr::collect()
 
-# Inspect raw columns for specific codes
-result <- CODES("E10", "E11", type = "ICD-10")
-get_lookup_table("ICD-10") |>
-  dplyr::filter(code \%in\% .env$result$code) |>
-  dplyr::collect()
+# Filter to specific codes
+get_lookup_table("ICD-10", codes = c("E10", "E11")) |> dplyr::collect()
 }
 \seealso{
 \code{\link[=CODES]{CODES()}} for standardised codelist output,
@@ -60,6 +63,7 @@ Other Clinical code lookups and mappings:
 \code{\link{CODES}()},
 \code{\link{MAP}()},
 \code{\link{get_mapping_table}()},
-\code{\link{get_relationship_table}()}
+\code{\link{get_relationship_table}()},
+\code{\link{get_relationship_tree}()}
 }
 \concept{Clinical code lookups and mappings}

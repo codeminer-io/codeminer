@@ -127,7 +127,7 @@ CODES <- function(
     con <- get_db_con()
     lookup_table <- get_lookup_table(
       type,
-      lookup_version,
+      lookup_version = lookup_version,
       col_filters = col_filters,
       con = con
     )
@@ -151,7 +151,7 @@ CODES <- function(
 
   lookup_table <- get_lookup_table(
     type,
-    lookup_version,
+    lookup_version = lookup_version,
     col_filters = col_filters,
     con = con
   )
@@ -281,7 +281,7 @@ CODES_LIKE <- function(
 
   lookup_table <- get_lookup_table(
     type,
-    lookup_version,
+    lookup_version = lookup_version,
     col_filters = col_filters,
     con = con
   )
@@ -312,6 +312,10 @@ CODES_LIKE <- function(
 #' returned by [CODES()] and [DESCRIPTION()].
 #'
 #' @param type The code type for which to retrieve the lookup table.
+#' @param codes Optional character vector of codes to filter the result to.
+#'   If `NULL` (default), all rows are returned. No warning is emitted for
+#'   codes that are not present in the table; use [CODES()] for missing-code
+#'   warnings.
 #' @param lookup_version The version to retrieve. Defaults to `"latest"`.
 #' @param col_filters Column filters to apply. See [CODES()] for details.
 #' @param con Optional DBI connection. If `NULL` (default), uses the
@@ -332,13 +336,11 @@ CODES_LIKE <- function(
 #' # Get the full ICD-10 lookup table
 #' get_lookup_table("ICD-10") |> dplyr::collect()
 #'
-#' # Inspect raw columns for specific codes
-#' result <- CODES("E10", "E11", type = "ICD-10")
-#' get_lookup_table("ICD-10") |>
-#'   dplyr::filter(code %in% .env$result$code) |>
-#'   dplyr::collect()
+#' # Filter to specific codes
+#' get_lookup_table("ICD-10", codes = c("E10", "E11")) |> dplyr::collect()
 get_lookup_table <- function(
   type,
+  codes = NULL,
   lookup_version = "latest",
   col_filters = "default",
   con = NULL,
@@ -394,6 +396,10 @@ get_lookup_table <- function(
     # (e.g. DuckDB `TRY_CAST(NULL AS TEXT)`) so the column comes back `<chr>`
     # rather than being inferred as integer from an untyped NULL.
     tbl <- dplyr::mutate(tbl, category = as.character(NA))
+  }
+
+  if (!is.null(codes)) {
+    tbl <- dplyr::filter(tbl, .data$code %in% .env$codes)
   }
 
   return(tbl)

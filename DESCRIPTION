@@ -1,7 +1,7 @@
 Package: codeminer
 Title: Functions for Mapping Between Clinical Coding Systems
 Description: Functions for mapping between clinical coding systems.
-Version: 0.0.0.9005
+Version: 0.0.0.9006
 Authors@R: c(
     person(given = "Alasdair",
            family = "Warwick",

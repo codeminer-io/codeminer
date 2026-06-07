@@ -104,6 +104,7 @@ Other Clinical code lookups and mappings:
 \code{\link{MAP}()},
 \code{\link{get_lookup_table}()},
 \code{\link{get_mapping_table}()},
-\code{\link{get_relationship_table}()}
+\code{\link{get_relationship_table}()},
+\code{\link{get_relationship_tree}()}
 }
 \concept{Clinical code lookups and mappings}

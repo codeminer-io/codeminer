@@ -6,6 +6,8 @@
 \usage{
 get_relationship_table(
   type,
+  codes = NULL,
+  endpoints = c("both", "either"),
   relationship_version = "latest",
   col_filters = "default",
   con = NULL,
@@ -14,6 +16,17 @@ get_relationship_table(
 }
 \arguments{
 \item{type}{The code type for which to retrieve relationships.}
+
+\item{codes}{Optional character vector of codes used to filter edges. If
+\code{NULL} (default), all rows are returned. The \code{endpoints} argument
+controls how an edge is matched against \code{codes}.}
+
+\item{endpoints}{One of \code{"both"} (default) or \code{"either"}. With \code{"both"},
+an edge is kept only when both endpoints (\code{from} \emph{and} \code{to}) are in
+\code{codes}. With \code{"either"}, an edge is kept when at least one endpoint is
+in \code{codes} — this surfaces edges crossing the boundary of the input set.
+For the common "give me ancestors / descendants of these codes as a
+codelist" question, prefer \code{\link[=PARENTS]{PARENTS()}} / \code{\link[=CHILDREN]{CHILDREN()}}.}
 
 \item{relationship_version}{The version to retrieve. Defaults to \code{"latest"}.}
 
@@ -43,15 +56,36 @@ create_dummy_database()
 
 # Get the full ICD-10 relationship table
 get_relationship_table("ICD-10") |> dplyr::collect()
+
+# Default endpoints = "both": only internal edges of the input set
+# (UKB-style ICD-10 codes have no dot — e.g. E101 = E10.1).
+get_relationship_table(
+  "ICD-10",
+  codes = c("E10", "E101", "E102")
+) |> dplyr::collect()
+
+# endpoints = "either": also surfaces edges crossing the boundary —
+# e.g. the parent of E10 and any siblings of E101 / E102. Rarely
+# needed in user code; prefer PARENTS() / CHILDREN() for those.
+get_relationship_table(
+  "ICD-10",
+  codes = c("E10", "E101", "E102"),
+  endpoints = "either"
+) |> dplyr::collect()
 }
 \seealso{
-\code{\link[=CHILDREN]{CHILDREN()}}, \code{\link[=PARENTS]{PARENTS()}} for graph traversal,
-\code{\link[=get_codeminer_metadata]{get_codeminer_metadata()}} for discovering available tables.
+\code{\link[=PARENTS]{PARENTS()}}, \code{\link[=CHILDREN]{CHILDREN()}} for the common "give me ancestors /
+descendants of these codes as a codelist" use case — this helper
+returns raw edge rows and is mainly useful when the edge structure
+itself is needed. \code{\link[=get_relationship_tree]{get_relationship_tree()}} for a \verb{\{nodes, edges\}}
+tree view. \code{\link[=get_codeminer_metadata]{get_codeminer_metadata()}} for discovering available
+tables.
 
 Other Clinical code lookups and mappings: 
 \code{\link{CODES}()},
 \code{\link{MAP}()},
 \code{\link{get_lookup_table}()},
-\code{\link{get_mapping_table}()}
+\code{\link{get_mapping_table}()},
+\code{\link{get_relationship_tree}()}
 }
 \concept{Clinical code lookups and mappings}
