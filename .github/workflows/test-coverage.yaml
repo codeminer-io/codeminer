@@ -43,6 +43,15 @@ jobs:
           covr::to_cobertura(cov)
         shell: Rscript {0}
 
+      # codecov-action@v5 verifies the Codecov CLI binary with a GPG
+      # signature, but the runner's keyring does not have Codecov's signing
+      # key by default — without this import the action fails with
+      # `Can't check signature: No public key` on push events to main
+      # (PRs only surface it silently because fail_ci_if_error is gated
+      # on event type).
+      - name: Import Codecov GPG public key
+        run: curl -sSL https://keybase.io/codecovsecurity/pgp_keys.asc | gpg --import
+
       - uses: codecov/codecov-action@v5
         with:
           # Fail if error if not on PR, or if on PR and token is given
