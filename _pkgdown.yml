@@ -16,6 +16,7 @@ reference:
       - get_lookup_table
       - get_mapping_table
       - get_relationship_table
+      - get_relationship_tree
       - default_col_filters
       - get_col_filters
 

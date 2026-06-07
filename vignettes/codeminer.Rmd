@@ -107,6 +107,43 @@ DESCRIPTION(pattern = "cyst", type = "ICD-10")
 <!-- ) -->
 <!-- ``` -->
 
+## Reviewing a draft codelist as a tree
+
+A common QA workflow is to draft a broad codelist with parent codes only —
+e.g. for diabetes mellitus — and then verify the descendant coverage,
+spotting any leaf codes worth including explicitly.
+
+`get_relationship_tree()` returns a flat `list(nodes, edges)` suitable for
+downstream hierarchy analysis or tree rendering (e.g. `data.tree`,
+`ggraph`, `visNetwork`).
+
+```{r get_relationship_tree}
+draft <- c("E10", "E11", "E13", "E14")
+tree <- get_relationship_tree(draft, type = "ICD-10")
+
+tree$nodes
+tree$edges
+```
+
+The `in_input_set` column on `nodes` flags codes that were in the
+original draft (`TRUE`) versus codes that were picked up by descendant
+expansion (`FALSE`). To inspect the subcodes the expansion added:
+
+```{r get_relationship_tree_expanded}
+subset(tree$nodes, !in_input_set)
+```
+
+The helper restricts edges to the hierarchical parent/child relationship
+type only, and applies `endpoints = "both"` internally — so every edge
+endpoint is guaranteed to appear in `nodes` (no dangling edges).
+
+For a defined codelist, the new `codes` argument on `get_lookup_table()`
+is the most direct way to pull the matching terms + categories:
+
+```{r get_lookup_table_codes}
+get_lookup_table("ICD-10", codes = draft) |> dplyr::collect()
+```
+
 # Managing tables
 
 ## Adding tables

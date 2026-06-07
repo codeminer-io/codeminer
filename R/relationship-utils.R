@@ -9,6 +9,15 @@
 #' [CHILDREN()], [PARENTS()], and other graph traversal functions.
 #'
 #' @param type The code type for which to retrieve relationships.
+#' @param codes Optional character vector of codes used to filter edges. If
+#'   `NULL` (default), all rows are returned. The `endpoints` argument
+#'   controls how an edge is matched against `codes`.
+#' @param endpoints One of `"both"` (default) or `"either"`. With `"both"`,
+#'   an edge is kept only when both endpoints (`from` *and* `to`) are in
+#'   `codes`. With `"either"`, an edge is kept when at least one endpoint is
+#'   in `codes` — this surfaces edges crossing the boundary of the input set.
+#'   For the common "give me ancestors / descendants of these codes as a
+#'   codelist" question, prefer [PARENTS()] / [CHILDREN()].
 #' @param relationship_version The version to retrieve. Defaults to `"latest"`.
 #' @param col_filters Column filters to apply. See [CODES()] for details.
 #' @param con Optional DBI connection. If `NULL` (default), uses the
@@ -19,20 +28,42 @@
 #'   `type`, `code_type`) plus all other columns from the underlying table.
 #' @export
 #' @family Clinical code lookups and mappings
-#' @seealso [CHILDREN()], [PARENTS()] for graph traversal,
-#'   [get_codeminer_metadata()] for discovering available tables.
+#' @seealso [PARENTS()], [CHILDREN()] for the common "give me ancestors /
+#'   descendants of these codes as a codelist" use case — this helper
+#'   returns raw edge rows and is mainly useful when the edge structure
+#'   itself is needed. [get_relationship_tree()] for a `{nodes, edges}`
+#'   tree view. [get_codeminer_metadata()] for discovering available
+#'   tables.
 #' @examples
 #' create_dummy_database()
 #'
 #' # Get the full ICD-10 relationship table
 #' get_relationship_table("ICD-10") |> dplyr::collect()
+#'
+#' # Default endpoints = "both": only internal edges of the input set
+#' get_relationship_table(
+#'   "ICD-10",
+#'   codes = c("E10", "E10.1", "E10.2")
+#' ) |> dplyr::collect()
+#'
+#' # endpoints = "either": also surfaces edges crossing the boundary —
+#' # e.g. the parent of E10 and any siblings of E10.1 / E10.2. Rarely
+#' # needed in user code; prefer PARENTS() / CHILDREN() for those.
+#' get_relationship_table(
+#'   "ICD-10",
+#'   codes = c("E10", "E10.1", "E10.2"),
+#'   endpoints = "either"
+#' ) |> dplyr::collect()
 get_relationship_table <- function(
   type,
+  codes = NULL,
+  endpoints = c("both", "either"),
   relationship_version = "latest",
   col_filters = "default",
   con = NULL,
   call = rlang::caller_env()
 ) {
+  endpoints <- rlang::arg_match(endpoints)
   con <- get_db_con(con)
   meta <- get_metadata_for_relationship(
     con,
@@ -65,6 +96,20 @@ get_relationship_table <- function(
     dplyr::everything()
   ) |>
     dplyr::mutate(code_type = .env$type)
+
+  if (!is.null(codes)) {
+    tbl <- if (endpoints == "both") {
+      dplyr::filter(
+        tbl,
+        .data$from %in% .env$codes & .data$to %in% .env$codes
+      )
+    } else {
+      dplyr::filter(
+        tbl,
+        .data$from %in% .env$codes | .data$to %in% .env$codes
+      )
+    }
+  }
 
   tbl
 }
@@ -325,6 +370,220 @@ graph_closure_codes <- function(
   )
 
   return(result)
+}
+
+#' Build a flat nodes/edges tree view for a set of codes
+#'
+#' Given a set of seed `codes`, returns a `list(nodes, edges)` suitable for
+#' hierarchy analysis or tree rendering (e.g. `data.tree`, `ggraph`,
+#' `visNetwork`). By default the seed is first expanded into its full
+#' descendant set, then the parent/child edges *among* that set are returned
+#' alongside a node table carrying term and category.
+#'
+#' Internally composes [graph_closure()] (for descendant expansion) and the
+#' filtered [get_relationship_table()] / [get_lookup_table()] getters. Edges
+#' are restricted to the hierarchical relationship type defined by
+#' `child_parent_relationship_code` in the relationship metadata — non
+#' hierarchical edges (e.g. SNOMED "has finding site") are excluded.
+#'
+#' @param codes Character vector of seed codes.
+#' @param type The code type (character).
+#' @param expand_to_descendants Logical. If `TRUE` (default), `codes` are
+#'   expanded to include all descendants via [graph_closure()] before
+#'   collecting edges and nodes. If `FALSE`, `codes` is used as-is.
+#' @param max_codes Integer. Maximum size of the (expanded) code set.
+#'   Aborts with class `codeminer_max_tree_codes_exceeded` if exceeded.
+#'   Defaults to `getOption("codeminer.max_tree_codes", default = 10000)` —
+#'   a guardrail against accidentally materialising a SNOMED-sized
+#'   subgraph in R memory.
+#' @param relationship_version Relationship table version. Defaults to
+#'   `"latest"`.
+#' @param lookup_version Lookup table version. Defaults to `"latest"`.
+#' @param col_filters Column filters to apply to both the relationship
+#'   and lookup tables. See [CODES()] for details.
+#' @param preferred_description_only Logical. If `TRUE` (default), node
+#'   `term` is the preferred description only (one row per code).
+#' @param con Optional DBI connection. If `NULL` (default), uses the
+#'   workbench connection.
+#' @param call The calling environment. Passed to [codeminer_abort].
+#'
+#' @return A plain `list` with two tibbles:
+#' \describe{
+#'   \item{`nodes`}{`code`, `term`, `category`, `in_input_set` (logical:
+#'     `TRUE` for codes in the original input, `FALSE` for codes added by
+#'     descendant expansion).}
+#'   \item{`edges`}{`parent`, `child` — one row per hierarchical edge among
+#'     the (expanded) code set.}
+#' }
+#'
+#' Orphan codes (in the set but with no hierarchical edges) appear in
+#' `nodes` with no rows in `edges`.
+#'
+#' @section Options:
+#' - `codeminer.max_tree_codes`: default size cap for the expanded code set.
+#'   Overridden by the `max_codes` argument.
+#'
+#' @export
+#' @family Clinical code lookups and mappings
+#' @seealso [get_relationship_table()] for raw edges,
+#'   [get_lookup_table()] for terms, [PARENTS()] / [CHILDREN()] for
+#'   flat codelist traversal.
+#' @examples
+#' create_dummy_database()
+#'
+#' tree <- get_relationship_tree("E10", type = "ICD-10")
+#' tree$nodes
+#' tree$edges
+#'
+#' # `in_input_set` flags the seed apart from expanded descendants
+#' subset(tree$nodes, in_input_set)
+get_relationship_tree <- function(
+  codes,
+  type,
+  expand_to_descendants = TRUE,
+  max_codes = getOption("codeminer.max_tree_codes", default = 10000),
+  relationship_version = "latest",
+  lookup_version = "latest",
+  col_filters = "default",
+  preferred_description_only = TRUE,
+  con = NULL,
+  call = rlang::caller_env()
+) {
+  # Validate inputs
+  check_code_type(type, call = call)
+  check_version(relationship_version, call = call)
+  check_version(lookup_version, call = call)
+  check_logical_scalar(
+    expand_to_descendants,
+    "expand_to_descendants",
+    call = call
+  )
+  check_logical_scalar(
+    preferred_description_only,
+    "preferred_description_only",
+    call = call
+  )
+  if (!is.character(codes) || length(codes) == 0) {
+    codeminer_abort(
+      "{.arg codes} must be a non-empty character vector.",
+      call = call
+    )
+  }
+  if (
+    !rlang::is_scalar_integerish(max_codes) ||
+      !is.finite(max_codes) ||
+      max_codes < 1
+  ) {
+    codeminer_abort(
+      "{.arg max_codes} must be a positive integer.",
+      call = call
+    )
+  }
+
+  con <- get_db_con(con)
+
+  # Early guard: bail before doing any expansion work if the input is already
+  # too big.
+  input_unique <- unique(codes)
+  if (length(input_unique) > max_codes) {
+    codeminer_abort(
+      c(
+        "Input has {length(input_unique)} codes, exceeding {.code max_codes} ({max_codes}).",
+        "i" = "Raise the limit by passing {.code max_codes} or setting {.code options(codeminer.max_tree_codes = N)}."
+      ),
+      class = "codeminer_max_tree_codes_exceeded",
+      call = call
+    )
+  }
+
+  # Resolve relationship metadata once and build a lazy table with col_filters
+  # applied — shared between the expansion step and the edges fetch.
+  rel_meta <- get_metadata_for_relationship(
+    con,
+    type,
+    relationship_version,
+    call = call
+  )
+  rel_tbl <- dplyr::tbl(con, rel_meta$relationship_table_name)
+  resolved <- resolve_col_filters(
+    col_filters,
+    rel_meta$col_filters,
+    pin_type = "relationship",
+    pin_key = type
+  )
+  rel_tbl <- apply_col_filters(
+    rel_tbl,
+    resolved,
+    tbl_name = rel_meta$relationship_table_name,
+    call = call
+  )
+
+  hierarchy_rel <- rel_meta$child_parent_relationship_code
+
+  # Expand the seed set to all descendants if requested. In this package
+  # `from = child`, `to = parent`, so descendants of a seed are reached by
+  # filtering on `to == seed` and returning `from` — i.e. direction = "in".
+  expanded <- if (expand_to_descendants) {
+    graph_closure(
+      nodes = input_unique,
+      relationship_tbl = rel_tbl,
+      from_colname = rel_meta$from_col,
+      to_colname = rel_meta$to_col,
+      type_colname = rel_meta$type_col,
+      direction = "in",
+      rel_type = hierarchy_rel,
+      include_self = TRUE
+    )
+  } else {
+    input_unique
+  }
+
+  # Post-expansion guard
+  if (length(expanded) > max_codes) {
+    codeminer_abort(
+      c(
+        "Expanded code set has {length(expanded)} codes, exceeding {.code max_codes} ({max_codes}).",
+        "i" = "Pass {.code expand_to_descendants = FALSE} or raise {.code max_codes}.",
+        "i" = "You can also set {.code options(codeminer.max_tree_codes = N)}."
+      ),
+      class = "codeminer_max_tree_codes_exceeded",
+      call = call
+    )
+  }
+
+  # Fetch edges: both endpoints must be in the expanded set, and only the
+  # hierarchical relationship type.
+  edges <- get_relationship_table(
+    type = type,
+    codes = expanded,
+    endpoints = "both",
+    relationship_version = relationship_version,
+    col_filters = col_filters,
+    con = con,
+    call = call
+  ) |>
+    dplyr::filter(.data$type %in% .env$hierarchy_rel) |>
+    dplyr::collect() |>
+    dplyr::select(parent = "to", child = "from")
+
+  # Build nodes from the lookup table.
+  nodes_tbl <- get_lookup_table(
+    type = type,
+    codes = expanded,
+    lookup_version = lookup_version,
+    col_filters = col_filters,
+    con = con,
+    call = call
+  )
+  if (preferred_description_only) {
+    nodes_tbl <- dplyr::filter(nodes_tbl, .data$preferred_description)
+  }
+  nodes <- nodes_tbl |>
+    dplyr::collect() |>
+    dplyr::select("code", term = "description", "category") |>
+    dplyr::mutate(in_input_set = .data$code %in% .env$input_unique)
+
+  list(nodes = nodes, edges = edges)
 }
 
 #' Mark a value to be extracted from metadata

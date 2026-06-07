@@ -37,7 +37,7 @@ DESCRIPTION <- function(
   con <- get_db_con()
   lkp_table <- get_lookup_table(
     type,
-    lookup_version,
+    lookup_version = lookup_version,
     col_filters = col_filters,
     con = con
   )

@@ -110,6 +110,30 @@ test_that("get_lookup_table() col_filters = NULL returns unfiltered", {
   expect_gte(nrow(unfiltered), nrow(filtered))
 })
 
+test_that("get_lookup_table() codes = NULL matches unfiltered baseline", {
+  baseline <- get_lookup_table("ICD-10") |> dplyr::collect()
+  explicit_null <- get_lookup_table("ICD-10", codes = NULL) |>
+    dplyr::collect()
+  expect_identical(baseline, explicit_null)
+})
+
+test_that("get_lookup_table() codes = c(...) filters to those rows", {
+  result <- get_lookup_table("ICD-10", codes = c("E10", "E11")) |>
+    dplyr::collect()
+  expect_true(all(result$code %in% c("E10", "E11")))
+  expect_true(all(c("E10", "E11") %in% result$code))
+})
+
+test_that("get_lookup_table() codes filter returns 0 rows for unknown codes", {
+  expect_no_warning(
+    result <- get_lookup_table("ICD-10", codes = "DEFINITELY_NOT_A_CODE") |>
+      dplyr::collect()
+  )
+  expect_equal(nrow(result), 0)
+  # Standardised columns still present so downstream code doesn't blow up
+  expect_true(all(c("code", "description", "category") %in% names(result)))
+})
+
 # get_mapping_table() -------------------------------------------------------
 
 test_that("get_mapping_table() returns a lazy tbl without explicit con", {
@@ -212,6 +236,52 @@ test_that("get_relationship_table() col_filters = NULL unfiltered", {
   unfiltered <- get_relationship_table("ICD-10", col_filters = NULL) |>
     dplyr::collect()
   expect_gte(nrow(unfiltered), nrow(filtered))
+})
+
+test_that("get_relationship_table() codes = NULL matches baseline", {
+  baseline <- get_relationship_table("ICD-10") |> dplyr::collect()
+  explicit_null <- get_relationship_table("ICD-10", codes = NULL) |>
+    dplyr::collect()
+  expect_identical(baseline, explicit_null)
+})
+
+test_that("get_relationship_table() endpoints = 'both' keeps only internal edges", {
+  # Pick a small set so we can reason about the result
+  picked <- c("E10", "E11")
+  result <- get_relationship_table(
+    "ICD-10",
+    codes = picked,
+    endpoints = "both"
+  ) |>
+    dplyr::collect()
+  expect_true(all(result$from %in% picked))
+  expect_true(all(result$to %in% picked))
+})
+
+test_that("get_relationship_table() endpoints = 'either' is a superset of 'both'", {
+  picked <- c("E10", "E11")
+  both <- get_relationship_table(
+    "ICD-10",
+    codes = picked,
+    endpoints = "both"
+  ) |>
+    dplyr::collect()
+  either <- get_relationship_table(
+    "ICD-10",
+    codes = picked,
+    endpoints = "either"
+  ) |>
+    dplyr::collect()
+  expect_gte(nrow(either), nrow(both))
+  # Every 'either' row must have at least one endpoint in `picked`
+  expect_true(all(either$from %in% picked | either$to %in% picked))
+})
+
+test_that("get_relationship_table() rejects unknown `endpoints` value", {
+  expect_error(
+    get_relationship_table("ICD-10", codes = "E10", endpoints = "neither"),
+    class = "rlang_error"
+  )
 })
 
 # col_filters stored during ingestion -----------------------------------------
