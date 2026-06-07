@@ -228,8 +228,6 @@ connection).
   : Clear all pinned column filters
 - [`with_col_filters()`](https://codeminer-io.github.io/codeminer/reference/with_col_filters.md)
   : Temporarily override column filters
-- [`codeminer_snapshot_extra()`](https://codeminer-io.github.io/codeminer/reference/codeminer_snapshot_extra.md)
-  : Create a snapshot of the extra database
 
 ## Database management
 

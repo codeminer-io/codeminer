@@ -31,7 +31,6 @@ Other Workbench management:
 [`codeminer_disconnect()`](https://codeminer-io.github.io/codeminer/reference/codeminer_disconnect.md),
 [`codeminer_set_col_filters()`](https://codeminer-io.github.io/codeminer/reference/codeminer_set_col_filters.md),
 [`codeminer_set_version()`](https://codeminer-io.github.io/codeminer/reference/codeminer_set_version.md),
-[`codeminer_snapshot_extra()`](https://codeminer-io.github.io/codeminer/reference/codeminer_snapshot_extra.md),
 [`codeminer_status()`](https://codeminer-io.github.io/codeminer/reference/codeminer_status.md),
 [`default_col_filters()`](https://codeminer-io.github.io/codeminer/reference/default_col_filters.md),
 [`get_col_filters()`](https://codeminer-io.github.io/codeminer/reference/get_col_filters.md),
