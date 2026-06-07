@@ -388,7 +388,8 @@ graph_closure_codes <- function(
 #' hierarchical edges (e.g. SNOMED "has finding site") are excluded.
 #'
 #' @param codes Character vector of seed codes.
-#' @param type The code type (character).
+#' @param type The code type (character). Can also be configured via the
+#'   `codeminer.code_type` option.
 #' @param expand_to_descendants Logical. If `TRUE` (default), `codes` are
 #'   expanded to include all descendants via [graph_closure()] before
 #'   collecting edges and nodes. If `FALSE`, `codes` is used as-is.
@@ -398,8 +399,10 @@ graph_closure_codes <- function(
 #'   a guardrail against accidentally materialising a SNOMED-sized
 #'   subgraph in R memory.
 #' @param relationship_version Relationship table version. Defaults to
-#'   `"latest"`.
-#' @param lookup_version Lookup table version. Defaults to `"latest"`.
+#'   `"latest"`. Can be configured via the `codeminer.relationship_version`
+#'   option.
+#' @param lookup_version Lookup table version. Defaults to `"latest"`. Can
+#'   be configured via the `codeminer.lookup_version` option.
 #' @param col_filters Column filters to apply to both the relationship
 #'   and lookup tables. See [CODES()] for details.
 #' @param preferred_description_only Logical. If `TRUE` (default), node
@@ -423,6 +426,9 @@ graph_closure_codes <- function(
 #' @section Options:
 #' - `codeminer.max_tree_codes`: default size cap for the expanded code set.
 #'   Overridden by the `max_codes` argument.
+#' - `codeminer.code_type`, `codeminer.lookup_version`,
+#'   `codeminer.relationship_version`: shared with [CODES()] / [CHILDREN()] /
+#'   [PARENTS()], used as defaults for the corresponding arguments.
 #'
 #' @export
 #' @family Clinical code lookups and mappings
@@ -440,11 +446,14 @@ graph_closure_codes <- function(
 #' subset(tree$nodes, in_input_set)
 get_relationship_tree <- function(
   codes,
-  type,
+  type = getOption("codeminer.code_type"),
   expand_to_descendants = TRUE,
   max_codes = getOption("codeminer.max_tree_codes", default = 10000),
-  relationship_version = "latest",
-  lookup_version = "latest",
+  relationship_version = getOption(
+    "codeminer.relationship_version",
+    default = "latest"
+  ),
+  lookup_version = getOption("codeminer.lookup_version", default = "latest"),
   col_filters = "default",
   preferred_description_only = TRUE,
   con = NULL,

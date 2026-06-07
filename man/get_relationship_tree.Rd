@@ -6,11 +6,11 @@
 \usage{
 get_relationship_tree(
   codes,
-  type,
+  type = getOption("codeminer.code_type"),
   expand_to_descendants = TRUE,
   max_codes = getOption("codeminer.max_tree_codes", default = 10000),
-  relationship_version = "latest",
-  lookup_version = "latest",
+  relationship_version = getOption("codeminer.relationship_version", default = "latest"),
+  lookup_version = getOption("codeminer.lookup_version", default = "latest"),
   col_filters = "default",
   preferred_description_only = TRUE,
   con = NULL,
@@ -20,7 +20,8 @@ get_relationship_tree(
 \arguments{
 \item{codes}{Character vector of seed codes.}
 
-\item{type}{The code type (character).}
+\item{type}{The code type (character). Can also be configured via the
+\code{codeminer.code_type} option.}
 
 \item{expand_to_descendants}{Logical. If \code{TRUE} (default), \code{codes} are
 expanded to include all descendants via \code{\link[=graph_closure]{graph_closure()}} before
@@ -33,9 +34,11 @@ a guardrail against accidentally materialising a SNOMED-sized
 subgraph in R memory.}
 
 \item{relationship_version}{Relationship table version. Defaults to
-\code{"latest"}.}
+\code{"latest"}. Can be configured via the \code{codeminer.relationship_version}
+option.}
 
-\item{lookup_version}{Lookup table version. Defaults to \code{"latest"}.}
+\item{lookup_version}{Lookup table version. Defaults to \code{"latest"}. Can
+be configured via the \code{codeminer.lookup_version} option.}
 
 \item{col_filters}{Column filters to apply to both the relationship
 and lookup tables. See \code{\link[=CODES]{CODES()}} for details.}
@@ -80,6 +83,9 @@ hierarchical edges (e.g. SNOMED "has finding site") are excluded.
 \itemize{
 \item \code{codeminer.max_tree_codes}: default size cap for the expanded code set.
 Overridden by the \code{max_codes} argument.
+\item \code{codeminer.code_type}, \code{codeminer.lookup_version},
+\code{codeminer.relationship_version}: shared with \code{\link[=CODES]{CODES()}} / \code{\link[=CHILDREN]{CHILDREN()}} /
+\code{\link[=PARENTS]{PARENTS()}}, used as defaults for the corresponding arguments.
 }
 }
 
