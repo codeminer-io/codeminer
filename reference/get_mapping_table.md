@@ -74,7 +74,8 @@ Other Clinical code lookups and mappings:
 [`CODES()`](https://codeminer-io.github.io/codeminer/reference/CODES.md),
 [`MAP()`](https://codeminer-io.github.io/codeminer/reference/MAP.md),
 [`get_lookup_table()`](https://codeminer-io.github.io/codeminer/reference/get_lookup_table.md),
-[`get_relationship_table()`](https://codeminer-io.github.io/codeminer/reference/get_relationship_table.md)
+[`get_relationship_table()`](https://codeminer-io.github.io/codeminer/reference/get_relationship_table.md),
+[`get_relationship_tree()`](https://codeminer-io.github.io/codeminer/reference/get_relationship_tree.md)
 
 ## Examples
 
@@ -82,7 +83,7 @@ Other Clinical code lookups and mappings:
 create_dummy_database()
 #> ✔ Dummy database ready to use!
 #> ℹ To reconnect to your previous database:
-#>   `Sys.setenv(CODEMINER_DB_PATH = "/tmp/Rtmpqz7mVJ/file1b1344498438.duckdb")`
+#>   `Sys.setenv(CODEMINER_DB_PATH = "/tmp/RtmpElJchn/file1add62be9416.duckdb")`
 #>   `codeminer_connect()`
 
 # Get the full Read 3 to ICD-10 mapping table

@@ -13,7 +13,7 @@ Call dplyr::collect() to materialise the result."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">codeminer</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0.9005</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0.9006</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -55,6 +55,7 @@ Call <code><a href="https://dplyr.tidyverse.org/reference/compute.html" class="e
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">get_lookup_table</span><span class="op">(</span></span>
 <span>  <span class="va">type</span>,</span>
+<span>  codes <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  lookup_version <span class="op">=</span> <span class="st">"latest"</span>,</span>
 <span>  col_filters <span class="op">=</span> <span class="st">"default"</span>,</span>
 <span>  con <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -68,6 +69,13 @@ Call <code><a href="https://dplyr.tidyverse.org/reference/compute.html" class="e
 
 <dl><dt id="arg-type">type<a class="anchor" aria-label="anchor" href="#arg-type"></a></dt>
 <dd><p>The code type for which to retrieve the lookup table.</p></dd>
+
+
+<dt id="arg-codes">codes<a class="anchor" aria-label="anchor" href="#arg-codes"></a></dt>
+<dd><p>Optional character vector of codes to filter the result to.
+If <code>NULL</code> (default), all rows are returned. No warning is emitted for
+codes that are not present in the table; use <code><a href="CODES.html">CODES()</a></code> for missing-code
+warnings.</p></dd>
 
 
 <dt id="arg-lookup-version">lookup_version<a class="anchor" aria-label="anchor" href="#arg-lookup-version"></a></dt>
@@ -107,7 +115,8 @@ returned by <code><a href="CODES.html">CODES()</a></code> and <code><a href="DES
 <code><a href="CODES.html">CODES()</a></code>,
 <code><a href="MAP.html">MAP()</a></code>,
 <code><a href="get_mapping_table.html">get_mapping_table()</a></code>,
-<code><a href="get_relationship_table.html">get_relationship_table()</a></code></p></div>
+<code><a href="get_relationship_table.html">get_relationship_table()</a></code>,
+<code><a href="get_relationship_tree.html">get_relationship_tree()</a></code></p></div>
     </div>
 
     <div class="section level2">
@@ -115,7 +124,7 @@ returned by <code><a href="CODES.html">CODES()</a></code> and <code><a href="DES
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="create_dummy_database.html">create_dummy_database</a></span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Dummy database ready to use!</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> To reconnect to your previous database:</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>   `Sys.setenv(CODEMINER_DB_PATH = "/tmp/Rtmpqz7mVJ/file1b134ae3d14d.duckdb")`</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>   `Sys.setenv(CODEMINER_DB_PATH = "/tmp/RtmpElJchn/file1add4275746d.duckdb")`</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>   `codeminer_connect()`</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Get the full ICD-10 lookup table</span></span></span>
@@ -139,11 +148,8 @@ returned by <code><a href="CODES.html">CODES()</a></code> and <code><a href="DES
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   TREE_DESCRIPTION &lt;chr&gt;, code_type &lt;chr&gt;, preferred_description &lt;lgl&gt;,</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   category &lt;chr&gt;</span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Inspect raw columns for specific codes</span></span></span>
-<span class="r-in"><span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="CODES.html">CODES</a></span><span class="op">(</span><span class="st">"E10"</span>, <span class="st">"E11"</span>, type <span class="op">=</span> <span class="st">"ICD-10"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu">get_lookup_table</span><span class="op">(</span><span class="st">"ICD-10"</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
-<span class="r-in"><span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">code</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="va">.env</span><span class="op">$</span><span class="va">result</span><span class="op">$</span><span class="va">code</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
-<span class="r-in"><span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/compute.html" class="external-link">collect</a></span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="co"># Filter to specific codes</span></span></span>
+<span class="r-in"><span><span class="fu">get_lookup_table</span><span class="op">(</span><span class="st">"ICD-10"</span>, codes <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"E10"</span>, <span class="st">"E11"</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/compute.html" class="external-link">collect</a></span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 2 × 15</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   code  description   ICD10_CODE USAGE USAGE_UK MODIFIER_4 MODIFIER_5 QUALIFIERS</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     </span>

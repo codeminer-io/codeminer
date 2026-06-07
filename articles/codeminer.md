@@ -50,9 +50,9 @@ of data frames:
 # Create a temporary database with dummy data
 (db_path <- create_dummy_database())
 #> ✔ Dummy database ready to use!
-#> [1] "/tmp/Rtmpb614vQ/file271c22c9fc73.duckdb"
+#> [1] "/tmp/RtmpA7UL7z/file2795516089ec.duckdb"
 Sys.getenv("CODEMINER_DB_PATH")
-#> [1] "/tmp/Rtmpb614vQ/file271c22c9fc73.duckdb"
+#> [1] "/tmp/RtmpA7UL7z/file2795516089ec.duckdb"
 ```
 
 `codeminer` resolves the database location using the following
@@ -88,7 +88,7 @@ connection status with
 
 codeminer_status()
 #> ℹ Workbench active
-#>   Main: /tmp/Rtmpb614vQ/file271c22c9fc73.duckdb
+#>   Main: /tmp/RtmpA7UL7z/file2795516089ec.duckdb
 ```
 
 ## Build a clinical code list
@@ -130,6 +130,100 @@ DESCRIPTION(pattern = "cyst", type = "ICD-10")
 #>   <chr> <chr>                <chr>    
 #> 1 L721  Trichilemmal cyst    ICD-10   
 #> 2 N330  Tuberculous cystitis ICD-10
+```
+
+### Reviewing a draft codelist as a tree
+
+A common QA workflow is to draft a broad codelist with parent codes only
+— e.g. for diabetes mellitus — and then verify the descendant coverage,
+spotting any leaf codes worth including explicitly.
+
+[`get_relationship_tree()`](https://codeminer-io.github.io/codeminer/reference/get_relationship_tree.md)
+returns a flat `list(nodes, edges)` suitable for downstream hierarchy
+analysis or tree rendering (e.g. `data.tree`, `ggraph`, `visNetwork`).
+
+``` r
+
+draft <- c("E10", "E11", "E13", "E14")
+tree <- get_relationship_tree(draft, type = "ICD-10")
+#> ℹ Using 'UKB v4' as latest version
+
+tree$nodes
+#> # A tibble: 44 × 4
+#>    code  term                                              category in_input_set
+#>    <chr> <chr>                                             <chr>    <lgl>       
+#>  1 E10   Type 1 diabetes mellitus                          NA       TRUE        
+#>  2 E100  Type 1 diabetes mellitus With coma                NA       FALSE       
+#>  3 E101  Type 1 diabetes mellitus With ketoacidosis        NA       FALSE       
+#>  4 E102  Type 1 diabetes mellitus With renal complications NA       FALSE       
+#>  5 E103  Type 1 diabetes mellitus With ophthalmic complic… NA       FALSE       
+#>  6 E104  Type 1 diabetes mellitus With neurological compl… NA       FALSE       
+#>  7 E105  Type 1 diabetes mellitus With peripheral circula… NA       FALSE       
+#>  8 E106  Type 1 diabetes mellitus With other specified co… NA       FALSE       
+#>  9 E107  Type 1 diabetes mellitus With multiple complicat… NA       FALSE       
+#> 10 E108  Type 1 diabetes mellitus With unspecified compli… NA       FALSE       
+#> # ℹ 34 more rows
+tree$edges
+#> # A tibble: 40 × 2
+#>    parent child
+#>    <chr>  <chr>
+#>  1 E10    E100 
+#>  2 E10    E101 
+#>  3 E10    E102 
+#>  4 E10    E103 
+#>  5 E10    E104 
+#>  6 E10    E105 
+#>  7 E10    E106 
+#>  8 E10    E107 
+#>  9 E10    E108 
+#> 10 E10    E109 
+#> # ℹ 30 more rows
+```
+
+The `in_input_set` column on `nodes` flags codes that were in the
+original draft (`TRUE`) versus codes that were picked up by descendant
+expansion (`FALSE`). To inspect the subcodes the expansion added:
+
+``` r
+
+subset(tree$nodes, !in_input_set)
+#> # A tibble: 40 × 4
+#>    code  term                                              category in_input_set
+#>    <chr> <chr>                                             <chr>    <lgl>       
+#>  1 E100  Type 1 diabetes mellitus With coma                NA       FALSE       
+#>  2 E101  Type 1 diabetes mellitus With ketoacidosis        NA       FALSE       
+#>  3 E102  Type 1 diabetes mellitus With renal complications NA       FALSE       
+#>  4 E103  Type 1 diabetes mellitus With ophthalmic complic… NA       FALSE       
+#>  5 E104  Type 1 diabetes mellitus With neurological compl… NA       FALSE       
+#>  6 E105  Type 1 diabetes mellitus With peripheral circula… NA       FALSE       
+#>  7 E106  Type 1 diabetes mellitus With other specified co… NA       FALSE       
+#>  8 E107  Type 1 diabetes mellitus With multiple complicat… NA       FALSE       
+#>  9 E108  Type 1 diabetes mellitus With unspecified compli… NA       FALSE       
+#> 10 E109  Type 1 diabetes mellitus Without complications    NA       FALSE       
+#> # ℹ 30 more rows
+```
+
+The helper restricts edges to the hierarchical parent/child relationship
+type only, and applies `endpoints = "both"` internally — so every edge
+endpoint is guaranteed to appear in `nodes` (no dangling edges).
+
+For a defined codelist, the new `codes` argument on
+[`get_lookup_table()`](https://codeminer-io.github.io/codeminer/reference/get_lookup_table.md)
+is the most direct way to pull the matching terms + categories:
+
+``` r
+
+get_lookup_table("ICD-10", codes = draft) |> dplyr::collect()
+#> # A tibble: 4 × 15
+#>   code  description   ICD10_CODE USAGE USAGE_UK MODIFIER_4 MODIFIER_5 QUALIFIERS
+#>   <chr> <chr>         <chr>      <chr> <chr>    <chr>      <chr>      <chr>     
+#> 1 E10   Type 1 diabe… E10        DEFA… 3        NA         NA         NA        
+#> 2 E11   Type 2 diabe… E11        DEFA… 3        NA         NA         NA        
+#> 3 E13   Other specif… E13        DEFA… 3        NA         NA         NA        
+#> 4 E14   Unspecified … E14        DEFA… 3        NA         NA         NA        
+#> # ℹ 7 more variables: GENDER_MASK <chr>, MIN_AGE <chr>, MAX_AGE <chr>,
+#> #   TREE_DESCRIPTION <chr>, code_type <chr>, preferred_description <lgl>,
+#> #   category <chr>
 ```
 
 ## Managing tables

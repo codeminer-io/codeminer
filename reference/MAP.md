@@ -83,7 +83,8 @@ Other Clinical code lookups and mappings:
 [`CODES()`](https://codeminer-io.github.io/codeminer/reference/CODES.md),
 [`get_lookup_table()`](https://codeminer-io.github.io/codeminer/reference/get_lookup_table.md),
 [`get_mapping_table()`](https://codeminer-io.github.io/codeminer/reference/get_mapping_table.md),
-[`get_relationship_table()`](https://codeminer-io.github.io/codeminer/reference/get_relationship_table.md)
+[`get_relationship_table()`](https://codeminer-io.github.io/codeminer/reference/get_relationship_table.md),
+[`get_relationship_tree()`](https://codeminer-io.github.io/codeminer/reference/get_relationship_tree.md)
 
 ## Examples
 
@@ -93,7 +94,7 @@ temp_db <- tempfile(fileext = ".duckdb")
 create_dummy_database(temp_db)
 #> ✔ Dummy database ready to use!
 #> ℹ To reconnect to your previous database:
-#>   `Sys.setenv(CODEMINER_DB_PATH = "/tmp/Rtmpqz7mVJ/file1b137d1ea98a.duckdb")`
+#>   `Sys.setenv(CODEMINER_DB_PATH = "/tmp/RtmpElJchn/file1add632774f4.duckdb")`
 #>   `codeminer_connect()`
 
 # Single code

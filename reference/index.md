@@ -29,6 +29,8 @@ coding systems.
   : Get the full mapping table for a pair of code types
 - [`get_relationship_table()`](https://codeminer-io.github.io/codeminer/reference/get_relationship_table.md)
   : Get the full relationship table for a code type
+- [`get_relationship_tree()`](https://codeminer-io.github.io/codeminer/reference/get_relationship_tree.md)
+  : Build a flat nodes/edges tree view for a set of codes
 - [`default_col_filters()`](https://codeminer-io.github.io/codeminer/reference/default_col_filters.md)
   : Default column filters
 - [`get_col_filters()`](https://codeminer-io.github.io/codeminer/reference/get_col_filters.md)

@@ -98,7 +98,8 @@ Other Clinical code lookups and mappings:
 [`MAP()`](https://codeminer-io.github.io/codeminer/reference/MAP.md),
 [`get_lookup_table()`](https://codeminer-io.github.io/codeminer/reference/get_lookup_table.md),
 [`get_mapping_table()`](https://codeminer-io.github.io/codeminer/reference/get_mapping_table.md),
-[`get_relationship_table()`](https://codeminer-io.github.io/codeminer/reference/get_relationship_table.md)
+[`get_relationship_table()`](https://codeminer-io.github.io/codeminer/reference/get_relationship_table.md),
+[`get_relationship_tree()`](https://codeminer-io.github.io/codeminer/reference/get_relationship_tree.md)
 
 ## Examples
 

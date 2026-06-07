@@ -13,6 +13,7 @@ to materialise the result.
 ``` r
 get_lookup_table(
   type,
+  codes = NULL,
   lookup_version = "latest",
   col_filters = "default",
   con = NULL,
@@ -25,6 +26,14 @@ get_lookup_table(
 - type:
 
   The code type for which to retrieve the lookup table.
+
+- codes:
+
+  Optional character vector of codes to filter the result to. If `NULL`
+  (default), all rows are returned. No warning is emitted for codes that
+  are not present in the table; use
+  [`CODES()`](https://codeminer-io.github.io/codeminer/reference/CODES.md)
+  for missing-code warnings.
 
 - lookup_version:
 
@@ -73,7 +82,8 @@ Other Clinical code lookups and mappings:
 [`CODES()`](https://codeminer-io.github.io/codeminer/reference/CODES.md),
 [`MAP()`](https://codeminer-io.github.io/codeminer/reference/MAP.md),
 [`get_mapping_table()`](https://codeminer-io.github.io/codeminer/reference/get_mapping_table.md),
-[`get_relationship_table()`](https://codeminer-io.github.io/codeminer/reference/get_relationship_table.md)
+[`get_relationship_table()`](https://codeminer-io.github.io/codeminer/reference/get_relationship_table.md),
+[`get_relationship_tree()`](https://codeminer-io.github.io/codeminer/reference/get_relationship_tree.md)
 
 ## Examples
 
@@ -81,7 +91,7 @@ Other Clinical code lookups and mappings:
 create_dummy_database()
 #> ✔ Dummy database ready to use!
 #> ℹ To reconnect to your previous database:
-#>   `Sys.setenv(CODEMINER_DB_PATH = "/tmp/Rtmpqz7mVJ/file1b134ae3d14d.duckdb")`
+#>   `Sys.setenv(CODEMINER_DB_PATH = "/tmp/RtmpElJchn/file1add4275746d.duckdb")`
 #>   `codeminer_connect()`
 
 # Get the full ICD-10 lookup table
@@ -105,11 +115,8 @@ get_lookup_table("ICD-10") |> dplyr::collect()
 #> #   TREE_DESCRIPTION <chr>, code_type <chr>, preferred_description <lgl>,
 #> #   category <chr>
 
-# Inspect raw columns for specific codes
-result <- CODES("E10", "E11", type = "ICD-10")
-get_lookup_table("ICD-10") |>
-  dplyr::filter(code %in% .env$result$code) |>
-  dplyr::collect()
+# Filter to specific codes
+get_lookup_table("ICD-10", codes = c("E10", "E11")) |> dplyr::collect()
 #> # A tibble: 2 × 15
 #>   code  description   ICD10_CODE USAGE USAGE_UK MODIFIER_4 MODIFIER_5 QUALIFIERS
 #>   <chr> <chr>         <chr>      <chr> <chr>    <chr>      <chr>      <chr>     
