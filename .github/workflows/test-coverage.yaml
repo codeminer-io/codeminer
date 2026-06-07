@@ -43,15 +43,6 @@ jobs:
           covr::to_cobertura(cov)
         shell: Rscript {0}
 
-      # codecov-action@v5 verifies the Codecov CLI binary with a GPG
-      # signature, but the runner's keyring does not have Codecov's signing
-      # key by default — without this import the action fails with
-      # `Can't check signature: No public key` on push events to main
-      # (PRs only surface it silently because fail_ci_if_error is gated
-      # on event type).
-      - name: Import Codecov GPG public key
-        run: curl -sSL https://keybase.io/codecovsecurity/pgp_keys.asc | gpg --import
-
       - uses: codecov/codecov-action@v5
         with:
           # Fail if error if not on PR, or if on PR and token is given
@@ -60,6 +51,14 @@ jobs:
           plugins: noop
           disable_search: true
           token: ${{ secrets.CODECOV_TOKEN }}
+          # Install the Codecov CLI via PyPI instead of downloading the
+          # signed binary. This sidesteps the GPG signature verification
+          # the binary path performs — the runner's keyring lacks
+          # Codecov's signing key, so binary verify fails with
+          # `Can't check signature: No public key` on main pushes.
+          # PR runs swallow the same error because fail_ci_if_error is
+          # gated on event type.
+          use_pypi: true
 
       - name: Show testthat output
         if: always()
