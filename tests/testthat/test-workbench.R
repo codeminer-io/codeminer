@@ -84,48 +84,6 @@ test_that("main database is attached as READ_ONLY", {
   )
 })
 
-# Search path --------------------------------------------------------------
-
-test_that("search_path prioritises extra over main", {
-  main_path <- withr::local_tempfile(fileext = ".duckdb")
-  extra_path <- withr::local_tempfile(fileext = ".duckdb")
-
-  # Populate main with a test table
-  con_m <- DBI::dbConnect(duckdb::duckdb(), main_path)
-  DBI::dbExecute(
-    con_m,
-    "CREATE TABLE _test_priority AS SELECT 'main' AS source"
-  )
-  DBI::dbDisconnect(con_m, shutdown = TRUE)
-
-  # Populate extra with the same table name but different data
-  con_e <- DBI::dbConnect(duckdb::duckdb(), extra_path)
-  DBI::dbExecute(
-    con_e,
-    "CREATE TABLE _test_priority AS SELECT 'extra' AS source"
-  )
-  DBI::dbDisconnect(con_e, shutdown = TRUE)
-
-  codeminer_connect(main = main_path, extra = extra_path)
-  withr::defer(codeminer_disconnect())
-
-  # Unqualified query should resolve to extra (search_path = 'user_db,core')
-  res <- DBI::dbGetQuery(
-    .codeminer_env$con,
-    "SELECT source FROM _test_priority"
-  )
-  expect_equal(res$source, "extra")
-
-  # Explicitly qualified queries should reach their respective databases
-  query <- paste0(
-    "SELECT source FROM ",
-    CODEMINER_ALIAS_MAIN,
-    "._test_priority"
-  )
-  res_main <- DBI::dbGetQuery(.codeminer_env$con, query)
-  expect_equal(res_main$source, "main")
-})
-
 # connect_to_db() write path -----------------------------------------------
 
 test_that("connect_to_db(read_only=FALSE) detaches and re-attaches", {

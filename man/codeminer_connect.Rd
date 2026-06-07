@@ -4,30 +4,24 @@
 \alias{codeminer_connect}
 \title{Connect to the codeminer workbench}
 \usage{
-codeminer_connect(main = NULL, extra = NULL)
+codeminer_connect(main = NULL)
 }
 \arguments{
-\item{main}{Path to the main (read-only) DuckDB database file.
-Defaults to the path from \code{CODEMINER_DB_PATH} env var or
+\item{main}{Path to the codeminer DuckDB database file. Defaults to the
+path from \code{CODEMINER_DB_PATH} env var or
 \code{rappdirs::user_data_dir("codeminer")}.}
-
-\item{extra}{Optional path to an extra (read-write) DuckDB database
-file. If the file does not exist, it will be created with empty
-metadata tables.}
 }
 \value{
 The DBI connection object, invisibly.
 }
 \description{
-Creates an in-memory DuckDB connection and ATTACHes one or more database
-files. The \code{main} database is attached as read-only (immutable ontologies).
-The optional \code{extra} database is attached as read-write (user-defined
-tables). A search path is set so that tables in \code{extra} shadow those
-in \code{main}.
+Creates an in-memory DuckDB connection and ATTACHes the codeminer database
+file as read-only. Writes to the database go through a short-lived direct
+connection that detaches/reattaches around the operation.
 }
 \details{
-If called with no arguments, uses the default database path from
-the \code{CODEMINER_DB_PATH} environment variable (or \code{rappdirs} default).
+If called with no arguments, uses the default database path from the
+\code{CODEMINER_DB_PATH} environment variable (or \code{rappdirs} default).
 }
 \seealso{
 \code{\link[=codeminer_disconnect]{codeminer_disconnect()}}, \code{\link[=codeminer_status]{codeminer_status()}}
@@ -39,7 +33,6 @@ Other Workbench management:
 \code{\link{codeminer_refresh_cache}()},
 \code{\link{codeminer_set_col_filters}()},
 \code{\link{codeminer_set_version}()},
-\code{\link{codeminer_snapshot_extra}()},
 \code{\link{codeminer_status}()},
 \code{\link{default_col_filters}()},
 \code{\link{get_col_filters}()},

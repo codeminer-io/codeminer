@@ -28,7 +28,6 @@ Other Workbench management:
 \code{\link{codeminer_disconnect}()},
 \code{\link{codeminer_set_col_filters}()},
 \code{\link{codeminer_set_version}()},
-\code{\link{codeminer_snapshot_extra}()},
 \code{\link{codeminer_status}()},
 \code{\link{default_col_filters}()},
 \code{\link{get_col_filters}()},

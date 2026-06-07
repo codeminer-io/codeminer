@@ -1,33 +1,25 @@
-# DuckDB ATTACH aliases.
-# "main" is reserved in DuckDB (it's the default schema for any connection),
-# so we use "core" for the read-only ontology database and "user_db" for the
-# user's private read-write database.
+# DuckDB ATTACH alias. "main" is reserved in DuckDB (the default schema for
+# any connection), so we use "core" for the read-only ontology database.
 CODEMINER_ALIAS_MAIN <- "core"
-CODEMINER_ALIAS_EXTRA <- "user_db"
 
 #' Connect to the codeminer workbench
 #'
-#' Creates an in-memory DuckDB connection and ATTACHes one or more database
-#' files. The `main` database is attached as read-only (immutable ontologies).
-#' The optional `extra` database is attached as read-write (user-defined
-#' tables). A search path is set so that tables in `extra` shadow those
-#' in `main`.
+#' Creates an in-memory DuckDB connection and ATTACHes the codeminer database
+#' file as read-only. Writes to the database go through a short-lived direct
+#' connection that detaches/reattaches around the operation.
 #'
-#' If called with no arguments, uses the default database path from
-#' the `CODEMINER_DB_PATH` environment variable (or `rappdirs` default).
+#' If called with no arguments, uses the default database path from the
+#' `CODEMINER_DB_PATH` environment variable (or `rappdirs` default).
 #'
-#' @param main Path to the main (read-only) DuckDB database file.
-#'   Defaults to the path from `CODEMINER_DB_PATH` env var or
+#' @param main Path to the codeminer DuckDB database file. Defaults to the
+#'   path from `CODEMINER_DB_PATH` env var or
 #'   `rappdirs::user_data_dir("codeminer")`.
-#' @param extra Optional path to an extra (read-write) DuckDB database
-#'   file. If the file does not exist, it will be created with empty
-#'   metadata tables.
 #'
 #' @return The DBI connection object, invisibly.
 #' @export
 #' @family Workbench management
 #' @seealso [codeminer_disconnect()], [codeminer_status()]
-codeminer_connect <- function(main = NULL, extra = NULL) {
+codeminer_connect <- function(main = NULL) {
   main_was_explicit <- !is.null(main)
   if (is.null(main)) {
     main <- db_path()
@@ -77,30 +69,13 @@ codeminer_connect <- function(main = NULL, extra = NULL) {
       )
     )
     .codeminer_env$db_paths$main <- main
+    codeminer_set_search_path()
   }
-
-  # Attach extra (read-write) if provided
-  if (!is.null(extra)) {
-    if (!file.exists(extra)) {
-      codeminer_init_extra(extra)
-    }
-    DBI::dbExecute(
-      .codeminer_env$con,
-      glue::glue_sql(
-        "ATTACH {extra} AS {`CODEMINER_ALIAS_EXTRA`}",
-        .con = .codeminer_env$con
-      )
-    )
-    .codeminer_env$db_paths$extra <- extra
-  }
-
-  # Set search path: extra first so user tables shadow core ontologies
-  codeminer_set_search_path()
 
   # Clear cached version selections — they may refer to a different database
   .codeminer_env$active_versions <- list()
 
-  # Cache metadata from attached databases
+  # Cache metadata from the attached database
   codeminer_refresh_cache()
 
   invisible(.codeminer_env$con)
@@ -151,11 +126,9 @@ codeminer_status <- function() {
     return(invisible(list()))
   }
   main_path <- .codeminer_env$db_paths$main %||% "not attached"
-  extra_path <- .codeminer_env$db_paths$extra %||% "not attached"
   msgs <- c(
     "i" = "Workbench active",
-    " " = "Main:  {.file {main_path}}",
-    " " = "Extra: {.file {extra_path}}"
+    " " = "Main: {.file {main_path}}"
   )
 
   # Show pinned versions if any
@@ -219,82 +192,24 @@ codeminer_refresh_cache <- function() {
   con <- .codeminer_env$con
   .codeminer_env$metadata <- list()
 
-  # Map R-side names to DuckDB ATTACH aliases
-  alias_map <- c(main = CODEMINER_ALIAS_MAIN, extra = CODEMINER_ALIAS_EXTRA)
+  if (is.null(.codeminer_env$db_paths$main)) {
+    return(invisible())
+  }
 
-  # Read metadata from each attached database
-  # extra is iterated first so it takes priority when combined
-  for (db_name in intersect(
-    c("extra", "main"),
-    names(.codeminer_env$db_paths)
-  )) {
-    schema <- alias_map[[db_name]]
-    for (type in c("lookup", "mapping", "relationship")) {
-      tbl_name <- codeminer_metadata_table_names[[type]]
-      if (schema_table_exists(con, schema, tbl_name)) {
-        qualified <- paste0(schema, ".", tbl_name)
-        meta_df <- DBI::dbGetQuery(
-          con,
-          paste0("SELECT * FROM ", qualified)
-        )
-        if (nrow(meta_df) > 0) {
-          meta_df$.schema <- schema
-          .codeminer_env$metadata[[type]] <- dplyr::bind_rows(
-            .codeminer_env$metadata[[type]],
-            meta_df
-          )
-        }
+  schema <- CODEMINER_ALIAS_MAIN
+  for (type in c("lookup", "mapping", "relationship")) {
+    tbl_name <- codeminer_metadata_table_names[[type]]
+    if (schema_table_exists(con, schema, tbl_name)) {
+      qualified <- paste0(schema, ".", tbl_name)
+      meta_df <- DBI::dbGetQuery(con, paste0("SELECT * FROM ", qualified))
+      if (nrow(meta_df) > 0) {
+        meta_df$.schema <- schema
+        .codeminer_env$metadata[[type]] <- meta_df
       }
     }
   }
 
   invisible()
-}
-
-#' Create a snapshot of the extra database
-#'
-#' Uses DuckDB's `VACUUM INTO` to create a clean, compacted copy of the
-#' user's extra database at the specified path.
-#'
-#' @param path File path for the snapshot.
-#'
-#' @return The snapshot path, invisibly.
-#' @export
-#' @family Workbench management
-codeminer_snapshot_extra <- function(path) {
-  con <- get_db_con()
-  if (is.null(.codeminer_env$db_paths$extra)) {
-    codeminer_abort(
-      "No extra database is attached to the workbench."
-    )
-  }
-  DBI::dbExecute(
-    con,
-    glue::glue_sql(
-      "VACUUM {`CODEMINER_ALIAS_EXTRA`} INTO {path}",
-      .con = con
-    )
-  )
-  codeminer_inform("Snapshot saved to {.file {path}}")
-  invisible(path)
-}
-
-#' Create an empty extra database
-#'
-#' Creates a new DuckDB file with empty metadata tables, ready to be
-#' attached as the user's extra database.
-#'
-#' @param path File path for the new database.
-#'
-#' @return The path, invisibly.
-#' @noRd
-codeminer_init_extra <- function(path) {
-  con <- DBI::dbConnect(duckdb::duckdb(), path)
-  withr::defer(DBI::dbDisconnect(con, shutdown = TRUE))
-  create_lookup_metadata_table(con)
-  create_mapping_metadata_table(con)
-  create_relationship_metadata_table(con)
-  invisible(path)
 }
 
 
@@ -613,19 +528,16 @@ with_col_filters <- function(
 
 # Internal helpers --------------------------------------------------------
 
-#' Set the DuckDB search path based on attached databases
+#' Set the DuckDB search path to the attached main database
 #' @noRd
 codeminer_set_search_path <- function() {
-  alias_map <- c(main = CODEMINER_ALIAS_MAIN, extra = CODEMINER_ALIAS_EXTRA)
-  attached <- intersect(c("extra", "main"), names(.codeminer_env$db_paths))
-  if (length(attached) > 0) {
-    aliases <- alias_map[attached]
-    search_path <- paste(aliases, collapse = ",")
-    DBI::dbExecute(
-      .codeminer_env$con,
-      paste0("SET search_path = '", search_path, "'")
-    )
+  if (is.null(.codeminer_env$db_paths$main)) {
+    return(invisible())
   }
+  DBI::dbExecute(
+    .codeminer_env$con,
+    paste0("SET search_path = '", CODEMINER_ALIAS_MAIN, "'")
+  )
 }
 
 #' Check if a table exists in a specific attached database (catalog)
