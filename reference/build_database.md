@@ -27,7 +27,7 @@ build_database(overwrite = FALSE)
 db_path <- tempfile(fileext = ".duckdb")
 Sys.setenv(CODEMINER_DB_PATH = db_path)
 build_database()
-#> Creating new database at /tmp/RtmpElJchn/file1add239da680.duckdb
+#> Creating new database at /tmp/RtmpcKcAeV/file1b0b1c1005b.duckdb
 file.exists(db_path)
 #> [1] TRUE
 ```
