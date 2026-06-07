@@ -58,17 +58,18 @@ create_dummy_database()
 get_relationship_table("ICD-10") |> dplyr::collect()
 
 # Default endpoints = "both": only internal edges of the input set
+# (UKB-style ICD-10 codes have no dot — e.g. E101 = E10.1).
 get_relationship_table(
   "ICD-10",
-  codes = c("E10", "E10.1", "E10.2")
+  codes = c("E10", "E101", "E102")
 ) |> dplyr::collect()
 
 # endpoints = "either": also surfaces edges crossing the boundary —
-# e.g. the parent of E10 and any siblings of E10.1 / E10.2. Rarely
+# e.g. the parent of E10 and any siblings of E101 / E102. Rarely
 # needed in user code; prefer PARENTS() / CHILDREN() for those.
 get_relationship_table(
   "ICD-10",
-  codes = c("E10", "E10.1", "E10.2"),
+  codes = c("E10", "E101", "E102"),
   endpoints = "either"
 ) |> dplyr::collect()
 }
