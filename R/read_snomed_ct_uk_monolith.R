@@ -86,7 +86,7 @@ read_snomed_ct_uk_monolith <- function(
   # Constants
   snomed_code_type <- "SNOMED CT"
   icd10_code_type <- "ICD-10"
-  opcs4_code_type <- "OPCS4"
+  opcs4_code_type <- "OPCS-4"
 
   # 1. Validation -----------------------------------------------------------
   if (!file.exists(path) && !dir.exists(path)) {

@@ -19,7 +19,7 @@ test_that("read_opcs4_trud() returns correct structure", {
   expect_true("table" %in% names(result$opcs4_lkp$lookup))
   expect_true("metadata" %in% names(result$opcs4_lkp$lookup))
   expect_s3_class(result$opcs4_lkp$lookup$table, "data.frame")
-  expect_equal(result$opcs4_lkp$lookup$metadata$code_type, "OPCS4")
+  expect_equal(result$opcs4_lkp$lookup$metadata$code_type, "OPCS-4")
 })
 
 test_that("read_opcs4_trud() reads the correct columns", {
@@ -43,7 +43,7 @@ test_that("read_opcs4_trud() returns relationship table", {
   expect_true("opcs4_relationship" %in% names(result))
   rel <- result$opcs4_relationship$relationship
   expect_s3_class(rel$table, "data.frame")
-  expect_equal(rel$metadata$code_type, "OPCS4")
+  expect_equal(rel$metadata$code_type, "OPCS-4")
   expect_equal(rel$metadata$child_parent_relationship_code, "is a")
 })
 

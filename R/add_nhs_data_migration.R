@@ -36,8 +36,8 @@ add_nhs_data_migration <- function(
   }
 
   expected_names <- c(
-    ctv3sctmap2 = paste("Read v3", "sct", version, sep = "_"),
-    rcsctmap2 = paste("Read v2", "sct", version, sep = "_"),
+    ctv3sctmap2 = paste("Read v3", "SNOMED CT", version, sep = "_"),
+    rcsctmap2 = paste("Read v2", "SNOMED CT", version, sep = "_"),
     read2_ctv3 = paste("Read v2", "Read v3", version, sep = "_"),
     ctv3_read2 = paste("Read v3", "Read v2", version, sep = "_")
   )

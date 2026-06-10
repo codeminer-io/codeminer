@@ -159,6 +159,13 @@ test_that("codeminer_connect() auto-migrates an unstamped DB via the gate", {
   })
   codeminer_disconnect()
 
+  # Pretend the package is only at schema v1 — so the gate has a pure-auto
+  # chain (just v0 -> v1) to run. With the real registry, the v1 -> v2 step
+  # is `breaking` and would (correctly) refuse here.
+  testthat::local_mocked_bindings(
+    current_schema_version = function() 1L
+  )
+
   # Connect should succeed and the gate should have stamped the DB.
   suppressMessages(codeminer_connect())
 
@@ -179,6 +186,7 @@ test_that("codeminer_connect() refuses when the chain has a non-auto migration",
   # Pretend the registry has a `breaking` v0 -> v1 migration. The gate
   # should refuse rather than auto-running it.
   testthat::local_mocked_bindings(
+    current_schema_version = function() 1L,
     codeminer_migrations = function() {
       list(
         list(
@@ -197,6 +205,93 @@ test_that("codeminer_connect() refuses when the chain has a non-auto migration",
     "non-auto"
   )
   codeminer_disconnect()
+})
+
+# ---- v1 -> v2: canonical code_type rename -------------------------------
+
+test_that("v1 -> v2 migration renames metadata + underlying tables to canonical code_type", {
+  local_build_temp_database()
+
+  # Seed the DB with rows + tables using the OLD (pre-canonical) strings.
+  # We bypass the read_* canonicalisation by writing directly to the
+  # underlying tables. Schema is bumped back to v1 so the gate has work to
+  # do.
+  with_write_conn(function(con) {
+    DBI::dbExecute(con, "UPDATE _db_metadata SET schema_version = '1'")
+
+    # Lookup: legacy OPCS4 table
+    DBI::dbExecute(con, "CREATE TABLE \"OPCS4_test_v1\" (code VARCHAR)")
+    DBI::dbExecute(con, "INSERT INTO \"OPCS4_test_v1\" VALUES ('A011')")
+    DBI::dbExecute(
+      con,
+      glue::glue_sql(
+        "INSERT INTO {`codeminer_metadata_table_names$lookup`}
+           (code_type, lookup_version, lookup_table_name,
+            lookup_code_col, lookup_description_col, lookup_source)
+         VALUES ('OPCS4', 'test_v1', 'OPCS4_test_v1',
+                 'code', 'description', 'fake')",
+        .con = con
+      )
+    )
+
+    # Mapping: legacy bnf -> dmd
+    DBI::dbExecute(con, "CREATE TABLE \"bnf_dmd_v0\" (from_code VARCHAR, to_code VARCHAR)")
+    DBI::dbExecute(
+      con,
+      glue::glue_sql(
+        "INSERT INTO {`codeminer_metadata_table_names$mapping`}
+           (from_code_type, to_code_type, map_version, mapping_table_name,
+            from_col, to_col, map_source)
+         VALUES ('bnf', 'dmd', 'v0', 'bnf_dmd_v0',
+                 'from_code', 'to_code', 'fake')",
+        .con = con
+      )
+    )
+
+    # Relationship: legacy OPCS4 relationship table
+    DBI::dbExecute(
+      con,
+      "CREATE TABLE \"OPCS4_relationship_test_v1\" (from_code VARCHAR, to_code VARCHAR, type VARCHAR)"
+    )
+    DBI::dbExecute(
+      con,
+      glue::glue_sql(
+        "INSERT INTO {`codeminer_metadata_table_names$relationship`}
+           (code_type, relationship_version, relationship_table_name,
+            from_col, to_col, type_col, child_parent_relationship_code,
+            relationship_source)
+         VALUES ('OPCS4', 'test_v1', 'OPCS4_relationship_test_v1',
+                 'from_code', 'to_code', 'type', 'is a', 'fake')",
+        .con = con
+      )
+    )
+  })
+  codeminer_disconnect()
+
+  # Run the migration.
+  suppressMessages(migrate_database())
+
+  # Verify metadata + underlying tables now use canonical names.
+  with_write_conn(function(con) {
+    tables <- DBI::dbListTables(con)
+    expect_true("OPCS-4_test_v1" %in% tables)
+    expect_false("OPCS4_test_v1" %in% tables)
+    expect_true("BNF_DM+D_v0" %in% tables)
+    expect_false("bnf_dmd_v0" %in% tables)
+    expect_true("OPCS-4_relationship_test_v1" %in% tables)
+    expect_false("OPCS4_relationship_test_v1" %in% tables)
+
+    lookup <- DBI::dbReadTable(con, codeminer_metadata_table_names$lookup)
+    expect_true("OPCS-4" %in% lookup$code_type)
+    expect_false("OPCS4" %in% lookup$code_type)
+
+    mapping <- DBI::dbReadTable(con, codeminer_metadata_table_names$mapping)
+    expect_true("BNF" %in% mapping$from_code_type)
+    expect_true("DM+D" %in% mapping$to_code_type)
+
+    rel <- DBI::dbReadTable(con, codeminer_metadata_table_names$relationship)
+    expect_true("OPCS-4" %in% rel$code_type)
+  })
 })
 
 # ---- migrate_database(): refusal paths -----------------------------------

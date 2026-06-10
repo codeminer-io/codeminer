@@ -135,13 +135,13 @@ read_nhs_data_migration <- function(
       tbl,
       ctv3sctmap2 = mapping_metadata(
         from_code_type = "Read v3",
-        to_code_type = "sct",
+        to_code_type = "SNOMED CT",
         map_version = version,
         map_source = source
       ),
       rcsctmap2 = mapping_metadata(
         from_code_type = "Read v2",
-        to_code_type = "sct",
+        to_code_type = "SNOMED CT",
         map_version = version,
         map_source = source
       ),

@@ -51,7 +51,7 @@ read_phecode <- function(
     )
 
     meta <- lookup_metadata(
-      code_type = "phecode",
+      code_type = "Phecode",
       lookup_version = version,
       lookup_code_col = "phecode",
       lookup_description_col = "phenotype",
@@ -75,8 +75,8 @@ read_phecode <- function(
     )
 
     meta <- mapping_metadata(
-      from_code_type = "icd10",
-      to_code_type = "phecode",
+      from_code_type = "ICD-10",
+      to_code_type = "Phecode",
       map_version = version,
       map_source = source
     )
@@ -97,8 +97,8 @@ read_phecode <- function(
     icd9_phecode$icd9 <- stringr::str_remove(icd9_phecode$icd9, pattern = "\\.")
 
     meta <- mapping_metadata(
-      from_code_type = "icd9",
-      to_code_type = "phecode",
+      from_code_type = "ICD-9",
+      to_code_type = "Phecode",
       map_version = version,
       map_source = "https://github.com/PheWAS/PheWAS"
     )

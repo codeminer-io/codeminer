@@ -671,7 +671,7 @@ process_read_v2_opcs4 <- function(.df, version, source) {
       table = .df,
       metadata = mapping_metadata(
         from_code_type = "Read v2",
-        to_code_type = "OPCS4",
+        to_code_type = "OPCS-4",
         map_version = version,
         from_col = "read_code",
         to_col = "opcs_4.2_code",
@@ -798,7 +798,7 @@ process_read_ctv3_opcs4 <- function(.df, version, source) {
       table = .df,
       metadata = mapping_metadata(
         from_code_type = "Read v3",
-        to_code_type = "OPCS4",
+        to_code_type = "OPCS-4",
         map_version = version,
         from_col = "read_code",
         to_col = "opcs4_code",

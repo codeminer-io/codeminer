@@ -22,5 +22,5 @@ test_that("add_opcs4_trud() adds lookup table to database", {
   suppressMessages(add_opcs4_trud(path = dir, version = "test_v1"))
 
   con <- connect_to_db()
-  expect_true(table_exists(con, "OPCS4_test_v1"))
+  expect_true(table_exists(con, "OPCS-4_test_v1"))
 })

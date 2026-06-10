@@ -50,6 +50,136 @@ codeminer_migrations <- function() {
           append = TRUE
         )
       }
+    ),
+    list(
+      from = 1L,
+      to = 2L,
+      mode = "breaking",
+      description = "Normalise code_type strings (e.g. sct -> SNOMED CT, icd10 -> ICD-10).",
+      up = function(con) {
+        canonicalise_code_types(con)
+      }
+    )
+  )
+}
+
+# Map of non-canonical -> canonical code_type strings. Used by the v1 -> v2
+# migration to rewrite metadata + rename the underlying tables. Kept in one
+# place so `valid_code_types()` and future migrations can share it.
+canonical_code_type_renames <- function() {
+  c(
+    "sct" = "SNOMED CT",
+    "bnf" = "BNF",
+    "dmd" = "DM+D",
+    "phecode" = "Phecode",
+    "icd10" = "ICD-10",
+    "icd9" = "ICD-9",
+    "OPCS4" = "OPCS-4",
+    "opcs4" = "OPCS-4"
+  )
+}
+
+# Apply `canonical_code_type_renames()` to every row of the lookup, mapping,
+# and relationship metadata tables. Rewrites the `code_type` /
+# `from_code_type` / `to_code_type` columns, recomputes the matching
+# `*_table_name` column, and renames the underlying DuckDB tables so the
+# index stays in sync with the data.
+canonicalise_code_types <- function(con) {
+  rename_map <- canonical_code_type_renames()
+  apply_rename <- function(s) {
+    out <- rename_map[s]
+    ifelse(is.na(out), s, out)
+  }
+
+  # lookup
+  lookup_tbl <- codeminer_metadata_table_names$lookup
+  lookup <- DBI::dbReadTable(con, lookup_tbl)
+  if (nrow(lookup) > 0L) {
+    new_code_type <- apply_rename(lookup$code_type)
+    new_table_name <- paste(new_code_type, lookup$lookup_version, sep = "_")
+    changed <- which(new_table_name != lookup$lookup_table_name)
+    for (i in changed) {
+      rename_db_table(con, lookup$lookup_table_name[i], new_table_name[i])
+      DBI::dbExecute(
+        con,
+        glue::glue_sql(
+          "UPDATE {`lookup_tbl`}
+             SET code_type = {new_code_type[i]},
+                 lookup_table_name = {new_table_name[i]}
+           WHERE code_type = {lookup$code_type[i]}
+             AND lookup_version = {lookup$lookup_version[i]}",
+          .con = con
+        )
+      )
+    }
+  }
+
+  # mapping
+  mapping_tbl <- codeminer_metadata_table_names$mapping
+  mapping <- DBI::dbReadTable(con, mapping_tbl)
+  if (nrow(mapping) > 0L) {
+    new_from <- apply_rename(mapping$from_code_type)
+    new_to <- apply_rename(mapping$to_code_type)
+    new_table_name <- paste(new_from, new_to, mapping$map_version, sep = "_")
+    changed <- which(new_table_name != mapping$mapping_table_name)
+    for (i in changed) {
+      rename_db_table(con, mapping$mapping_table_name[i], new_table_name[i])
+      DBI::dbExecute(
+        con,
+        glue::glue_sql(
+          "UPDATE {`mapping_tbl`}
+             SET from_code_type = {new_from[i]},
+                 to_code_type = {new_to[i]},
+                 mapping_table_name = {new_table_name[i]}
+           WHERE from_code_type = {mapping$from_code_type[i]}
+             AND to_code_type = {mapping$to_code_type[i]}
+             AND map_version = {mapping$map_version[i]}",
+          .con = con
+        )
+      )
+    }
+  }
+
+  # relationship
+  rel_tbl <- codeminer_metadata_table_names$relationship
+  rel <- DBI::dbReadTable(con, rel_tbl)
+  if (nrow(rel) > 0L) {
+    new_code_type <- apply_rename(rel$code_type)
+    new_table_name <- paste(
+      new_code_type,
+      "relationship",
+      rel$relationship_version,
+      sep = "_"
+    )
+    changed <- which(new_table_name != rel$relationship_table_name)
+    for (i in changed) {
+      rename_db_table(con, rel$relationship_table_name[i], new_table_name[i])
+      DBI::dbExecute(
+        con,
+        glue::glue_sql(
+          "UPDATE {`rel_tbl`}
+             SET code_type = {new_code_type[i]},
+                 relationship_table_name = {new_table_name[i]}
+           WHERE code_type = {rel$code_type[i]}
+             AND relationship_version = {rel$relationship_version[i]}",
+          .con = con
+        )
+      )
+    }
+  }
+}
+
+# Rename a DuckDB table in place. Quoting is handled by glue_sql via the
+# backtick-delimited expressions.
+rename_db_table <- function(con, old_name, new_name) {
+  if (identical(old_name, new_name)) {
+    return(invisible(NULL))
+  }
+  DBI::dbExecute(
+    con,
+    glue::glue_sql(
+      "ALTER TABLE {`old_name`} RENAME TO {`new_name`}",
+      .con = con
     )
   )
 }
