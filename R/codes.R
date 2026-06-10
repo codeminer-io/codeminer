@@ -385,6 +385,13 @@ get_lookup_table <- function(
     renames <- c(renames, category = category_col)
   }
 
+  check_meta_columns_exist(
+    tbl,
+    cols = renames,
+    tbl_name = tbl_name,
+    metadata_type = "lookup",
+    call = call
+  )
   tbl <- dplyr::select(tbl, !!!renames, dplyr::everything()) |>
     dplyr::mutate(code_type = .env$type)
 

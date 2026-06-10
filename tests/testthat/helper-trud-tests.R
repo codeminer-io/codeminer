@@ -220,14 +220,16 @@ create_dummy_nhs_data_migration_dir <- function(.envir = parent.frame()) {
   )
   dir.create(assured_dir, recursive = TRUE)
 
-  # ctv3sctmap2: CTV3 -> SNOMED CT (clinically assured)
+  # ctv3sctmap2: CTV3 -> SNOMED CT (clinically assured). Column names
+  # match the real TRUD file so the metadata's from_col/to_col line up
+  # with what's actually on disk.
   writeLines(
     c(
       paste(
         c(
           "MapId",
           "MapVersion",
-          "ConceptId",
+          "SCT_CONCEPTID",
           "DescriptionId",
           "CTV3_TERMID",
           "CTV3_CONCEPTID",

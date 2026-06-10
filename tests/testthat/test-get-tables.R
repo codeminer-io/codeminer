@@ -362,3 +362,85 @@ test_that("CHILDREN() still works after get_relationship_table() addition", {
   expect_s3_class(result, "codeminer_codelist")
   expect_true(nrow(result) > 0)
 })
+
+# check_meta_columns_exist() ------------------------------------------------
+
+test_that("check_meta_columns_exist() is a no-op when every column is present", {
+  tbl <- dplyr::tbl(connect_to_db(), "ICD-10_UKB v4")
+  expect_invisible(
+    check_meta_columns_exist(
+      tbl,
+      cols = c(code = "ALT_CODE", description = "DESCRIPTION"),
+      tbl_name = "ICD-10_UKB v4",
+      metadata_type = "lookup"
+    )
+  )
+})
+
+test_that("check_meta_columns_exist() aborts with codeminer_metadata_col_missing when columns are absent", {
+  tbl <- dplyr::tbl(connect_to_db(), "ICD-10_UKB v4")
+  expect_error(
+    check_meta_columns_exist(
+      tbl,
+      cols = c(from_col = "from", to_col = "to"),
+      tbl_name = "ICD-10_UKB v4",
+      metadata_type = "mapping"
+    ),
+    class = "codeminer_metadata_col_missing"
+  )
+})
+
+test_that("check_meta_columns_exist() reports the missing names + a hint", {
+  tbl <- dplyr::tbl(connect_to_db(), "ICD-10_UKB v4")
+  err <- tryCatch(
+    check_meta_columns_exist(
+      tbl,
+      cols = c(from_col = "from", to_col = "to"),
+      tbl_name = "ICD-10_UKB v4",
+      metadata_type = "mapping"
+    ),
+    error = function(e) e
+  )
+  msg <- conditionMessage(err)
+  expect_match(msg, "ICD-10_UKB v4")
+  expect_match(msg, "mapping metadata")
+  expect_match(msg, "from_col")
+  expect_match(msg, "to_col")
+  expect_match(msg, "Rebuild the table")
+})
+
+test_that("get_mapping_table() surfaces the friendly error when metadata is broken", {
+  # Dedicated DB for this test so the broken metadata doesn't leak into
+  # other tests sharing the file-level dummy DB.
+  local_build_temp_database()
+
+  suppressMessages(add_mapping_table(
+    tibble::tibble(SRC = "A", TGT = "B"),
+    mapping_metadata(
+      from_code_type = "broken_from",
+      to_code_type = "broken_to",
+      map_version = "v1",
+      from_col = "SRC",
+      to_col = "TGT"
+    )
+  ))
+  # Rewrite the stored from_col/to_col to the literal defaults so the
+  # rename in get_mapping_table() would otherwise blow up with a generic
+  # dplyr message. Wrap in a function so connect_to_db()'s withr::defer
+  # fires (and re-ATTACHes the workbench) before the assertion runs.
+  break_meta <- function() {
+    con <- connect_to_db(read_only = FALSE)
+    DBI::dbExecute(
+      con,
+      "UPDATE _mapping_metadata
+         SET from_col = 'from', to_col = 'to'
+       WHERE from_code_type = 'broken_from'"
+    )
+  }
+  break_meta()
+
+  expect_error(
+    get_mapping_table("broken_from", "broken_to") |> dplyr::collect(),
+    class = "codeminer_metadata_col_missing"
+  )
+})
