@@ -212,59 +212,39 @@ test_that("codeminer_connect() refuses when the chain has a non-auto migration",
 test_that("v1 -> v2 migration renames metadata + underlying tables to canonical code_type", {
   local_build_temp_database()
 
-  # Seed the DB with rows + tables using the OLD (pre-canonical) strings.
-  # We bypass the read_* canonicalisation by writing directly to the
-  # underlying tables. Schema is bumped back to v1 so the gate has work to
-  # do.
+  # Seed the DB with rows + tables using the OLD (pre-canonical) strings
+  # via the public add_*_table() helpers. The metadata constructors derive
+  # the table name from the code_type — e.g. lookup_metadata("OPCS4",
+  # lookup_version = "test_v1") produces lookup_table_name "OPCS4_test_v1".
+  suppressMessages(add_lookup_table(
+    tibble::tibble(code = "A011", description = "Excision of gallbladder"),
+    lookup_metadata(
+      code_type = "OPCS4",
+      lookup_version = "test_v1",
+      lookup_source = "fake"
+    )
+  ))
+  suppressMessages(add_mapping_table(
+    tibble::tibble(from = "0204", to = "12345001"),
+    mapping_metadata(
+      from_code_type = "bnf",
+      to_code_type = "dmd",
+      map_version = "v0",
+      map_source = "fake"
+    )
+  ))
+  suppressMessages(add_relationship_table(
+    tibble::tibble(from = "A011", to = "A01", type = "is a"),
+    relationship_metadata(
+      code_type = "OPCS4",
+      relationship_version = "test_v1",
+      relationship_source = "fake"
+    )
+  ))
+
+  # Push the stamp back to v1 so the gate has work to do.
   with_write_conn(function(con) {
     DBI::dbExecute(con, "UPDATE _db_metadata SET schema_version = '1'")
-
-    # Lookup: legacy OPCS4 table
-    DBI::dbExecute(con, "CREATE TABLE \"OPCS4_test_v1\" (code VARCHAR)")
-    DBI::dbExecute(con, "INSERT INTO \"OPCS4_test_v1\" VALUES ('A011')")
-    DBI::dbExecute(
-      con,
-      glue::glue_sql(
-        "INSERT INTO {`codeminer_metadata_table_names$lookup`}
-           (code_type, lookup_version, lookup_table_name,
-            lookup_code_col, lookup_description_col, lookup_source)
-         VALUES ('OPCS4', 'test_v1', 'OPCS4_test_v1',
-                 'code', 'description', 'fake')",
-        .con = con
-      )
-    )
-
-    # Mapping: legacy bnf -> dmd
-    DBI::dbExecute(con, "CREATE TABLE \"bnf_dmd_v0\" (from_code VARCHAR, to_code VARCHAR)")
-    DBI::dbExecute(
-      con,
-      glue::glue_sql(
-        "INSERT INTO {`codeminer_metadata_table_names$mapping`}
-           (from_code_type, to_code_type, map_version, mapping_table_name,
-            from_col, to_col, map_source)
-         VALUES ('bnf', 'dmd', 'v0', 'bnf_dmd_v0',
-                 'from_code', 'to_code', 'fake')",
-        .con = con
-      )
-    )
-
-    # Relationship: legacy OPCS4 relationship table
-    DBI::dbExecute(
-      con,
-      "CREATE TABLE \"OPCS4_relationship_test_v1\" (from_code VARCHAR, to_code VARCHAR, type VARCHAR)"
-    )
-    DBI::dbExecute(
-      con,
-      glue::glue_sql(
-        "INSERT INTO {`codeminer_metadata_table_names$relationship`}
-           (code_type, relationship_version, relationship_table_name,
-            from_col, to_col, type_col, child_parent_relationship_code,
-            relationship_source)
-         VALUES ('OPCS4', 'test_v1', 'OPCS4_relationship_test_v1',
-                 'from_code', 'to_code', 'type', 'is a', 'fake')",
-        .con = con
-      )
-    )
   })
   codeminer_disconnect()
 
@@ -281,15 +261,18 @@ test_that("v1 -> v2 migration renames metadata + underlying tables to canonical 
     expect_true("OPCS-4_relationship_test_v1" %in% tables)
     expect_false("OPCS4_relationship_test_v1" %in% tables)
 
-    lookup <- DBI::dbReadTable(con, codeminer_metadata_table_names$lookup)
+    lookup <- dplyr::tbl(con, codeminer_metadata_table_names$lookup) |>
+      dplyr::collect()
     expect_true("OPCS-4" %in% lookup$code_type)
     expect_false("OPCS4" %in% lookup$code_type)
 
-    mapping <- DBI::dbReadTable(con, codeminer_metadata_table_names$mapping)
+    mapping <- dplyr::tbl(con, codeminer_metadata_table_names$mapping) |>
+      dplyr::collect()
     expect_true("BNF" %in% mapping$from_code_type)
     expect_true("DM+D" %in% mapping$to_code_type)
 
-    rel <- DBI::dbReadTable(con, codeminer_metadata_table_names$relationship)
+    rel <- dplyr::tbl(con, codeminer_metadata_table_names$relationship) |>
+      dplyr::collect()
     expect_true("OPCS-4" %in% rel$code_type)
   })
 })
