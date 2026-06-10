@@ -7,16 +7,16 @@
 #' Convenience wrappers (`icd10()`, `sct()`, etc.) call `with_type()` for each
 #' supported code type.
 #'
-#' @param type A string naming the code type (e.g. `"icd10"`, `"sct"`). This
-#'   corresponds to the `type` argument accepted by query functions such as
-#'   [CODES()], [CHILDREN()], and [MAP()].
+#' @param type A string naming the code type (e.g. `"ICD-10"`, `"SNOMED CT"`).
+#'   This corresponds to the `type` argument accepted by query functions such
+#'   as [CODES()], [CHILDREN()], and [MAP()].
 #' @param code The expression to evaluate within the code type context.
 #'
 #' @return The result of evaluating `code`.
 #'
 #' @examples
 #' \dontrun{
-#' with_type("icd10", DESCRIPTION("diabetes"))
+#' with_type("ICD-10", DESCRIPTION("diabetes"))
 #' icd10(DESCRIPTION("diabetes"))
 #' bnf(CODES("0204 << Beta-Adrenoceptor Blocking Drugs >>"))
 #' sct(
@@ -40,11 +40,11 @@ with_type <- function(type, code) {
 
 #' @rdname with_type
 #' @export
-icd10 <- function(code) with_type("icd10", code)
+icd10 <- function(code) with_type("ICD-10", code)
 
 #' @rdname with_type
 #' @export
-icd9 <- function(code) with_type("icd9", code)
+icd9 <- function(code) with_type("ICD-9", code)
 
 #' @rdname with_type
 #' @export
@@ -56,15 +56,15 @@ read2 <- function(code) with_type("Read v2", code)
 
 #' @rdname with_type
 #' @export
-sct <- function(code) with_type("sct", code)
+sct <- function(code) with_type("SNOMED CT", code)
 
 #' @rdname with_type
 #' @export
-opcs4 <- function(code) with_type("opcs4", code)
+opcs4 <- function(code) with_type("OPCS-4", code)
 
 #' @rdname with_type
 #' @export
-phecode <- function(code) with_type("phecode", code)
+phecode <- function(code) with_type("Phecode", code)
 
 #' @rdname with_type
 #' @export
@@ -72,11 +72,11 @@ read2_drugs <- function(code) with_type("Read v2 drugs", code)
 
 #' @rdname with_type
 #' @export
-bnf <- function(code) with_type("bnf", code)
+bnf <- function(code) with_type("BNF", code)
 
 #' @rdname with_type
 #' @export
-dmd <- function(code) with_type("dmd", code)
+dmd <- function(code) with_type("DM+D", code)
 
 #' @rdname with_type
 #' @export

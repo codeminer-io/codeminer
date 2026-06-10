@@ -40,7 +40,7 @@ test_that("read_nhs_data_migration() ctv3sctmap2 has correct metadata", {
 
   meta <- result$ctv3sctmap2$mapping$metadata
   expect_equal(meta$from_code_type, "Read v3")
-  expect_equal(meta$to_code_type, "sct")
+  expect_equal(meta$to_code_type, "SNOMED CT")
 })
 
 test_that("read_nhs_data_migration() rcsctmap2 has correct metadata", {
@@ -52,7 +52,7 @@ test_that("read_nhs_data_migration() rcsctmap2 has correct metadata", {
 
   meta <- result$rcsctmap2$mapping$metadata
   expect_equal(meta$from_code_type, "Read v2")
-  expect_equal(meta$to_code_type, "sct")
+  expect_equal(meta$to_code_type, "SNOMED CT")
 })
 
 test_that("read_nhs_data_migration() read2_ctv3 has correct metadata", {

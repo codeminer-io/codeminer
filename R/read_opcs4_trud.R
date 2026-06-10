@@ -115,7 +115,7 @@ read_opcs4_trud <- function(
     )
 
   opcs4_metadata <- lookup_metadata(
-    code_type = "OPCS4",
+    code_type = "OPCS-4",
     lookup_version = version,
     lookup_code_col = "opcs4_code",
     lookup_description_col = "description",
@@ -136,7 +136,7 @@ read_opcs4_trud <- function(
       relationship = list(
         table = opcs4_relationship,
         metadata = relationship_metadata(
-          code_type = "OPCS4",
+          code_type = "OPCS-4",
           relationship_version = version,
           from_col = "from",
           to_col = "to",

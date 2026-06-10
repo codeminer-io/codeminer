@@ -31,8 +31,8 @@ add_opcs4_trud <- function(
   }
 
   expected_names <- c(
-    opcs4_lkp = paste("OPCS4", version, sep = "_"),
-    opcs4_relationship = paste("OPCS4", "relationship", version, sep = "_")
+    opcs4_lkp = paste("OPCS-4", version, sep = "_"),
+    opcs4_relationship = paste("OPCS-4", "relationship", version, sep = "_")
   )
   expected_types <- c(
     opcs4_lkp = "lookup",

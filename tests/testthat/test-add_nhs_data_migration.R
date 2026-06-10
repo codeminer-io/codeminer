@@ -27,8 +27,8 @@ test_that("add_nhs_data_migration() adds all four mapping tables to database", {
   suppressMessages(add_nhs_data_migration(path = dir, version = "test_v1"))
 
   con <- connect_to_db()
-  expect_true(table_exists(con, "Read v3_sct_test_v1"))
-  expect_true(table_exists(con, "Read v2_sct_test_v1"))
+  expect_true(table_exists(con, "Read v3_SNOMED CT_test_v1"))
+  expect_true(table_exists(con, "Read v2_SNOMED CT_test_v1"))
   expect_true(table_exists(con, "Read v2_Read v3_test_v1"))
   expect_true(table_exists(con, "Read v3_Read v2_test_v1"))
 })

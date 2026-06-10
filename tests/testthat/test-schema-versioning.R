@@ -159,6 +159,13 @@ test_that("codeminer_connect() auto-migrates an unstamped DB via the gate", {
   })
   codeminer_disconnect()
 
+  # Pretend the package is only at schema v1 — so the gate has a pure-auto
+  # chain (just v0 -> v1) to run. With the real registry, the v1 -> v2 step
+  # is `breaking` and would (correctly) refuse here.
+  testthat::local_mocked_bindings(
+    current_schema_version = function() 1L
+  )
+
   # Connect should succeed and the gate should have stamped the DB.
   suppressMessages(codeminer_connect())
 
@@ -179,6 +186,7 @@ test_that("codeminer_connect() refuses when the chain has a non-auto migration",
   # Pretend the registry has a `breaking` v0 -> v1 migration. The gate
   # should refuse rather than auto-running it.
   testthat::local_mocked_bindings(
+    current_schema_version = function() 1L,
     codeminer_migrations = function() {
       list(
         list(
@@ -197,6 +205,76 @@ test_that("codeminer_connect() refuses when the chain has a non-auto migration",
     "non-auto"
   )
   codeminer_disconnect()
+})
+
+# ---- v1 -> v2: canonical code_type rename -------------------------------
+
+test_that("v1 -> v2 migration renames metadata + underlying tables to canonical code_type", {
+  local_build_temp_database()
+
+  # Seed the DB with rows + tables using the OLD (pre-canonical) strings
+  # via the public add_*_table() helpers. The metadata constructors derive
+  # the table name from the code_type — e.g. lookup_metadata("OPCS4",
+  # lookup_version = "test_v1") produces lookup_table_name "OPCS4_test_v1".
+  suppressMessages(add_lookup_table(
+    tibble::tibble(code = "A011", description = "Excision of gallbladder"),
+    lookup_metadata(
+      code_type = "OPCS4",
+      lookup_version = "test_v1",
+      lookup_source = "fake"
+    )
+  ))
+  suppressMessages(add_mapping_table(
+    tibble::tibble(from = "0204", to = "12345001"),
+    mapping_metadata(
+      from_code_type = "bnf",
+      to_code_type = "dmd",
+      map_version = "v0",
+      map_source = "fake"
+    )
+  ))
+  suppressMessages(add_relationship_table(
+    tibble::tibble(from = "A011", to = "A01", type = "is a"),
+    relationship_metadata(
+      code_type = "OPCS4",
+      relationship_version = "test_v1",
+      relationship_source = "fake"
+    )
+  ))
+
+  # Push the stamp back to v1 so the gate has work to do.
+  with_write_conn(function(con) {
+    DBI::dbExecute(con, "UPDATE _db_metadata SET schema_version = '1'")
+  })
+  codeminer_disconnect()
+
+  # Run the migration.
+  suppressMessages(migrate_database())
+
+  # Verify metadata + underlying tables now use canonical names.
+  with_write_conn(function(con) {
+    tables <- DBI::dbListTables(con)
+    expect_true("OPCS-4_test_v1" %in% tables)
+    expect_false("OPCS4_test_v1" %in% tables)
+    expect_true("BNF_DM+D_v0" %in% tables)
+    expect_false("bnf_dmd_v0" %in% tables)
+    expect_true("OPCS-4_relationship_test_v1" %in% tables)
+    expect_false("OPCS4_relationship_test_v1" %in% tables)
+
+    lookup <- dplyr::tbl(con, codeminer_metadata_table_names$lookup) |>
+      dplyr::collect()
+    expect_true("OPCS-4" %in% lookup$code_type)
+    expect_false("OPCS4" %in% lookup$code_type)
+
+    mapping <- dplyr::tbl(con, codeminer_metadata_table_names$mapping) |>
+      dplyr::collect()
+    expect_true("BNF" %in% mapping$from_code_type)
+    expect_true("DM+D" %in% mapping$to_code_type)
+
+    rel <- dplyr::tbl(con, codeminer_metadata_table_names$relationship) |>
+      dplyr::collect()
+    expect_true("OPCS-4" %in% rel$code_type)
+  })
 })
 
 # ---- migrate_database(): refusal paths -----------------------------------

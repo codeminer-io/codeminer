@@ -10,7 +10,7 @@
 # Current schema version. BUMP this when registering a new migration. See
 # CLAUDE.md and `vignettes/developer-guide.Rmd` for what warrants a bump.
 current_schema_version <- function() {
-  1L
+  2L
 }
 
 # Oldest schema version this codeminer can still operate on. Bump only when

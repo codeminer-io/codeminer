@@ -49,9 +49,9 @@ data_coding_5(code)
 data_coding_6(code)
 }
 \arguments{
-\item{type}{A string naming the code type (e.g. \code{"icd10"}, \code{"sct"}). This
-corresponds to the \code{type} argument accepted by query functions such as
-\code{\link[=CODES]{CODES()}}, \code{\link[=CHILDREN]{CHILDREN()}}, and \code{\link[=MAP]{MAP()}}.}
+\item{type}{A string naming the code type (e.g. \code{"ICD-10"}, \code{"SNOMED CT"}).
+This corresponds to the \code{type} argument accepted by query functions such
+as \code{\link[=CODES]{CODES()}}, \code{\link[=CHILDREN]{CHILDREN()}}, and \code{\link[=MAP]{MAP()}}.}
 
 \item{code}{The expression to evaluate within the code type context.}
 }
@@ -67,7 +67,7 @@ supported code type.
 }
 \examples{
 \dontrun{
-with_type("icd10", DESCRIPTION("diabetes"))
+with_type("ICD-10", DESCRIPTION("diabetes"))
 icd10(DESCRIPTION("diabetes"))
 bnf(CODES("0204 << Beta-Adrenoceptor Blocking Drugs >>"))
 sct(

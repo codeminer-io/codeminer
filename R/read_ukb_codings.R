@@ -64,7 +64,7 @@ read_ukb_codings <- function(
     opcs4_lkp = list(
       coding = "240",
       code_col = "opcs4_code",
-      code_type = "opcs4"
+      code_type = "OPCS-4"
     ),
     data_coding_3 = list(
       coding = "3",

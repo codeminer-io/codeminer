@@ -100,7 +100,7 @@ add_snomed_ct_uk_monolith <- function(
     sct_lookup = paste("SNOMED CT", version, sep = "_"),
     sct_relationship = paste("SNOMED CT", "relationship", version, sep = "_"),
     sct_icd10 = paste("SNOMED CT", "ICD-10", version, sep = "_"),
-    sct_opcs4 = paste("SNOMED CT", "OPCS4", version, sep = "_")
+    sct_opcs4 = paste("SNOMED CT", "OPCS-4", version, sep = "_")
   )
   expected_types <- c(
     sct_lookup = "lookup",

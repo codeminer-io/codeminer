@@ -65,8 +65,8 @@ read_nhsbsa_bnf_snomed <- function(
   names(bnf_dmd) <- col_names
 
   meta <- mapping_metadata(
-    from_code_type = "bnf",
-    to_code_type = "dmd",
+    from_code_type = "BNF",
+    to_code_type = "DM+D",
     map_version = version,
     map_source = source
   )
