@@ -193,6 +193,13 @@ get_mapping_table <- function(
   )
   tbl <- apply_col_filters(tbl, resolved, tbl_name = tbl_name, call = call)
 
+  check_meta_columns_exist(
+    tbl,
+    cols = c(from_col = this_meta$from_col, to_col = this_meta$to_col),
+    tbl_name = tbl_name,
+    metadata_type = "mapping",
+    call = call
+  )
   tbl <- dplyr::select(
     tbl,
     from = .env$this_meta$from_col,
@@ -200,6 +207,46 @@ get_mapping_table <- function(
     dplyr::everything()
   )
   return(tbl)
+}
+
+# Pre-check the columns named by mapping / lookup / relationship metadata
+# exist on the underlying table. Raises a friendly error instead of letting
+# the downstream `dplyr::select()` blow up with the generic
+# "Column `from` doesn't exist" message.
+check_meta_columns_exist <- function(
+  tbl,
+  cols,
+  tbl_name,
+  metadata_type,
+  call = rlang::caller_env()
+) {
+  available <- colnames(tbl)
+  missing_idx <- !cols %in% available
+  if (!any(missing_idx)) {
+    return(invisible(NULL))
+  }
+  problems <- cols[missing_idx]
+  problem_lines <- vapply(
+    seq_along(problems),
+    function(i) {
+      sprintf(
+        "{.arg %s} = {.val %s}",
+        names(problems)[i],
+        unname(problems[i])
+      )
+    },
+    character(1)
+  )
+  codeminer_abort(
+    c(
+      "{metadata_type} metadata for {.field {tbl_name}} names columns that do not exist on the underlying table.",
+      "x" = paste(problem_lines, collapse = ", "),
+      "i" = "Available columns: {.val {available}}.",
+      "i" = "Rebuild the table - the read_* function's stored metadata no longer matches what's on disk."
+    ),
+    class = "codeminer_metadata_col_missing",
+    call = call
+  )
 }
 
 get_metadata_for_mapping <- function(

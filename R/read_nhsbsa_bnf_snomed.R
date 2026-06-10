@@ -68,6 +68,8 @@ read_nhsbsa_bnf_snomed <- function(
     from_code_type = "BNF",
     to_code_type = "DM+D",
     map_version = version,
+    from_col = "bnf_code",
+    to_col = "snomed_code",
     map_source = source
   )
 

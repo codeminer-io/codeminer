@@ -41,6 +41,11 @@ test_that("read_nhs_data_migration() ctv3sctmap2 has correct metadata", {
   meta <- result$ctv3sctmap2$mapping$metadata
   expect_equal(meta$from_code_type, "Read v3")
   expect_equal(meta$to_code_type, "SNOMED CT")
+  expect_equal(meta$from_col, "CTV3_CONCEPTID")
+  expect_equal(meta$to_col, "SCT_CONCEPTID")
+  expect_true(all(
+    c(meta$from_col, meta$to_col) %in% names(result$ctv3sctmap2$mapping$table)
+  ))
 })
 
 test_that("read_nhs_data_migration() rcsctmap2 has correct metadata", {
@@ -53,6 +58,11 @@ test_that("read_nhs_data_migration() rcsctmap2 has correct metadata", {
   meta <- result$rcsctmap2$mapping$metadata
   expect_equal(meta$from_code_type, "Read v2")
   expect_equal(meta$to_code_type, "SNOMED CT")
+  expect_equal(meta$from_col, "ReadCode")
+  expect_equal(meta$to_col, "ConceptId")
+  expect_true(all(
+    c(meta$from_col, meta$to_col) %in% names(result$rcsctmap2$mapping$table)
+  ))
 })
 
 test_that("read_nhs_data_migration() read2_ctv3 has correct metadata", {

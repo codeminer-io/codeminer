@@ -78,6 +78,8 @@ read_phecode <- function(
       from_code_type = "ICD-10",
       to_code_type = "Phecode",
       map_version = version,
+      from_col = "ICD10",
+      to_col = "PHECODE",
       map_source = source
     )
 
@@ -100,6 +102,8 @@ read_phecode <- function(
       from_code_type = "ICD-9",
       to_code_type = "Phecode",
       map_version = version,
+      from_col = "icd9",
+      to_col = "phecode",
       map_source = "https://github.com/PheWAS/PheWAS"
     )
 

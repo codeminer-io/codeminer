@@ -88,6 +88,18 @@ get_relationship_table <- function(
     call = call
   )
 
+  check_meta_columns_exist(
+    tbl,
+    cols = c(
+      from_col = meta$from_col,
+      to_col = meta$to_col,
+      type_col = meta$type_col
+    ),
+    tbl_name = meta$relationship_table_name,
+    metadata_type = "relationship",
+    call = call
+  )
+
   # Standardise key columns, keep all others
   tbl <- dplyr::select(
     tbl,

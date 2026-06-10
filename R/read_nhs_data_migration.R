@@ -137,12 +137,16 @@ read_nhs_data_migration <- function(
         from_code_type = "Read v3",
         to_code_type = "SNOMED CT",
         map_version = version,
+        from_col = "CTV3_CONCEPTID",
+        to_col = "SCT_CONCEPTID",
         map_source = source
       ),
       rcsctmap2 = mapping_metadata(
         from_code_type = "Read v2",
         to_code_type = "SNOMED CT",
         map_version = version,
+        from_col = "ReadCode",
+        to_col = "ConceptId",
         map_source = source
       ),
       read2_ctv3 = mapping_metadata(
