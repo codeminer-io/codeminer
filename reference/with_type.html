@@ -89,9 +89,9 @@ supported code type.</p>
 
 
 <dl><dt id="arg-type">type<a class="anchor" aria-label="anchor" href="#arg-type"></a></dt>
-<dd><p>A string naming the code type (e.g. <code>"icd10"</code>, <code>"sct"</code>). This
-corresponds to the <code>type</code> argument accepted by query functions such as
-<code><a href="CODES.html">CODES()</a></code>, <code><a href="parent_child_retrieval.html">CHILDREN()</a></code>, and <code><a href="MAP.html">MAP()</a></code>.</p></dd>
+<dd><p>A string naming the code type (e.g. <code>"ICD-10"</code>, <code>"SNOMED CT"</code>).
+This corresponds to the <code>type</code> argument accepted by query functions such
+as <code><a href="CODES.html">CODES()</a></code>, <code><a href="parent_child_retrieval.html">CHILDREN()</a></code>, and <code><a href="MAP.html">MAP()</a></code>.</p></dd>
 
 
 <dt id="arg-code">code<a class="anchor" aria-label="anchor" href="#arg-code"></a></dt>
@@ -106,7 +106,7 @@ corresponds to the <code>type</code> argument accepted by query functions such a
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span> <span class="co"># \dontrun{</span></span></span>
-<span class="r-in"><span><span class="fu">with_type</span><span class="op">(</span><span class="st">"icd10"</span>, <span class="fu"><a href="DESCRIPTION.html">DESCRIPTION</a></span><span class="op">(</span><span class="st">"diabetes"</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">with_type</span><span class="op">(</span><span class="st">"ICD-10"</span>, <span class="fu"><a href="DESCRIPTION.html">DESCRIPTION</a></span><span class="op">(</span><span class="st">"diabetes"</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">icd10</span><span class="op">(</span><span class="fu"><a href="DESCRIPTION.html">DESCRIPTION</a></span><span class="op">(</span><span class="st">"diabetes"</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">bnf</span><span class="op">(</span><span class="fu"><a href="CODES.html">CODES</a></span><span class="op">(</span><span class="st">"0204 &lt;&lt; Beta-Adrenoceptor Blocking Drugs &gt;&gt;"</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">sct</span><span class="op">(</span></span></span>

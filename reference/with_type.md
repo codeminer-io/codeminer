@@ -45,7 +45,7 @@ data_coding_6(code)
 
 - type:
 
-  A string naming the code type (e.g. `"icd10"`, `"sct"`). This
+  A string naming the code type (e.g. `"ICD-10"`, `"SNOMED CT"`). This
   corresponds to the `type` argument accepted by query functions such as
   [`CODES()`](https://codeminer-io.github.io/codeminer/reference/CODES.md),
   [`CHILDREN()`](https://codeminer-io.github.io/codeminer/reference/parent_child_retrieval.md),
@@ -64,7 +64,7 @@ The result of evaluating `code`.
 
 ``` r
 if (FALSE) { # \dontrun{
-with_type("icd10", DESCRIPTION("diabetes"))
+with_type("ICD-10", DESCRIPTION("diabetes"))
 icd10(DESCRIPTION("diabetes"))
 bnf(CODES("0204 << Beta-Adrenoceptor Blocking Drugs >>"))
 sct(

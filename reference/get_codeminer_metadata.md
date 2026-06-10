@@ -36,7 +36,7 @@ requested, a named list of data frames.
 create_dummy_database()
 #> ✔ Dummy database ready to use!
 #> ℹ To reconnect to your previous database:
-#>   `Sys.setenv(CODEMINER_DB_PATH = "/tmp/RtmpcKcAeV/file1b0b113bcde8.duckdb")`
+#>   `Sys.setenv(CODEMINER_DB_PATH = "/tmp/RtmpNU8OVZ/file1baa12eda76c.duckdb")`
 #>   `codeminer_connect()`
 get_codeminer_metadata()
 #> $lookup
@@ -79,11 +79,11 @@ get_codeminer_metadata()
 #> 2  Read v2 drugs_BNF_UKB v4  Read v2 drugs          BNF      UKB v4   read_code
 #> 3      Read v2_ICD-9_UKB v4        Read v2        ICD-9      UKB v4   read_code
 #> 4     Read v2_ICD-10_UKB v4        Read v2       ICD-10      UKB v4   read_code
-#> 5      Read v2_OPCS4_UKB v4        Read v2        OPCS4      UKB v4   read_code
+#> 5     Read v2_OPCS-4_UKB v4        Read v2       OPCS-4      UKB v4   read_code
 #> 6    Read v2_Read v3_UKB v4        Read v2      Read v3      UKB v4 READV2_CODE
 #> 7      Read v3_ICD-9_UKB v4        Read v3        ICD-9      UKB v4   read_code
 #> 8     Read v3_ICD-10_UKB v4        Read v3       ICD-10      UKB v4   read_code
-#> 9      Read v3_OPCS4_UKB v4        Read v3        OPCS4      UKB v4   read_code
+#> 9     Read v3_OPCS-4_UKB v4        Read v3       OPCS-4      UKB v4   read_code
 #> 10   Read v3_Read v2_UKB v4        Read v3      Read v2      UKB v4 READV3_CODE
 #>           to_col                                         map_source
 #> 1          ICD10 https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592
@@ -199,11 +199,11 @@ get_codeminer_metadata(c("lookup", "mapping"))
 #> 2  Read v2 drugs_BNF_UKB v4  Read v2 drugs          BNF      UKB v4   read_code
 #> 3      Read v2_ICD-9_UKB v4        Read v2        ICD-9      UKB v4   read_code
 #> 4     Read v2_ICD-10_UKB v4        Read v2       ICD-10      UKB v4   read_code
-#> 5      Read v2_OPCS4_UKB v4        Read v2        OPCS4      UKB v4   read_code
+#> 5     Read v2_OPCS-4_UKB v4        Read v2       OPCS-4      UKB v4   read_code
 #> 6    Read v2_Read v3_UKB v4        Read v2      Read v3      UKB v4 READV2_CODE
 #> 7      Read v3_ICD-9_UKB v4        Read v3        ICD-9      UKB v4   read_code
 #> 8     Read v3_ICD-10_UKB v4        Read v3       ICD-10      UKB v4   read_code
-#> 9      Read v3_OPCS4_UKB v4        Read v3        OPCS4      UKB v4   read_code
+#> 9     Read v3_OPCS-4_UKB v4        Read v3       OPCS-4      UKB v4   read_code
 #> 10   Read v3_Read v2_UKB v4        Read v3      Read v2      UKB v4 READV3_CODE
 #>           to_col                                         map_source
 #> 1          ICD10 https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592
