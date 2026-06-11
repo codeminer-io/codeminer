@@ -55,8 +55,8 @@
 </ul></div>
 <div class="section level2">
 <h2 id="database-schema-changes">Database schema changes<a class="anchor" aria-label="anchor" href="#database-schema-changes"></a></h2>
-<p>The on-disk codeminer database carries a schema version separate from the package version. <code>current_schema_version()</code> lives in <code>R/schema.R</code>; a row in the <code>_db_metadata</code> table records which schema version a given DB is on. See <code>vignettes/developer-guide.Rmd</code> for the full gate behaviour and migration registry.</p>
-<p>When your change touches <strong>how data is stored</strong>, you MUST bump <code>current_schema_version()</code> and append a migration to <code>codeminer_migrations()</code>. Triggers:</p>
+<p>The on-disk codeminer database carries a schema version separate from the package version. <code>current_schema_version()</code> lives in <code>R/schema.R</code>; a row in the <code>_db_metadata</code> table records which schema version a given DB is on. <code>enforce_schema_gate()</code> refuses any DB whose stamp doesn’t match the package’s current version. There is intentionally <strong>no in-place migration path</strong> — pre-1.0 we expect users to rebuild via <code>build_database(overwrite = TRUE)</code> when the format changes. See <code>vignettes/developer-guide.Rmd</code> for the gate policy.</p>
+<p>When your change touches <strong>how data is stored</strong>, you MUST bump <code>current_schema_version()</code>. Triggers:</p>
 <ul><li>Add/remove a column in <code>required_*_metadata_columns()</code> (lookup, mapping, relationship, or db)</li>
 <li>Add/remove/rename a metadata table</li>
 <li>Rename, retype, or change the semantics of any stored column</li>
@@ -67,7 +67,7 @@
 <li>Bug fixes that don’t alter stored data</li>
 <li>New R functions, refactors, tests, docs</li>
 <li>Adding/changing function arguments that don’t change persisted data</li>
-</ul><p>Each migration declares a mode: <code>auto_additive</code> (the connect gate runs it silently), <code>manual_additive</code> (requires explicit <code><a href="reference/migrate_database.html">migrate_database()</a></code>), or <code>breaking</code> (requires <code><a href="reference/migrate_database.html">migrate_database()</a></code>, user may need to back up first). Default to the strictest mode that fits — better to ask for confirmation than to silently rewrite data.</p>
+</ul><p>If/when we add external users we may reintroduce a migration registry — see issue #139 for that discussion.</p>
 </div>
 <div class="section level2">
 <h2 id="testing-and-checks">Testing and checks<a class="anchor" aria-label="anchor" href="#testing-and-checks"></a></h2>
