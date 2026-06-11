@@ -46,6 +46,34 @@ codeminer_connect <- function(main = NULL) {
   .codeminer_env$con <- DBI::dbConnect(duckdb::duckdb(), ":memory:")
   .codeminer_env$db_paths <- list()
 
+  # If anything below throws (gate refusal, failed ATTACH, ...) the
+  # workbench would be left valid but with no main file attached. The
+  # next `get_db_con()` call would then short-circuit on the cached con
+  # and queries would hit raw DuckDB catalog errors instead of the
+  # friendly gate message. Use on.exit to tear down on any early exit
+  # and clear the guard on success.
+  connection_complete <- FALSE
+  on.exit(
+    {
+      if (!connection_complete) {
+        if (
+          exists("con", envir = .codeminer_env) &&
+            DBI::dbIsValid(.codeminer_env$con)
+        ) {
+          try(
+            DBI::dbDisconnect(.codeminer_env$con, shutdown = TRUE),
+            silent = TRUE
+          )
+        }
+        if (exists("con", envir = .codeminer_env)) {
+          rm("con", envir = .codeminer_env)
+        }
+        .codeminer_env$db_paths <- list()
+      }
+    },
+    add = TRUE
+  )
+
   # Attach main (read-only)
   if (main_was_explicit && !file.exists(main)) {
     codeminer_abort(c(
@@ -78,6 +106,7 @@ codeminer_connect <- function(main = NULL) {
   # Cache metadata from the attached database
   codeminer_refresh_cache()
 
+  connection_complete <- TRUE
   invisible(.codeminer_env$con)
 }
 
