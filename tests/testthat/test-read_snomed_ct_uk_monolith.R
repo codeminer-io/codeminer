@@ -285,6 +285,22 @@ test_that("read_snomed_ct_uk_monolith() uses custom source parameter", {
   )
 })
 
+test_that("read_snomed_ct_uk_monolith() defaults relationships to active edges only", {
+  result <- suppressMessages(
+    read_snomed_ct_uk_monolith(
+      dummy_snomed_ct_uk_monolith_path(),
+      tables = "sct_relationship"
+    )
+  )
+
+  cf <- deserialise_col_filters(
+    result$sct_relationship$relationship$metadata$col_filters
+  )
+
+  expect_equal(cf$active$values, c("0", "1"))
+  expect_equal(cf$active$defaults, "1")
+})
+
 test_that("read_snomed_ct_uk_monolith() uses custom refset IDs", {
   # This won't find any matches with dummy data, but tests parameter passing
   result <- suppressMessages(
