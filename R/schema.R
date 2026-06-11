@@ -2,25 +2,16 @@
 #
 # The on-disk codeminer database carries its own schema version, independent
 # of the package version. The package declares `current_schema_version()` —
-# what fresh `build_database()` produces — and `min_readable_schema_version()`
-# — how far back this codeminer can still operate. Older DBs are migrated
-# forward (auto-additive migrations) or hard-refused with a pointer at
-# `migrate_database()` (non-additive). Newer-than-package DBs are refused.
+# what `build_database()` produces — and refuses to attach any DB stamped at
+# a different version via `enforce_schema_gate()`. There is intentionally no
+# in-place migration path: pre-1.0 we expect users to rebuild when the
+# format changes. See `vignettes/developer-guide.Rmd` for the gate policy.
 
-# Current schema version. BUMP this when registering a new migration. See
-# CLAUDE.md and `vignettes/developer-guide.Rmd` for what warrants a bump.
+# Current schema version. BUMP this when the on-disk format changes. The
+# gate will then refuse pre-bump DBs with a "rebuild required" message.
+# See CLAUDE.md for what counts as a format change.
 current_schema_version <- function() {
   2L
-}
-
-# Oldest schema version this codeminer can still operate on. Bump only when
-# carrying support for an ancient schema becomes a maintenance burden. DBs
-# stamped older than this are hard-refused at connect time.
-#
-# `0L` is the implicit "unstamped" version — i.e. databases built before
-# `_db_metadata` existed in the codeminer source.
-min_readable_schema_version <- function() {
-  0L
 }
 
 required_db_metadata_columns <- function() {
@@ -66,7 +57,8 @@ codeminer_build_info <- function() {
 
 # The single row that `build_database()` writes into `_db_metadata` on a
 # fresh DB. Schema-version is the current package value; built_at is now;
-# last_migrated_at is NA until a migration runs.
+# last_migrated_at stays NA (kept on the row for forward compatibility in
+# case we re-introduce migrations).
 codeminer_initial_stamp_row <- function(now = Sys.time()) {
   info <- codeminer_build_info()
   data.frame(
@@ -101,8 +93,53 @@ read_db_schema_version <- function(con) {
   as.integer(row$schema_version[[1L]])
 }
 
-# `read_db_schema_version()` returns NA for unstamped DBs. The gate treats
-# that as version 0 (pre-#128). This helper centralises that translation.
+# Treat unstamped DBs (pre-#128) as version 0 for the gate so they get the
+# same "rebuild required" refusal as any other older version.
 effective_schema_version <- function(read_version) {
   if (is.na(read_version)) 0L else read_version
+}
+
+# Refuse to attach a database whose stamped schema version differs from what
+# the current package expects. Called from `codeminer_connect()` before the
+# read-only ATTACH so the user gets a friendly error rather than a raw
+# DuckDB catalog miss.
+#
+# Behaviour:
+#   * file does not exist        -> caller will build it; nothing to gate
+#   * stamped == current_schema  -> proceed silently
+#   * stamped > current_schema   -> refuse: "upgrade codeminer"
+#   * stamped < current_schema   -> refuse: "rebuild the database"
+#     (covers unstamped DBs too: effective_schema_version() maps them to 0L)
+#
+# Returns TRUE invisibly on success. Errors via `codeminer_abort()` on
+# refusal.
+enforce_schema_gate <- function(path) {
+  if (!file.exists(path)) {
+    return(invisible(TRUE))
+  }
+
+  con <- DBI::dbConnect(duckdb::duckdb(), path, read_only = TRUE)
+  version <- effective_schema_version(read_db_schema_version(con))
+  DBI::dbDisconnect(con, shutdown = TRUE)
+
+  current <- current_schema_version()
+  if (version == current) {
+    return(invisible(TRUE))
+  }
+
+  if (version > current) {
+    codeminer_abort(
+      c(
+        "Database at {.file {path}} is at schema v{version}; this codeminer supports up to v{current}.",
+        "i" = "Upgrade codeminer to a release that supports schema >= v{version}."
+      )
+    )
+  }
+
+  codeminer_abort(
+    c(
+      "Database at {.file {path}} is at schema v{version}; this codeminer expects v{current}.",
+      "i" = "Rebuild the database with {.code build_database(overwrite = TRUE)} (or install an older codeminer)."
+    )
+  )
 }

@@ -18,13 +18,15 @@ codeminer is an R package for working with clinical coding systems (ICD-10, SNOM
 
 The on-disk codeminer database carries a schema version separate from the
 package version. `current_schema_version()` lives in `R/schema.R`; a row in
-the `_db_metadata` table records which schema version a given DB is on. See
-`vignettes/developer-guide.Rmd` for the full gate behaviour and migration
-registry.
+the `_db_metadata` table records which schema version a given DB is on.
+`enforce_schema_gate()` refuses any DB whose stamp doesn't match the
+package's current version. There is intentionally **no in-place migration
+path** — pre-1.0 we expect users to rebuild via `build_database(overwrite = TRUE)`
+when the format changes. See `vignettes/developer-guide.Rmd` for the gate
+policy.
 
 When your change touches **how data is stored**, you MUST bump
-`current_schema_version()` and append a migration to `codeminer_migrations()`.
-Triggers:
+`current_schema_version()`. Triggers:
 
 - Add/remove a column in `required_*_metadata_columns()` (lookup, mapping,
   relationship, or db)
@@ -43,11 +45,8 @@ warrant a bump:
 - New R functions, refactors, tests, docs
 - Adding/changing function arguments that don't change persisted data
 
-Each migration declares a mode: `auto_additive` (the connect gate runs it
-silently), `manual_additive` (requires explicit `migrate_database()`), or
-`breaking` (requires `migrate_database()`, user may need to back up first).
-Default to the strictest mode that fits — better to ask for confirmation than
-to silently rewrite data.
+If/when we add external users we may reintroduce a migration registry —
+see issue #139 for that discussion.
 
 ## Testing and checks
 

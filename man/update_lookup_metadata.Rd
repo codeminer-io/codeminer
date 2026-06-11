@@ -33,7 +33,6 @@ data. Currently supports updating \code{col_filters}.
 \code{\link[=lookup_metadata]{lookup_metadata()}}, \code{\link[=add_lookup_table]{add_lookup_table()}}
 
 Other Database management: 
-\code{\link{migrate_database}()},
 \code{\link{update_mapping_metadata}()},
 \code{\link{update_relationship_metadata}()}
 }

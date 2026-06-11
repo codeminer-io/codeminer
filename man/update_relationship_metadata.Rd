@@ -34,7 +34,6 @@ the data. Currently supports updating \code{col_filters}.
 \code{\link[=relationship_metadata]{relationship_metadata()}}, \code{\link[=add_relationship_table]{add_relationship_table()}}
 
 Other Database management: 
-\code{\link{migrate_database}()},
 \code{\link{update_lookup_metadata}()},
 \code{\link{update_mapping_metadata}()}
 }

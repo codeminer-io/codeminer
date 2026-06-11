@@ -30,17 +30,18 @@ build_database <- function(overwrite = FALSE) {
     codeminer_inform("Creating new database at {.file {db_path()}}")
   }
 
-  # Existing-DB-without-overwrite path: hand off to the migration runner,
-  # which walks any pending registered migrations. The v0 -> v1 migration
-  # creates any missing metadata tables and stamps the DB. Subsequent
-  # migrations follow the registered chain.
+  # Existing-DB-without-overwrite path: the schema gate (run on
+  # `codeminer_connect()`) will refuse it if the format has drifted; rebuild
+  # via `overwrite = TRUE` if so. Nothing for us to do here.
   if (db_exists && !overwrite) {
-    migrate_database()
+    codeminer_inform(c(
+      "i" = "Database already exists; pass {.code overwrite = TRUE} to recreate from scratch."
+    ))
     return(invisible(TRUE))
   }
 
   # Fresh build (or `overwrite = TRUE`): create everything from scratch and
-  # stamp directly at the current schema version. No migration chain.
+  # stamp at the current schema version.
   con <- connect_to_db(read_only = FALSE)
 
   if (db_exists && overwrite) {
@@ -229,48 +230,6 @@ required_relationship_metadata_columns <- function() {
     "relationship_source",
     "col_filters"
   )
-}
-
-# Migrate metadata tables to add any missing columns.
-# Called during `build_database()` when the database already exists and
-# `overwrite = FALSE`, so that older databases gain new columns (e.g.
-# col_filters) without requiring a full rebuild.
-migrate_metadata_schema <- function(con) {
-  meta_tables <- list(
-    list(
-      tbl = codeminer_metadata_table_names$lookup,
-      required = required_lookup_metadata_columns()
-    ),
-    list(
-      tbl = codeminer_metadata_table_names$mapping,
-      required = required_mapping_metadata_columns()
-    ),
-    list(
-      tbl = codeminer_metadata_table_names$relationship,
-      required = required_relationship_metadata_columns()
-    )
-  )
-
-  for (entry in meta_tables) {
-    if (!table_exists(con, entry$tbl)) {
-      next
-    }
-
-    existing_cols <- DBI::dbListFields(con, entry$tbl)
-    missing_cols <- setdiff(entry$required, existing_cols)
-
-    for (col in missing_cols) {
-      DBI::dbExecute(
-        con,
-        glue::glue_sql(
-          "ALTER TABLE {`entry$tbl`} ADD COLUMN {`col`} VARCHAR",
-          .con = con
-        )
-      )
-    }
-  }
-
-  invisible(TRUE)
 }
 
 # Connect to the database.
