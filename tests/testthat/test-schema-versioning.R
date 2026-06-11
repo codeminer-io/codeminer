@@ -1,14 +1,16 @@
-# Tests for the DB schema-versioning framework (#128).
+# Tests for the DB schema-versioning stamp + gate.
 #
 # Covers:
 #   * fresh build_database() stamps `_db_metadata` at current_schema_version()
-#   * existing-DB build_database() walks the migration chain
-#   * unstamped (pre-#128) DBs are migrated forward via v0 -> v1
-#   * migrate_database(dry_run = TRUE) reports without changing the DB
-#   * codeminer_connect() gate refuses too-new DBs and below-min_readable DBs
-#   * codeminer_connect() gate auto-migrates when the chain is auto_additive
-#   * pending_migrations() validates the chain
+#   * required_db_metadata_columns() matches the stamp row shape
+#   * codeminer_connect() gate refuses too-new and older DBs
+#   * codeminer_connect() tears down the workbench when the gate refuses
 #   * codeminer_build_info() reflects packageDescription() fields
+#
+# Pre-1.0 there is intentionally no in-place migration path — the gate
+# refuses any DB whose stamp doesn't match the current package's schema
+# version, and the user rebuilds via `build_database(overwrite = TRUE)`.
+# See #139 for the discussion that landed this policy.
 
 # Helper: open a write connection to the active DB and run `f(con)`. Uses
 # `connect_to_db(read_only = FALSE)` because that path detaches the
@@ -54,86 +56,17 @@ test_that("required_db_metadata_columns() covers every field in the stamp row", 
   )
 })
 
-# ---- Migration chain & registry -------------------------------------------
-
-test_that("pending_migrations() returns an empty list when start == end", {
-  expect_equal(pending_migrations(1L, 1L), list())
-})
-
-test_that("pending_migrations() returns the v0 -> v1 migration for an unstamped DB", {
-  chain <- pending_migrations(0L, 1L)
-  expect_equal(length(chain), 1L)
-  expect_equal(chain[[1]]$from, 0L)
-  expect_equal(chain[[1]]$to, 1L)
-  expect_equal(chain[[1]]$mode, "auto_additive")
-})
-
-# ---- Backfill: unstamped DB gets migrated -------------------------------
-
-test_that("build_database() on an unstamped DB applies the v0 -> v1 migration", {
+test_that("build_database() on an existing DB without overwrite is a no-op", {
   local_build_temp_database()
-
-  # Simulate a pre-#128 DB by dropping the stamp table.
-  with_write_conn(function(con) {
-    DBI::dbRemoveTable(con, codeminer_metadata_table_names$db)
-  })
-
-  suppressMessages(build_database(overwrite = FALSE))
-
-  with_write_conn(function(con) {
-    expect_true(
-      codeminer_metadata_table_names$db %in% DBI::dbListTables(con)
-    )
-    row <- DBI::dbGetQuery(
-      con,
-      "SELECT schema_version, last_migrated_at FROM _db_metadata"
-    )
-    expect_equal(as.integer(row$schema_version), current_schema_version())
-    expect_true(!is.na(row$last_migrated_at))
-  })
-})
-
-# ---- migrate_database() dry_run ------------------------------------------
-
-test_that("migrate_database(dry_run = TRUE) reports without mutating", {
-  local_build_temp_database()
-  with_write_conn(function(con) {
-    DBI::dbRemoveTable(con, codeminer_metadata_table_names$db)
-  })
-
+  # Second call should not throw and should not have re-stamped the row.
   before <- with_write_conn(function(con) {
-    list(
-      tables = DBI::dbListTables(con),
-      lookup_fields = DBI::dbListFields(
-        con,
-        codeminer_metadata_table_names$lookup
-      )
-    )
+    DBI::dbGetQuery(con, "SELECT built_at FROM _db_metadata")$built_at
   })
-
-  res <- suppressMessages(migrate_database(dry_run = TRUE))
-  expect_equal(res, current_schema_version())
-
+  expect_message(suppressMessages(build_database()), NA) # no error
   after <- with_write_conn(function(con) {
-    list(
-      tables = DBI::dbListTables(con),
-      lookup_fields = DBI::dbListFields(
-        con,
-        codeminer_metadata_table_names$lookup
-      )
-    )
+    DBI::dbGetQuery(con, "SELECT built_at FROM _db_metadata")$built_at
   })
-  expect_identical(before$tables, after$tables)
-  expect_identical(before$lookup_fields, after$lookup_fields)
-})
-
-test_that("migrate_database() is a no-op on a DB already at the current schema", {
-  local_build_temp_database()
-  expect_message(
-    res <- migrate_database(),
-    "already at schema"
-  )
-  expect_null(res)
+  expect_equal(after, before)
 })
 
 # ---- Connect gate: refusal paths -----------------------------------------
@@ -152,11 +85,41 @@ test_that("codeminer_connect() refuses a DB stamped at a newer schema than the p
   codeminer_disconnect()
 })
 
+test_that("codeminer_connect() refuses a DB stamped at an older schema than the package", {
+  local_build_temp_database()
+  with_write_conn(function(con) {
+    DBI::dbExecute(con, "UPDATE _db_metadata SET schema_version = '0'")
+  })
+  codeminer_disconnect()
+
+  expect_error(
+    suppressMessages(codeminer_connect()),
+    "Rebuild the database"
+  )
+  codeminer_disconnect()
+})
+
+test_that("codeminer_connect() refuses an unstamped DB (no _db_metadata table)", {
+  local_build_temp_database()
+  with_write_conn(function(con) {
+    DBI::dbRemoveTable(con, codeminer_metadata_table_names$db)
+  })
+  codeminer_disconnect()
+
+  # `read_db_schema_version()` returns NA for an unstamped DB; the gate
+  # treats that as v0 and refuses with the same "rebuild" message.
+  expect_error(
+    suppressMessages(codeminer_connect()),
+    "Rebuild the database"
+  )
+  codeminer_disconnect()
+})
+
 test_that("codeminer_connect() tears down the workbench when the schema gate refuses", {
-  # Regression for #140 — after a gate refusal, the in-memory `:memory:`
-  # workbench was left valid but with no file attached, so the next call
-  # to `get_db_con()` returned the cached con and queries hit a raw
-  # DuckDB catalog error instead of the friendly gate message.
+  # Regression for #140 — after a gate refusal the in-memory `:memory:`
+  # workbench was left valid but with no file attached, so subsequent
+  # `get_db_con()` calls returned the cached con and queries hit raw
+  # DuckDB catalog errors instead of the friendly gate message.
   local_build_temp_database()
   with_write_conn(function(con) {
     DBI::dbExecute(con, "UPDATE _db_metadata SET schema_version = '99'")
@@ -171,222 +134,11 @@ test_that("codeminer_connect() tears down the workbench when the schema gate ref
   # After the refusal the workbench should be gone.
   expect_false(exists("con", envir = .codeminer_env))
 
-  # And a subsequent get_db_con() should re-trigger the gate, raising
-  # the SAME friendly error rather than a raw DuckDB catalog error.
+  # A subsequent get_db_con() should re-trigger the gate, raising the
+  # same friendly error rather than a raw DuckDB catalog error.
   expect_error(
     suppressMessages(get_db_con()),
     "supports up to v"
-  )
-})
-
-test_that("codeminer_connect() auto-migrates an unstamped DB via the gate", {
-  local_build_temp_database()
-  with_write_conn(function(con) {
-    DBI::dbRemoveTable(con, codeminer_metadata_table_names$db)
-  })
-  codeminer_disconnect()
-
-  # Pretend the package is only at schema v1 — so the gate has a pure-auto
-  # chain (just v0 -> v1) to run. With the real registry, the v1 -> v2 step
-  # is `breaking` and would (correctly) refuse here.
-  testthat::local_mocked_bindings(
-    current_schema_version = function() 1L
-  )
-
-  # Connect should succeed and the gate should have stamped the DB.
-  suppressMessages(codeminer_connect())
-
-  with_write_conn(function(con) {
-    expect_true(
-      codeminer_metadata_table_names$db %in% DBI::dbListTables(con)
-    )
-  })
-})
-
-test_that("codeminer_connect() refuses when the chain has a non-auto migration", {
-  local_build_temp_database()
-  with_write_conn(function(con) {
-    DBI::dbRemoveTable(con, codeminer_metadata_table_names$db)
-  })
-  codeminer_disconnect()
-
-  # Pretend the registry has a `breaking` v0 -> v1 migration. The gate
-  # should refuse rather than auto-running it.
-  testthat::local_mocked_bindings(
-    current_schema_version = function() 1L,
-    codeminer_migrations = function() {
-      list(
-        list(
-          from = 0L,
-          to = 1L,
-          mode = "breaking",
-          description = "fake breaking migration for tests",
-          up = function(con) stop("must not run")
-        )
-      )
-    }
-  )
-
-  expect_error(
-    suppressMessages(codeminer_connect()),
-    "non-auto"
-  )
-  codeminer_disconnect()
-})
-
-# ---- v1 -> v2: canonical code_type rename -------------------------------
-
-test_that("v1 -> v2 migration renames metadata + underlying tables to canonical code_type", {
-  local_build_temp_database()
-
-  # Seed the DB with rows + tables using the OLD (pre-canonical) strings
-  # via the public add_*_table() helpers. The metadata constructors derive
-  # the table name from the code_type — e.g. lookup_metadata("OPCS4",
-  # lookup_version = "test_v1") produces lookup_table_name "OPCS4_test_v1".
-  suppressMessages(add_lookup_table(
-    tibble::tibble(code = "A011", description = "Excision of gallbladder"),
-    lookup_metadata(
-      code_type = "OPCS4",
-      lookup_version = "test_v1",
-      lookup_source = "fake"
-    )
-  ))
-  suppressMessages(add_mapping_table(
-    tibble::tibble(from = "0204", to = "12345001"),
-    mapping_metadata(
-      from_code_type = "bnf",
-      to_code_type = "dmd",
-      map_version = "v0",
-      map_source = "fake"
-    )
-  ))
-  suppressMessages(add_relationship_table(
-    tibble::tibble(from = "A011", to = "A01", type = "is a"),
-    relationship_metadata(
-      code_type = "OPCS4",
-      relationship_version = "test_v1",
-      relationship_source = "fake"
-    )
-  ))
-
-  # Push the stamp back to v1 so the gate has work to do.
-  with_write_conn(function(con) {
-    DBI::dbExecute(con, "UPDATE _db_metadata SET schema_version = '1'")
-  })
-  codeminer_disconnect()
-
-  # Run the migration.
-  suppressMessages(migrate_database())
-
-  # Verify metadata + underlying tables now use canonical names.
-  with_write_conn(function(con) {
-    tables <- DBI::dbListTables(con)
-    expect_true("OPCS-4_test_v1" %in% tables)
-    expect_false("OPCS4_test_v1" %in% tables)
-    expect_true("BNF_DM+D_v0" %in% tables)
-    expect_false("bnf_dmd_v0" %in% tables)
-    expect_true("OPCS-4_relationship_test_v1" %in% tables)
-    expect_false("OPCS4_relationship_test_v1" %in% tables)
-
-    lookup <- dplyr::tbl(con, codeminer_metadata_table_names$lookup) |>
-      dplyr::collect()
-    expect_true("OPCS-4" %in% lookup$code_type)
-    expect_false("OPCS4" %in% lookup$code_type)
-
-    mapping <- dplyr::tbl(con, codeminer_metadata_table_names$mapping) |>
-      dplyr::collect()
-    expect_true("BNF" %in% mapping$from_code_type)
-    expect_true("DM+D" %in% mapping$to_code_type)
-
-    rel <- dplyr::tbl(con, codeminer_metadata_table_names$relationship) |>
-      dplyr::collect()
-    expect_true("OPCS-4" %in% rel$code_type)
-  })
-})
-
-# ---- migrate_database(): refusal paths -----------------------------------
-
-test_that("migrate_database() refuses a DB stamped at a newer schema than the package", {
-  local_build_temp_database()
-  with_write_conn(function(con) {
-    DBI::dbExecute(con, "UPDATE _db_metadata SET schema_version = '99'")
-  })
-
-  expect_error(
-    suppressMessages(migrate_database()),
-    "newer than this codeminer"
-  )
-})
-
-test_that("migrate_database() refuses a DB stamped below min_readable_schema_version()", {
-  local_build_temp_database()
-  with_write_conn(function(con) {
-    DBI::dbExecute(con, "UPDATE _db_metadata SET schema_version = '-1'")
-  })
-
-  expect_error(
-    suppressMessages(migrate_database()),
-    "this codeminer requires"
-  )
-})
-
-# ---- pending_migrations(): chain validation -------------------------------
-
-test_that("pending_migrations() errors when no registered migrations cover the path", {
-  testthat::local_mocked_bindings(
-    codeminer_migrations = function() list()
-  )
-  expect_error(
-    pending_migrations(0L, 1L),
-    "No registered migrations"
-  )
-})
-
-test_that("pending_migrations() errors when the registered chain has a gap", {
-  testthat::local_mocked_bindings(
-    codeminer_migrations = function() {
-      list(
-        list(
-          from = 0L,
-          to = 1L,
-          mode = "auto_additive",
-          description = "v0->v1",
-          up = function(con) NULL
-        ),
-        # gap: missing v1 -> v2
-        list(
-          from = 2L,
-          to = 3L,
-          mode = "auto_additive",
-          description = "v2->v3",
-          up = function(con) NULL
-        )
-      )
-    }
-  )
-  expect_error(
-    pending_migrations(0L, 3L),
-    "chain is broken"
-  )
-})
-
-test_that("pending_migrations() errors when the chain stops short of the target", {
-  testthat::local_mocked_bindings(
-    codeminer_migrations = function() {
-      list(
-        list(
-          from = 0L,
-          to = 1L,
-          mode = "auto_additive",
-          description = "v0->v1",
-          up = function(con) NULL
-        )
-      )
-    }
-  )
-  expect_error(
-    pending_migrations(0L, 5L),
-    "chain stops at"
   )
 })
 

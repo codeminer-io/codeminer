@@ -43,7 +43,7 @@ A fourth metadata table — `_db_metadata` — is *DB-level state*, not a per-da
 | `codeminer_version` | `packageVersion("codeminer")` at the time the DB was last built or migrated. |
 | `schema_version` | Integer. The codeminer-defined schema version this DB is on. Compared against `current_schema_version()` at every connect. |
 | `built_at` | ISO timestamp of the original build. Immutable. |
-| `last_migrated_at` | ISO timestamp of the most recent migration. `NA` until a migration first runs. |
+| `last_migrated_at` | ISO timestamp of the most recent in-place migration. Always `NA` while the project is pre-1.0 (no migration path; rebuild on schema change). Kept on the row for forward compatibility. |
 | `codeminer_source` | Where this codeminer was installed from (`"CRAN"`, `"GitHub"`, `"Local"`, …) — `packageDescription()$Source`. |
 | `codeminer_remote_type` / `codeminer_remote_host` / `codeminer_remote_repo` / `codeminer_remote_username` / `codeminer_remote_sha` | renv-style provenance fields. Populated when codeminer was installed via `devtools::install_github()` / `pak`/`remotes`; `NA` for CRAN or local installs. |
 
@@ -53,9 +53,11 @@ A fourth metadata table — `_db_metadata` — is *DB-level state*, not a per-da
 
 The on-disk database carries its own schema version, separate from the package version. The contract:
 
-* The package declares `current_schema_version()` (what fresh `build_database()` writes) and `min_readable_schema_version()` (the oldest schema this codeminer can still operate on).
+* The package declares `current_schema_version()` (what fresh `build_database()` writes).
 * Every codeminer DB has a `_db_metadata` row stamping which schema version produced it, when, by which codeminer version, and the install provenance.
-* On connect, codeminer compares the DB's stamp to the package's range and applies a gate.
+* On connect, codeminer compares the DB's stamp to `current_schema_version()` and refuses anything that doesn't match.
+
+There is intentionally **no in-place migration path** while the package is pre-1.0. When the format changes the user rebuilds the DB. See issue #139 for the discussion that landed this policy and #139's "Options" for what the longer-term story might look like once we have external users.
 
 ## Connect-time gate
 
@@ -64,49 +66,25 @@ The on-disk database carries its own schema version, separate from the package v
 | DB stamp vs package | behaviour |
 |---|---|
 | `schema_version == current_schema_version()` | proceed silently |
-| in `[min_readable, current)`, **all** registered migrations on the chain are `auto_additive` | run them, bump the stamp, continue |
-| in `[min_readable, current)`, **any** registered migration is `manual_additive` or `breaking` | refuse with a clear pointer at `migrate_database()`; nothing silent |
-| `> current_schema_version()` | refuse: DB built with a newer codeminer; user must upgrade the package |
-| `< min_readable_schema_version()` | refuse: DB too old; user must run an older codeminer first |
+| `> current_schema_version()` | refuse: DB built with a newer codeminer; upgrade the package |
+| `< current_schema_version()` | refuse: format has changed; rebuild via `build_database(overwrite = TRUE)` |
 
-An *unstamped* DB (built before `_db_metadata` existed) is treated as `schema_version = 0` and walks the chain from there.
+An *unstamped* DB (built before `_db_metadata` existed) is treated as `schema_version = 0` and falls into the third row — same "rebuild" refusal.
 
 ## When to bump `current_schema_version()`
 
-Bump if and only if your change alters **what is stored on disk**. See `CLAUDE.md` for the full list of triggers and non-triggers. Examples that bump:
+Bump if and only if your change alters **what is stored on disk**. See `CLAUDE.md` for the full list of triggers and non-triggers. Examples:
 
-| change | bump? | migration mode |
-|---|---|---|
-| New column in `required_lookup_metadata_columns()`, defaults to NULL | yes | `auto_additive` |
-| Same, but needs values backfilled from elsewhere | yes | `manual_additive` |
-| Rename a column in an existing metadata table | yes | `breaking` |
-| Change the `paste(code_type, lookup_version, ...)` rule | yes | `breaking` |
-| New top-level R function | no | — |
-| Change how `get_lookup_table()` renames columns at read time | no | — |
+| change | bump? |
+|---|---|
+| New column in `required_lookup_metadata_columns()` | yes |
+| Rename a column in an existing metadata table | yes |
+| Change the `paste(code_type, lookup_version, ...)` rule for `*_table_name` | yes |
+| New top-level R function | no |
+| Change how `get_lookup_table()` renames columns at read time | no |
+| Bug fix that doesn't alter stored data | no |
 
-## Registering a migration
-
-Append a record to the list returned by `codeminer_migrations()` (`R/migrate.R`) and bump `current_schema_version()`:
-
-```r
-list(
-  from = N - 1L,
-  to = N,
-  mode = "auto_additive",      # or "manual_additive" / "breaking"
-  description = "<one line, shown in inform/error>",
-  up = function(con) {
-    # idempotent SQL that brings a v(N-1) DB to vN
-  }
-)
-```
-
-Default to the strictest mode that fits — better to ask the user to confirm than to silently rewrite data.
-
-`migrate_database()` walks the chain from the DB's stamp to `current_schema_version()`. It refuses to run any non-auto migration without an explicit call (the connect gate refuses outright). A `dry_run = TRUE` flag prints the pending chain without applying it.
-
-## The compatibility window
-
-`min_readable_schema_version()` defines how far back this codeminer supports. Older DBs are hard-refused with a pointer at the last codeminer version that could read them. Bump `min_readable` only when carrying support for an old schema becomes a maintenance burden — never gratuitously, because doing so abandons users with DBs at older versions.
+When you bump, the next connect against any pre-bump DB will refuse with a "rebuild" message. Users (currently just the team) rebuild via `build_database(overwrite = TRUE)`.
 
 # Dummy Data
 
