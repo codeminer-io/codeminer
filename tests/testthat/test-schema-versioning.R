@@ -152,6 +152,33 @@ test_that("codeminer_connect() refuses a DB stamped at a newer schema than the p
   codeminer_disconnect()
 })
 
+test_that("codeminer_connect() tears down the workbench when the schema gate refuses", {
+  # Regression for #140 — after a gate refusal, the in-memory `:memory:`
+  # workbench was left valid but with no file attached, so the next call
+  # to `get_db_con()` returned the cached con and queries hit a raw
+  # DuckDB catalog error instead of the friendly gate message.
+  local_build_temp_database()
+  with_write_conn(function(con) {
+    DBI::dbExecute(con, "UPDATE _db_metadata SET schema_version = '99'")
+  })
+  codeminer_disconnect()
+
+  expect_error(
+    suppressMessages(codeminer_connect()),
+    "supports up to v"
+  )
+
+  # After the refusal the workbench should be gone.
+  expect_false(exists("con", envir = .codeminer_env))
+
+  # And a subsequent get_db_con() should re-trigger the gate, raising
+  # the SAME friendly error rather than a raw DuckDB catalog error.
+  expect_error(
+    suppressMessages(get_db_con()),
+    "supports up to v"
+  )
+})
+
 test_that("codeminer_connect() auto-migrates an unstamped DB via the gate", {
   local_build_temp_database()
   with_write_conn(function(con) {
