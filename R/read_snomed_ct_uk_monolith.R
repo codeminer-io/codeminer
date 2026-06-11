@@ -404,14 +404,21 @@ fread_sct <- function(file_path) {
   )
 }
 
-#' Attach a per-concept `category` derived from the active FSN
+#' Attach a per-concept `category` derived from the FSN
 #'
 #' Extracts the trailing parenthetical (e.g. "(disorder)") from each concept's
-#' active Fully Specified Name and sentence-cases it. Non-FSN rows for the
-#' same concept inherit the value via a left join on `conceptId`. Retired
-#' concepts (`active_concept == "0"`) are surfaced as `"Inactive"` so that
-#' hierarchy tooling can group retired codes instead of seeing `NA` (retired
-#' concepts often have no active FSN to derive a category from).
+#' Fully Specified Name and sentence-cases it. Active descriptions are
+#' preferred when picking which FSN to extract from, but inactive concepts
+#' fall back to their historical FSN so they still get a category.
+#'
+#' Inactive concepts (`active_concept == "0"`) are flagged with an
+#' `(Inactive)` prefix on the category:
+#'
+#' * concept has an FSN parenthetical -> `(Inactive) Disorder`
+#' * concept has no FSN parenthetical -> `(Inactive)`
+#'
+#' Non-FSN rows for the same concept inherit the category via the left
+#' join on `conceptId`.
 #'
 #' @param sct_lookup_table The merged description/concept lookup table.
 #' @return The same table with a new `category` column.
@@ -419,29 +426,44 @@ fread_sct <- function(file_path) {
 snomed_attach_category <- function(sct_lookup_table) {
   fsn_type_id <- "900000000000003001"
 
+  # FSN-derived category per concept. Prefer active descriptions but fall
+  # back to any FSN so retired concepts still get a category from their
+  # historical FSN.
   fsn_categories <- sct_lookup_table |>
-    dplyr::filter(
-      .data$typeId_description == .env$fsn_type_id,
-      .data$active_description == "1"
-    ) |>
+    dplyr::filter(.data$typeId_description == .env$fsn_type_id) |>
     dplyr::mutate(
       category = stringr::str_to_sentence(
         stringr::str_match(
           .data$term_description,
           "\\(([^()]*)\\)\\s*$"
         )[, 2]
+      ),
+      .desc_priority = dplyr::if_else(
+        !is.na(.data$active_description) & .data$active_description == "1",
+        1L,
+        2L
       )
     ) |>
+    dplyr::arrange(.data$conceptId, .data$.desc_priority) |>
     dplyr::distinct(.data$conceptId, .keep_all = TRUE) |>
     dplyr::select(dplyr::all_of(c("conceptId", "category")))
 
   sct_lookup_table |>
     dplyr::left_join(fsn_categories, by = "conceptId") |>
     dplyr::mutate(
-      category = dplyr::if_else(
-        !is.na(.data$active_concept) & .data$active_concept == "0",
-        "Inactive",
-        .data$category
+      category = dplyr::case_when(
+        # Inactive concept with an extractable FSN category -> prefix it.
+        !is.na(.data$active_concept) &
+          .data$active_concept == "0" &
+          !is.na(.data$category) ~
+          paste0("(Inactive) ", .data$category),
+        # Inactive concept with no FSN parenthetical -> bare marker.
+        !is.na(.data$active_concept) &
+          .data$active_concept == "0" ~
+          "(Inactive)",
+        # Active concept (or unknown status) -> keep the extracted category
+        # as-is, including NA when no parenthetical was present.
+        TRUE ~ .data$category
       )
     )
 }
