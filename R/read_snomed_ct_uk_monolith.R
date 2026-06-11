@@ -256,7 +256,15 @@ read_snomed_ct_uk_monolith <- function(
       to_col = "destinationId",
       type_col = "typeId",
       child_parent_relationship_code = "116680003",
-      relationship_source = source
+      relationship_source = source,
+      # SNOMED relationships carry an `active` flag: retired (`"0"`) edges are
+      # kept in the release for history but no longer hold. Default to active
+      # edges only so hierarchy traversals (e.g. `get_relationship_tree()`)
+      # don't follow withdrawn is-a links; users can opt back in with
+      # `col_filters = NULL`.
+      col_filters = list(
+        active = list(values = c("0", "1"), defaults = c("1"))
+      )
     )
 
     result$sct_relationship <- list(
