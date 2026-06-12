@@ -42,7 +42,7 @@ test_that("snomed_attach_category derives category from active FSN", {
   )
 })
 
-test_that("snomed_attach_category marks inactive concepts as 'Inactive'", {
+test_that("snomed_attach_category prefixes the extracted category with `(Inactive)` for retired concepts", {
   tbl <- data.frame(
     conceptId = c("1", "2"),
     typeId_description = c("900000000000003001", "900000000000003001"),
@@ -57,8 +57,23 @@ test_that("snomed_attach_category marks inactive concepts as 'Inactive'", {
 
   out <- snomed_attach_category(tbl)
 
-  expect_equal(out$category[out$conceptId == "1"], "Inactive")
+  expect_equal(out$category[out$conceptId == "1"], "(Inactive) Disorder")
   expect_equal(out$category[out$conceptId == "2"], "Disorder")
+})
+
+test_that("snomed_attach_category uses bare `(Inactive)` when the retired FSN has no parenthetical", {
+  tbl <- data.frame(
+    conceptId = "1",
+    typeId_description = "900000000000003001",
+    term_description = "Retired with no parenthetical",
+    active_description = "0",
+    active_concept = "0",
+    stringsAsFactors = FALSE
+  )
+
+  out <- snomed_attach_category(tbl)
+
+  expect_equal(out$category, "(Inactive)")
 })
 
 test_that("snomed_attach_category returns NA for FSNs with no parenthetical", {
