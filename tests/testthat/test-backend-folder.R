@@ -39,7 +39,124 @@ test_that("backend_kind() distinguishes folder vs file paths", {
 
   tmp_dir <- withr::local_tempfile()
   dir.create(tmp_dir)
+  # Empty folder defaults to codeminer_folder.
   expect_equal(backend_kind(tmp_dir), "codeminer_folder")
+})
+
+test_that("backend_kind() reads storage_format stamp for empty folders", {
+  # Build a parquet_folder with no data tables added; backend_kind() has
+  # nothing to grep for at the file-extension level, so it must consult
+  # the storage_format column in `_db_metadata.parquet`.
+  tmp <- withr::local_tempfile()
+  dir.create(tmp)
+  withr::local_envvar(CODEMINER_DB_PATH = tmp)
+  codeminer_disconnect()
+  build_database(format = "parquet")
+  expect_equal(backend_kind(tmp), "parquet_folder")
+})
+
+test_that("backend_kind() distinguishes folders by data-file extension", {
+  # codeminer_folder: data tables are .duckdb files at root
+  tmp1 <- withr::local_tempfile()
+  dir.create(tmp1)
+  file.create(file.path(tmp1, "_lookup_metadata.parquet"))
+  file.create(file.path(tmp1, "ICD-10_v1.duckdb"))
+  expect_equal(backend_kind(tmp1), "codeminer_folder")
+
+  # parquet_folder: data tables are .parquet files at root
+  tmp2 <- withr::local_tempfile()
+  dir.create(tmp2)
+  file.create(file.path(tmp2, "_lookup_metadata.parquet"))
+  file.create(file.path(tmp2, "ICD-10_v1.parquet"))
+  expect_equal(backend_kind(tmp2), "parquet_folder")
+})
+
+test_that("build_database(format) stamps storage_format correctly", {
+  tmp <- withr::local_tempfile()
+  dir.create(tmp)
+  withr::local_envvar(CODEMINER_DB_PATH = tmp)
+  codeminer_disconnect()
+  build_database(format = "parquet")
+  expect_equal(backend_read_storage_format_folder(tmp), "parquet_folder")
+
+  tmp2 <- withr::local_tempfile()
+  dir.create(tmp2)
+  withr::local_envvar(CODEMINER_DB_PATH = tmp2)
+  codeminer_disconnect()
+  build_database(format = "duckdb")
+  expect_equal(backend_read_storage_format_folder(tmp2), "codeminer_folder")
+})
+
+# parquet_folder round-trip ------------------------------------------------
+
+# Helper: build a parquet_folder DB and point the workbench at it.
+local_build_temp_parquet_folder <- function(..., .envir = parent.frame()) {
+  if (
+    exists("con", envir = .codeminer_env) && DBI::dbIsValid(.codeminer_env$con)
+  ) {
+    codeminer_disconnect()
+  }
+  temp_dir <- withr::local_tempfile(.local_envir = .envir)
+  dir.create(temp_dir)
+  withr::local_envvar(CODEMINER_DB_PATH = temp_dir, .local_envir = .envir)
+  withr::defer(codeminer_disconnect(), envir = .envir)
+  build_database(overwrite = TRUE, format = "parquet")
+  codeminer_connect(main = temp_dir)
+  invisible(temp_dir)
+}
+
+test_that("parquet_folder: add + query round-trips", {
+  temp_dir <- local_build_temp_parquet_folder()
+  add_lookup_table(
+    sample_lookup(),
+    lookup_metadata("ICD-10", lookup_version = "v1")
+  )
+  # Data file is parquet, not duckdb
+  expect_true(file.exists(file.path(temp_dir, "ICD-10_v1.parquet")))
+  expect_false(file.exists(file.path(temp_dir, "ICD-10_v1.duckdb")))
+
+  res <- as.data.frame(CODES("E10", type = "ICD-10"))
+  expect_equal(res$code, "E10")
+})
+
+test_that("parquet_folder: remove deletes the .parquet data file", {
+  temp_dir <- local_build_temp_parquet_folder()
+  add_lookup_table(
+    sample_lookup(),
+    lookup_metadata("ICD-10", lookup_version = "v1")
+  )
+  remove_lookup_table("ICD-10", "v1")
+  expect_false(file.exists(file.path(temp_dir, "ICD-10_v1.parquet")))
+  meta_df <- backend_read_metadata(temp_dir, "lookup")
+  expect_false("ICD-10_v1" %in% meta_df$lookup_table_name)
+})
+
+test_that("parquet_folder: validate_database is consistent on a clean DB", {
+  local_build_temp_parquet_folder()
+  add_lookup_table(
+    sample_lookup(),
+    lookup_metadata("ICD-10", lookup_version = "v1")
+  )
+  issues <- validate_database()
+  expect_length(issues$orphan_data_files, 0)
+  expect_length(issues$dangling_metadata, 0)
+  expect_length(issues$stale_temp_files, 0)
+})
+
+test_that("parquet_folder: validate flags an orphan .parquet data file", {
+  temp_dir <- local_build_temp_parquet_folder()
+  writeBin(as.raw(c(0)), file.path(temp_dir, "stray_v9.parquet"))
+  issues <- validate_database()
+  expect_true("stray_v9" %in% issues$orphan_data_files)
+})
+
+test_that("build_database(format = 'parquet') ignored for a .duckdb file path", {
+  tmp_file <- withr::local_tempfile(fileext = ".duckdb")
+  withr::local_envvar(CODEMINER_DB_PATH = tmp_file)
+  codeminer_disconnect()
+  # format arg silently does nothing for a file path
+  build_database(format = "parquet")
+  expect_equal(backend_kind(tmp_file), "duckdb_file")
 })
 
 # build_database() initialises a fresh folder --------------------------------

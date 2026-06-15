@@ -11,7 +11,7 @@
 # gate will then refuse pre-bump DBs with a "rebuild required" message.
 # See CLAUDE.md for what counts as a format change.
 current_schema_version <- function() {
-  2L
+  3L
 }
 
 required_db_metadata_columns <- function() {
@@ -19,6 +19,11 @@ required_db_metadata_columns <- function() {
     # Initial stamp + most-recent provenance
     "codeminer_version",
     "schema_version",
+    # On-disk layout. One of "duckdb_file", "codeminer_folder",
+    # "parquet_folder". Recorded once at `build_database()` time and used
+    # by `backend_kind()` to distinguish folder layouts that look
+    # identical at the metadata level.
+    "storage_format",
     "built_at",
     "last_migrated_at",
     # renv.lock-style install provenance: filled in from packageDescription()
@@ -58,12 +63,18 @@ codeminer_build_info <- function() {
 # The single row that `build_database()` writes into `_db_metadata` on a
 # fresh DB. Schema-version is the current package value; built_at is now;
 # last_migrated_at stays NA (kept on the row for forward compatibility in
-# case we re-introduce migrations).
-codeminer_initial_stamp_row <- function(now = Sys.time()) {
+# case we re-introduce migrations). `storage_format` records the on-disk
+# layout chosen at build time and is consulted by `backend_kind()` to
+# disambiguate folder DBs.
+codeminer_initial_stamp_row <- function(
+  storage_format = "duckdb_file",
+  now = Sys.time()
+) {
   info <- codeminer_build_info()
   data.frame(
     codeminer_version = info$codeminer_version,
     schema_version = as.character(current_schema_version()),
+    storage_format = storage_format,
     built_at = format(now, "%Y-%m-%dT%H:%M:%SZ", tz = "UTC"),
     last_migrated_at = NA_character_,
     codeminer_source = info$codeminer_source,

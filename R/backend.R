@@ -1,21 +1,25 @@
 # Storage backend abstraction.
 #
-# Codeminer's "main" database can be one of two shapes:
+# Codeminer's "main" database can be one of three shapes:
 #
 # * `duckdb_file` — a single `.duckdb` file. Read access happens via
 #   `ATTACH ... (READ_ONLY)` into the workbench; writes open a short-lived
 #   direct DuckDB connection to the file.
 #
-# * `codeminer_folder` — a directory holding one parquet file per metadata
-#   type (`_lookup_metadata.parquet`, `_mapping_metadata.parquet`,
+# * `codeminer_folder` — a directory holding parquet metadata files at the
+#   root (`_lookup_metadata.parquet`, `_mapping_metadata.parquet`,
 #   `_relationship_metadata.parquet`, `_db_metadata.parquet`) plus one
 #   `.duckdb` file per registered data table. Metadata stays as parquet
 #   (small, rewritten atomically on each add); data tables get the
 #   speed of native DuckDB storage — important for recursive queries
-#   like CHILDREN that hit the relationship table repeatedly.
-#   Read access ATTACHes each `<name>.duckdb` and projects it through a
-#   view in the workbench. Writes use a write-to-temp + atomic-rename
-#   transaction (see `backend_add_table()`).
+#   like CHILDREN that hit the relationship table repeatedly. This is
+#   the default folder layout (`build_database(format = "duckdb")`).
+#
+# * `parquet_folder` — a directory holding parquet files for both metadata
+#   and data tables. Smaller on disk than `codeminer_folder` (parquet's
+#   column compression beats DuckDB's row storage on typical lookup
+#   tables) but slower for recursive queries since each iteration
+#   re-scans the data parquet. Opt in via `build_database(format = "parquet")`.
 #
 # All callers go through the dispatcher functions in this file; no other
 # file should hard-code DuckDB or parquet specifics for the "main" backend.
@@ -23,17 +27,70 @@
 # Detect which backend a path uses.
 #
 # Rules:
-# * If the path ends in `.duckdb`, treat as `duckdb_file` (even when the
-#   file doesn't exist yet — `backend_init()` will create it).
-# * If the path is an existing directory, treat as `codeminer_folder`.
-# * If the path doesn't exist and has no `.duckdb` extension, fall back
-#   to `duckdb_file` for backwards compatibility with the default
-#   `db_path()` (which historically pointed at `ontology.duckdb`).
+# * If the path is not an existing directory, treat as `duckdb_file`.
+# * Otherwise it's a folder. Peek at the file extensions of data files at
+#   the root: only `.duckdb` → `codeminer_folder`; only `.parquet` →
+#   `parquet_folder`. For empty / ambiguous folders, fall back to the
+#   `storage_format` stamp in `_db_metadata.parquet`. As a last resort
+#   (no stamp file either), default to `codeminer_folder`.
 backend_kind <- function(path) {
-  if (dir.exists(path)) {
+  if (!dir.exists(path)) {
+    return("duckdb_file")
+  }
+
+  metadata_filenames <- vapply(
+    c("lookup", "mapping", "relationship", "db"),
+    function(type) paste0(backend_metadata_name(type), ".parquet"),
+    character(1)
+  )
+
+  files <- list.files(path)
+  data_files <- setdiff(files, metadata_filenames)
+
+  any_duckdb <- any(grepl("\\.duckdb$", data_files))
+  any_parquet <- any(grepl("\\.parquet$", data_files))
+
+  if (any_duckdb && !any_parquet) {
     return("codeminer_folder")
   }
-  "duckdb_file"
+  if (any_parquet && !any_duckdb) {
+    return("parquet_folder")
+  }
+
+  # Either empty (just-built folder, no data tables yet) or mixed
+  # (manually-edited / cross-format leftovers). Consult the stamp.
+  meta_path <- file.path(path, "_db_metadata.parquet")
+  if (!file.exists(meta_path)) {
+    return("codeminer_folder")
+  }
+  format <- tryCatch(
+    backend_read_storage_format_folder(path),
+    error = function(e) NA_character_
+  )
+  if (identical(format, "parquet_folder")) {
+    return("parquet_folder")
+  }
+  "codeminer_folder"
+}
+
+# Read the `storage_format` column from `_db_metadata.parquet`. Returns
+# `NA_character_` if the file or column isn't present. Called from
+# `backend_kind()` as the tiebreaker for empty/ambiguous folders.
+backend_read_storage_format_folder <- function(path) {
+  meta <- file.path(path, "_db_metadata.parquet")
+  con <- backend_pq_con()
+  withr::defer(DBI::dbDisconnect(con, shutdown = TRUE))
+  row <- DBI::dbGetQuery(
+    con,
+    glue::glue_sql(
+      "SELECT storage_format FROM read_parquet({meta})",
+      .con = con
+    )
+  )
+  if (nrow(row) == 0L || is.null(row$storage_format)) {
+    return(NA_character_)
+  }
+  as.character(row$storage_format[[1L]])
 }
 
 # Initialise a fresh database at `path` for the given backend.
@@ -43,13 +100,20 @@ backend_kind <- function(path) {
 #   short-circuit; this function only runs on a fresh build or overwrite.
 # * Creates the metadata tables and writes the initial `_db_metadata`
 #   stamp row at the current schema version.
-backend_init <- function(path, overwrite = FALSE) {
-  kind <- backend_kind(path)
+backend_init <- function(path, overwrite = FALSE, storage_format = NULL) {
+  # `storage_format` is the *intended* layout for the (possibly
+  # not-yet-built) DB; it lets `build_database()` say "I want to make
+  # this folder a parquet_folder" even when the directory is currently
+  # empty (where `backend_kind()` would default to `codeminer_folder`).
+  if (is.null(storage_format)) {
+    storage_format <- backend_kind(path)
+  }
   switch(
-    kind,
+    storage_format,
     duckdb_file = backend_init_duckdb_file(path, overwrite = overwrite),
     codeminer_folder = backend_init_codeminer_folder(path, overwrite = overwrite),
-    codeminer_abort("Unknown backend kind {.val {kind}}.")
+    parquet_folder = backend_init_parquet_folder(path, overwrite = overwrite),
+    codeminer_abort("Unknown storage format {.val {storage_format}}.")
   )
 }
 
@@ -62,6 +126,7 @@ backend_attach <- function(con, alias, path) {
     kind,
     duckdb_file = backend_attach_duckdb_file(con, alias, path),
     codeminer_folder = backend_attach_codeminer_folder(con, alias, path),
+    parquet_folder = backend_attach_parquet_folder(con, alias, path),
     codeminer_abort("Unknown backend kind {.val {kind}}.")
   )
 }
@@ -75,6 +140,7 @@ backend_read_schema_version <- function(path) {
     kind,
     duckdb_file = backend_read_schema_version_duckdb_file(path),
     codeminer_folder = backend_read_schema_version_codeminer_folder(path),
+    parquet_folder = backend_read_schema_version_codeminer_folder(path),
     codeminer_abort("Unknown backend kind {.val {kind}}.")
   )
 }
@@ -104,6 +170,12 @@ backend_add_table <- function(path, type, metadata_row, data_df) {
       metadata_row,
       data_df
     ),
+    parquet_folder = backend_add_table_parquet_folder(
+      path,
+      type,
+      metadata_row,
+      data_df
+    ),
     codeminer_abort("Unknown backend kind {.val {kind}}.")
   )
 }
@@ -117,6 +189,11 @@ backend_remove_table <- function(path, type, table_name) {
     kind,
     duckdb_file = backend_remove_table_duckdb_file(path, type, table_name),
     codeminer_folder = backend_remove_table_codeminer_folder(
+      path,
+      type,
+      table_name
+    ),
+    parquet_folder = backend_remove_table_parquet_folder(
       path,
       type,
       table_name
@@ -145,6 +222,13 @@ backend_update_metadata <- function(path, type, table_name, col, value) {
       col,
       value
     ),
+    parquet_folder = backend_update_metadata_codeminer_folder(
+      path,
+      type,
+      table_name,
+      col,
+      value
+    ),
     codeminer_abort("Unknown backend kind {.val {kind}}.")
   )
 }
@@ -159,6 +243,7 @@ backend_read_metadata <- function(path, type) {
     kind,
     duckdb_file = backend_read_metadata_duckdb_file(path, type),
     codeminer_folder = backend_read_metadata_codeminer_folder(path, type),
+    parquet_folder = backend_read_metadata_codeminer_folder(path, type),
     codeminer_abort("Unknown backend kind {.val {kind}}.")
   )
 }
@@ -171,6 +256,7 @@ backend_table_exists <- function(path, name) {
     kind,
     duckdb_file = backend_table_exists_duckdb_file(path, name),
     codeminer_folder = backend_table_exists_codeminer_folder(path, name),
+    parquet_folder = backend_table_exists_parquet_folder(path, name),
     codeminer_abort("Unknown backend kind {.val {kind}}.")
   )
 }
@@ -221,7 +307,9 @@ acquire_writable_workbench <- function(path, .envir = parent.frame()) {
       },
       envir = .envir
     )
-  } else if (kind == "codeminer_folder" && workbench_holds_file) {
+  } else if (
+    kind %in% c("codeminer_folder", "parquet_folder") && workbench_holds_file
+  ) {
     withr::defer(
       {
         wb_alive <- exists("con", envir = .codeminer_env) &&
@@ -322,7 +410,7 @@ backend_init_duckdb_file <- function(path, overwrite = FALSE) {
   DBI::dbWriteTable(
     con,
     name = codeminer_metadata_table_names$db,
-    value = codeminer_initial_stamp_row(),
+    value = codeminer_initial_stamp_row(storage_format = "duckdb_file"),
     append = TRUE
   )
   invisible(TRUE)
@@ -558,7 +646,7 @@ backend_init_codeminer_folder <- function(path, overwrite = FALSE) {
   if (overwrite || !file.exists(db_target)) {
     backend_write_parquet_atomic(
       con,
-      codeminer_initial_stamp_row(),
+      codeminer_initial_stamp_row(storage_format = "codeminer_folder"),
       db_target
     )
   }
@@ -851,6 +939,7 @@ backend_validate <- function(path) {
     kind,
     duckdb_file = backend_validate_duckdb_file(path),
     codeminer_folder = backend_validate_codeminer_folder(path),
+    parquet_folder = backend_validate_parquet_folder(path),
     codeminer_abort("Unknown backend kind {.val {kind}}.")
   )
 }
@@ -1032,4 +1121,260 @@ backend_update_metadata_codeminer_folder <- function(
     backend_meta_path(path, type)
   )
   invisible(TRUE)
+}
+
+# Parquet-folder backend ---------------------------------------------------
+#
+# Data tables live alongside the metadata parquets at the folder root,
+# as `<name>.parquet` files. Both the data and metadata write paths use
+# the same write-to-temp + atomic-rename transaction pattern.
+
+# Path of the parquet file backing a data table in parquet_folder mode.
+backend_pq_data_path <- function(path, table_name) {
+  file.path(path, paste0(table_name, ".parquet"))
+}
+
+backend_init_parquet_folder <- function(path, overwrite = FALSE) {
+  if (!dir.exists(path)) {
+    dir.create(path, recursive = TRUE, showWarnings = FALSE)
+  }
+
+  if (overwrite) {
+    existing <- list.files(path, pattern = "\\.parquet$", full.names = TRUE)
+    if (length(existing) > 0) {
+      codeminer_inform("Removing existing parquet files from {.file {path}}")
+      unlink(existing)
+    }
+    leftover_tmp <- list.files(
+      path,
+      pattern = "\\.parquet\\.tmp$",
+      full.names = TRUE
+    )
+    if (length(leftover_tmp) > 0) {
+      unlink(leftover_tmp)
+    }
+  }
+
+  con <- backend_pq_con()
+  withr::defer(DBI::dbDisconnect(con, shutdown = TRUE))
+
+  for (type in c("lookup", "mapping", "relationship")) {
+    target <- backend_meta_path(path, type)
+    if (overwrite || !file.exists(target)) {
+      backend_write_parquet_atomic(
+        con,
+        backend_empty_metadata(type),
+        target
+      )
+    }
+  }
+
+  db_target <- backend_meta_path(path, "db")
+  if (overwrite || !file.exists(db_target)) {
+    backend_write_parquet_atomic(
+      con,
+      codeminer_initial_stamp_row(storage_format = "parquet_folder"),
+      db_target
+    )
+  }
+
+  invisible(TRUE)
+}
+
+backend_attach_parquet_folder <- function(con, alias, path) {
+  # Same in-memory catalog setup as codeminer_folder so that the rest
+  # of the package addresses tables as `<alias>.main.<table>`.
+  catalogs <- DBI::dbGetQuery(
+    con,
+    glue::glue_sql(
+      "SELECT database_name FROM duckdb_databases() WHERE database_name = {alias}",
+      .con = con
+    )
+  )
+  if (nrow(catalogs) == 0L) {
+    DBI::dbExecute(
+      con,
+      glue::glue_sql("ATTACH ':memory:' AS {`alias`}", .con = con)
+    )
+  }
+
+  # Metadata views (parquet — same as codeminer_folder).
+  for (type in c("lookup", "mapping", "relationship", "db")) {
+    meta_path <- backend_meta_path(path, type)
+    if (!file.exists(meta_path)) {
+      next
+    }
+    view_name <- backend_metadata_name(type)
+    DBI::dbExecute(
+      con,
+      glue::glue_sql(
+        "CREATE OR REPLACE VIEW {`alias`}.main.{`view_name`} AS
+         SELECT * FROM read_parquet({meta_path})",
+        .con = con
+      )
+    )
+  }
+
+  # Data table views point at `<name>.parquet` via read_parquet — no
+  # ATTACH needed, so no `_t_<name>` aliases. Enumerated from metadata
+  # to skip orphan files.
+  for (type in c("lookup", "mapping", "relationship")) {
+    meta_path <- backend_meta_path(path, type)
+    if (!file.exists(meta_path)) {
+      next
+    }
+    meta_df <- backend_read_metadata_codeminer_folder(path, type)
+    id_col <- backend_id_col(type)
+    table_names <- meta_df[[id_col]]
+    for (tbl in table_names) {
+      data_path <- backend_pq_data_path(path, tbl)
+      if (!file.exists(data_path)) {
+        next
+      }
+      DBI::dbExecute(
+        con,
+        glue::glue_sql(
+          "CREATE OR REPLACE VIEW {`alias`}.main.{`tbl`} AS
+           SELECT * FROM read_parquet({data_path})",
+          .con = con
+        )
+      )
+    }
+  }
+  invisible(TRUE)
+}
+
+backend_table_exists_parquet_folder <- function(path, name) {
+  if (
+    name %in%
+      vapply(
+        c("lookup", "mapping", "relationship", "db"),
+        backend_metadata_name,
+        character(1)
+      )
+  ) {
+    return(file.exists(file.path(path, paste0(name, ".parquet"))))
+  }
+  file.exists(backend_pq_data_path(path, name))
+}
+
+backend_add_table_parquet_folder <- function(
+  path,
+  type,
+  metadata_row,
+  data_df
+) {
+  validate_metadata_row(metadata_row, type)
+
+  id_col <- backend_id_col(type)
+  table_name <- metadata_row[[id_col]][[1]]
+
+  current_meta <- backend_read_metadata_codeminer_folder(path, type)
+  if (table_name %in% current_meta[[id_col]]) {
+    return(invisible(FALSE))
+  }
+
+  meta_path <- backend_meta_path(path, type)
+  data_path <- backend_pq_data_path(path, table_name)
+  meta_tmp <- paste0(meta_path, ".tmp")
+  data_tmp <- paste0(data_path, ".tmp")
+
+  pq_con <- backend_pq_con()
+  withr::defer(DBI::dbDisconnect(pq_con, shutdown = TRUE))
+
+  # Step 1: write metadata temp.
+  combined_meta <- dplyr::bind_rows(current_meta, as.data.frame(metadata_row))
+  backend_pq_write_to_tmp(pq_con, combined_meta, meta_tmp)
+  committed_meta_tmp <- FALSE
+  withr::defer(
+    if (!committed_meta_tmp && file.exists(meta_tmp)) unlink(meta_tmp)
+  )
+
+  # Step 2: write data temp (also parquet).
+  backend_pq_write_to_tmp(pq_con, data_df, data_tmp)
+  committed_data_tmp <- FALSE
+  withr::defer(
+    if (!committed_data_tmp && file.exists(data_tmp)) unlink(data_tmp)
+  )
+
+  # Step 3: commit data.
+  file.rename(data_tmp, data_path)
+  committed_data_tmp <- TRUE
+  data_committed <- TRUE
+
+  # Step 4: commit metadata; roll back data on failure.
+  tryCatch(
+    file.rename(meta_tmp, meta_path),
+    error = function(e) {
+      if (data_committed && file.exists(data_path)) {
+        unlink(data_path)
+      }
+      stop(e)
+    }
+  )
+  committed_meta_tmp <- TRUE
+  invisible(TRUE)
+}
+
+backend_remove_table_parquet_folder <- function(path, type, table_name) {
+  current_meta <- backend_read_metadata_codeminer_folder(path, type)
+  id_col <- backend_id_col(type)
+  if (!table_name %in% current_meta[[id_col]]) {
+    codeminer_abort(
+      "No {type} metadata row found for {.val {table_name}}."
+    )
+  }
+  new_meta <- current_meta[current_meta[[id_col]] != table_name, , drop = FALSE]
+
+  con <- backend_pq_con()
+  withr::defer(DBI::dbDisconnect(con, shutdown = TRUE))
+  backend_write_parquet_atomic(
+    con,
+    new_meta,
+    backend_meta_path(path, type)
+  )
+
+  data_path <- backend_pq_data_path(path, table_name)
+  if (file.exists(data_path)) {
+    unlink(data_path)
+  }
+  invisible(TRUE)
+}
+
+# parquet_folder validation. Same three issue types as codeminer_folder
+# but data files are `.parquet` and the stale-temp pattern only needs to
+# catch `.parquet.tmp` (both metadata and data writes use it).
+backend_validate_parquet_folder <- function(path) {
+  issues <- list(
+    orphan_data_files = character(0),
+    dangling_metadata = character(0),
+    stale_temp_files = character(0)
+  )
+  if (!dir.exists(path)) {
+    return(issues)
+  }
+
+  metadata_filenames <- vapply(
+    c("lookup", "mapping", "relationship", "db"),
+    function(type) paste0(backend_metadata_name(type), ".parquet"),
+    character(1)
+  )
+
+  parquet_files <- list.files(path, pattern = "\\.parquet$")
+  data_files <- setdiff(parquet_files, metadata_filenames)
+  data_table_names <- sub("\\.parquet$", "", data_files)
+
+  registered <- character(0)
+  for (type in c("lookup", "mapping", "relationship")) {
+    meta <- backend_read_metadata_codeminer_folder(path, type)
+    id_col <- backend_id_col(type)
+    registered <- c(registered, meta[[id_col]])
+  }
+  registered <- unique(registered)
+
+  issues$orphan_data_files <- setdiff(data_table_names, registered)
+  issues$dangling_metadata <- setdiff(registered, data_table_names)
+  issues$stale_temp_files <- list.files(path, pattern = "\\.parquet\\.tmp$")
+
+  issues
 }

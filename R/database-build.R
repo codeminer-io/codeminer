@@ -11,7 +11,17 @@ lockEnvironment(codeminer_metadata_table_names, bindings = TRUE)
 #' Set up the codeminer database and create the required lookup and
 #' mapping metadata tables.
 #'
-#' @param overwrite Logical indicating whether to overwrite existing tables (default: `FALSE`)
+#' @param overwrite Logical indicating whether to overwrite existing tables
+#'   (default: `FALSE`).
+#' @param format Character. For folder-mode databases, controls how data
+#'   tables are stored inside the folder. One of:
+#'   * `"duckdb"` (default): metadata stays as parquet at the folder root;
+#'     each data table is a `<name>.duckdb` file. Faster recursive queries
+#'     (CHILDREN etc.) at the cost of ~50% larger disk than `"parquet"`.
+#'   * `"parquet"`: data tables and metadata are all parquet files at the
+#'     folder root. Smaller on disk; recursive queries hit re-scan cost.
+#'   Ignored when `CODEMINER_DB_PATH` points at a single `.duckdb` file
+#'   (there's only one shape — a single DuckDB file).
 #'
 #' @return `TRUE` invisibly if successful.
 #'
@@ -22,7 +32,8 @@ lockEnvironment(codeminer_metadata_table_names, bindings = TRUE)
 #' Sys.setenv(CODEMINER_DB_PATH = db_path)
 #' build_database()
 #' file.exists(db_path)
-build_database <- function(overwrite = FALSE) {
+build_database <- function(overwrite = FALSE, format = c("duckdb", "parquet")) {
+  format <- rlang::arg_match(format)
   target_path <- db_path()
   db_exists <- backend_database_exists(target_path)
   if (db_exists) {
@@ -41,28 +52,43 @@ build_database <- function(overwrite = FALSE) {
     return(invisible(TRUE))
   }
 
+  # Resolve the storage format to stamp into `_db_metadata`. For file
+  # paths there's only one shape; `format` is silently ignored. For
+  # folder paths, `"duckdb"` maps to `codeminer_folder` (parquet meta +
+  # per-table .duckdb), `"parquet"` maps to `parquet_folder`.
+  storage_format <- if (dir.exists(target_path)) {
+    switch(
+      format,
+      duckdb = "codeminer_folder",
+      parquet = "parquet_folder"
+    )
+  } else {
+    "duckdb_file"
+  }
+
   # Fresh build (or `overwrite = TRUE`): if the workbench currently holds
   # the file open, release it first so the init routine can take a write
   # connection. The acquire_writable_workbench helper handles both
   # backend kinds and re-attaches on exit.
   acquire_writable_workbench(target_path)
 
-  backend_init(target_path, overwrite = overwrite)
+  backend_init(target_path, overwrite = overwrite, storage_format = storage_format)
 
   invisible(TRUE)
 }
 
 # Does a database already exist at `path`? Backend-aware: for
-# `duckdb_file`, the path is a regular file; for `parquet_folder`, it's
-# a directory containing the metadata parquet files.
+# `duckdb_file`, the path is a regular file; for the folder backends
+# (`codeminer_folder`, `parquet_folder`), it's a directory containing
+# the metadata parquet files.
 backend_database_exists <- function(path) {
   kind <- backend_kind(path)
   if (kind == "duckdb_file") {
     return(file.exists(path))
   }
-  # parquet_folder: consider "exists" to mean the directory contains the
-  # _db_metadata file. An empty directory or a stale folder without the
-  # stamp file isn't a usable codeminer DB.
+  # folder backends: consider "exists" to mean the directory contains
+  # the `_db_metadata` file. An empty directory or a stale folder
+  # without the stamp file isn't a usable codeminer DB.
   file.exists(backend_meta_path(path, "db"))
 }
 
