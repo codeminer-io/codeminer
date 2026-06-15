@@ -187,13 +187,17 @@ read_read3_trud <- function(
   if ("read3_relationship" %in% tables) {
     cli::cli_inform("Loading Read 3 hierarchy...")
 
+    # CTV3 V3hier.v3's `relationship_type` column is a per-pair sequence
+    # number (not a semantic label like "is a"). Every row is a valid
+    # parent-child edge, so set `child_parent_relationship_code = NA` to tell
+    # `graph_closure()` to skip the type filter entirely.
     read3_relationship_metadata <- relationship_metadata(
       code_type = "Read v3",
       relationship_version = version,
       from_col = "child_code",
       to_col = "parent_code",
       type_col = "relationship_type",
-      child_parent_relationship_code = "01",
+      child_parent_relationship_code = NA_character_,
       relationship_source = source
     )
 
@@ -259,7 +263,11 @@ read3_attach_category <- function(read3_lkp_table, hier_table) {
   frontier <- descendants
   repeat {
     next_step <- frontier |>
-      dplyr::inner_join(hier_edges, by = c("descendant" = "parent_code")) |>
+      dplyr::inner_join(
+        hier_edges,
+        by = c("descendant" = "parent_code"),
+        relationship = "many-to-many"
+      ) |>
       dplyr::transmute(
         category_code = .data$category_code,
         descendant = .data$child_code

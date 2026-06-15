@@ -79,10 +79,9 @@ test_that("read_read3_trud() read3_relationship has correct structure", {
     result$read3_relationship$relationship$metadata$code_type,
     "Read v3"
   )
-  expect_equal(
-    result$read3_relationship$relationship$metadata$child_parent_relationship_code,
-    "01"
-  )
+  expect_true(is.na(
+    result$read3_relationship$relationship$metadata$child_parent_relationship_code
+  ))
 })
 
 test_that("read_read3_trud() relationship table has expected rows", {
@@ -94,8 +93,9 @@ test_that("read_read3_trud() relationship table has expected rows", {
   tbl <- result$read3_relationship$relationship$table
 
   # Augmented fixture: CHAP1/CHAP2 -> root, X40J5 -> CHAP1, X40J5 -> CHAP2,
-  # X40J6 -> X40J5, X40J7 -> X40J6 (6 edges).
-  expect_equal(nrow(tbl), 6L)
+  # X40J6 -> X40J5, X40J7 -> X40J6, plus X40J8 -> X40J6 via non-"01"
+  # sequence number (7 edges).
+  expect_equal(nrow(tbl), 7L)
   expect_true("child_code" %in% names(tbl))
   expect_true("parent_code" %in% names(tbl))
 })
@@ -203,4 +203,31 @@ test_that("read_read3_trud() retired codes still inherit their chapter category"
   # X40J7 is retired (status = "R") but still inherits the chapter category
   # — category is independent of active-status.
   expect_equal(unique(tbl$category[tbl$code == "X40J7"]), "Body system")
+})
+
+# Relationship metadata (#148) ---------------------------------------------
+
+test_that("read_read3_trud() relationship metadata uses NA child_parent_relationship_code", {
+  # CTV3 V3hier.v3 uses `relationship_type` as a per-pair sequence number
+  # (01..99), not a semantic label. The metadata signals this to
+  # `graph_closure()` by setting `child_parent_relationship_code` to NA so
+  # every row is treated as a valid hierarchical edge.
+  dir <- create_dummy_read3_dir()
+  result <- suppressMessages(read_read3_trud(
+    dir,
+    tables = "read3_relationship"
+  ))
+  meta <- result$read3_relationship$relationship$metadata
+  expect_true(is.na(meta$child_parent_relationship_code))
+})
+
+test_that("read_read3_trud() category walk includes parents reached via non-01 sequence numbers", {
+  # X40J8 hangs off X40J6 via relationship_type = "05" in the dummy. Before
+  # #148, the walk filtered by "01" and X40J8 dropped out. After #148, every
+  # row is a valid edge so X40J8 inherits the chapter category like its
+  # siblings.
+  dir <- create_dummy_read3_dir()
+  result <- suppressMessages(read_read3_trud(dir, tables = "read3_lkp"))
+  tbl <- result$read3_lkp$lookup$table
+  expect_equal(unique(tbl$category[tbl$code == "X40J8"]), "Body system")
 })
