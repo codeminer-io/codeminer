@@ -210,11 +210,7 @@ test_that("read_read3_trud() retired codes still inherit their chapter category"
 
 # Relationship metadata (#148) ---------------------------------------------
 
-test_that("read_read3_trud() relationship metadata uses NA child_parent_relationship_code", {
-  # CTV3 V3hier.v3 uses `relationship_type` as a per-pair sequence number
-  # (01..99), not a semantic label. The metadata signals this to
-  # `graph_closure()` by setting `child_parent_relationship_code` to NA so
-  # every row is treated as a valid hierarchical edge.
+test_that("read_read3_trud() relationship metadata uses NA child_parent_relationship_code (#148)", {
   dir <- create_dummy_read3_dir()
   result <- suppressMessages(read_read3_trud(
     dir,
@@ -224,11 +220,7 @@ test_that("read_read3_trud() relationship metadata uses NA child_parent_relation
   expect_true(is.na(meta$child_parent_relationship_code))
 })
 
-test_that("read_read3_trud() category walk includes parents reached via non-01 sequence numbers", {
-  # X40J8 hangs off X40J6 via relationship_type = "05" in the dummy. Before
-  # #148, the walk filtered by "01" and X40J8 dropped out. After #148, every
-  # row is a valid edge so X40J8 inherits the chapter category like its
-  # siblings.
+test_that("read_read3_trud() category walk includes parents reached via non-01 sequence numbers (#148)", {
   dir <- create_dummy_read3_dir()
   result <- suppressMessages(read_read3_trud(dir, tables = "read3_lkp"))
   tbl <- result$read3_lkp$lookup$table

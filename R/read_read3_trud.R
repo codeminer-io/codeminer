@@ -165,10 +165,9 @@ read_read3_trud <- function(
       col_filters = list(
         # NHS Concept.v3 status codes: C = Current (active); O = Optional
         # (clinically valid but non-preferred subtype/synonym); E = Extinct
-        # (withdrawn); R = Redundant. The default keeps both Current and
-        # Optional so a CHILDREN() walk surfaces subtypes / complications
-        # the way browsers like opencodelists do; Extinct/Redundant stay
-        # filtered.
+        # (withdrawn); R = Redundant. Default keeps C + O so CHILDREN()
+        # walks surface clinically meaningful subtypes / complications;
+        # E and R stay filtered.
         status = list(
           values = status_values,
           defaults = intersect(c("C", "O"), status_values)

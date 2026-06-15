@@ -202,11 +202,7 @@ graph_closure <- function(
     related_edges <- relationship_tbl |>
       dplyr::filter(.data[[filter_col]] %in% .env$frontier_nodes)
 
-    # Apply relationship type filter if specified. NA / all-NA / character(0)
-    # are treated as "no filter" — used by code systems where the
-    # relationship table does not encode a semantic type column (e.g. CTV3's
-    # `V3hier.v3`, where `relationship_type` is a per-pair sequence number
-    # rather than a label like "is a").
+    # NA / all-NA / length-0 rel_type means "no filter" (see #148).
     if (
       !is.null(rel_type) &&
         length(rel_type) > 0L &&

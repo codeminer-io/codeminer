@@ -342,11 +342,7 @@ test_that("CHILDREN() handles empty input", {
 
 # Read v3 hierarchy walk (#148) -------------------------------------------
 
-test_that("CHILDREN() walks the full Read v3 hierarchy regardless of relationship_type", {
-  # Real CTV3 V3hier.v3 uses `relationship_type` as a per-pair sequence
-  # number, not a semantic "is a" label. The dummy fixture exercises this
-  # with X40J8 hanging off X40J6 via type "05" — pre-#148 the "01" filter
-  # would have dropped that edge entirely.
+test_that("CHILDREN() walks the full Read v3 hierarchy regardless of relationship_type (#148)", {
   dir <- create_dummy_read3_dir()
   local_build_temp_database()
   suppressMessages(add_read3_trud(path = dir, version = "test_v1"))
@@ -363,10 +359,11 @@ test_that("CHILDREN() walks the full Read v3 hierarchy regardless of relationshi
   )
 })
 
-test_that("CHILDREN() default col_filters keep Optional-status Read v3 codes (matches opencodelists tree behaviour)", {
-  # X40J9 (status "O") should appear by default — opencodelists' tree for
-  # codes like X40J5 includes Optional subtypes/complications. Pre-fix the
-  # default of `c("C")` only would have dropped X40J9 silently.
+test_that("CHILDREN() default col_filters keep Optional-status Read v3 codes", {
+  # X40J9 (status "O") should appear by default. The previous default of
+  # `c("C")` only would have dropped it silently — many clinically
+  # meaningful subtype / complication codes in CTV3 are stored as
+  # Optional, not Current.
   dir <- create_dummy_read3_dir()
   local_build_temp_database()
   suppressMessages(add_read3_trud(path = dir, version = "test_v1"))

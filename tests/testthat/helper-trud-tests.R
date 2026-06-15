@@ -190,10 +190,8 @@ create_dummy_read3_dir <- function(.envir = parent.frame()) {
     file.path(v3_dir, "Terms.v3")
   )
 
-  # Columns: child_code, parent_code, relationship_type. The X40J8->X40J6
-  # edge intentionally uses relationship_type "05" — real CTV3 uses
-  # arbitrary sequence numbers for hierarchical edges, and `graph_closure()`
-  # must NOT filter them out.
+  # Columns: child_code, parent_code, relationship_type. X40J8->X40J6 uses
+  # type "05" to exercise the no-filter contract (#148).
   writeLines(
     c(
       "CHAP1|.....|01",
