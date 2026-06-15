@@ -39,7 +39,7 @@ test_that("backend_kind() distinguishes folder vs file paths", {
 
   tmp_dir <- withr::local_tempfile()
   dir.create(tmp_dir)
-  expect_equal(backend_kind(tmp_dir), "parquet_folder")
+  expect_equal(backend_kind(tmp_dir), "codeminer_folder")
 })
 
 # build_database() initialises a fresh folder --------------------------------
@@ -106,7 +106,7 @@ test_that("add_lookup_table() writes both data and metadata atomically", {
   expect_true(added)
 
   # Both files now exist
-  expect_true(file.exists(file.path(temp_dir, "ICD-10_v1.parquet")))
+  expect_true(file.exists(file.path(temp_dir, "ICD-10_v1.duckdb")))
   expect_true(file.exists(file.path(temp_dir, "_lookup_metadata.parquet")))
 
   # No stray .tmp files left behind from the transaction
@@ -154,7 +154,7 @@ test_that("re-add succeeds after a metadata-less orphan data file is present", {
   # data file on disk, no metadata row. A new add of the same name
   # should overwrite the orphan rather than block on file.exists().
   temp_dir <- local_build_temp_folder_database()
-  orphan_path <- file.path(temp_dir, "ICD-10_v1.parquet")
+  orphan_path <- file.path(temp_dir, "ICD-10_v1.duckdb")
   # Drop a stray file with random bytes — uniqueness check must look at
   # metadata only, not at file existence.
   writeBin(as.raw(c(1, 2, 3)), orphan_path)
@@ -167,7 +167,7 @@ test_that("re-add succeeds after a metadata-less orphan data file is present", {
   )
   expect_true(added)
 
-  # Orphan was overwritten with a valid parquet of our lookup
+  # Orphan was overwritten with a valid duckdb file holding our lookup
   res <- as.data.frame(dplyr::tbl(get_db_con(), "ICD-10_v1"))
   expect_setequal(res$code, c("E10", "E11", "E12"))
 })
@@ -200,7 +200,7 @@ test_that("metadata-rename failure rolls the data file commit back", {
   )
 
   # After the rollback: no data parquet, no temp files, no metadata row
-  expect_false(file.exists(file.path(temp_dir, "ICD-10_v1.parquet")))
+  expect_false(file.exists(file.path(temp_dir, "ICD-10_v1.duckdb")))
   expect_false(file.exists(file.path(temp_dir, "ICD-10_v1.parquet.tmp")))
   expect_false(file.exists(file.path(temp_dir, "_lookup_metadata.parquet.tmp")))
   meta_df <- backend_read_metadata(temp_dir, "lookup")
@@ -223,7 +223,7 @@ test_that("data-rename failure leaves the database untouched", {
     }
   )
 
-  expect_false(file.exists(file.path(temp_dir, "ICD-10_v1.parquet")))
+  expect_false(file.exists(file.path(temp_dir, "ICD-10_v1.duckdb")))
   meta_df <- backend_read_metadata(temp_dir, "lookup")
   expect_false("ICD-10_v1" %in% meta_df$lookup_table_name)
 })
@@ -238,7 +238,7 @@ test_that("remove_lookup_table() deletes both metadata row and data file", {
   )
 
   remove_lookup_table("ICD-10", "v1")
-  expect_false(file.exists(file.path(temp_dir, "ICD-10_v1.parquet")))
+  expect_false(file.exists(file.path(temp_dir, "ICD-10_v1.duckdb")))
   meta_df <- backend_read_metadata(temp_dir, "lookup")
   expect_false("ICD-10_v1" %in% meta_df$lookup_table_name)
 })
@@ -280,10 +280,12 @@ test_that("validate_database() reports a clean DB as consistent", {
 
 test_that("validate_database() detects orphan data files", {
   temp_dir <- local_build_temp_folder_database()
-  # Drop a stray data parquet at the root with no matching metadata row.
+  # Drop a stray data file at the root with no matching metadata row.
+  # The validator looks for `.duckdb` files at the root; the contents
+  # don't have to be a valid DuckDB file for the orphan check.
   writeBin(
     as.raw(c(1, 2, 3)),
-    file.path(temp_dir, "stray_v9.parquet")
+    file.path(temp_dir, "stray_v9.duckdb")
   )
   issues <- validate_database()
   expect_true("stray_v9" %in% issues$orphan_data_files)
@@ -296,7 +298,7 @@ test_that("validate_database() detects dangling metadata", {
     lookup_metadata("ICD-10", lookup_version = "v1")
   )
   # Delete the data file behind the back of the package.
-  unlink(file.path(temp_dir, "ICD-10_v1.parquet"))
+  unlink(file.path(temp_dir, "ICD-10_v1.duckdb"))
   issues <- validate_database()
   expect_true("ICD-10_v1" %in% issues$dangling_metadata)
 })
@@ -307,9 +309,16 @@ test_that("validate_database() detects stale .tmp files", {
     as.raw(c(0)),
     file.path(temp_dir, "_lookup_metadata.parquet.tmp")
   )
+  writeBin(
+    as.raw(c(0)),
+    file.path(temp_dir, "ICD-10_v1.duckdb.tmp")
+  )
   issues <- validate_database()
   expect_true(
     "_lookup_metadata.parquet.tmp" %in% issues$stale_temp_files
+  )
+  expect_true(
+    "ICD-10_v1.duckdb.tmp" %in% issues$stale_temp_files
   )
 })
 

@@ -17,16 +17,17 @@ specific checks depend on the backend:
 }
 \details{
 \itemize{
-\item \code{parquet_folder}:
+\item \code{codeminer_folder}:
 \itemize{
-\item \strong{orphan data files}: \verb{<name>.parquet} files at the folder root
+\item \strong{orphan data files}: \verb{<name>.duckdb} files at the folder root
 with no matching metadata row (typically left by a previous
 \verb{add_*_table()} that died after the data file was committed but
 before the metadata file was).
 \item \strong{dangling metadata}: metadata rows that reference a data file
 that does not exist.
-\item \strong{stale temp files}: \verb{*.parquet.tmp} files left over from an
-interrupted write.
+\item \strong{stale temp files}: \verb{*.parquet.tmp} (metadata) or
+\verb{*.duckdb.tmp} (data) files left over from an interrupted
+write.
 }
 \item \code{duckdb_file}:
 \itemize{
