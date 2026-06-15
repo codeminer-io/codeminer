@@ -126,32 +126,72 @@ create_dummy_read3_dir <- function(.envir = parent.frame()) {
   v3_dir <- file.path(dir, "V3")
   dir.create(v3_dir)
 
-  # Columns: code, status, type, related_code (C = active, R = retired)
+  # Mini hierarchy that mirrors real CTV3 shape:
+  #   .....   (root, "Read thesaurus")
+  #   /   \
+  # CHAP1  CHAP2  (chapters, children of root)
+  #   \   /
+  #   X40J5  (multi-parent code under both chapters)
+  #     |
+  #   X40J6
+  #     |
+  #   X40J7  (retired)
+  # Plus an orphan code with no hierarchy edges to exercise the NA path.
   writeLines(
-    c("X40J5|C|P|", "X40J6|C|P|", "X40J7|R|P|"),
+    c(
+      ".....|C|P|",
+      "CHAP1|C|P|",
+      "CHAP2|C|P|",
+      "X40J5|C|P|",
+      "X40J6|C|P|",
+      "X40J7|R|P|",
+      "ORPH1|C|P|"
+    ),
     file.path(v3_dir, "Concept.v3")
   )
 
   # Columns: code, description_id, desc_type (P = preferred, S = synonym)
   writeLines(
-    c("X40J5|D001|P", "X40J5|D002|S", "X40J6|D003|P", "X40J7|D004|P"),
+    c(
+      ".....|D100|P",
+      "CHAP1|D101|P",
+      "CHAP2|D102|P",
+      "X40J5|D001|P",
+      "X40J5|D002|S",
+      "X40J6|D003|P",
+      "X40J7|D004|P",
+      "ORPH1|D005|P"
+    ),
     file.path(v3_dir, "Descrip.v3")
   )
 
-  # Columns: description_id, term_type, term, alt1, alt2 (C = clinical, O = obsolete)
+  # Chapter labels: CHAP1 is "Body system" (alphabetically first), CHAP2 is
+  # "Clinical findings". So a code reachable from both tie-breaks to
+  # "Body system".
   writeLines(
     c(
+      "D100|C|Read thesaurus||",
+      "D101|C|Body system||",
+      "D102|C|Clinical findings||",
       "D001|C|Disorder of organ||",
       "D002|O|Old term for disorder||",
       "D003|C|Other disorder||",
-      "D004|C|Retired disorder||"
+      "D004|C|Retired disorder||",
+      "D005|C|Orphan concept||"
     ),
     file.path(v3_dir, "Terms.v3")
   )
 
   # Columns: child_code, parent_code, relationship_type
   writeLines(
-    c("X40J5|X40J6|01", "X40J6|X40J7|01"),
+    c(
+      "CHAP1|.....|01",
+      "CHAP2|.....|01",
+      "X40J5|CHAP1|01",
+      "X40J5|CHAP2|01",
+      "X40J6|X40J5|01",
+      "X40J7|X40J6|01"
+    ),
     file.path(v3_dir, "V3hier.v3")
   )
 
@@ -164,27 +204,33 @@ create_dummy_read2_dir <- function(.envir = parent.frame()) {
   dir.create(v2_dir, recursive = TRUE)
 
   # DESC.DBF — Read code (CC) -> term id with TERMTYPE (P/S) and CCSTATUS (C/R).
-  # Code "1234." has a preferred and a synonym term; "5678." is active with a
-  # single preferred term; "9999." is retired with a single preferred term.
+  # `1....` is the chapter code for codes starting with `1`. `1234.` has a
+  # preferred and a synonym term under that chapter; `5678.` is active under
+  # its own (different) chapter; `9999.` is retired so exercises the category
+  # being independent of CCSTATUS.
   desc <- data.frame(
-    CC = c("1234.", "1234.", "5678.", "9999."),
-    TERMID = c("00001", "11001", "00002", "00003"),
-    TERMTYPE = c("P", "S", "P", "P"),
-    CCSTATUS = c("C", "C", "C", "R"),
+    CC = c("1....", "9....", "1234.", "1234.", "5678.", "9999."),
+    TERMID = c("00010", "00090", "00001", "11001", "00002", "00003"),
+    TERMTYPE = c("P", "P", "P", "S", "P", "P"),
+    CCSTATUS = c("C", "C", "C", "C", "C", "R"),
     stringsAsFactors = FALSE
   )
   foreign::write.dbf(desc, file.path(v2_dir, "DESC.DBF"))
 
   # Term.dbf — TERMID -> TERM30 / TERM60 (covers every TERMID in DESC.DBF).
   term <- data.frame(
-    TERMID = c("00001", "11001", "00002", "00003"),
+    TERMID = c("00010", "00090", "00001", "11001", "00002", "00003"),
     TERM30 = c(
+      "History / symptoms",
+      "Administration",
       "Diabetes mellitus",
       "DM (diabetes mellitus)",
       "Hypertension",
       "Retired condition"
     ),
     TERM60 = c(
+      "History / symptoms",
+      "Administration",
       "Diabetes mellitus",
       "DM (diabetes mellitus)",
       "Hypertension",

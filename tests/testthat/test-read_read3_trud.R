@@ -93,7 +93,9 @@ test_that("read_read3_trud() relationship table has expected rows", {
   ))
   tbl <- result$read3_relationship$relationship$table
 
-  expect_equal(nrow(tbl), 2L)
+  # Augmented fixture: CHAP1/CHAP2 -> root, X40J5 -> CHAP1, X40J5 -> CHAP2,
+  # X40J6 -> X40J5, X40J7 -> X40J6 (6 edges).
+  expect_equal(nrow(tbl), 6L)
   expect_true("child_code" %in% names(tbl))
   expect_true("parent_code" %in% names(tbl))
 })
@@ -137,4 +139,68 @@ test_that("read_read3_trud() accepts zip file input", {
 
   expect_named(result, c("read3_lkp", "read3_relationship"))
   expect_gt(nrow(result$read3_lkp$lookup$table), 0)
+})
+
+# Category attach ----------------------------------------------------------
+
+test_that("read_read3_trud() lookup metadata sets lookup_category_col = 'category'", {
+  dir <- create_dummy_read3_dir()
+  result <- suppressMessages(read_read3_trud(dir, tables = "read3_lkp"))
+  expect_equal(result$read3_lkp$lookup$metadata$lookup_category_col, "category")
+})
+
+test_that("read_read3_trud() chapter codes get their own description as category", {
+  dir <- create_dummy_read3_dir()
+  result <- suppressMessages(read_read3_trud(dir, tables = "read3_lkp"))
+  tbl <- result$read3_lkp$lookup$table
+
+  expect_equal(unique(tbl$category[tbl$code == "CHAP1"]), "Body system")
+  expect_equal(unique(tbl$category[tbl$code == "CHAP2"]), "Clinical findings")
+})
+
+test_that("read_read3_trud() root code gets its own description as category", {
+  dir <- create_dummy_read3_dir()
+  result <- suppressMessages(read_read3_trud(dir, tables = "read3_lkp"))
+  tbl <- result$read3_lkp$lookup$table
+
+  expect_equal(unique(tbl$category[tbl$code == "....."]), "Read thesaurus")
+})
+
+test_that("read_read3_trud() multi-parent codes tie-break to alphabetically-first chapter description", {
+  dir <- create_dummy_read3_dir()
+  result <- suppressMessages(read_read3_trud(dir, tables = "read3_lkp"))
+  tbl <- result$read3_lkp$lookup$table
+
+  # X40J5 is a direct child of both CHAP1 ("Body system") and CHAP2
+  # ("Clinical findings"). Alphabetical tie-break picks "Body system".
+  expect_equal(unique(tbl$category[tbl$code == "X40J5"]), "Body system")
+})
+
+test_that("read_read3_trud() descendant codes inherit the chapter category transitively", {
+  dir <- create_dummy_read3_dir()
+  result <- suppressMessages(read_read3_trud(dir, tables = "read3_lkp"))
+  tbl <- result$read3_lkp$lookup$table
+
+  # X40J6 and X40J7 are reachable from both chapters via X40J5, so they
+  # also pick "Body system" by the same tie-break.
+  expect_equal(unique(tbl$category[tbl$code == "X40J6"]), "Body system")
+  expect_equal(unique(tbl$category[tbl$code == "X40J7"]), "Body system")
+})
+
+test_that("read_read3_trud() orphan codes (no hierarchy edge) get NA category", {
+  dir <- create_dummy_read3_dir()
+  result <- suppressMessages(read_read3_trud(dir, tables = "read3_lkp"))
+  tbl <- result$read3_lkp$lookup$table
+
+  expect_true(all(is.na(tbl$category[tbl$code == "ORPH1"])))
+})
+
+test_that("read_read3_trud() retired codes still inherit their chapter category", {
+  dir <- create_dummy_read3_dir()
+  result <- suppressMessages(read_read3_trud(dir, tables = "read3_lkp"))
+  tbl <- result$read3_lkp$lookup$table
+
+  # X40J7 is retired (status = "R") but still inherits the chapter category
+  # — category is independent of active-status.
+  expect_equal(unique(tbl$category[tbl$code == "X40J7"]), "Body system")
 })

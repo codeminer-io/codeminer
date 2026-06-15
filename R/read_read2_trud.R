@@ -153,6 +153,11 @@ read_read2_trud <- function(
       ) |>
       data.table::as.data.table()
 
+    # Per-code category derived from the first-character chapter code
+    # (e.g. "K0102" -> "K...."). Chapter codes themselves and the root
+    # "....." get their own preferred + current description.
+    read2_lkp_table <- read2_attach_category(read2_lkp_table)
+
     ccstatus_values <- sort(unique(read2_lkp_table$CCSTATUS))
 
     read2_lkp_metadata <- lookup_metadata(
@@ -160,6 +165,7 @@ read_read2_trud <- function(
       lookup_version = version,
       lookup_code_col = "CC",
       lookup_description_col = "term",
+      lookup_category_col = "category",
       lookup_source = source,
       preferred_description_col = "TERMTYPE",
       preferred_description_indicator = "P",
@@ -214,4 +220,33 @@ read_read2_trud <- function(
   }
 
   result
+}
+
+#' Attach a per-code `category` derived from the chapter code
+#'
+#' For each row, the chapter is the first character of the code padded with
+#' dots to length 5 (e.g. `K0102` -> `K....`). The chapter's preferred +
+#' current term becomes the row's `category`. Chapter codes themselves and
+#' the root `.....` self-join to their own description.
+#'
+#' @param read2_lkp_table The merged DESC + Term lookup table.
+#' @return The same table with a new `category` column.
+#' @noRd
+read2_attach_category <- function(read2_lkp_table) {
+  chapter_descs <- read2_lkp_table |>
+    dplyr::filter(
+      substr(.data$CC, 2, 5) == "....",
+      .data$TERMTYPE == "P",
+      .data$CCSTATUS == "C"
+    ) |>
+    dplyr::distinct(.data$CC, .keep_all = TRUE) |>
+    dplyr::select(.chapter_code = "CC", category = "term")
+
+  read2_lkp_table |>
+    dplyr::mutate(
+      .chapter_code = paste0(substr(.data$CC, 1, 1), "....")
+    ) |>
+    dplyr::left_join(chapter_descs, by = ".chapter_code") |>
+    dplyr::select(-".chapter_code") |>
+    data.table::as.data.table()
 }

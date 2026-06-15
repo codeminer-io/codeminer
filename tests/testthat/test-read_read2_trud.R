@@ -68,8 +68,9 @@ test_that("read_read2_trud() read2_lkp retains synonyms and retired codes", {
   result <- suppressMessages(read_read2_trud(dir, tables = "read2_lkp"))
   tbl <- result$read2_lkp$lookup$table
 
-  # Fixture has 4 rows total: 1234. (P + S), 5678. (P), 9999. (R, P)
-  expect_equal(nrow(tbl), 4L)
+  # Fixture has 6 rows total: 1.... (P), 9.... (P), 1234. (P + S),
+  # 5678. (P), 9999. (R, P)
+  expect_equal(nrow(tbl), 6L)
   expect_setequal(unique(tbl$TERMTYPE), c("P", "S"))
   expect_setequal(unique(tbl$CCSTATUS), c("C", "R"))
   expect_equal(sum(tbl$CC == "1234."), 2L)
@@ -133,4 +134,49 @@ test_that("read_read2_trud() accepts zip file input", {
 
   expect_named(result, c("read2_lkp", "read2_relationship"))
   expect_gt(nrow(result$read2_lkp$lookup$table), 0)
+})
+
+# Category attach ----------------------------------------------------------
+
+test_that("read_read2_trud() lookup metadata sets lookup_category_col = 'category'", {
+  dir <- create_dummy_read2_dir()
+  result <- suppressMessages(read_read2_trud(dir, tables = "read2_lkp"))
+  expect_equal(result$read2_lkp$lookup$metadata$lookup_category_col, "category")
+})
+
+test_that("read_read2_trud() sub-codes get the first-char chapter's preferred + current description as category", {
+  dir <- create_dummy_read2_dir()
+  result <- suppressMessages(read_read2_trud(dir, tables = "read2_lkp"))
+  tbl <- result$read2_lkp$lookup$table
+
+  expect_equal(
+    unique(tbl$category[tbl$CC == "1234."]),
+    "History / symptoms"
+  )
+  # "5678." has no chapter row in the fixture, so category is NA.
+  expect_true(all(is.na(tbl$category[tbl$CC == "5678."])))
+})
+
+test_that("read_read2_trud() chapter codes get their own description as category", {
+  dir <- create_dummy_read2_dir()
+  result <- suppressMessages(read_read2_trud(dir, tables = "read2_lkp"))
+  tbl <- result$read2_lkp$lookup$table
+
+  expect_equal(
+    unique(tbl$category[tbl$CC == "1...."]),
+    "History / symptoms"
+  )
+})
+
+test_that("read_read2_trud() retired sub-codes still get a category", {
+  dir <- create_dummy_read2_dir()
+  result <- suppressMessages(read_read2_trud(dir, tables = "read2_lkp"))
+  tbl <- result$read2_lkp$lookup$table
+
+  # `9999.` is retired (CCSTATUS = "R") but its category should still come
+  # from the chapter `9....` (active) — category is independent of status.
+  expect_equal(
+    unique(tbl$category[tbl$CC == "9999."]),
+    "Administration"
+  )
 })
