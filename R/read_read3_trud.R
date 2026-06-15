@@ -104,6 +104,16 @@ read_read3_trud <- function(
 
   result <- list()
 
+  # `read3_lkp` needs the hierarchy to derive each code's chapter category,
+  # so always read V3hier.v3 when either table is requested.
+  hier <- data.table::fread(
+    file.path(v3_dir, "V3hier.v3"),
+    sep = "|",
+    header = FALSE,
+    col.names = c("child_code", "parent_code", "relationship_type"),
+    colClasses = "character"
+  )
+
   if ("read3_lkp" %in% tables) {
     cli::cli_inform("Loading Read 3 concepts, descriptions, and terms...")
 
@@ -136,6 +146,10 @@ read_read3_trud <- function(
       dplyr::inner_join(terms, by = "description_id") |>
       data.table::as.data.table()
 
+    # Per-code category derived by walking V3hier to the chapter-level
+    # ancestor (children of the single root `.....`).
+    read3_lkp_table <- read3_attach_category(read3_lkp_table, hier)
+
     status_values <- sort(unique(read3_lkp_table$status))
     term_type_values <- sort(unique(read3_lkp_table$term_type))
 
@@ -144,6 +158,7 @@ read_read3_trud <- function(
       lookup_version = version,
       lookup_code_col = "code",
       lookup_description_col = "term",
+      lookup_category_col = "category",
       lookup_source = source,
       preferred_description_col = "desc_type",
       preferred_description_indicator = "P",
@@ -172,14 +187,6 @@ read_read3_trud <- function(
   if ("read3_relationship" %in% tables) {
     cli::cli_inform("Loading Read 3 hierarchy...")
 
-    hier <- data.table::fread(
-      file.path(v3_dir, "V3hier.v3"),
-      sep = "|",
-      header = FALSE,
-      col.names = c("child_code", "parent_code", "relationship_type"),
-      colClasses = "character"
-    )
-
     read3_relationship_metadata <- relationship_metadata(
       code_type = "Read v3",
       relationship_version = version,
@@ -199,4 +206,88 @@ read_read3_trud <- function(
   }
 
   result
+}
+
+#' Attach a per-code `category` derived from the V3 chapter ancestor
+#'
+#' Read 3 / CTV3 has a single root `.....` ("Read thesaurus") whose
+#' children are the 18 top-level chapters (e.g. "Clinical findings",
+#' "Occupations"). For each code we walk `V3hier.v3` upward, looking for
+#' the first chapter-level ancestor reached. Codes with multiple paths to
+#' different chapters take the alphabetically-first chapter description.
+#' Top-level codes (root, chapters themselves) self-join to their own
+#' preferred + current description.
+#'
+#' @param read3_lkp_table The merged concept/descrip/terms lookup table.
+#' @param hier_table The V3hier.v3 parent-child table.
+#' @return The same lookup table with a new `category` column.
+#' @noRd
+read3_attach_category <- function(read3_lkp_table, hier_table) {
+  hier_edges <- hier_table |>
+    dplyr::filter(.data$relationship_type == "01") |>
+    dplyr::select("child_code", "parent_code")
+
+  # Root: code(s) that appear as a parent but never as a child.
+  root_codes <- setdiff(
+    unique(hier_edges$parent_code),
+    unique(hier_edges$child_code)
+  )
+  # Chapters: children of root.
+  chapter_codes <- unique(
+    hier_edges$child_code[hier_edges$parent_code %in% root_codes]
+  )
+
+  # Preferred + current description per chapter / root code.
+  category_descs <- read3_lkp_table |>
+    dplyr::filter(
+      .data$code %in% c(.env$chapter_codes, .env$root_codes),
+      .data$desc_type == "P",
+      .data$status == "C"
+    ) |>
+    dplyr::distinct(.data$code, .keep_all = TRUE) |>
+    dplyr::select(category_code = "code", category_desc = "term")
+
+  # Build the chapter descendant set by iteratively expanding downward
+  # from each chapter until no new (chapter, descendant) pairs are added.
+  descendants <- tibble::tibble(
+    category_code = chapter_codes,
+    descendant = chapter_codes
+  )
+  frontier <- descendants
+  repeat {
+    next_step <- frontier |>
+      dplyr::inner_join(hier_edges, by = c("descendant" = "parent_code")) |>
+      dplyr::transmute(
+        category_code = .data$category_code,
+        descendant = .data$child_code
+      ) |>
+      dplyr::anti_join(descendants, by = c("category_code", "descendant"))
+
+    if (nrow(next_step) == 0L) {
+      break
+    }
+    descendants <- dplyr::bind_rows(descendants, next_step)
+    frontier <- next_step
+  }
+
+  # Per-code category: pick the alphabetically-first chapter description
+  # when a code is reachable from multiple chapters.
+  code_to_category <- descendants |>
+    dplyr::inner_join(category_descs, by = "category_code") |>
+    dplyr::arrange(.data$descendant, .data$category_desc) |>
+    dplyr::distinct(.data$descendant, .keep_all = TRUE) |>
+    dplyr::select(code = "descendant", category = "category_desc")
+
+  # The root code itself isn't a descendant of any chapter, so cover it
+  # separately with its own description (matches the "top-level keeps own
+  # description" convention).
+  root_to_category <- category_descs |>
+    dplyr::filter(.data$category_code %in% .env$root_codes) |>
+    dplyr::select(code = "category_code", category = "category_desc")
+
+  code_to_category <- dplyr::bind_rows(code_to_category, root_to_category)
+
+  read3_lkp_table |>
+    dplyr::left_join(code_to_category, by = "code") |>
+    data.table::as.data.table()
 }
