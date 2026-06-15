@@ -134,8 +134,10 @@ create_dummy_read3_dir <- function(.envir = parent.frame()) {
   #   X40J5  (multi-parent code under both chapters)
   #     |
   #   X40J6
-  #     |
-  #   X40J7  (retired)
+  #   /   \
+  # X40J7   X40J8  (X40J7 retired; X40J8 attached via a non-"01" sequence
+  #                 number to exercise the "every row is a valid edge"
+  #                 contract that V3hier.v3 actually uses).
   # Plus an orphan code with no hierarchy edges to exercise the NA path.
   writeLines(
     c(
@@ -145,6 +147,8 @@ create_dummy_read3_dir <- function(.envir = parent.frame()) {
       "X40J5|C|P|",
       "X40J6|C|P|",
       "X40J7|R|P|",
+      "X40J8|C|P|",
+      "X40J9|O|P|",
       "ORPH1|C|P|"
     ),
     file.path(v3_dir, "Concept.v3")
@@ -160,6 +164,8 @@ create_dummy_read3_dir <- function(.envir = parent.frame()) {
       "X40J5|D002|S",
       "X40J6|D003|P",
       "X40J7|D004|P",
+      "X40J8|D006|P",
+      "X40J9|D007|P",
       "ORPH1|D005|P"
     ),
     file.path(v3_dir, "Descrip.v3")
@@ -177,12 +183,15 @@ create_dummy_read3_dir <- function(.envir = parent.frame()) {
       "D002|O|Old term for disorder||",
       "D003|C|Other disorder||",
       "D004|C|Retired disorder||",
-      "D005|C|Orphan concept||"
+      "D005|C|Orphan concept||",
+      "D006|C|Disorder via non-01 type||",
+      "D007|C|Optional-status disorder||"
     ),
     file.path(v3_dir, "Terms.v3")
   )
 
-  # Columns: child_code, parent_code, relationship_type
+  # Columns: child_code, parent_code, relationship_type. X40J8->X40J6 uses
+  # type "05" to exercise the no-filter contract (#148).
   writeLines(
     c(
       "CHAP1|.....|01",
@@ -190,7 +199,9 @@ create_dummy_read3_dir <- function(.envir = parent.frame()) {
       "X40J5|CHAP1|01",
       "X40J5|CHAP2|01",
       "X40J6|X40J5|01",
-      "X40J7|X40J6|01"
+      "X40J7|X40J6|01",
+      "X40J8|X40J6|05",
+      "X40J9|X40J6|01"
     ),
     file.path(v3_dir, "V3hier.v3")
   )

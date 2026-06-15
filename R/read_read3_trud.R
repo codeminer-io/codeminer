@@ -163,11 +163,14 @@ read_read3_trud <- function(
       preferred_description_col = "desc_type",
       preferred_description_indicator = "P",
       col_filters = list(
-        # NHS Concept.v3 status codes: C = Current (active);
-        # E = Extinct, O = Optional, R = Redundant (all inactive).
+        # NHS Concept.v3 status codes: C = Current (active); O = Optional
+        # (clinically valid but non-preferred subtype/synonym); E = Extinct
+        # (withdrawn); R = Redundant. Default keeps C + O so CHILDREN()
+        # walks surface clinically meaningful subtypes / complications;
+        # E and R stay filtered.
         status = list(
           values = status_values,
-          defaults = "C"
+          defaults = intersect(c("C", "O"), status_values)
         ),
         term_type = list(
           values = term_type_values,
@@ -187,13 +190,17 @@ read_read3_trud <- function(
   if ("read3_relationship" %in% tables) {
     cli::cli_inform("Loading Read 3 hierarchy...")
 
+    # CTV3 V3hier.v3's `relationship_type` column is a per-pair sequence
+    # number (not a semantic label like "is a"). Every row is a valid
+    # parent-child edge, so set `child_parent_relationship_code = NA` to tell
+    # `graph_closure()` to skip the type filter entirely.
     read3_relationship_metadata <- relationship_metadata(
       code_type = "Read v3",
       relationship_version = version,
       from_col = "child_code",
       to_col = "parent_code",
       type_col = "relationship_type",
-      child_parent_relationship_code = "01",
+      child_parent_relationship_code = NA_character_,
       relationship_source = source
     )
 
@@ -259,7 +266,11 @@ read3_attach_category <- function(read3_lkp_table, hier_table) {
   frontier <- descendants
   repeat {
     next_step <- frontier |>
-      dplyr::inner_join(hier_edges, by = c("descendant" = "parent_code")) |>
+      dplyr::inner_join(
+        hier_edges,
+        by = c("descendant" = "parent_code"),
+        relationship = "many-to-many"
+      ) |>
       dplyr::transmute(
         category_code = .data$category_code,
         descendant = .data$child_code
