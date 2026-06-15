@@ -165,9 +165,9 @@ create_dummy_read3_dir <- function(.envir = parent.frame()) {
     file.path(v3_dir, "Descrip.v3")
   )
 
-  # CHAP1 -> "Body system" (alphabetically first)
-  # CHAP2 -> "Clinical findings"
-  # So a code reachable from both should tie-break to "Body system".
+  # Chapter labels: CHAP1 is "Body system" (alphabetically first), CHAP2 is
+  # "Clinical findings". So a code reachable from both tie-breaks to
+  # "Body system".
   writeLines(
     c(
       "D100|C|Read thesaurus||",
