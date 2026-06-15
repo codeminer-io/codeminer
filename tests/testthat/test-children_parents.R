@@ -339,3 +339,67 @@ test_that("CHILDREN() handles empty input", {
   expect_warning(result <- CHILDREN(character(0), type = "ICD-10"))
   expect_equal(nrow(result), 0)
 })
+
+# Read v3 hierarchy walk (#148) -------------------------------------------
+
+test_that("CHILDREN() walks the full Read v3 hierarchy regardless of relationship_type (#148)", {
+  dir <- create_dummy_read3_dir()
+  local_build_temp_database()
+  suppressMessages(add_read3_trud(path = dir, version = "test_v1"))
+
+  # Use col_filters = NULL so retired codes (X40J7 status "R") show up
+  # alongside the active ones — we're asserting on the walk, not on the
+  # default lookup filter.
+  result <- suppressMessages(suppressWarnings(
+    CHILDREN("X40J5", type = "Read v3", col_filters = NULL)
+  ))
+  expect_setequal(
+    result$code,
+    c("X40J5", "X40J6", "X40J7", "X40J8", "X40J9")
+  )
+})
+
+test_that("CHILDREN() default col_filters keep Optional-status Read v3 codes", {
+  # X40J9 (status "O") should appear by default. The previous default of
+  # `c("C")` only would have dropped it silently — many clinically
+  # meaningful subtype / complication codes in CTV3 are stored as
+  # Optional, not Current.
+  dir <- create_dummy_read3_dir()
+  local_build_temp_database()
+  suppressMessages(add_read3_trud(path = dir, version = "test_v1"))
+
+  result <- suppressMessages(suppressWarnings(
+    CHILDREN("X40J5", type = "Read v3")
+  ))
+  expect_true("X40J9" %in% result$code)
+  # X40J7 (status "R" = Redundant) stays filtered by default.
+  expect_false("X40J7" %in% result$code)
+})
+
+test_that("PARENTS() walks the full Read v3 hierarchy regardless of relationship_type", {
+  dir <- create_dummy_read3_dir()
+  local_build_temp_database()
+  suppressMessages(add_read3_trud(path = dir, version = "test_v1"))
+
+  result <- suppressMessages(suppressWarnings(
+    PARENTS("X40J8", type = "Read v3")
+  ))
+  # X40J8 -> X40J6 (type 05) -> X40J5 (type 01) -> CHAP1/CHAP2 -> root.
+  expect_true(all(
+    c("X40J8", "X40J6", "X40J5", "CHAP1", "CHAP2", ".....") %in% result$code
+  ))
+})
+
+test_that("get_relationship_tree() returns the same Read v3 walk for the same seed", {
+  dir <- create_dummy_read3_dir()
+  local_build_temp_database()
+  suppressMessages(add_read3_trud(path = dir, version = "test_v1"))
+
+  tree <- suppressMessages(suppressWarnings(
+    get_relationship_tree("X40J5", type = "Read v3", col_filters = NULL)
+  ))
+  expect_setequal(
+    tree$nodes$code,
+    c("X40J5", "X40J6", "X40J7", "X40J8", "X40J9")
+  )
+})

@@ -202,8 +202,12 @@ graph_closure <- function(
     related_edges <- relationship_tbl |>
       dplyr::filter(.data[[filter_col]] %in% .env$frontier_nodes)
 
-    # Apply relationship type filter if specified
-    if (!is.null(rel_type)) {
+    # NA / all-NA / length-0 rel_type means "no filter" (see #148).
+    if (
+      !is.null(rel_type) &&
+        length(rel_type) > 0L &&
+        !all(is.na(rel_type))
+    ) {
       related_edges <- related_edges |>
         dplyr::filter(.data[[type_colname]] %in% .env$rel_type)
     }

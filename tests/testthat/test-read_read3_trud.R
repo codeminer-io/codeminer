@@ -48,11 +48,11 @@ test_that("read_read3_trud() read3_lkp retains retired codes, synonyms, and non-
   expect_true("X40J7" %in% tbl$code)
   # Synonym desc_type ("S") and non-clinical term_type ("O") should be present
   expect_setequal(unique(tbl$desc_type), c("P", "S"))
-  expect_setequal(unique(tbl$status), c("C", "R"))
+  expect_setequal(unique(tbl$status), c("C", "O", "R"))
   expect_setequal(unique(tbl$term_type), c("C", "O"))
 })
 
-test_that("read_read3_trud() col_filters default to active codes + clinical terms", {
+test_that("read_read3_trud() col_filters default keeps Current + Optional statuses (Extinct/Redundant filtered)", {
   dir <- create_dummy_read3_dir()
   result <- suppressMessages(read_read3_trud(dir, tables = "read3_lkp"))
   cf <- deserialise_col_filters(
@@ -60,8 +60,11 @@ test_that("read_read3_trud() col_filters default to active codes + clinical term
   )
 
   expect_setequal(names(cf), c("status", "term_type"))
-  expect_equal(cf$status$defaults, "C")
-  expect_setequal(cf$status$values, c("C", "R"))
+  # Dummy has C / O / R. Default includes C and O (clinically meaningful)
+  # but excludes R (Redundant). E (Extinct) absent in this fixture but
+  # would also be excluded.
+  expect_setequal(cf$status$defaults, c("C", "O"))
+  expect_setequal(cf$status$values, c("C", "O", "R"))
   expect_equal(cf$term_type$defaults, "C")
   expect_setequal(cf$term_type$values, c("C", "O"))
 })
@@ -79,10 +82,9 @@ test_that("read_read3_trud() read3_relationship has correct structure", {
     result$read3_relationship$relationship$metadata$code_type,
     "Read v3"
   )
-  expect_equal(
-    result$read3_relationship$relationship$metadata$child_parent_relationship_code,
-    "01"
-  )
+  expect_true(is.na(
+    result$read3_relationship$relationship$metadata$child_parent_relationship_code
+  ))
 })
 
 test_that("read_read3_trud() relationship table has expected rows", {
@@ -93,7 +95,10 @@ test_that("read_read3_trud() relationship table has expected rows", {
   ))
   tbl <- result$read3_relationship$relationship$table
 
-  expect_equal(nrow(tbl), 2L)
+  # Augmented fixture: CHAP1/CHAP2 -> root, X40J5 -> CHAP1, X40J5 -> CHAP2,
+  # X40J6 -> X40J5, X40J7 -> X40J6, X40J8 -> X40J6 via non-"01" sequence
+  # number, and X40J9 -> X40J6 (status "O" code) — 8 edges.
+  expect_equal(nrow(tbl), 8L)
   expect_true("child_code" %in% names(tbl))
   expect_true("parent_code" %in% names(tbl))
 })
@@ -137,4 +142,87 @@ test_that("read_read3_trud() accepts zip file input", {
 
   expect_named(result, c("read3_lkp", "read3_relationship"))
   expect_gt(nrow(result$read3_lkp$lookup$table), 0)
+})
+
+# Category attach ----------------------------------------------------------
+
+test_that("read_read3_trud() lookup metadata sets lookup_category_col = 'category'", {
+  dir <- create_dummy_read3_dir()
+  result <- suppressMessages(read_read3_trud(dir, tables = "read3_lkp"))
+  expect_equal(result$read3_lkp$lookup$metadata$lookup_category_col, "category")
+})
+
+test_that("read_read3_trud() chapter codes get their own description as category", {
+  dir <- create_dummy_read3_dir()
+  result <- suppressMessages(read_read3_trud(dir, tables = "read3_lkp"))
+  tbl <- result$read3_lkp$lookup$table
+
+  expect_equal(unique(tbl$category[tbl$code == "CHAP1"]), "Body system")
+  expect_equal(unique(tbl$category[tbl$code == "CHAP2"]), "Clinical findings")
+})
+
+test_that("read_read3_trud() root code gets its own description as category", {
+  dir <- create_dummy_read3_dir()
+  result <- suppressMessages(read_read3_trud(dir, tables = "read3_lkp"))
+  tbl <- result$read3_lkp$lookup$table
+
+  expect_equal(unique(tbl$category[tbl$code == "....."]), "Read thesaurus")
+})
+
+test_that("read_read3_trud() multi-parent codes tie-break to alphabetically-first chapter description", {
+  dir <- create_dummy_read3_dir()
+  result <- suppressMessages(read_read3_trud(dir, tables = "read3_lkp"))
+  tbl <- result$read3_lkp$lookup$table
+
+  # X40J5 is a direct child of both CHAP1 ("Body system") and CHAP2
+  # ("Clinical findings"). Alphabetical tie-break picks "Body system".
+  expect_equal(unique(tbl$category[tbl$code == "X40J5"]), "Body system")
+})
+
+test_that("read_read3_trud() descendant codes inherit the chapter category transitively", {
+  dir <- create_dummy_read3_dir()
+  result <- suppressMessages(read_read3_trud(dir, tables = "read3_lkp"))
+  tbl <- result$read3_lkp$lookup$table
+
+  # X40J6 and X40J7 are reachable from both chapters via X40J5, so they
+  # also pick "Body system" by the same tie-break.
+  expect_equal(unique(tbl$category[tbl$code == "X40J6"]), "Body system")
+  expect_equal(unique(tbl$category[tbl$code == "X40J7"]), "Body system")
+})
+
+test_that("read_read3_trud() orphan codes (no hierarchy edge) get NA category", {
+  dir <- create_dummy_read3_dir()
+  result <- suppressMessages(read_read3_trud(dir, tables = "read3_lkp"))
+  tbl <- result$read3_lkp$lookup$table
+
+  expect_true(all(is.na(tbl$category[tbl$code == "ORPH1"])))
+})
+
+test_that("read_read3_trud() retired codes still inherit their chapter category", {
+  dir <- create_dummy_read3_dir()
+  result <- suppressMessages(read_read3_trud(dir, tables = "read3_lkp"))
+  tbl <- result$read3_lkp$lookup$table
+
+  # X40J7 is retired (status = "R") but still inherits the chapter category
+  # — category is independent of active-status.
+  expect_equal(unique(tbl$category[tbl$code == "X40J7"]), "Body system")
+})
+
+# Relationship metadata (#148) ---------------------------------------------
+
+test_that("read_read3_trud() relationship metadata uses NA child_parent_relationship_code (#148)", {
+  dir <- create_dummy_read3_dir()
+  result <- suppressMessages(read_read3_trud(
+    dir,
+    tables = "read3_relationship"
+  ))
+  meta <- result$read3_relationship$relationship$metadata
+  expect_true(is.na(meta$child_parent_relationship_code))
+})
+
+test_that("read_read3_trud() category walk includes parents reached via non-01 sequence numbers (#148)", {
+  dir <- create_dummy_read3_dir()
+  result <- suppressMessages(read_read3_trud(dir, tables = "read3_lkp"))
+  tbl <- result$read3_lkp$lookup$table
+  expect_equal(unique(tbl$category[tbl$code == "X40J8"]), "Body system")
 })
