@@ -114,13 +114,11 @@ effective_schema_version <- function(read_version) {
 # Returns TRUE invisibly on success. Errors via `codeminer_abort()` on
 # refusal.
 enforce_schema_gate <- function(path) {
-  if (!file.exists(path)) {
+  if (!backend_database_exists(path)) {
     return(invisible(TRUE))
   }
 
-  con <- DBI::dbConnect(duckdb::duckdb(), path, read_only = TRUE)
-  version <- effective_schema_version(read_db_schema_version(con))
-  DBI::dbDisconnect(con, shutdown = TRUE)
+  version <- effective_schema_version(backend_read_schema_version(path))
 
   current <- current_schema_version()
   if (version == current) {

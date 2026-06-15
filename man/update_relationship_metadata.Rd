@@ -35,6 +35,7 @@ the data. Currently supports updating \code{col_filters}.
 
 Other Database management: 
 \code{\link{update_lookup_metadata}()},
-\code{\link{update_mapping_metadata}()}
+\code{\link{update_mapping_metadata}()},
+\code{\link{validate_database}()}
 }
 \concept{Database management}

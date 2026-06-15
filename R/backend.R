@@ -1,0 +1,995 @@
+# Storage backend abstraction.
+#
+# Codeminer's "main" database can be one of two shapes:
+#
+# * `duckdb_file` — a single `.duckdb` file. Read access happens via
+#   `ATTACH ... (READ_ONLY)` into the workbench; writes open a short-lived
+#   direct DuckDB connection to the file.
+#
+# * `parquet_folder` — a directory holding one parquet file per metadata
+#   type (`_lookup_metadata.parquet`, `_mapping_metadata.parquet`,
+#   `_relationship_metadata.parquet`, `_db_metadata.parquet`) plus one
+#   parquet file per registered data table. Read access happens via
+#   `CREATE VIEW ... AS SELECT * FROM read_parquet(...)`. Writes use a
+#   write-to-temp + atomic-rename transaction (see `backend_add_table()`).
+#
+# All callers go through the dispatcher functions in this file; no other
+# file should hard-code DuckDB or parquet specifics for the "main" backend.
+
+# Detect which backend a path uses.
+#
+# Rules:
+# * If the path ends in `.duckdb`, treat as `duckdb_file` (even when the
+#   file doesn't exist yet — `backend_init()` will create it).
+# * If the path is an existing directory, treat as `parquet_folder`.
+# * If the path doesn't exist and has no `.duckdb` extension, fall back
+#   to `duckdb_file` for backwards compatibility with the default
+#   `db_path()` (which historically pointed at `ontology.duckdb`).
+backend_kind <- function(path) {
+  if (dir.exists(path)) {
+    return("parquet_folder")
+  }
+  "duckdb_file"
+}
+
+# Initialise a fresh database at `path` for the given backend.
+#
+# Behaviour matches the existing `build_database()` semantics:
+# * If the DB already exists and `overwrite = FALSE`, the caller should
+#   short-circuit; this function only runs on a fresh build or overwrite.
+# * Creates the metadata tables and writes the initial `_db_metadata`
+#   stamp row at the current schema version.
+backend_init <- function(path, overwrite = FALSE) {
+  kind <- backend_kind(path)
+  switch(
+    kind,
+    duckdb_file = backend_init_duckdb_file(path, overwrite = overwrite),
+    parquet_folder = backend_init_parquet_folder(path, overwrite = overwrite),
+    codeminer_abort("Unknown backend kind {.val {kind}}.")
+  )
+}
+
+# Make the database at `path` queryable from the workbench connection
+# under the catalog/schema alias `alias`. Idempotent: callers may invoke
+# this after writes to refresh views over newly-added data tables.
+backend_attach <- function(con, alias, path) {
+  kind <- backend_kind(path)
+  switch(
+    kind,
+    duckdb_file = backend_attach_duckdb_file(con, alias, path),
+    parquet_folder = backend_attach_parquet_folder(con, alias, path),
+    codeminer_abort("Unknown backend kind {.val {kind}}.")
+  )
+}
+
+# Read the on-disk schema version stamp from `path`. Returns
+# `NA_integer_` for an unstamped DB (no `_db_metadata` table). Used by
+# `enforce_schema_gate()`.
+backend_read_schema_version <- function(path) {
+  kind <- backend_kind(path)
+  switch(
+    kind,
+    duckdb_file = backend_read_schema_version_duckdb_file(path),
+    parquet_folder = backend_read_schema_version_parquet_folder(path),
+    codeminer_abort("Unknown backend kind {.val {kind}}.")
+  )
+}
+
+# Atomically add a (metadata_row, data_df) pair to the database at `path`.
+#
+# Returns TRUE on success, FALSE if a row with the same `<id_col>` value
+# already exists in the metadata table (matching the existing
+# `add_metadata_table()` semantics).
+#
+# `type` is "lookup", "mapping" or "relationship". `metadata_row` is a
+# one-row data frame whose columns are the required metadata fields.
+# `data_df` is the data table (already validated by the caller).
+backend_add_table <- function(path, type, metadata_row, data_df) {
+  kind <- backend_kind(path)
+  switch(
+    kind,
+    duckdb_file = backend_add_table_duckdb_file(
+      path,
+      type,
+      metadata_row,
+      data_df
+    ),
+    parquet_folder = backend_add_table_parquet_folder(
+      path,
+      type,
+      metadata_row,
+      data_df
+    ),
+    codeminer_abort("Unknown backend kind {.val {kind}}.")
+  )
+}
+
+# Remove a data table and its metadata row from the database. Returns
+# TRUE invisibly on success; raises an error if the metadata row isn't
+# present.
+backend_remove_table <- function(path, type, table_name) {
+  kind <- backend_kind(path)
+  switch(
+    kind,
+    duckdb_file = backend_remove_table_duckdb_file(path, type, table_name),
+    parquet_folder = backend_remove_table_parquet_folder(
+      path,
+      type,
+      table_name
+    ),
+    codeminer_abort("Unknown backend kind {.val {kind}}.")
+  )
+}
+
+# Update a single column of a single metadata row. Used by the
+# `update_*_metadata()` helpers (currently only `col_filters`).
+backend_update_metadata <- function(path, type, table_name, col, value) {
+  kind <- backend_kind(path)
+  switch(
+    kind,
+    duckdb_file = backend_update_metadata_duckdb_file(
+      path,
+      type,
+      table_name,
+      col,
+      value
+    ),
+    parquet_folder = backend_update_metadata_parquet_folder(
+      path,
+      type,
+      table_name,
+      col,
+      value
+    ),
+    codeminer_abort("Unknown backend kind {.val {kind}}.")
+  )
+}
+
+# Read a complete metadata table from the database as a data frame.
+# Used by the parquet backend's add/remove/update helpers (where the
+# whole metadata file is rewritten on each change) and as a fallback
+# when the workbench cache isn't populated.
+backend_read_metadata <- function(path, type) {
+  kind <- backend_kind(path)
+  switch(
+    kind,
+    duckdb_file = backend_read_metadata_duckdb_file(path, type),
+    parquet_folder = backend_read_metadata_parquet_folder(path, type),
+    codeminer_abort("Unknown backend kind {.val {kind}}.")
+  )
+}
+
+# Check whether the database at `path` already contains a top-level
+# table named `name` (either a real DuckDB table or a parquet file).
+backend_table_exists <- function(path, name) {
+  kind <- backend_kind(path)
+  switch(
+    kind,
+    duckdb_file = backend_table_exists_duckdb_file(path, name),
+    parquet_folder = backend_table_exists_parquet_folder(path, name),
+    codeminer_abort("Unknown backend kind {.val {kind}}.")
+  )
+}
+
+# Prepare the workbench connection so that a write against `path` can
+# proceed, and schedule the workbench to be re-attached + cache-refreshed
+# when the caller's frame exits.
+#
+# For `duckdb_file`: DETACHes the file from the workbench (matching the
+# behaviour of the old `connect_to_db(read_only = FALSE)`) so that the
+# write side can open the file in write-mode without a lock conflict.
+# A `withr::defer()` re-ATTACHes and refreshes the metadata cache.
+#
+# For `parquet_folder`: no DETACH needed — parquet writes don't take a
+# lock that conflicts with the workbench's read-only views. A
+# `withr::defer()` recreates the views (so newly-added data tables are
+# visible) and refreshes the metadata cache.
+acquire_writable_workbench <- function(path, .envir = parent.frame()) {
+  kind <- backend_kind(path)
+
+  workbench_active <- exists("con", envir = .codeminer_env) &&
+    DBI::dbIsValid(.codeminer_env$con)
+  workbench_holds_file <- workbench_active &&
+    identical(.codeminer_env$db_paths$main, path)
+
+  if (kind == "duckdb_file" && workbench_holds_file) {
+    # Switch to the in-memory catalog first -- DuckDB won't DETACH the
+    # "current" database (which search_path may have set to core).
+    DBI::dbExecute(.codeminer_env$con, "USE memory")
+    DBI::dbExecute(
+      .codeminer_env$con,
+      glue::glue_sql(
+        "DETACH {`CODEMINER_ALIAS_MAIN`}",
+        .con = .codeminer_env$con
+      )
+    )
+    .codeminer_env$db_paths$main <- NULL
+    withr::defer(
+      {
+        wb_alive <- exists("con", envir = .codeminer_env) &&
+          DBI::dbIsValid(.codeminer_env$con)
+        if (wb_alive && is.null(.codeminer_env$db_paths$main)) {
+          backend_attach(.codeminer_env$con, CODEMINER_ALIAS_MAIN, path)
+          .codeminer_env$db_paths$main <- path
+          codeminer_set_search_path()
+          codeminer_refresh_cache()
+        }
+      },
+      envir = .envir
+    )
+  } else if (kind == "parquet_folder" && workbench_holds_file) {
+    withr::defer(
+      {
+        wb_alive <- exists("con", envir = .codeminer_env) &&
+          DBI::dbIsValid(.codeminer_env$con)
+        if (wb_alive) {
+          # Idempotent: CREATE OR REPLACE VIEW handles existing names and
+          # picks up the new data table view.
+          backend_attach(.codeminer_env$con, CODEMINER_ALIAS_MAIN, path)
+          codeminer_refresh_cache()
+        }
+      },
+      envir = .envir
+    )
+  }
+  invisible()
+}
+
+# Validate a single metadata row before it is sent to a backend. Centralises
+# the "reserved name / forbidden character" checks that used to live in
+# `add_metadata_table()` so each backend's `backend_add_table_*` just
+# performs the write.
+validate_metadata_row <- function(metadata_row, type) {
+  id_col <- backend_id_col(type)
+  ids <- metadata_row[[id_col]]
+  if (is.null(ids)) {
+    codeminer_abort("Missing field {id_col} in metadata.")
+  }
+
+  version_col <- switch(
+    type,
+    lookup = "lookup_version",
+    mapping = "map_version",
+    relationship = "relationship_version"
+  )
+  versions <- metadata_row[[version_col]]
+  if (!is.null(versions) && any(versions == "latest")) {
+    codeminer_abort(
+      "{.val latest} is a reserved version name and cannot be used."
+    )
+  }
+
+  code_type_cols <- switch(
+    type,
+    lookup = "code_type",
+    mapping = c("from_code_type", "to_code_type"),
+    relationship = "code_type"
+  )
+  for (col in code_type_cols) {
+    vals <- metadata_row[[col]]
+    if (!is.null(vals) && any(grepl(">", vals, fixed = TRUE))) {
+      codeminer_abort(
+        "Code type values must not contain {.val >} (found in column {.field {col}})."
+      )
+    }
+  }
+  invisible(metadata_row)
+}
+
+# Shared helpers ----------------------------------------------------------
+
+# Internal: resolve the primary-key column name for a metadata type.
+backend_id_col <- function(type) {
+  switch(
+    type,
+    lookup = "lookup_table_name",
+    mapping = "mapping_table_name",
+    relationship = "relationship_table_name",
+    codeminer_abort("Invalid metadata type: {.val {type}}.")
+  )
+}
+
+# Internal: the four metadata "table" names indexed by type. Reuses the
+# locked environment from `database-build.R` so the values stay in sync
+# across the package.
+backend_metadata_name <- function(type) {
+  codeminer_metadata_table_names[[type]]
+}
+
+# DuckDB-file backend ------------------------------------------------------
+
+backend_init_duckdb_file <- function(path, overwrite = FALSE) {
+  db_exists <- file.exists(path)
+
+  con <- DBI::dbConnect(duckdb::duckdb(), path, read_only = FALSE)
+  withr::defer(DBI::dbDisconnect(con, shutdown = TRUE))
+
+  if (db_exists && overwrite) {
+    codeminer_inform("Removing existing tables from database")
+    for (table in DBI::dbListTables(con)) {
+      DBI::dbRemoveTable(con, table)
+    }
+  }
+
+  create_lookup_metadata_table(con, overwrite = overwrite)
+  create_mapping_metadata_table(con, overwrite = overwrite)
+  create_relationship_metadata_table(con, overwrite = overwrite)
+  create_db_metadata_table(con, overwrite = overwrite)
+  DBI::dbWriteTable(
+    con,
+    name = codeminer_metadata_table_names$db,
+    value = codeminer_initial_stamp_row(),
+    append = TRUE
+  )
+  invisible(TRUE)
+}
+
+backend_attach_duckdb_file <- function(con, alias, path) {
+  DBI::dbExecute(
+    con,
+    glue::glue_sql(
+      "ATTACH {path} AS {`alias`} (READ_ONLY)",
+      .con = con
+    )
+  )
+  invisible(TRUE)
+}
+
+backend_read_schema_version_duckdb_file <- function(path) {
+  con <- DBI::dbConnect(duckdb::duckdb(), path, read_only = TRUE)
+  withr::defer(DBI::dbDisconnect(con, shutdown = TRUE))
+  read_db_schema_version(con)
+}
+
+backend_add_table_duckdb_file <- function(path, type, metadata_row, data_df) {
+  validate_metadata_row(metadata_row, type)
+
+  con <- DBI::dbConnect(duckdb::duckdb(), path, read_only = FALSE)
+  withr::defer(DBI::dbDisconnect(con, shutdown = TRUE))
+
+  tbl_name <- backend_metadata_name(type)
+  id_col <- backend_id_col(type)
+
+  # Uniqueness check (metadata-only, matching the parquet backend's rule).
+  current <- read_table_from_db(con, tbl_name)
+  if (any(metadata_row[[id_col]] %in% current[[id_col]])) {
+    return(invisible(FALSE))
+  }
+
+  table_name <- metadata_row[[id_col]][[1]]
+
+  # Wrap the metadata-row INSERT + data-table CREATE in a single
+  # transaction so a mid-write failure leaves no orphan rows or tables.
+  DBI::dbExecute(con, "BEGIN")
+  on_error <- function(e) {
+    try(DBI::dbExecute(con, "ROLLBACK"), silent = TRUE)
+    stop(e)
+  }
+  tryCatch(
+    {
+      DBI::dbAppendTable(con, tbl_name, as.data.frame(metadata_row))
+      DBI::dbWriteTable(
+        con,
+        name = table_name,
+        value = data_df,
+        overwrite = FALSE
+      )
+      DBI::dbExecute(con, "COMMIT")
+    },
+    error = on_error
+  )
+  invisible(TRUE)
+}
+
+backend_table_exists_duckdb_file <- function(path, name) {
+  if (!file.exists(path)) {
+    return(FALSE)
+  }
+  con <- DBI::dbConnect(duckdb::duckdb(), path, read_only = TRUE)
+  withr::defer(DBI::dbDisconnect(con, shutdown = TRUE))
+  table_exists(con, name)
+}
+
+backend_remove_table_duckdb_file <- function(path, type, table_name) {
+  con <- DBI::dbConnect(duckdb::duckdb(), path, read_only = FALSE)
+  withr::defer(DBI::dbDisconnect(con, shutdown = TRUE))
+  remove_table_entry(con, type, table_name)
+  invisible(TRUE)
+}
+
+backend_update_metadata_duckdb_file <- function(
+  path,
+  type,
+  table_name,
+  col,
+  value
+) {
+  con <- DBI::dbConnect(duckdb::duckdb(), path, read_only = FALSE)
+  withr::defer(DBI::dbDisconnect(con, shutdown = TRUE))
+
+  tbl <- backend_metadata_name(type)
+  id_col <- backend_id_col(type)
+  DBI::dbExecute(
+    con,
+    glue::glue_sql(
+      "UPDATE {`tbl`} SET {`col`} = {value} WHERE {`id_col`} = {table_name}",
+      .con = con
+    )
+  )
+  invisible(TRUE)
+}
+
+backend_read_metadata_duckdb_file <- function(path, type) {
+  con <- DBI::dbConnect(duckdb::duckdb(), path, read_only = TRUE)
+  withr::defer(DBI::dbDisconnect(con, shutdown = TRUE))
+  read_table_from_db(con, backend_metadata_name(type))
+}
+
+# Parquet-folder backend ---------------------------------------------------
+
+# Path of the parquet file backing a metadata "table" in folder mode.
+backend_meta_path <- function(path, type) {
+  file.path(path, paste0(backend_metadata_name(type), ".parquet"))
+}
+
+# Path of the parquet file backing a data table in folder mode.
+backend_data_path <- function(path, table_name) {
+  file.path(path, paste0(table_name, ".parquet"))
+}
+
+# Drive parquet reads/writes through a transient in-memory DuckDB
+# connection. The workbench connection could be used, but using a
+# scratch connection avoids polluting the workbench with helper tables
+# and keeps backend writes independent of the workbench's state.
+backend_pq_con <- function() {
+  DBI::dbConnect(duckdb::duckdb(), ":memory:")
+}
+
+# Write a data frame to `target_path` as a parquet file, atomically:
+# COPY into `target_path.tmp`, then `file.rename()` to `target_path`.
+# Returns the final path invisibly.
+backend_write_parquet_atomic <- function(con, df, target_path) {
+  tmp_path <- paste0(target_path, ".tmp")
+  if (file.exists(tmp_path)) {
+    unlink(tmp_path)
+  }
+  scratch <- paste0(
+    "_codeminer_backend_write_",
+    format(Sys.time(), "%Y%m%d%H%M%S"),
+    "_",
+    sample.int(.Machine$integer.max, 1L)
+  )
+  DBI::dbWriteTable(con, scratch, as.data.frame(df), overwrite = TRUE)
+  withr::defer(try(DBI::dbRemoveTable(con, scratch), silent = TRUE))
+  DBI::dbExecute(
+    con,
+    glue::glue_sql(
+      "COPY (SELECT * FROM {`scratch`}) TO {tmp_path} (FORMAT PARQUET)",
+      .con = con
+    )
+  )
+  file.rename(tmp_path, target_path)
+  invisible(target_path)
+}
+
+# Required-column accessor for the given metadata type.
+backend_required_cols <- function(type) {
+  switch(
+    type,
+    lookup = required_lookup_metadata_columns(),
+    mapping = required_mapping_metadata_columns(),
+    relationship = required_relationship_metadata_columns(),
+    db = required_db_metadata_columns(),
+    codeminer_abort("Invalid metadata type: {.val {type}}.")
+  )
+}
+
+# Build a zero-row data frame with the schema of a metadata type so that
+# `backend_init_parquet_folder()` can produce empty parquet files with
+# the correct columns.
+backend_empty_metadata <- function(type) {
+  cols <- backend_required_cols(type)
+  if (type %in% c("lookup", "mapping", "relationship")) {
+    id_col <- backend_id_col(type)
+    cols <- c(id_col, cols)
+  }
+  df <- as.data.frame(
+    stats::setNames(
+      replicate(length(cols), character(0), simplify = FALSE),
+      cols
+    ),
+    stringsAsFactors = FALSE
+  )
+  df
+}
+
+backend_init_parquet_folder <- function(path, overwrite = FALSE) {
+  if (!dir.exists(path)) {
+    dir.create(path, recursive = TRUE, showWarnings = FALSE)
+  }
+
+  if (overwrite) {
+    existing <- list.files(path, pattern = "\\.parquet$", full.names = TRUE)
+    if (length(existing) > 0) {
+      codeminer_inform("Removing existing parquet files from {.file {path}}")
+      unlink(existing)
+    }
+    # Stray .tmp files from a previously-interrupted write are also
+    # cleared so the fresh build starts from a clean directory.
+    leftover_tmp <- list.files(
+      path,
+      pattern = "\\.parquet\\.tmp$",
+      full.names = TRUE
+    )
+    if (length(leftover_tmp) > 0) {
+      unlink(leftover_tmp)
+    }
+  }
+
+  con <- backend_pq_con()
+  withr::defer(DBI::dbDisconnect(con, shutdown = TRUE))
+
+  # Write empty metadata parquets for the per-table metadata types.
+  for (type in c("lookup", "mapping", "relationship")) {
+    target <- backend_meta_path(path, type)
+    if (overwrite || !file.exists(target)) {
+      backend_write_parquet_atomic(
+        con,
+        backend_empty_metadata(type),
+        target
+      )
+    }
+  }
+
+  # Stamp the _db_metadata file at the current schema version.
+  db_target <- backend_meta_path(path, "db")
+  if (overwrite || !file.exists(db_target)) {
+    backend_write_parquet_atomic(
+      con,
+      codeminer_initial_stamp_row(),
+      db_target
+    )
+  }
+
+  invisible(TRUE)
+}
+
+backend_attach_parquet_folder <- function(con, alias, path) {
+  # ATTACH an in-memory catalog under the same alias the duckdb_file
+  # backend uses. This keeps object addressing symmetric across the two
+  # backends — both end up as `<alias>.main.<table>` — so the rest of
+  # the package (search_path, schema_table_exists, etc.) needs no
+  # backend-specific branching.
+  catalogs <- DBI::dbGetQuery(
+    con,
+    glue::glue_sql(
+      "SELECT database_name FROM duckdb_databases() WHERE database_name = {alias}",
+      .con = con
+    )
+  )
+  if (nrow(catalogs) == 0L) {
+    DBI::dbExecute(
+      con,
+      glue::glue_sql("ATTACH ':memory:' AS {`alias`}", .con = con)
+    )
+  }
+
+  # Views over each metadata file. One file per metadata type in folder
+  # mode — `read_parquet()` on the single file returns the metadata
+  # rows.
+  for (type in c("lookup", "mapping", "relationship", "db")) {
+    meta_path <- backend_meta_path(path, type)
+    if (!file.exists(meta_path)) {
+      next
+    }
+    view_name <- backend_metadata_name(type)
+    DBI::dbExecute(
+      con,
+      glue::glue_sql(
+        "CREATE OR REPLACE VIEW {`alias`}.main.{`view_name`} AS
+         SELECT * FROM read_parquet({meta_path})",
+        .con = con
+      )
+    )
+  }
+
+  # Views over each registered data table. Names are enumerated from
+  # the metadata files so we don't accidentally expose stray .parquet
+  # files left over from a prior interrupted add (orphans).
+  for (type in c("lookup", "mapping", "relationship")) {
+    meta_path <- backend_meta_path(path, type)
+    if (!file.exists(meta_path)) {
+      next
+    }
+    meta_df <- backend_read_metadata_parquet_folder(path, type)
+    id_col <- backend_id_col(type)
+    table_names <- meta_df[[id_col]]
+    for (tbl in table_names) {
+      data_path <- backend_data_path(path, tbl)
+      if (!file.exists(data_path)) {
+        next
+      }
+      DBI::dbExecute(
+        con,
+        glue::glue_sql(
+          "CREATE OR REPLACE VIEW {`alias`}.main.{`tbl`} AS
+           SELECT * FROM read_parquet({data_path})",
+          .con = con
+        )
+      )
+    }
+  }
+  invisible(TRUE)
+}
+
+backend_read_schema_version_parquet_folder <- function(path) {
+  db_path_file <- backend_meta_path(path, "db")
+  if (!file.exists(db_path_file)) {
+    return(NA_integer_)
+  }
+  con <- backend_pq_con()
+  withr::defer(DBI::dbDisconnect(con, shutdown = TRUE))
+  row <- DBI::dbGetQuery(
+    con,
+    glue::glue_sql(
+      "SELECT schema_version FROM read_parquet({db_path_file})",
+      .con = con
+    )
+  )
+  if (nrow(row) == 0L) {
+    return(NA_integer_)
+  }
+  as.integer(row$schema_version[[1L]])
+}
+
+backend_read_metadata_parquet_folder <- function(path, type) {
+  meta_path <- backend_meta_path(path, type)
+  if (!file.exists(meta_path)) {
+    return(backend_empty_metadata(type))
+  }
+  con <- backend_pq_con()
+  withr::defer(DBI::dbDisconnect(con, shutdown = TRUE))
+  DBI::dbGetQuery(
+    con,
+    glue::glue_sql(
+      "SELECT * FROM read_parquet({meta_path})",
+      .con = con
+    )
+  )
+}
+
+# Four-step transactional add: write metadata.tmp, write data.tmp, rename
+# data, rename metadata. If the metadata rename fails after a successful
+# data rename, the data file is unlinked to roll the data commit back.
+# An R-process death between step 3 and step 4 leaves an orphan data
+# file; that's invisible to readers (no metadata row references it) and
+# gets overwritten cleanly on the next add of the same name.
+backend_table_exists_parquet_folder <- function(path, name) {
+  # Metadata "tables" map to `_*_metadata.parquet`; data tables map to
+  # `<name>.parquet` at the folder root.
+  if (
+    name %in%
+      vapply(
+        c("lookup", "mapping", "relationship", "db"),
+        backend_metadata_name,
+        character(1)
+      )
+  ) {
+    return(file.exists(file.path(path, paste0(name, ".parquet"))))
+  }
+  file.exists(backend_data_path(path, name))
+}
+
+backend_add_table_parquet_folder <- function(
+  path,
+  type,
+  metadata_row,
+  data_df
+) {
+  validate_metadata_row(metadata_row, type)
+
+  id_col <- backend_id_col(type)
+  table_name <- metadata_row[[id_col]][[1]]
+
+  # Uniqueness check is metadata-only — never `file.exists()` on the data
+  # path — so an orphan from a previous crashed add doesn't block a re-add.
+  current_meta <- backend_read_metadata_parquet_folder(path, type)
+  if (table_name %in% current_meta[[id_col]]) {
+    return(invisible(FALSE))
+  }
+
+  meta_path <- backend_meta_path(path, type)
+  data_path <- backend_data_path(path, table_name)
+  meta_tmp <- paste0(meta_path, ".tmp")
+  data_tmp <- paste0(data_path, ".tmp")
+
+  con <- backend_pq_con()
+  withr::defer(DBI::dbDisconnect(con, shutdown = TRUE))
+
+  # Step 1: write metadata temp.
+  combined_meta <- dplyr::bind_rows(current_meta, as.data.frame(metadata_row))
+  # Use the helper but redirect to the explicit .tmp path: we want to
+  # control when (and whether) the rename happens.
+  backend_pq_write_to_tmp(con, combined_meta, meta_tmp)
+
+  # If we bail out before committing, clean up the metadata temp file.
+  committed_meta_tmp <- FALSE
+  withr::defer(
+    if (!committed_meta_tmp && file.exists(meta_tmp)) unlink(meta_tmp)
+  )
+
+  # Step 2: write data temp.
+  backend_pq_write_to_tmp(con, data_df, data_tmp)
+  committed_data_tmp <- FALSE
+  withr::defer(
+    if (!committed_data_tmp && file.exists(data_tmp)) unlink(data_tmp)
+  )
+
+  # Step 3: commit data. Atomic on POSIX. Once this returns, the data
+  # file is the new file; the metadata still references the old set.
+  file.rename(data_tmp, data_path)
+  committed_data_tmp <- TRUE
+  data_committed <- TRUE
+
+  # Step 4: commit metadata. If the rename fails, roll back the data
+  # commit so we don't leak an orphan.
+  tryCatch(
+    file.rename(meta_tmp, meta_path),
+    error = function(e) {
+      if (data_committed && file.exists(data_path)) {
+        unlink(data_path)
+      }
+      stop(e)
+    }
+  )
+  committed_meta_tmp <- TRUE
+
+  invisible(TRUE)
+}
+
+# Internal helper: write a data frame as parquet to an explicit path
+# (typically a `.tmp` file). Reuses a scratch table in `con` and removes
+# it after the COPY. Does NOT rename — callers control the commit.
+backend_pq_write_to_tmp <- function(con, df, tmp_path) {
+  if (file.exists(tmp_path)) {
+    unlink(tmp_path)
+  }
+  scratch <- paste0(
+    "_codeminer_backend_write_",
+    format(Sys.time(), "%Y%m%d%H%M%S"),
+    "_",
+    sample.int(.Machine$integer.max, 1L)
+  )
+  DBI::dbWriteTable(con, scratch, as.data.frame(df), overwrite = TRUE)
+  withr::defer(try(DBI::dbRemoveTable(con, scratch), silent = TRUE))
+  DBI::dbExecute(
+    con,
+    glue::glue_sql(
+      "COPY (SELECT * FROM {`scratch`}) TO {tmp_path} (FORMAT PARQUET)",
+      .con = con
+    )
+  )
+  invisible(tmp_path)
+}
+
+backend_remove_table_parquet_folder <- function(path, type, table_name) {
+  current_meta <- backend_read_metadata_parquet_folder(path, type)
+  id_col <- backend_id_col(type)
+  if (!table_name %in% current_meta[[id_col]]) {
+    codeminer_abort(
+      "No {type} metadata row found for {.val {table_name}}."
+    )
+  }
+
+  new_meta <- current_meta[current_meta[[id_col]] != table_name, , drop = FALSE]
+
+  con <- backend_pq_con()
+  withr::defer(DBI::dbDisconnect(con, shutdown = TRUE))
+  backend_write_parquet_atomic(
+    con,
+    new_meta,
+    backend_meta_path(path, type)
+  )
+
+  data_path <- backend_data_path(path, table_name)
+  if (file.exists(data_path)) {
+    unlink(data_path)
+  }
+  invisible(TRUE)
+}
+
+# Validate the database at `path`, returning a (possibly empty) named
+# list of issues. Backend-aware: see the per-backend implementations
+# for what each one checks. Used by the public `validate_database()`
+# wrapper.
+backend_validate <- function(path) {
+  kind <- backend_kind(path)
+  switch(
+    kind,
+    duckdb_file = backend_validate_duckdb_file(path),
+    parquet_folder = backend_validate_parquet_folder(path),
+    codeminer_abort("Unknown backend kind {.val {kind}}.")
+  )
+}
+
+#' Validate the codeminer database for on-disk inconsistencies
+#'
+#' Inspects the database at `CODEMINER_DB_PATH` and reports any
+#' inconsistencies it finds — without modifying the database. The
+#' specific checks depend on the backend:
+#'
+#' * `parquet_folder`:
+#'   * **orphan data files**: `<name>.parquet` files at the folder root
+#'     with no matching metadata row (typically left by a previous
+#'     `add_*_table()` that died after the data file was committed but
+#'     before the metadata file was).
+#'   * **dangling metadata**: metadata rows that reference a data file
+#'     that does not exist.
+#'   * **stale temp files**: `*.parquet.tmp` files left over from an
+#'     interrupted write.
+#' * `duckdb_file`:
+#'   * **dangling metadata**: metadata rows referencing data tables
+#'     that do not exist in the file.
+#'
+#' Issues are reported via informational messages. The function
+#' returns a named list of issues invisibly so callers can act on
+#' them programmatically.
+#'
+#' @return A named list of character vectors, one entry per kind of
+#'   issue. Empty vectors mean no issues of that kind were found.
+#' @export
+#' @family Database management
+#' @examples
+#' \dontrun{
+#' issues <- validate_database()
+#' }
+validate_database <- function() {
+  path <- db_path()
+  if (!backend_database_exists(path)) {
+    codeminer_inform(c(
+      "i" = "No database exists at {.file {path}}; nothing to validate."
+    ))
+    return(invisible(list()))
+  }
+
+  issues <- backend_validate(path)
+  any_issues <- any(vapply(issues, function(x) length(x) > 0, logical(1)))
+
+  if (!any_issues) {
+    codeminer_inform(c(
+      "v" = "Database at {.file {path}} looks consistent."
+    ))
+    return(invisible(issues))
+  }
+
+  msgs <- c("!" = "Database at {.file {path}} has issues:")
+  if (length(issues$orphan_data_files %||% character(0)) > 0) {
+    msgs <- c(
+      msgs,
+      "x" = paste(
+        "Orphan data files (parquet files with no metadata row): ",
+        "{.val {issues$orphan_data_files}}"
+      )
+    )
+  }
+  if (length(issues$dangling_metadata %||% character(0)) > 0) {
+    msgs <- c(
+      msgs,
+      "x" = paste(
+        "Dangling metadata rows (referenced data table missing): ",
+        "{.val {issues$dangling_metadata}}"
+      )
+    )
+  }
+  if (length(issues$stale_temp_files %||% character(0)) > 0) {
+    msgs <- c(
+      msgs,
+      "x" = "Stale temp files: {.val {issues$stale_temp_files}}"
+    )
+  }
+  codeminer_inform(msgs)
+  invisible(issues)
+}
+
+# DuckDB-file validation: the only inconsistency that can realistically
+# happen is a metadata row whose referenced data table is missing
+# (e.g. someone called DBI::dbRemoveTable() directly). Orphan data
+# tables are difficult to identify generically because the duckdb_file
+# also contains the metadata tables themselves.
+backend_validate_duckdb_file <- function(path) {
+  issues <- list(
+    dangling_metadata = character(0)
+  )
+  if (!file.exists(path)) {
+    return(issues)
+  }
+  con <- DBI::dbConnect(duckdb::duckdb(), path, read_only = TRUE)
+  withr::defer(DBI::dbDisconnect(con, shutdown = TRUE))
+
+  existing_tables <- DBI::dbListTables(con)
+  for (type in c("lookup", "mapping", "relationship")) {
+    tbl <- backend_metadata_name(type)
+    if (!tbl %in% existing_tables) {
+      next
+    }
+    id_col <- backend_id_col(type)
+    rows <- DBI::dbGetQuery(
+      con,
+      glue::glue_sql("SELECT {`id_col`} AS name FROM {`tbl`}", .con = con)
+    )
+    missing <- setdiff(rows$name, existing_tables)
+    if (length(missing) > 0) {
+      issues$dangling_metadata <- c(issues$dangling_metadata, missing)
+    }
+  }
+  issues
+}
+
+# Parquet-folder validation:
+#  * orphan_data_files — `<name>.parquet` files at root with no matching
+#    metadata row (typically left by a crashed add between step 3 and
+#    step 4).
+#  * dangling_metadata — metadata rows whose `<name>.parquet` data file
+#    is missing.
+#  * stale_temp_files — `*.parquet.tmp` files left over from an
+#    interrupted write.
+backend_validate_parquet_folder <- function(path) {
+  issues <- list(
+    orphan_data_files = character(0),
+    dangling_metadata = character(0),
+    stale_temp_files = character(0)
+  )
+  if (!dir.exists(path)) {
+    return(issues)
+  }
+
+  metadata_filenames <- vapply(
+    c("lookup", "mapping", "relationship", "db"),
+    function(type) paste0(backend_metadata_name(type), ".parquet"),
+    character(1)
+  )
+
+  parquet_files <- list.files(path, pattern = "\\.parquet$")
+  data_files <- setdiff(parquet_files, metadata_filenames)
+  data_table_names <- sub("\\.parquet$", "", data_files)
+
+  registered <- character(0)
+  for (type in c("lookup", "mapping", "relationship")) {
+    meta <- backend_read_metadata_parquet_folder(path, type)
+    id_col <- backend_id_col(type)
+    registered <- c(registered, meta[[id_col]])
+  }
+  registered <- unique(registered)
+
+  issues$orphan_data_files <- setdiff(data_table_names, registered)
+  issues$dangling_metadata <- setdiff(registered, data_table_names)
+  issues$stale_temp_files <- list.files(path, pattern = "\\.parquet\\.tmp$")
+
+  issues
+}
+
+backend_update_metadata_parquet_folder <- function(
+  path,
+  type,
+  table_name,
+  col,
+  value
+) {
+  current_meta <- backend_read_metadata_parquet_folder(path, type)
+  id_col <- backend_id_col(type)
+  if (!table_name %in% current_meta[[id_col]]) {
+    codeminer_abort(
+      "No {type} metadata row found for {.val {table_name}}."
+    )
+  }
+  current_meta[[col]][current_meta[[id_col]] == table_name] <- value
+
+  con <- backend_pq_con()
+  withr::defer(DBI::dbDisconnect(con, shutdown = TRUE))
+  backend_write_parquet_atomic(
+    con,
+    current_meta,
+    backend_meta_path(path, type)
+  )
+  invisible(TRUE)
+}

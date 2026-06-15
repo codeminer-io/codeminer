@@ -65,11 +65,17 @@ add_relationship_table <- function(table, metadata) {
   table <- as.data.frame(table)
   metadata <- as.data.frame(metadata)
 
-  con <- connect_to_db(read_only = FALSE)
-  check_database(con)
+  target_path <- db_path()
+  check_database(target_path)
+  acquire_writable_workbench(target_path)
 
-  meta_added <- add_metadata_table(con, metadata, type = "relationship")
-  if (!meta_added) {
+  added <- backend_add_table(
+    target_path,
+    type = "relationship",
+    metadata_row = metadata,
+    data_df = table
+  )
+  if (isFALSE(added)) {
     codeminer_warn(
       c(
         "!" = paste0(
@@ -86,38 +92,30 @@ add_relationship_table <- function(table, metadata) {
     return(invisible(FALSE))
   }
 
-  success <- DBI::dbWriteTable(
-    con,
-    name = table_name,
-    value = table,
-    overwrite = FALSE
-  )
-  if (success) {
-    codeminer_inform(
-      c(
-        "v" = "Relationship table {.field {metadata$relationship_table_name}} added successfully."
-      )
+  codeminer_inform(
+    c(
+      "v" = "Relationship table {.field {metadata$relationship_table_name}} added successfully."
     )
-    cached <- .codeminer_env$active_versions[["relationship"]][[
-      metadata$code_type
-    ]]
-    if (
-      !is.null(cached) &&
-        cached != metadata$relationship_version
-    ) {
-      codeminer_inform(c(
-        "i" = paste0(
-          "Currently using version {.val {cached}} for ",
-          "{.val {metadata$code_type}} relationships."
-        ),
-        "i" = paste0(
-          "Use {.fun codeminer_clear_versions} or ",
-          "{.fun codeminer_set_version} to switch."
-        )
-      ))
-    }
+  )
+  cached <- .codeminer_env$active_versions[["relationship"]][[
+    metadata$code_type
+  ]]
+  if (
+    !is.null(cached) &&
+      cached != metadata$relationship_version
+  ) {
+    codeminer_inform(c(
+      "i" = paste0(
+        "Currently using version {.val {cached}} for ",
+        "{.val {metadata$code_type}} relationships."
+      ),
+      "i" = paste0(
+        "Use {.fun codeminer_clear_versions} or ",
+        "{.fun codeminer_set_version} to switch."
+      )
+    ))
   }
-  return(invisible(success))
+  return(invisible(TRUE))
 }
 
 #' Remove a relationship table from the database
@@ -139,17 +137,18 @@ remove_relationship_table <- function(code_type, relationship_version) {
     sep = "_"
   )
 
-  con <- connect_to_db(read_only = FALSE)
-  check_database(con)
+  target_path <- db_path()
+  check_database(target_path)
+  acquire_writable_workbench(target_path)
 
-  meta <- read_table_from_db(con, codeminer_metadata_table_names$relationship)
+  meta <- backend_read_metadata(target_path, "relationship")
   if (!table_name %in% meta$relationship_table_name) {
     codeminer_abort(
       "No relationship table found for {.val {code_type}} version {.val {relationship_version}}."
     )
   }
 
-  remove_table_entry(con, "relationship", table_name)
+  backend_remove_table(target_path, "relationship", table_name)
   cached <- .codeminer_env$active_versions[["relationship"]][[
     code_type
   ]]
@@ -189,11 +188,10 @@ update_relationship_metadata <- function(
 ) {
   rlang::check_dots_empty()
 
-  con <- connect_to_db(read_only = FALSE)
-  check_database(con)
+  target_path <- db_path()
+  check_database(target_path)
 
-  # Resolve version
-  meta <- read_table_from_db(con, codeminer_metadata_table_names$relationship)
+  meta <- backend_read_metadata(target_path, "relationship")
   resolved <- resolve_versioned_metadata(
     meta,
     code_type_val = code_type,
@@ -205,10 +203,9 @@ update_relationship_metadata <- function(
   )
   table_name <- resolved$relationship_table_name
 
-  # Validate col_filters columns exist in the data table
   cf_json <- serialise_col_filters(col_filters)
   if (!is.na(cf_json)) {
-    table_cols <- DBI::dbListFields(con, table_name)
+    table_cols <- DBI::dbListFields(get_db_con(), table_name)
     validate_col_filters_columns(
       col_filters,
       table_cols = table_cols,
@@ -216,15 +213,13 @@ update_relationship_metadata <- function(
     )
   }
 
-  # Update metadata row
-  DBI::dbExecute(
-    con,
-    glue::glue_sql(
-      "UPDATE {`codeminer_metadata_table_names$relationship`}
-       SET col_filters = {cf_json}
-       WHERE relationship_table_name = {table_name}",
-      .con = con
-    )
+  acquire_writable_workbench(target_path)
+  backend_update_metadata(
+    target_path,
+    "relationship",
+    table_name = table_name,
+    col = "col_filters",
+    value = cf_json
   )
 
   codeminer_inform(c(

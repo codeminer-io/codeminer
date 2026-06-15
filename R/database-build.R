@@ -23,11 +23,12 @@ lockEnvironment(codeminer_metadata_table_names, bindings = TRUE)
 #' build_database()
 #' file.exists(db_path)
 build_database <- function(overwrite = FALSE) {
-  db_exists <- file.exists(db_path())
+  target_path <- db_path()
+  db_exists <- backend_database_exists(target_path)
   if (db_exists) {
-    codeminer_inform("Existing database found at {.file {db_path()}}")
+    codeminer_inform("Existing database found at {.file {target_path}}")
   } else {
-    codeminer_inform("Creating new database at {.file {db_path()}}")
+    codeminer_inform("Creating new database at {.file {target_path}}")
   }
 
   # Existing-DB-without-overwrite path: the schema gate (run on
@@ -40,29 +41,29 @@ build_database <- function(overwrite = FALSE) {
     return(invisible(TRUE))
   }
 
-  # Fresh build (or `overwrite = TRUE`): create everything from scratch and
-  # stamp at the current schema version.
-  con <- connect_to_db(read_only = FALSE)
+  # Fresh build (or `overwrite = TRUE`): if the workbench currently holds
+  # the file open, release it first so the init routine can take a write
+  # connection. The acquire_writable_workbench helper handles both
+  # backend kinds and re-attaches on exit.
+  acquire_writable_workbench(target_path)
 
-  if (db_exists && overwrite) {
-    codeminer_inform("Removing existing tables from database")
-    for (table in DBI::dbListTables(con)) {
-      DBI::dbRemoveTable(con, table)
-    }
-  }
-
-  create_lookup_metadata_table(con, overwrite = overwrite)
-  create_mapping_metadata_table(con, overwrite = overwrite)
-  create_relationship_metadata_table(con, overwrite = overwrite)
-  create_db_metadata_table(con, overwrite = overwrite)
-  DBI::dbWriteTable(
-    con,
-    name = codeminer_metadata_table_names$db,
-    value = codeminer_initial_stamp_row(),
-    append = TRUE
-  )
+  backend_init(target_path, overwrite = overwrite)
 
   invisible(TRUE)
+}
+
+# Does a database already exist at `path`? Backend-aware: for
+# `duckdb_file`, the path is a regular file; for `parquet_folder`, it's
+# a directory containing the metadata parquet files.
+backend_database_exists <- function(path) {
+  kind <- backend_kind(path)
+  if (kind == "duckdb_file") {
+    return(file.exists(path))
+  }
+  # parquet_folder: consider "exists" to mean the directory contains the
+  # _db_metadata file. An empty directory or a stale folder without the
+  # stamp file isn't a usable codeminer DB.
+  file.exists(backend_meta_path(path, "db"))
 }
 
 #' Create lookup metadata table in database

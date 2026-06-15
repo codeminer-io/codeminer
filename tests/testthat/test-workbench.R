@@ -3,7 +3,7 @@
 test_that("codeminer_connect() errors when explicit path does not exist", {
   expect_error(
     codeminer_connect(main = "/nonexistent/path/to/database.duckdb"),
-    "Database file not found"
+    "Database not found"
   )
 })
 

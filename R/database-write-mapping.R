@@ -49,11 +49,17 @@ add_mapping_table <- function(table, metadata) {
   table <- as.data.frame(table)
   metadata <- as.data.frame(metadata)
 
-  con <- connect_to_db(read_only = FALSE)
-  check_database(con)
+  target_path <- db_path()
+  check_database(target_path)
+  acquire_writable_workbench(target_path)
 
-  meta_added <- add_metadata_table(con, metadata, type = "mapping")
-  if (!meta_added) {
+  added <- backend_add_table(
+    target_path,
+    type = "mapping",
+    metadata_row = metadata,
+    data_df = table
+  )
+  if (isFALSE(added)) {
     codeminer_warn(
       c(
         "!" = "The mapping table {.field {metadata$mapping_table_name}} already exists.",
@@ -63,40 +69,32 @@ add_mapping_table <- function(table, metadata) {
     return(invisible(FALSE))
   }
 
-  success <- DBI::dbWriteTable(
-    con,
-    name = table_name,
-    value = table,
-    overwrite = FALSE
+  codeminer_inform(
+    c(
+      "v" = "Mapping table {.field {metadata$mapping_table_name}} added successfully."
+    )
   )
-  if (success) {
-    codeminer_inform(
-      c(
-        "v" = "Mapping table {.field {metadata$mapping_table_name}} added successfully."
+  map_pin_key <- paste(
+    metadata$from_code_type,
+    ">",
+    metadata$to_code_type
+  )
+  cached <- .codeminer_env$active_versions[["mapping"]][[
+    map_pin_key
+  ]]
+  if (!is.null(cached) && cached != metadata$map_version) {
+    codeminer_inform(c(
+      "i" = paste0(
+        "Currently using version {.val {cached}} for ",
+        "{.val {map_pin_key}} mappings."
+      ),
+      "i" = paste0(
+        "Use {.fun codeminer_clear_versions} or ",
+        "{.fun codeminer_set_version} to switch."
       )
-    )
-    map_pin_key <- paste(
-      metadata$from_code_type,
-      ">",
-      metadata$to_code_type
-    )
-    cached <- .codeminer_env$active_versions[["mapping"]][[
-      map_pin_key
-    ]]
-    if (!is.null(cached) && cached != metadata$map_version) {
-      codeminer_inform(c(
-        "i" = paste0(
-          "Currently using version {.val {cached}} for ",
-          "{.val {map_pin_key}} mappings."
-        ),
-        "i" = paste0(
-          "Use {.fun codeminer_clear_versions} or ",
-          "{.fun codeminer_set_version} to switch."
-        )
-      ))
-    }
+    ))
   }
-  return(invisible(success))
+  return(invisible(TRUE))
 }
 
 #' Remove a mapping table from the database
@@ -114,17 +112,18 @@ add_mapping_table <- function(table, metadata) {
 remove_mapping_table <- function(from_code_type, to_code_type, map_version) {
   table_name <- paste(from_code_type, to_code_type, map_version, sep = "_")
 
-  con <- connect_to_db(read_only = FALSE)
-  check_database(con)
+  target_path <- db_path()
+  check_database(target_path)
+  acquire_writable_workbench(target_path)
 
-  meta <- read_table_from_db(con, codeminer_metadata_table_names$mapping)
+  meta <- backend_read_metadata(target_path, "mapping")
   if (!table_name %in% meta$mapping_table_name) {
     codeminer_abort(
       "No mapping table found for {.val {from_code_type}} > {.val {to_code_type}} version {.val {map_version}}."
     )
   }
 
-  remove_table_entry(con, "mapping", table_name)
+  backend_remove_table(target_path, "mapping", table_name)
   map_pin_key <- paste(from_code_type, ">", to_code_type)
   cached <- .codeminer_env$active_versions[["mapping"]][[
     map_pin_key
@@ -166,11 +165,10 @@ update_mapping_metadata <- function(
 ) {
   rlang::check_dots_empty()
 
-  con <- connect_to_db(read_only = FALSE)
-  check_database(con)
+  target_path <- db_path()
+  check_database(target_path)
 
-  # Resolve version
-  meta <- read_table_from_db(con, codeminer_metadata_table_names$mapping)
+  meta <- backend_read_metadata(target_path, "mapping")
   pair_meta <- meta[
     meta$from_code_type == from_code_type & meta$to_code_type == to_code_type,
   ]
@@ -188,10 +186,9 @@ update_mapping_metadata <- function(
   )
   table_name <- resolved$mapping_table_name
 
-  # Validate col_filters columns exist in the data table
   cf_json <- serialise_col_filters(col_filters)
   if (!is.na(cf_json)) {
-    table_cols <- DBI::dbListFields(con, table_name)
+    table_cols <- DBI::dbListFields(get_db_con(), table_name)
     validate_col_filters_columns(
       col_filters,
       table_cols = table_cols,
@@ -199,15 +196,13 @@ update_mapping_metadata <- function(
     )
   }
 
-  # Update metadata row
-  DBI::dbExecute(
-    con,
-    glue::glue_sql(
-      "UPDATE {`codeminer_metadata_table_names$mapping`}
-       SET col_filters = {cf_json}
-       WHERE mapping_table_name = {table_name}",
-      .con = con
-    )
+  acquire_writable_workbench(target_path)
+  backend_update_metadata(
+    target_path,
+    "mapping",
+    table_name = table_name,
+    col = "col_filters",
+    value = cf_json
   )
 
   codeminer_inform(c(
