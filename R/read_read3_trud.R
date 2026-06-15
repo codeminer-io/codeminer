@@ -223,9 +223,12 @@ read_read3_trud <- function(
 #' @return The same lookup table with a new `category` column.
 #' @noRd
 read3_attach_category <- function(read3_lkp_table, hier_table) {
+  # V3hier.v3 lists one row per (child, parent) pair with `relationship_type`
+  # as a per-pair sequence number (NOT a semantic label like "is a"). Every
+  # row is a valid hierarchical edge for the chapter walk, so dedup on
+  # (child, parent) rather than filtering by relationship_type.
   hier_edges <- hier_table |>
-    dplyr::filter(.data$relationship_type == "01") |>
-    dplyr::select("child_code", "parent_code")
+    dplyr::distinct(.data$child_code, .data$parent_code)
 
   # Root: code(s) that appear as a parent but never as a child.
   root_codes <- setdiff(
