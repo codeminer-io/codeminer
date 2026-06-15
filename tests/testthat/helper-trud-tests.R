@@ -148,6 +148,7 @@ create_dummy_read3_dir <- function(.envir = parent.frame()) {
       "X40J6|C|P|",
       "X40J7|R|P|",
       "X40J8|C|P|",
+      "X40J9|O|P|",
       "ORPH1|C|P|"
     ),
     file.path(v3_dir, "Concept.v3")
@@ -164,6 +165,7 @@ create_dummy_read3_dir <- function(.envir = parent.frame()) {
       "X40J6|D003|P",
       "X40J7|D004|P",
       "X40J8|D006|P",
+      "X40J9|D007|P",
       "ORPH1|D005|P"
     ),
     file.path(v3_dir, "Descrip.v3")
@@ -182,7 +184,8 @@ create_dummy_read3_dir <- function(.envir = parent.frame()) {
       "D003|C|Other disorder||",
       "D004|C|Retired disorder||",
       "D005|C|Orphan concept||",
-      "D006|C|Disorder via non-01 type||"
+      "D006|C|Disorder via non-01 type||",
+      "D007|C|Optional-status disorder||"
     ),
     file.path(v3_dir, "Terms.v3")
   )
@@ -199,7 +202,8 @@ create_dummy_read3_dir <- function(.envir = parent.frame()) {
       "X40J5|CHAP2|01",
       "X40J6|X40J5|01",
       "X40J7|X40J6|01",
-      "X40J8|X40J6|05"
+      "X40J8|X40J6|05",
+      "X40J9|X40J6|01"
     ),
     file.path(v3_dir, "V3hier.v3")
   )

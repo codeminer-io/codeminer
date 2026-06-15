@@ -48,11 +48,11 @@ test_that("read_read3_trud() read3_lkp retains retired codes, synonyms, and non-
   expect_true("X40J7" %in% tbl$code)
   # Synonym desc_type ("S") and non-clinical term_type ("O") should be present
   expect_setequal(unique(tbl$desc_type), c("P", "S"))
-  expect_setequal(unique(tbl$status), c("C", "R"))
+  expect_setequal(unique(tbl$status), c("C", "O", "R"))
   expect_setequal(unique(tbl$term_type), c("C", "O"))
 })
 
-test_that("read_read3_trud() col_filters default to active codes + clinical terms", {
+test_that("read_read3_trud() col_filters default keeps Current + Optional statuses (Extinct/Redundant filtered)", {
   dir <- create_dummy_read3_dir()
   result <- suppressMessages(read_read3_trud(dir, tables = "read3_lkp"))
   cf <- deserialise_col_filters(
@@ -60,8 +60,11 @@ test_that("read_read3_trud() col_filters default to active codes + clinical term
   )
 
   expect_setequal(names(cf), c("status", "term_type"))
-  expect_equal(cf$status$defaults, "C")
-  expect_setequal(cf$status$values, c("C", "R"))
+  # Dummy has C / O / R. Default includes C and O (clinically meaningful)
+  # but excludes R (Redundant). E (Extinct) absent in this fixture but
+  # would also be excluded.
+  expect_setequal(cf$status$defaults, c("C", "O"))
+  expect_setequal(cf$status$values, c("C", "O", "R"))
   expect_equal(cf$term_type$defaults, "C")
   expect_setequal(cf$term_type$values, c("C", "O"))
 })
@@ -93,9 +96,9 @@ test_that("read_read3_trud() relationship table has expected rows", {
   tbl <- result$read3_relationship$relationship$table
 
   # Augmented fixture: CHAP1/CHAP2 -> root, X40J5 -> CHAP1, X40J5 -> CHAP2,
-  # X40J6 -> X40J5, X40J7 -> X40J6, plus X40J8 -> X40J6 via non-"01"
-  # sequence number (7 edges).
-  expect_equal(nrow(tbl), 7L)
+  # X40J6 -> X40J5, X40J7 -> X40J6, X40J8 -> X40J6 via non-"01" sequence
+  # number, and X40J9 -> X40J6 (status "O" code) — 8 edges.
+  expect_equal(nrow(tbl), 8L)
   expect_true("child_code" %in% names(tbl))
   expect_true("parent_code" %in% names(tbl))
 })

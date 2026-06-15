@@ -359,8 +359,24 @@ test_that("CHILDREN() walks the full Read v3 hierarchy regardless of relationshi
   ))
   expect_setequal(
     result$code,
-    c("X40J5", "X40J6", "X40J7", "X40J8")
+    c("X40J5", "X40J6", "X40J7", "X40J8", "X40J9")
   )
+})
+
+test_that("CHILDREN() default col_filters keep Optional-status Read v3 codes (matches opencodelists tree behaviour)", {
+  # X40J9 (status "O") should appear by default — opencodelists' tree for
+  # codes like X40J5 includes Optional subtypes/complications. Pre-fix the
+  # default of `c("C")` only would have dropped X40J9 silently.
+  dir <- create_dummy_read3_dir()
+  local_build_temp_database()
+  suppressMessages(add_read3_trud(path = dir, version = "test_v1"))
+
+  result <- suppressMessages(suppressWarnings(
+    CHILDREN("X40J5", type = "Read v3")
+  ))
+  expect_true("X40J9" %in% result$code)
+  # X40J7 (status "R" = Redundant) stays filtered by default.
+  expect_false("X40J7" %in% result$code)
 })
 
 test_that("PARENTS() walks the full Read v3 hierarchy regardless of relationship_type", {
@@ -387,6 +403,6 @@ test_that("get_relationship_tree() returns the same Read v3 walk for the same se
   ))
   expect_setequal(
     tree$nodes$code,
-    c("X40J5", "X40J6", "X40J7", "X40J8")
+    c("X40J5", "X40J6", "X40J7", "X40J8", "X40J9")
   )
 })
