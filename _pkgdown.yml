@@ -67,6 +67,7 @@ reference:
       - read_read2_trud
       - add_read2_trud
       - build_database
+      - validate_database
       - dummy_ukb_resource_592_path
       - create_dummy_database
       - add_lookup_table

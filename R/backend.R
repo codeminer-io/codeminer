@@ -111,7 +111,10 @@ backend_init <- function(path, overwrite = FALSE, storage_format = NULL) {
   switch(
     storage_format,
     duckdb_file = backend_init_duckdb_file(path, overwrite = overwrite),
-    codeminer_folder = backend_init_codeminer_folder(path, overwrite = overwrite),
+    codeminer_folder = backend_init_codeminer_folder(
+      path,
+      overwrite = overwrite
+    ),
     parquet_folder = backend_init_parquet_folder(path, overwrite = overwrite),
     codeminer_abort("Unknown storage format {.val {storage_format}}.")
   )

@@ -72,7 +72,11 @@ build_database <- function(overwrite = FALSE, format = c("duckdb", "parquet")) {
   # backend kinds and re-attaches on exit.
   acquire_writable_workbench(target_path)
 
-  backend_init(target_path, overwrite = overwrite, storage_format = storage_format)
+  backend_init(
+    target_path,
+    overwrite = overwrite,
+    storage_format = storage_format
+  )
 
   invisible(TRUE)
 }
