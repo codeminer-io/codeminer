@@ -4,10 +4,23 @@
 \alias{build_database}
 \title{Build the Codeminer database}
 \usage{
-build_database(overwrite = FALSE)
+build_database(overwrite = FALSE, format = c("duckdb", "parquet"))
 }
 \arguments{
-\item{overwrite}{Logical indicating whether to overwrite existing tables (default: \code{FALSE})}
+\item{overwrite}{Logical indicating whether to overwrite existing tables
+(default: \code{FALSE}).}
+
+\item{format}{Character. For folder-mode databases, controls how data
+tables are stored inside the folder. One of:
+\itemize{
+\item \code{"duckdb"} (default): metadata stays as parquet at the folder root;
+each data table is a \verb{<name>.duckdb} file. Faster recursive queries
+(CHILDREN etc.) at the cost of ~50\% larger disk than \code{"parquet"}.
+\item \code{"parquet"}: data tables and metadata are all parquet files at the
+folder root. Smaller on disk; recursive queries hit re-scan cost.
+Ignored when \code{CODEMINER_DB_PATH} points at a single \code{.duckdb} file
+(there's only one shape — a single DuckDB file).
+}}
 }
 \value{
 \code{TRUE} invisibly if successful.

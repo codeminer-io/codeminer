@@ -20,7 +20,21 @@ This guide provides technical details for developers contributing to codeminer, 
 
 # Data model
 
-codeminer stores everything in a single DuckDB file. The file holds the data tables for each code system (lookups, mappings, relationships) plus a small set of **metadata tables** that index them.
+codeminer stores everything in one of three on-disk layouts. All three hold the data tables for each code system (lookups, mappings, relationships) plus a small set of **metadata tables** that index them; the layouts differ only in how those tables are persisted to disk.
+
+## Storage backends
+
+The active backend is decided by what `CODEMINER_DB_PATH` points at, and (for folder paths) what was stamped at `build_database()` time. `backend_kind()` in `R/backend.R` is the source of truth for the decision.
+
+| backend (`backend_kind()` return) | path | data tables | metadata tables | choice of |
+|---|---|---|---|---|
+| `duckdb_file` | a single `.duckdb` file | inside the file | inside the file | default for file paths |
+| `codeminer_folder` | a directory | one `<name>.duckdb` per data table at the folder root | `_lookup_metadata.parquet`, `_mapping_metadata.parquet`, `_relationship_metadata.parquet`, `_db_metadata.parquet` | default for folder paths (`build_database(format = "duckdb")`) |
+| `parquet_folder` | a directory | one `<name>.parquet` per data table at the folder root | same parquet metadata files as `codeminer_folder` | opt-in via `build_database(format = "parquet")` |
+
+All three look identical from the rest of the package's perspective — `codeminer_connect()` projects the data tables into a workbench schema and `dplyr::tbl(con, "<name>")` works the same way regardless. `dbListTables()` returns the same listing in every backend. Writes (`add_*_table()`, `remove_*_table()`, `update_*_metadata()`) all go through the dispatcher in `R/backend.R`; no other file should hard-code DuckDB or parquet specifics for the main backend.
+
+The folder backends use a write-to-temp + atomic-rename transaction for `add_*_table()` so that readers always see either the complete pre-add state or the complete post-add state — never a torn read. See `validate_database()` for the on-disk consistency checks (orphan data files, dangling metadata rows, stale `.tmp` files).
 
 ## Index tables
 
@@ -42,6 +56,7 @@ A fourth metadata table — `_db_metadata` — is *DB-level state*, not a per-da
 |---|---|
 | `codeminer_version` | `packageVersion("codeminer")` at the time the DB was last built or migrated. |
 | `schema_version` | Integer. The codeminer-defined schema version this DB is on. Compared against `current_schema_version()` at every connect. |
+| `storage_format` | One of `"duckdb_file"`, `"codeminer_folder"`, `"parquet_folder"`. Recorded once at `build_database()` time. Used by `backend_kind()` to disambiguate folder layouts that have no data tables yet (otherwise the file extensions at the folder root drive the decision). |
 | `built_at` | ISO timestamp of the original build. Immutable. |
 | `last_migrated_at` | ISO timestamp of the most recent in-place migration. Always `NA` while the project is pre-1.0 (no migration path; rebuild on schema change). Kept on the row for forward compatibility. |
 | `codeminer_source` | Where this codeminer was installed from (`"CRAN"`, `"GitHub"`, `"Local"`, …) — `packageDescription()$Source`. |

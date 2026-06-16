@@ -620,18 +620,44 @@ tables_all_exist <- function(table_names, types) {
   TRUE
 }
 
-# Helper to check if the database is valid or throw an error
-check_database <- function(con) {
+# Helper to check if the database is valid or throw an error.
+#
+# Accepts either a path (the modern call style used by the write
+# functions and the backend abstraction) or a DBI connection (for
+# back-compat with older tests). For paths, dispatches through the
+# backend so both duckdb_file and parquet_folder DBs are checked
+# consistently.
+check_database <- function(con_or_path) {
   error_msg <- c(
     "The database is not initialised.",
     "i" = "You may need to build the database first with {.fun codeminer::build_database}"
   )
-  has_lookup_meta <- table_exists(con, codeminer_metadata_table_names$lookup)
-  has_mapping_meta <- table_exists(con, codeminer_metadata_table_names$mapping)
-  has_relationship_meta <- table_exists(
-    con,
-    codeminer_metadata_table_names$relationship
-  )
+  if (is.character(con_or_path)) {
+    path <- con_or_path
+    has_lookup_meta <- backend_table_exists(
+      path,
+      codeminer_metadata_table_names$lookup
+    )
+    has_mapping_meta <- backend_table_exists(
+      path,
+      codeminer_metadata_table_names$mapping
+    )
+    has_relationship_meta <- backend_table_exists(
+      path,
+      codeminer_metadata_table_names$relationship
+    )
+  } else {
+    con <- con_or_path
+    has_lookup_meta <- table_exists(con, codeminer_metadata_table_names$lookup)
+    has_mapping_meta <- table_exists(
+      con,
+      codeminer_metadata_table_names$mapping
+    )
+    has_relationship_meta <- table_exists(
+      con,
+      codeminer_metadata_table_names$relationship
+    )
+  }
 
   if (!has_lookup_meta) {
     codeminer_abort(c(

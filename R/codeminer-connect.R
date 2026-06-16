@@ -74,10 +74,13 @@ codeminer_connect <- function(main = NULL) {
     add = TRUE
   )
 
-  # Attach main (read-only)
-  if (main_was_explicit && !file.exists(main)) {
+  # Attach main (read-only). A backend may be either a `.duckdb` file or
+  # a `parquet_folder` directory; `backend_kind()` picks the right path
+  # mechanically.
+  exists_at_main <- backend_database_exists(main)
+  if (main_was_explicit && !exists_at_main) {
     codeminer_abort(c(
-      "Database file not found at {.file {main}}.",
+      "Database not found at {.file {main}}.",
       "i" = paste(
         "To create a new database, use",
         "{.code Sys.setenv(CODEMINER_DB_PATH = ...)} then",
@@ -85,17 +88,12 @@ codeminer_connect <- function(main = NULL) {
       )
     ))
   }
-  if (file.exists(main)) {
-    # Gate the schema version BEFORE the read-only ATTACH so the migration
-    # path can open its own write connection without lock contention.
+  if (exists_at_main) {
+    # Gate the schema version BEFORE the read-only ATTACH so an explicit
+    # rebuild request can open its own write connection without lock
+    # contention.
     enforce_schema_gate(main)
-    DBI::dbExecute(
-      .codeminer_env$con,
-      glue::glue_sql(
-        "ATTACH {main} AS {`CODEMINER_ALIAS_MAIN`} (READ_ONLY)",
-        .con = .codeminer_env$con
-      )
-    )
+    backend_attach(.codeminer_env$con, CODEMINER_ALIAS_MAIN, main)
     .codeminer_env$db_paths$main <- main
     codeminer_set_search_path()
   }
