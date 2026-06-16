@@ -76,10 +76,82 @@ contract, and the dummy datasets used for testing.</p>
 <div class="section level2">
 <h2 id="data-model">Data model<a class="anchor" aria-label="anchor" href="#data-model"></a>
 </h2>
-<p>codeminer stores everything in a single DuckDB file. The file holds
-the data tables for each code system (lookups, mappings, relationships)
-plus a small set of <strong>metadata tables</strong> that index
-them.</p>
+<p>codeminer stores everything in one of three on-disk layouts. All
+three hold the data tables for each code system (lookups, mappings,
+relationships) plus a small set of <strong>metadata tables</strong> that
+index them; the layouts differ only in how those tables are persisted to
+disk.</p>
+<div class="section level3">
+<h3 id="storage-backends">Storage backends<a class="anchor" aria-label="anchor" href="#storage-backends"></a>
+</h3>
+<p>The active backend is decided by what <code>CODEMINER_DB_PATH</code>
+points at, and (for folder paths) what was stamped at
+<code><a href="../reference/build_database.html">build_database()</a></code> time. <code>backend_kind()</code> in
+<code>R/backend.R</code> is the source of truth for the decision.</p>
+<table class="table">
+<colgroup>
+<col width="20%">
+<col width="20%">
+<col width="20%">
+<col width="20%">
+<col width="20%">
+</colgroup>
+<thead><tr class="header">
+<th>backend (<code>backend_kind()</code> return)</th>
+<th>path</th>
+<th>data tables</th>
+<th>metadata tables</th>
+<th>choice of</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td><code>duckdb_file</code></td>
+<td>a single <code>.duckdb</code> file</td>
+<td>inside the file</td>
+<td>inside the file</td>
+<td>default for file paths</td>
+</tr>
+<tr class="even">
+<td><code>codeminer_folder</code></td>
+<td>a directory</td>
+<td>one <code>&lt;name&gt;.duckdb</code> per data table at the folder
+root</td>
+<td>
+<code>_lookup_metadata.parquet</code>,
+<code>_mapping_metadata.parquet</code>,
+<code>_relationship_metadata.parquet</code>,
+<code>_db_metadata.parquet</code>
+</td>
+<td>default for folder paths
+(<code>build_database(format = "duckdb")</code>)</td>
+</tr>
+<tr class="odd">
+<td><code>parquet_folder</code></td>
+<td>a directory</td>
+<td>one <code>&lt;name&gt;.parquet</code> per data table at the folder
+root</td>
+<td>same parquet metadata files as <code>codeminer_folder</code>
+</td>
+<td>opt-in via <code>build_database(format = "parquet")</code>
+</td>
+</tr>
+</tbody>
+</table>
+<p>All three look identical from the rest of the package’s perspective —
+<code><a href="../reference/codeminer_connect.html">codeminer_connect()</a></code> projects the data tables into a
+workbench schema and <code>dplyr::tbl(con, "&lt;name&gt;")</code> works
+the same way regardless. <code>dbListTables()</code> returns the same
+listing in every backend. Writes (<code>add_*_table()</code>,
+<code>remove_*_table()</code>, <code>update_*_metadata()</code>) all go
+through the dispatcher in <code>R/backend.R</code>; no other file should
+hard-code DuckDB or parquet specifics for the main backend.</p>
+<p>The folder backends use a write-to-temp + atomic-rename transaction
+for <code>add_*_table()</code> so that readers always see either the
+complete pre-add state or the complete post-add state — never a torn
+read. See <code><a href="../reference/validate_database.html">validate_database()</a></code> for the on-disk consistency
+checks (orphan data files, dangling metadata rows, stale
+<code>.tmp</code> files).</p>
+</div>
 <div class="section level3">
 <h3 id="index-tables">Index tables<a class="anchor" aria-label="anchor" href="#index-tables"></a>
 </h3>
@@ -159,22 +231,30 @@ Compared against <code>current_schema_version()</code> at every
 connect.</td>
 </tr>
 <tr class="odd">
+<td><code>storage_format</code></td>
+<td>One of <code>"duckdb_file"</code>, <code>"codeminer_folder"</code>,
+<code>"parquet_folder"</code>. Recorded once at
+<code><a href="../reference/build_database.html">build_database()</a></code> time. Used by <code>backend_kind()</code>
+to disambiguate folder layouts that have no data tables yet (otherwise
+the file extensions at the folder root drive the decision).</td>
+</tr>
+<tr class="even">
 <td><code>built_at</code></td>
 <td>ISO timestamp of the original build. Immutable.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code>last_migrated_at</code></td>
 <td>ISO timestamp of the most recent in-place migration. Always
 <code>NA</code> while the project is pre-1.0 (no migration path; rebuild
 on schema change). Kept on the row for forward compatibility.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code>codeminer_source</code></td>
 <td>Where this codeminer was installed from (<code>"CRAN"</code>,
 <code>"GitHub"</code>, <code>"Local"</code>, …) —
 <code>packageDescription()$Source</code>.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>
 <code>codeminer_remote_type</code> /
 <code>codeminer_remote_host</code> / <code>codeminer_remote_repo</code>

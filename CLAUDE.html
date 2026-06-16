@@ -41,7 +41,7 @@
 
 <div class="section level2">
 <h2 id="project-overview">Project overview<a class="anchor" aria-label="anchor" href="#project-overview"></a></h2>
-<p>codeminer is an R package for working with clinical coding systems (ICD-10, SNOMED CT, Read codes, etc.). It uses DuckDB as a backend database for storing lookup tables, mapping tables, and relationship tables with associated metadata.</p>
+<p>codeminer is an R package for working with clinical coding systems (ICD-10, SNOMED CT, Read codes, etc.). It uses DuckDB as a backend database for storing lookup tables, mapping tables, and relationship tables with associated metadata. On-disk storage can be a single <code>.duckdb</code> file or a folder of per-table files (<code>.duckdb</code> or <code>.parquet</code>); the backend abstraction in <code>R/backend.R</code> keeps the choice transparent to the rest of the package. See the data-model section of <code>vignettes/developer-guide.Rmd</code> for details.</p>
 </div>
 <div class="section level2">
 <h2 id="style-guidelines">Style guidelines<a class="anchor" aria-label="anchor" href="#style-guidelines"></a></h2>

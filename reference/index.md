@@ -127,6 +127,8 @@ clinical coding systems.
   : Add Read 2 tables to CodeMiner database
 - [`build_database()`](https://codeminer-io.github.io/codeminer/reference/build_database.md)
   : Build the Codeminer database
+- [`validate_database()`](https://codeminer-io.github.io/codeminer/reference/validate_database.md)
+  : Validate the codeminer database for on-disk inconsistencies
 - [`dummy_ukb_resource_592_path()`](https://codeminer-io.github.io/codeminer/reference/dummy_ukb_resource_592_path.md)
   : Get path to dummy UK Biobank Resource 592 file
 - [`create_dummy_database()`](https://codeminer-io.github.io/codeminer/reference/create_dummy_database.md)

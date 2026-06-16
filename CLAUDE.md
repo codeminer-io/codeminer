@@ -5,7 +5,11 @@
 codeminer is an R package for working with clinical coding systems
 (ICD-10, SNOMED CT, Read codes, etc.). It uses DuckDB as a backend
 database for storing lookup tables, mapping tables, and relationship
-tables with associated metadata.
+tables with associated metadata. On-disk storage can be a single
+`.duckdb` file or a folder of per-table files (`.duckdb` or `.parquet`);
+the backend abstraction in `R/backend.R` keeps the choice transparent to
+the rest of the package. See the data-model section of
+`vignettes/developer-guide.Rmd` for details.
 
 ## Style guidelines
 

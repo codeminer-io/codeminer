@@ -51,4 +51,5 @@ update_mapping_metadata(
 
 Other Database management:
 [`update_lookup_metadata()`](https://codeminer-io.github.io/codeminer/reference/update_lookup_metadata.md),
-[`update_relationship_metadata()`](https://codeminer-io.github.io/codeminer/reference/update_relationship_metadata.md)
+[`update_relationship_metadata()`](https://codeminer-io.github.io/codeminer/reference/update_relationship_metadata.md),
+[`validate_database()`](https://codeminer-io.github.io/codeminer/reference/validate_database.md)

@@ -50,9 +50,9 @@ of data frames:
 # Create a temporary database with dummy data
 (db_path <- create_dummy_database())
 #> ✔ Dummy database ready to use!
-#> [1] "/tmp/RtmpWpswq3/file2763122320df.duckdb"
+#> [1] "/tmp/RtmppI9vpl/file3af3137d348d.duckdb"
 Sys.getenv("CODEMINER_DB_PATH")
-#> [1] "/tmp/RtmpWpswq3/file2763122320df.duckdb"
+#> [1] "/tmp/RtmppI9vpl/file3af3137d348d.duckdb"
 ```
 
 `codeminer` resolves the database location using the following
@@ -88,8 +88,40 @@ connection status with
 
 codeminer_status()
 #> ℹ Workbench active
-#>   Main: /tmp/RtmpWpswq3/file2763122320df.duckdb
+#>   Main: /tmp/RtmppI9vpl/file3af3137d348d.duckdb
 ```
+
+### Single file vs folder
+
+`CODEMINER_DB_PATH` can point at either a single `.duckdb` file (the
+default) **or** an existing directory. The directory form holds the
+per-table data files separately at the folder root, which makes the
+database easier to inspect, distribute, or sync to remote storage.
+Choose the layout when you call
+[`build_database()`](https://codeminer-io.github.io/codeminer/reference/build_database.md):
+
+``` r
+
+# Single .duckdb file (default)
+Sys.setenv(CODEMINER_DB_PATH = "/path/to/codeminer.duckdb")
+build_database()
+
+# Folder, data tables as per-table .duckdb files (matches single-file
+# query performance; recommended folder layout)
+dir.create("/path/to/codeminer-folder")
+Sys.setenv(CODEMINER_DB_PATH = "/path/to/codeminer-folder")
+build_database(format = "duckdb")
+
+# Folder, data tables as parquet (~35% smaller on disk; slower
+# recursive queries like CHILDREN())
+dir.create("/path/to/codeminer-parquet")
+Sys.setenv(CODEMINER_DB_PATH = "/path/to/codeminer-parquet")
+build_database(format = "parquet")
+```
+
+[`codeminer_connect()`](https://codeminer-io.github.io/codeminer/reference/codeminer_connect.md)
+figures out which layout you have automatically — no flags to remember
+at query time.
 
 ## Build a clinical code list
 

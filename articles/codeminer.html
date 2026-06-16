@@ -109,9 +109,9 @@ list of data frames:</p>
 <code class="sourceCode R"><span><span class="co"># Create a temporary database with dummy data</span></span>
 <span><span class="op">(</span><span class="va">db_path</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/create_dummy_database.html">create_dummy_database</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Dummy database ready to use!</span></span>
-<span><span class="co">#&gt; [1] "/tmp/RtmpWpswq3/file2763122320df.duckdb"</span></span>
+<span><span class="co">#&gt; [1] "/tmp/RtmppI9vpl/file3af3137d348d.duckdb"</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/Sys.getenv.html" class="external-link">Sys.getenv</a></span><span class="op">(</span><span class="st">"CODEMINER_DB_PATH"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] "/tmp/RtmpWpswq3/file2763122320df.duckdb"</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] "/tmp/RtmppI9vpl/file3af3137d348d.duckdb"</span></span></code></pre></div>
 <p><code>codeminer</code> resolves the database location using the
 following precedence:</p>
 <ol style="list-style-type: decimal">
@@ -135,7 +135,35 @@ current connection status with <code><a href="../reference/codeminer_status.html
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/codeminer_status.html">codeminer_status</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Workbench active</span></span>
-<span><span class="co">#&gt;   Main: <span style="color: #0000BB;">/tmp/RtmpWpswq3/file2763122320df.duckdb</span></span></span></code></pre></div>
+<span><span class="co">#&gt;   Main: <span style="color: #0000BB;">/tmp/RtmppI9vpl/file3af3137d348d.duckdb</span></span></span></code></pre></div>
+<div class="section level3">
+<h3 id="single-file-vs-folder">Single file vs folder<a class="anchor" aria-label="anchor" href="#single-file-vs-folder"></a>
+</h3>
+<p><code>CODEMINER_DB_PATH</code> can point at either a single
+<code>.duckdb</code> file (the default) <strong>or</strong> an existing
+directory. The directory form holds the per-table data files separately
+at the folder root, which makes the database easier to inspect,
+distribute, or sync to remote storage. Choose the layout when you call
+<code><a href="../reference/build_database.html">build_database()</a></code>:</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Single .duckdb file (default)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/Sys.setenv.html" class="external-link">Sys.setenv</a></span><span class="op">(</span>CODEMINER_DB_PATH <span class="op">=</span> <span class="st">"/path/to/codeminer.duckdb"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/build_database.html">build_database</a></span><span class="op">(</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Folder, data tables as per-table .duckdb files (matches single-file</span></span>
+<span><span class="co"># query performance; recommended folder layout)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/files2.html" class="external-link">dir.create</a></span><span class="op">(</span><span class="st">"/path/to/codeminer-folder"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/Sys.setenv.html" class="external-link">Sys.setenv</a></span><span class="op">(</span>CODEMINER_DB_PATH <span class="op">=</span> <span class="st">"/path/to/codeminer-folder"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/build_database.html">build_database</a></span><span class="op">(</span>format <span class="op">=</span> <span class="st">"duckdb"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Folder, data tables as parquet (~35% smaller on disk; slower</span></span>
+<span><span class="co"># recursive queries like CHILDREN())</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/files2.html" class="external-link">dir.create</a></span><span class="op">(</span><span class="st">"/path/to/codeminer-parquet"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/Sys.setenv.html" class="external-link">Sys.setenv</a></span><span class="op">(</span>CODEMINER_DB_PATH <span class="op">=</span> <span class="st">"/path/to/codeminer-parquet"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/build_database.html">build_database</a></span><span class="op">(</span>format <span class="op">=</span> <span class="st">"parquet"</span><span class="op">)</span></span></code></pre></div>
+<p><code><a href="../reference/codeminer_connect.html">codeminer_connect()</a></code> figures out which layout you have
+automatically — no flags to remember at query time.</p>
+</div>
 </div>
 <div class="section level2">
 <h2 id="build-a-clinical-code-list">Build a clinical code list<a class="anchor" aria-label="anchor" href="#build-a-clinical-code-list"></a>
@@ -149,7 +177,7 @@ current connection status with <code><a href="../reference/codeminer_status.html
 <code><a href="../reference/CODES.html">CODES()</a></code>: look up descriptions for a set of code in the
 given code system type</li>
 </ul>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/CODES.html">CODES</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"E10"</span>, <span class="st">"E11"</span><span class="op">)</span>,</span>
 <span>  type <span class="op">=</span> <span class="st">"ICD-10"</span></span>
@@ -168,7 +196,7 @@ given code system type</li>
 <code>DESCRIPTION():</code> search for codes that match a
 description</li>
 </ul>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/DESCRIPTION.html">DESCRIPTION</a></span><span class="op">(</span>pattern <span class="op">=</span> <span class="st">"cyst"</span>, type <span class="op">=</span> <span class="st">"ICD-10"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #0000BB;">&lt;codeminer_codelist&gt;</span>: 2 codes</span></span>
 <span><span class="co">#&gt; Code type: <span style="color: #0000BB;">"ICD-10"</span></span></span>
@@ -196,7 +224,7 @@ coverage, spotting any leaf codes worth including explicitly.</p>
 <code>list(nodes, edges)</code> suitable for downstream hierarchy
 analysis or tree rendering (e.g. <code>data.tree</code>,
 <code>ggraph</code>, <code>visNetwork</code>).</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">draft</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"E10"</span>, <span class="st">"E11"</span>, <span class="st">"E13"</span>, <span class="st">"E14"</span><span class="op">)</span></span>
 <span><span class="va">tree</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_relationship_tree.html">get_relationship_tree</a></span><span class="op">(</span><span class="va">draft</span>, type <span class="op">=</span> <span class="st">"ICD-10"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Using 'UKB v4' as latest version</span></span>
@@ -235,7 +263,7 @@ analysis or tree rendering (e.g. <code>data.tree</code>,
 codes that were in the original draft (<code>TRUE</code>) versus codes
 that were picked up by descendant expansion (<code>FALSE</code>). To
 inspect the subcodes the expansion added:</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/subset.html" class="external-link">subset</a></span><span class="op">(</span><span class="va">tree</span><span class="op">$</span><span class="va">nodes</span>, <span class="op">!</span><span class="va">in_input_set</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 40 × 4</span></span></span>
 <span><span class="co">#&gt;    code  term                                              category in_input_set</span></span>
@@ -258,7 +286,7 @@ internally — so every edge endpoint is guaranteed to appear in
 <p>For a defined codelist, the new <code>codes</code> argument on
 <code><a href="../reference/get_lookup_table.html">get_lookup_table()</a></code> is the most direct way to pull the
 matching terms + categories:</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/get_lookup_table.html">get_lookup_table</a></span><span class="op">(</span><span class="st">"ICD-10"</span>, codes <span class="op">=</span> <span class="va">draft</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/compute.html" class="external-link">collect</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 4 × 15</span></span></span>
 <span><span class="co">#&gt;   code  description   ICD10_CODE USAGE USAGE_UK MODIFIER_4 MODIFIER_5 QUALIFIERS</span></span>
@@ -284,7 +312,7 @@ database with <code><a href="../reference/add_lookup_table.html">add_lookup_tabl
 <code><a href="../reference/add_relationship_table.html">add_relationship_table()</a></code>. Each requires a data frame and a
 metadata object created with the corresponding <code>*_metadata()</code>
 constructor:</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">custom_lookup</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
 <span>  code <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"CUSTOM1"</span>, <span class="st">"CUSTOM2"</span><span class="op">)</span>,</span>
 <span>  description <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Custom code 1"</span>, <span class="st">"Custom code 2"</span><span class="op">)</span></span>
@@ -313,7 +341,7 @@ constructor:</p>
 <p>To remove a table, use the corresponding
 <code>remove_*_table()</code> function with the same identifying
 keys:</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/remove_lookup_table.html">remove_lookup_table</a></span><span class="op">(</span><span class="st">"custom_codes"</span>, <span class="st">"v1"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Lookup table <span style="color: #00BB00;">custom_codes_v1</span> removed.</span></span></code></pre></div>
 <p>Removing a table deletes both the data table and its metadata entry.
@@ -324,7 +352,7 @@ After removal, the same code type and version can be re-added.</p>
 </h3>
 <p>Use <code><a href="../reference/get_codeminer_metadata.html">get_codeminer_metadata()</a></code> to inspect the tables
 currently in the database:</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/get_codeminer_metadata.html">get_codeminer_metadata</a></span><span class="op">(</span><span class="st">"lookup"</span><span class="op">)</span></span>
 <span><span class="co">#&gt;      lookup_table_name     code_type lookup_version lookup_code_col</span></span>
 <span><span class="co">#&gt; 1           BNF_UKB v4           BNF         UKB v4        BNF_Code</span></span>
@@ -372,7 +400,7 @@ informational messages and ensures consistent version usage across a
 workflow.</p>
 <p>You can override this for the current session with
 <code><a href="../reference/codeminer_set_version.html">codeminer_set_version()</a></code>:</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Pin lookup and relationship versions for a code type</span></span>
 <span><span class="fu"><a href="../reference/codeminer_set_version.html">codeminer_set_version</a></span><span class="op">(</span></span>
 <span>  lookup       <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"ICD-10"</span> <span class="op">=</span> <span class="st">"UKB v4"</span><span class="op">)</span>,</span>
@@ -385,7 +413,7 @@ workflow.</p>
 <span><span class="op">)</span></span></code></pre></div>
 <p>Pins only affect the default <code>"latest"</code> resolution.
 Explicit version arguments always take precedence:</p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># This uses the pinned version for ICD-10:</span></span>
 <span><span class="fu"><a href="../reference/CODES.html">CODES</a></span><span class="op">(</span><span class="st">"E10"</span>, type <span class="op">=</span> <span class="st">"ICD-10"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #0000BB;">&lt;codeminer_codelist&gt;</span>: 1 code</span></span>
@@ -407,10 +435,10 @@ Explicit version arguments always take precedence:</p>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> E10   Type 1 diabetes mellitus ICD-10</span></span></code></pre></div>
 <p>To clear all version selections and return to automatic
 <code>"latest"</code> resolution:</p>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/codeminer_clear_versions.html">codeminer_clear_versions</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p>You can also clear versions selectively by code type:</p>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Clear only the ICD-10 lookup version</span></span>
 <span><span class="fu"><a href="../reference/codeminer_clear_versions.html">codeminer_clear_versions</a></span><span class="op">(</span>lookup <span class="op">=</span> <span class="st">"ICD-10"</span><span class="op">)</span></span>
 <span></span>
@@ -432,7 +460,7 @@ table type):</p>
 ICD-10,UKB v4,UKB v4
 Read v3,UKB v4,UKB v4
 SNOMED CT,GPS v1,GPS v1</code></pre>
-<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">cfg</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">read.csv</a></span><span class="op">(</span><span class="st">"codeminer_versions.csv"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/codeminer_set_version.html">codeminer_set_version</a></span><span class="op">(</span></span>
 <span>  lookup       <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/setNames.html" class="external-link">setNames</a></span><span class="op">(</span><span class="va">cfg</span><span class="op">$</span><span class="va">lookup</span>, <span class="va">cfg</span><span class="op">$</span><span class="va">code_type</span><span class="op">)</span>,</span>
@@ -441,12 +469,12 @@ SNOMED CT,GPS v1,GPS v1</code></pre>
 <p>Mapping pins use a <code>"from &gt; to"</code> key format and are
 best stored in a separate file or in JSON:</p>
 <p><strong>JSON format:</strong></p>
-<div class="sourceCode" id="cb20"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb20-1"><a href="#cb20-1" tabindex="-1"></a><span class="fu">{</span></span>
-<span id="cb20-2"><a href="#cb20-2" tabindex="-1"></a>  <span class="dt">"lookup"</span><span class="fu">:</span> <span class="fu">{</span><span class="dt">"ICD-10"</span><span class="fu">:</span> <span class="st">"UKB v4"</span><span class="fu">,</span> <span class="dt">"Read v3"</span><span class="fu">:</span> <span class="st">"UKB v4"</span><span class="fu">},</span></span>
-<span id="cb20-3"><a href="#cb20-3" tabindex="-1"></a>  <span class="dt">"relationship"</span><span class="fu">:</span> <span class="fu">{</span><span class="dt">"ICD-10"</span><span class="fu">:</span> <span class="st">"UKB v4"</span><span class="fu">},</span></span>
-<span id="cb20-4"><a href="#cb20-4" tabindex="-1"></a>  <span class="dt">"mapping"</span><span class="fu">:</span> <span class="fu">{</span><span class="dt">"Read v3 &gt; ICD-10"</span><span class="fu">:</span> <span class="st">"UKB v4"</span><span class="fu">}</span></span>
-<span id="cb20-5"><a href="#cb20-5" tabindex="-1"></a><span class="fu">}</span></span></code></pre></div>
-<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb21"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb21-1"><a href="#cb21-1" tabindex="-1"></a><span class="fu">{</span></span>
+<span id="cb21-2"><a href="#cb21-2" tabindex="-1"></a>  <span class="dt">"lookup"</span><span class="fu">:</span> <span class="fu">{</span><span class="dt">"ICD-10"</span><span class="fu">:</span> <span class="st">"UKB v4"</span><span class="fu">,</span> <span class="dt">"Read v3"</span><span class="fu">:</span> <span class="st">"UKB v4"</span><span class="fu">},</span></span>
+<span id="cb21-3"><a href="#cb21-3" tabindex="-1"></a>  <span class="dt">"relationship"</span><span class="fu">:</span> <span class="fu">{</span><span class="dt">"ICD-10"</span><span class="fu">:</span> <span class="st">"UKB v4"</span><span class="fu">},</span></span>
+<span id="cb21-4"><a href="#cb21-4" tabindex="-1"></a>  <span class="dt">"mapping"</span><span class="fu">:</span> <span class="fu">{</span><span class="dt">"Read v3 &gt; ICD-10"</span><span class="fu">:</span> <span class="st">"UKB v4"</span><span class="fu">}</span></span>
+<span id="cb21-5"><a href="#cb21-5" tabindex="-1"></a><span class="fu">}</span></span></code></pre></div>
+<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">cfg</span> <span class="op">&lt;-</span> <span class="fu">jsonlite</span><span class="fu">::</span><span class="fu"><a href="https://jeroen.r-universe.dev/jsonlite/reference/fromJSON.html" class="external-link">fromJSON</a></span><span class="op">(</span><span class="st">"codeminer_versions.json"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/codeminer_set_version.html">codeminer_set_version</a></span><span class="op">(</span></span>
 <span>  lookup       <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/unlist.html" class="external-link">unlist</a></span><span class="op">(</span><span class="va">cfg</span><span class="op">$</span><span class="va">lookup</span><span class="op">)</span>,</span>
@@ -470,7 +498,7 @@ values should be selected by default.</p>
 filterable column has an entry with <code>values</code> (all valid
 options) and <code>defaults</code> (applied when no override is
 given):</p>
-<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># When adding a lookup table with filters</span></span>
 <span><span class="fu"><a href="../reference/add_lookup_table.html">add_lookup_table</a></span><span class="op">(</span></span>
 <span>  <span class="va">my_snomed_lookup</span>,</span>
@@ -502,7 +530,7 @@ regardless of column values</li>
 <strong>A named list</strong>: apply explicit filters for this call
 only</li>
 </ul>
-<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Default: only active concepts (from metadata defaults)</span></span>
 <span><span class="fu"><a href="../reference/CODES.html">CODES</a></span><span class="op">(</span><span class="st">"all"</span>, type <span class="op">=</span> <span class="st">"SNOMED CT"</span><span class="op">)</span></span>
 <span></span>
@@ -532,7 +560,7 @@ when looking up descriptions. This is intentional — the two tables have
 different filterable columns and different semantics.</p>
 <p>To override filters on the target lookup as well, use session
 pinning:</p>
-<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Pin lookup filters for SNOMED CT</span></span>
 <span><span class="fu"><a href="../reference/codeminer_set_col_filters.html">codeminer_set_col_filters</a></span><span class="op">(</span></span>
 <span>  lookup <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"SNOMED CT"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>active_concept <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"0"</span>, <span class="st">"1"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
@@ -546,7 +574,7 @@ pinning:</p>
 </h3>
 <p>Like version pinning, you can pin col_filters for the entire
 session:</p>
-<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Pin: include inactive SNOMED concepts</span></span>
 <span><span class="fu"><a href="../reference/codeminer_set_col_filters.html">codeminer_set_col_filters</a></span><span class="op">(</span></span>
 <span>  lookup <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"SNOMED CT"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>active_concept <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"0"</span>, <span class="st">"1"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
@@ -559,7 +587,7 @@ session:</p>
 <h3 id="temporary-overrides">Temporary overrides<a class="anchor" aria-label="anchor" href="#temporary-overrides"></a>
 </h3>
 <p>For a scoped override, use <code><a href="../reference/with_col_filters.html">with_col_filters()</a></code>:</p>
-<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Temporarily include inactive concepts for this block only</span></span>
 <span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/with_col_filters.html">with_col_filters</a></span><span class="op">(</span></span>
 <span>  <span class="op">{</span></span>
@@ -574,7 +602,7 @@ session:</p>
 </h3>
 <p>If you need to add or change filters on an existing table without
 re-adding the data:</p>
-<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/update_lookup_metadata.html">update_lookup_metadata</a></span><span class="op">(</span></span>
 <span>  <span class="st">"SNOMED CT"</span>,</span>
 <span>  col_filters <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
@@ -587,7 +615,7 @@ re-adding the data:</p>
 </h3>
 <p><code><a href="../reference/get_col_filters.html">get_col_filters()</a></code> returns all registered filters, useful
 for building UIs:</p>
-<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Just defaults (for applying)</span></span>
 <span><span class="fu"><a href="../reference/get_col_filters.html">get_col_filters</a></span><span class="op">(</span>defaults_only <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span></span>
