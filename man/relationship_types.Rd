@@ -4,12 +4,15 @@
 \alias{relationship_types}
 \alias{RELATIONSHIP_TYPES_FROM}
 \alias{RELATIONSHIP_TYPES_TO}
-\title{Get relationship types for codes}
+\alias{RELATIONSHIP_TYPES}
+\title{Relationship types}
 \usage{
 RELATIONSHIP_TYPES_FROM(
   ...,
   type = getOption("codeminer.code_type"),
   relationship_version = getOption("codeminer.relationship_version", default = "latest"),
+  lookup_version = getOption("codeminer.lookup_version", default = "latest"),
+  preferred_description_only = TRUE,
   col_filters = "default"
 )
 
@@ -17,6 +20,18 @@ RELATIONSHIP_TYPES_TO(
   ...,
   type = getOption("codeminer.code_type"),
   relationship_version = getOption("codeminer.relationship_version", default = "latest"),
+  lookup_version = getOption("codeminer.lookup_version", default = "latest"),
+  preferred_description_only = TRUE,
+  col_filters = "default"
+)
+
+RELATIONSHIP_TYPES(
+  pattern = NULL,
+  type = getOption("codeminer.code_type"),
+  relationship_version = getOption("codeminer.relationship_version", default = "latest"),
+  lookup_version = getOption("codeminer.lookup_version", default = "latest"),
+  ignore_case = TRUE,
+  preferred_description_only = TRUE,
   col_filters = "default"
 )
 }
@@ -27,25 +42,48 @@ RELATIONSHIP_TYPES_TO(
 
 \item{relationship_version}{Relationship table version (character).}
 
+\item{lookup_version}{Lookup table version (character).}
+
+\item{preferred_description_only}{Logical. If \code{TRUE}, return only preferred
+descriptions.}
+
 \item{col_filters}{Column filters to apply. See \code{\link[=CODES]{CODES()}} for details.}
+
+\item{pattern}{Optional description pattern to filter the relationship types
+by. See \code{\link[stringr:str_detect]{stringr::str_detect()}} for details. \code{NULL} (default) returns all
+types.}
+
+\item{ignore_case}{If \code{TRUE} (default), ignore case when matching \code{pattern}.}
 }
 \value{
-A character vector of distinct relationship types.
+A \link[=as_codelist]{codeminer_codelist} of relationship types with their
+descriptions.
 }
 \description{
-These functions return the distinct relationship types that originate from or
-point to the supplied codes.
+Return relationship types as a \link[=as_codelist]{codeminer_codelist}, with each
+type's description looked up from the lookup table where available.
 }
 \details{
 \itemize{
-\item \code{RELATIONSHIP_TYPES_FROM()} returns relationship types originating from codes
-\item \code{RELATIONSHIP_TYPES_TO()} returns relationship types pointing to codes
+\item \code{RELATIONSHIP_TYPES_FROM()} — types originating from the supplied codes.
+\item \code{RELATIONSHIP_TYPES_TO()} — types pointing to the supplied codes.
+\item \code{RELATIONSHIP_TYPES()} — all types in a code type's relationship table,
+optionally filtered by a description \code{pattern} (like \code{\link[=DESCRIPTION]{DESCRIPTION()}}).
 }
+
+Relationship types are themselves codes (e.g. a SNOMED CT relationship type
+is a concept id), so they are described via the lookup table. A type with no
+matching lookup entry falls back to using its own value as the description.
+
+These functions are not applicable to purely hierarchical relationship
+tables (those with no type column); they error in that case. Use \code{\link[=CHILDREN]{CHILDREN()}}
+/ \code{\link[=PARENTS]{PARENTS()}} to traverse a hierarchy.
 }
 \examples{
 create_dummy_database()
-# RELATIONSHIP_TYPES_FROM returns types originating from codes
-# RELATIONSHIP_TYPES_TO returns types pointing to codes
+# RELATIONSHIP_TYPES_FROM() returns types originating from codes
+# RELATIONSHIP_TYPES_TO() returns types pointing to codes
+# RELATIONSHIP_TYPES() lists / searches all types for a code type
 }
 \seealso{
 Other Code relationships: 
