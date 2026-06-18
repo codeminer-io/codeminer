@@ -1,8 +1,9 @@
 #' Get the full relationship table for a code type
 #'
 #' Returns a lazy `dplyr::tbl()` containing the relationship table with
-#' standardised column names (`from`, `to`, `type`, `code_type`) plus all
-#' additional columns from the underlying database table. Call
+#' standardised column names (`from`, `to`, `code_type`, plus `type` for
+#' multi-type tables) and all additional columns from the underlying database
+#' table. Purely hierarchical tables have no `type` column. Call
 #' [dplyr::collect()] to materialise the result.
 #'
 #' This is useful for inspecting the raw relationship data used by
@@ -25,7 +26,8 @@
 #' @param call The calling environment. Passed to [codeminer_abort].
 #'
 #' @return A lazy `dplyr::tbl()` with standardised columns (`from`, `to`,
-#'   `type`, `code_type`) plus all other columns from the underlying table.
+#'   `code_type`, plus `type` for multi-type tables) and all other columns from
+#'   the underlying table.
 #' @export
 #' @family Clinical code lookups and mappings
 #' @seealso [PARENTS()], [CHILDREN()] for the common "give me ancestors /
@@ -88,24 +90,32 @@ get_relationship_table <- function(
     call = call
   )
 
+  # A purely hierarchical table has no type column (`type_col = NA`); drop it
+  # from the required-columns check and the standardisation below.
+  key_cols <- c(
+    from_col = meta$from_col,
+    to_col = meta$to_col,
+    type_col = meta$type_col
+  )
+  key_cols <- key_cols[!is.na(key_cols)]
+
   check_meta_columns_exist(
     tbl,
-    cols = c(
-      from_col = meta$from_col,
-      to_col = meta$to_col,
-      type_col = meta$type_col
-    ),
+    cols = key_cols,
     tbl_name = meta$relationship_table_name,
     metadata_type = "relationship",
     call = call
   )
 
-  # Standardise key columns, keep all others
+  # Standardise key columns, keep all others. `type` is only present for
+  # multi-type tables.
+  select_cols <- c(from = meta$from_col, to = meta$to_col)
+  if (!is.na(meta$type_col)) {
+    select_cols <- c(select_cols, type = meta$type_col)
+  }
   tbl <- dplyr::select(
     tbl,
-    from = .env$meta$from_col,
-    to = .env$meta$to_col,
-    type = .env$meta$type_col,
+    dplyr::all_of(select_cols),
     dplyr::everything()
   ) |>
     dplyr::mutate(code_type = .env$type)
@@ -125,6 +135,41 @@ get_relationship_table <- function(
   }
 
   tbl
+}
+
+#' Abort if a relationship table has no relationship-type dimension
+#'
+#' Type-dimension functions (`RELATIONSHIP_TYPES_FROM/TO`, `ATTRIBUTES_FOR`,
+#' `HAS_ATTRIBUTES`) are not applicable to a purely hierarchical relationship
+#' table, which has no type column (`type_col` is `NA`). Hierarchy traversal
+#' (`CHILDREN`/`PARENTS`) remains valid and must not call this.
+#'
+#' @param meta Resolved relationship metadata (single-row data frame / list).
+#' @param fn Name of the calling user-facing function, for the message.
+#' @param call Calling environment for the error.
+#' @return `meta` invisibly if it has a type dimension; otherwise aborts.
+#' @keywords internal
+#' @noRd
+abort_if_no_relationship_types <- function(
+  meta,
+  fn,
+  call = rlang::caller_env()
+) {
+  if (length(meta$type_col) == 1 && is.na(meta$type_col)) {
+    codeminer_abort(
+      c(
+        "{.fun {fn}} is not applicable to {.val {meta$code_type}}.",
+        "x" = paste0(
+          "Its relationship table contains only child-parent relationships ",
+          "and has no relationship/attribute types."
+        ),
+        "i" = "Use {.fun CHILDREN} or {.fun PARENTS} to traverse the hierarchy."
+      ),
+      class = "codeminer_no_relationship_types",
+      call = call
+    )
+  }
+  return(invisible(meta))
 }
 
 get_metadata_for_relationship <- function(
@@ -212,13 +257,15 @@ graph_closure <- function(
         dplyr::filter(.data[[type_colname]] %in% .env$rel_type)
     }
 
-    # Collect the edges
+    # Collect the edges. Only keep the type column when the table has one
+    # (purely hierarchical tables have `type_colname = NA`); it is not used for
+    # traversal, only carried through for the (multi-type) filter above.
+    keep_cols <- c(from_colname, to_colname)
+    if (length(type_colname) == 1 && !is.na(type_colname)) {
+      keep_cols <- c(keep_cols, type_colname)
+    }
     related_edges <- related_edges |>
-      dplyr::select(
-        !!from_colname := dplyr::all_of(from_colname),
-        !!to_colname := dplyr::all_of(to_colname),
-        !!type_colname := dplyr::all_of(type_colname)
-      ) |>
+      dplyr::select(dplyr::all_of(keep_cols)) |>
       dplyr::collect()
 
     # Combine with accumulated edges
@@ -280,6 +327,12 @@ graph_closure <- function(
 #' @param include_self Logical. If `TRUE`, include starting codes in result.
 #' @param max_depth Maximum traversal depth (integer).
 #' @param empty_warning Warning message when no codes are found (character).
+#' @param require_relationship_types Either `NULL` (default) for hierarchy
+#'   callers (`CHILDREN`/`PARENTS`), or the name of the calling type-dimension
+#'   function (e.g. `"ATTRIBUTES_FOR"`). When non-`NULL`, the traversal aborts
+#'   via [abort_if_no_relationship_types()] if the relationship table is purely
+#'   hierarchical (no type column); the supplied name is used in the error
+#'   message.
 #'
 #' @return A data frame with code information.
 #' @keywords internal
@@ -296,6 +349,7 @@ graph_closure_codes <- function(
   max_depth = Inf,
   empty_warning = "No valid codes found.",
   col_filters = "default",
+  require_relationship_types = NULL,
   call = rlang::caller_env()
 ) {
   check_code_type(code_type, call = call)
@@ -307,6 +361,18 @@ graph_closure_codes <- function(
     relationship_version,
     call = call
   )
+
+  # Type-dimension callers (e.g. ATTRIBUTES_FOR) pass their own name here so the
+  # guard can refuse a purely hierarchical table. Hierarchy callers (CHILDREN /
+  # PARENTS) leave it `NULL`.
+  if (!is.null(require_relationship_types)) {
+    abort_if_no_relationship_types(
+      meta,
+      fn = require_relationship_types,
+      call = call
+    )
+  }
+
   rel_table <- dplyr::tbl(con, meta$relationship_table_name)
 
   # Apply col_filters to relationship table before traversal
@@ -323,8 +389,9 @@ graph_closure_codes <- function(
     call = call
   )
 
-  # Resolve rel_type if it's a from_meta reference
-
+  # Resolve rel_type if it's a from_meta reference. For a purely hierarchical
+  # table this resolves to `NA`, which `graph_closure()` treats as "no type
+  # filter".
   if (inherits(rel_type, "from_meta")) {
     rel_type <- meta[[as.character(rel_type)]]
   }
@@ -544,7 +611,12 @@ get_relationship_tree <- function(
     call = call
   )
 
+  # A purely hierarchical table has no type column; `NA` means "every edge is
+  # child-parent", so there is nothing to filter on.
   hierarchy_rel <- rel_meta$child_parent_relationship_code
+  if (length(hierarchy_rel) == 1 && is.na(hierarchy_rel)) {
+    hierarchy_rel <- NULL
+  }
 
   # Expand the seed set to all descendants if requested. In this package
   # `from = child`, `to = parent`, so descendants of a seed are reached by
@@ -577,8 +649,9 @@ get_relationship_tree <- function(
     )
   }
 
-  # Fetch edges: both endpoints must be in the expanded set, and only the
-  # hierarchical relationship type.
+  # Fetch edges: both endpoints must be in the expanded set, and (for multi-type
+  # tables) only the hierarchical relationship type. A purely hierarchical table
+  # has no type column, so there is nothing to filter on.
   edges <- get_relationship_table(
     type = type,
     codes = expanded,
@@ -587,8 +660,11 @@ get_relationship_tree <- function(
     col_filters = col_filters,
     con = con,
     call = call
-  ) |>
-    dplyr::filter(.data$type %in% .env$hierarchy_rel) |>
+  )
+  if (!is.null(hierarchy_rel)) {
+    edges <- dplyr::filter(edges, .data$type %in% .env$hierarchy_rel)
+  }
+  edges <- edges |>
     dplyr::collect() |>
     dplyr::select(parent = "to", child = "from")
 

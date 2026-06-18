@@ -97,7 +97,9 @@ test_that("read_read2_trud() read2_relationship has correct structure", {
   rel <- result$read2_relationship$relationship
   expect_s3_class(rel$table, "data.frame")
   expect_equal(rel$metadata$code_type, "Read v2")
-  expect_equal(rel$metadata$child_parent_relationship_code, "is a")
+  # Purely hierarchical: no type column, so both type fields are NA.
+  expect_equal(rel$metadata$type_col, NA_character_)
+  expect_equal(rel$metadata$child_parent_relationship_code, NA_character_)
 })
 
 test_that("read_read2_trud() tables argument selects subset", {

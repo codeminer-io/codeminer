@@ -11,7 +11,7 @@
 # gate will then refuse pre-bump DBs with a "rebuild required" message.
 # See CLAUDE.md for what counts as a format change.
 current_schema_version <- function() {
-  3L
+  4L
 }
 
 required_db_metadata_columns <- function() {

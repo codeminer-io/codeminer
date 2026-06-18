@@ -195,12 +195,14 @@ test_that("get_relationship_table() returns a lazy tbl without explicit con", {
 })
 
 test_that("get_relationship_table() returns standardised columns plus extras", {
+  # ICD-10 is purely hierarchical, so there is no `type` column.
   result <- get_relationship_table("ICD-10") |> dplyr::collect()
-  expect_true(all(c("from", "to", "type", "code_type") %in% names(result)))
+  expect_true(all(c("from", "to", "code_type") %in% names(result)))
+  expect_false("type" %in% names(result))
   expect_true(nrow(result) > 0)
   expect_identical(unique(result$code_type), "ICD-10")
-  # At minimum the 4 standardised columns
-  expect_true(ncol(result) >= 4)
+  # At minimum the standardised from/to/code_type columns
+  expect_true(ncol(result) >= 3)
 })
 
 test_that("get_relationship_table() respects explicit version", {

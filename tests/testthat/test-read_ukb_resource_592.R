@@ -225,8 +225,8 @@ test_that("`build_prefix_hierarchy_len()` creates correct hierarchies", {
   result <- build_prefix_hierarchy_len(bnf_codes)
 
   expect_equal(nrow(result), 3)
-  expect_true(all(c("from", "to", "type") %in% names(result)))
-  expect_true(all(result$type == "is a"))
+  # Purely hierarchical: just `from`/`to`, no synthetic type column.
+  expect_named(result, c("from", "to"))
 
   # Check parent-child relationships
   expect_equal(
@@ -234,10 +234,10 @@ test_that("`build_prefix_hierarchy_len()` creates correct hierarchies", {
     # fmt: skip
     # nolint start
     tibble::tribble(
-      ~from,    ~to,  ~type,
-      "0101",   "01", "is a",
-      "0201",   "02", "is a",
-      "010101", "0101", "is a"
+      ~from,    ~to,
+      "0101",   "01",
+      "0201",   "02",
+      "010101", "0101"
       )
     # nolint end
   )

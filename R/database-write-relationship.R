@@ -239,9 +239,12 @@ update_relationship_metadata <- function(
 #' @inheritParams rlang::args_dots_empty
 #' @param from_col The column name for the source code in the relationship (default: "from")
 #' @param to_col The column name for the target code in the relationship (default: "to")
-#' @param type_col The column name for the relationship type (default: "type")
-#' @param child_parent_relationship_code The code value that indicates a
-#'   child-parent (is-a) relationship in the `type_col` column (default: "is a")
+#' @param type_col The column name for the relationship type, or `NA` (default)
+#'   when the relationship table is purely hierarchical (every edge is
+#'   child-parent, so there is no type column and no type filtering).
+#' @param child_parent_relationship_code The value in `type_col` that indicates a
+#'   child-parent (is-a) relationship, or `NA` (default) for a purely
+#'   hierarchical table. Must be `NA` if and only if `type_col` is `NA`.
 #' @param relationship_source The source of the relationship metadata (default: `NA_character_`)
 #' @param col_filters Optional column filter specification. A named list where
 #'   each element is a list with `values` (all valid values) and `defaults`
@@ -252,19 +255,30 @@ update_relationship_metadata <- function(
 #' @seealso [add_relationship_table()]
 #' @export
 #' @examples
-#' relationship_metadata("SNOMED-CT", relationship_version = "2023")
+#' # Purely hierarchical table (no type column): `type_col` and
+#' # `child_parent_relationship_code` both default to `NA`.
+#' relationship_metadata("ICD-10", relationship_version = "2023")
+#'
+#' # Multi-type table: name the type column and the value selecting is-a edges.
+#' relationship_metadata(
+#'   "SNOMED-CT",
+#'   relationship_version = "2023",
+#'   type_col = "typeId",
+#'   child_parent_relationship_code = "116680003"
+#' )
 relationship_metadata <- function(
   code_type,
   relationship_version = "v0",
   ...,
   from_col = "from",
   to_col = "to",
-  type_col = "type",
-  child_parent_relationship_code = "is a",
+  type_col = NA_character_,
+  child_parent_relationship_code = NA_character_,
   relationship_source = NA_character_,
   col_filters = NULL
 ) {
   rlang::check_dots_empty()
+  validate_type_col_pairing(type_col, child_parent_relationship_code)
 
   relationship_table_name <- paste(
     code_type,
@@ -312,5 +326,57 @@ validate_relationship_metadata <- function(
     )
   }
 
+  validate_type_col_pairing(
+    metadata$type_col,
+    metadata$child_parent_relationship_code,
+    call = call
+  )
+
   return(invisible(metadata))
+}
+
+#' Validate the `type_col` / `child_parent_relationship_code` pairing
+#'
+#' A relationship table either has a type column (so both `type_col` and the
+#' `child_parent_relationship_code` that selects hierarchical edges within it are
+#' set) or is purely hierarchical (no type column, so both are `NA`). One set and
+#' the other `NA` is contradictory.
+#'
+#' @param type_col The relationship type column name, or `NA`.
+#' @param child_parent_relationship_code The hierarchical type value, or `NA`.
+#' @param call The calling environment. Used to construct error message.
+#' @return `TRUE` invisibly if valid; otherwise aborts.
+#' @keywords internal
+#' @noRd
+validate_type_col_pairing <- function(
+  type_col,
+  child_parent_relationship_code,
+  call = rlang::caller_env()
+) {
+  type_col_na <- length(type_col) == 0 || is.na(type_col)
+  cpr_na <- length(child_parent_relationship_code) == 0 ||
+    is.na(child_parent_relationship_code)
+
+  if (type_col_na != cpr_na) {
+    codeminer_abort(
+      c(
+        paste0(
+          "{.arg type_col} and {.arg child_parent_relationship_code} ",
+          "must both be set or both be {.code NA}."
+        ),
+        "x" = paste0(
+          "Got {.arg type_col} = {.val {type_col}} and ",
+          "{.arg child_parent_relationship_code} = ",
+          "{.val {child_parent_relationship_code}}."
+        ),
+        "i" = paste0(
+          "Use {.code NA} for both when a relationship table is purely ",
+          "hierarchical (child-parent only, with no type column)."
+        )
+      ),
+      call = call
+    )
+  }
+
+  return(invisible(TRUE))
 }

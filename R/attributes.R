@@ -68,7 +68,8 @@ ATTRIBUTES_FOR <- function(
     include_self = FALSE,
     max_depth = 1,
     empty_warning = "No codes found with the specified attributes.",
-    col_filters = col_filters
+    col_filters = col_filters,
+    require_relationship_types = "ATTRIBUTES_FOR"
   )
 }
 
@@ -119,6 +120,7 @@ HAS_ATTRIBUTES <- function(
     include_self = FALSE,
     max_depth = 1,
     empty_warning = "No codes found with the specified attributes.",
-    col_filters = col_filters
+    col_filters = col_filters,
+    require_relationship_types = "HAS_ATTRIBUTES"
   )
 }

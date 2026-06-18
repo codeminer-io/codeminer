@@ -409,8 +409,6 @@ process_bnf_lkp <- function(.df, version, source) {
         relationship_version = version,
         from_col = "from",
         to_col = "to",
-        type_col = "type",
-        child_parent_relationship_code = "is a",
         relationship_source = source
       )
     )
@@ -459,8 +457,6 @@ process_icd9_lkp <- function(.df, version, source) {
         relationship_version = version,
         from_col = "from",
         to_col = "to",
-        type_col = "type",
-        child_parent_relationship_code = "is a",
         relationship_source = source
       )
     )
@@ -516,8 +512,6 @@ process_icd10_lkp <- function(.df, version, source) {
         relationship_version = version,
         from_col = "from",
         to_col = "to",
-        type_col = "type",
-        child_parent_relationship_code = "is a",
         relationship_source = source
       )
     )
@@ -586,8 +580,6 @@ process_read_v2_lkp <- function(.df, version, source) {
         relationship_version = version,
         from_col = "from",
         to_col = "to",
-        type_col = "type",
-        child_parent_relationship_code = "is a",
         relationship_source = source
       )
     )
@@ -1083,10 +1075,12 @@ extend_read_v2_icd10_from_ukb592 <- function(ukb592_result) {
 #'
 #' @param codes A character vector of codes
 #'
-#' @return A tibble with three columns:
+#' @return A tibble with two columns:
 #' - `from`: Child code
 #' - `to`: Nearest valid parent code
-#' - `type`: Type of relationship connecting `from` and `to`. Always "is a".
+#'
+#' Every edge is child-parent (is-a), so there is no type column: the
+#' relationship table is purely hierarchical.
 #'
 #' @examples
 #' \dontrun{
@@ -1125,8 +1119,14 @@ build_prefix_hierarchy_len <- function(codes) {
       )
   })
 
-  all_pairs |>
-    dplyr::mutate("type" = "is a")
+  # When no parent-child pairs exist (e.g. all codes are the same length),
+  # `map_dfr()` returns a zero-column frame; guarantee the `from`/`to` columns so
+  # the (empty) relationship table is still well-formed.
+  if (ncol(all_pairs) == 0) {
+    return(tibble::tibble(from = character(), to = character()))
+  }
+
+  all_pairs
 }
 
 #' Get a vector of ICD10 codes in ALT_CODE format for a specified start/end

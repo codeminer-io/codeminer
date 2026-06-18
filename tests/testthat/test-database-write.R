@@ -200,3 +200,56 @@ test_that("add_relationship_table fails with invalid metadata", {
     "The metadata in `test_metadata` is incomplete"
   )
 })
+
+test_that("relationship_metadata() defaults to a purely hierarchical table", {
+  meta <- relationship_metadata("foo", relationship_version = "v0")
+  expect_equal(meta$type_col, NA_character_)
+  expect_equal(meta$child_parent_relationship_code, NA_character_)
+})
+
+test_that("relationship_metadata() requires type_col and child_parent_relationship_code to be set together", {
+  # type_col set but no hierarchical value
+  expect_error(
+    relationship_metadata("foo", type_col = "type"),
+    class = "codeminer_error"
+  )
+  # hierarchical value set but no type column
+  expect_error(
+    relationship_metadata(
+      "foo",
+      child_parent_relationship_code = "is a"
+    ),
+    class = "codeminer_error"
+  )
+  # both set is valid
+  expect_no_error(
+    relationship_metadata(
+      "foo",
+      type_col = "type",
+      child_parent_relationship_code = "is a"
+    )
+  )
+  # both NA (default) is valid
+  expect_no_error(relationship_metadata("foo"))
+})
+
+test_that("add_relationship_table() rejects a half-specified type pairing on read-back", {
+  local_build_temp_database()
+
+  # Bypass the constructor's check to confirm validate_relationship_metadata()
+  # also catches a contradictory pairing.
+  meta <- relationship_metadata(
+    "foo",
+    type_col = "type",
+    child_parent_relationship_code = "is a"
+  )
+  meta$child_parent_relationship_code <- NA_character_
+
+  expect_error(
+    add_relationship_table(
+      data.frame(from = "a", to = "b", type = "is a"),
+      meta
+    ),
+    class = "codeminer_error"
+  )
+})
