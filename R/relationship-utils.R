@@ -345,10 +345,45 @@ graph_closure_codes <- function(
   missing_codes <- setdiff(codes, available_codes)
 
   if (length(missing_codes) > 0) {
+    # Classify the codes absent from the relationship table: those present in
+    # the lookup point to a lookup/relationship version mismatch (or a code with
+    # no recorded relationships); those absent from both are likely invalid.
+    in_lookup <- codes_present_in_lookup(
+      missing_codes,
+      code_type,
+      lookup_version,
+      con
+    )
+    not_in_lookup <- setdiff(missing_codes, in_lookup)
+    n_in <- length(in_lookup)
+    n_out <- length(not_in_lookup)
+
+    extra <- c(
+      if (n_in > 0) {
+        c(
+          "i" = paste0(
+            "{n_in} of these {cli::qty(n_in)}{?is/are} in the {code_type} lookup ",
+            "table but absent from its relationship table — they may have no ",
+            "recorded relationships, or the lookup and relationship versions may ",
+            "be mismatched."
+          )
+        )
+      },
+      if (n_out > 0) {
+        c(
+          "i" = paste0(
+            "{n_out} of these {cli::qty(n_out)}{?is/are} not in the {code_type} ",
+            "lookup table either — they may be invalid codes."
+          )
+        )
+      }
+    )
+
     missing_codes_warning(
       missing_codes,
       table_type = "relationship",
-      table_meta = meta
+      table_meta = meta,
+      extra = extra
     )
   }
 
@@ -378,12 +413,23 @@ graph_closure_codes <- function(
     )))
   }
 
-  result <- CODES(
-    result_codes,
-    type = code_type,
-    lookup_version = lookup_version,
-    preferred_description_only = preferred_description_only,
-    col_filters = col_filters
+  # Codes reached by traversal are looked up for descriptions; if any are absent
+  # from the lookup, enrich the resulting warning with the likely cause.
+  result <- with_lookup_miss_hint(
+    CODES(
+      result_codes,
+      type = code_type,
+      lookup_version = lookup_version,
+      preferred_description_only = preferred_description_only,
+      col_filters = col_filters
+    ),
+    hint = c(
+      "i" = paste0(
+        "These codes are in the {code_type} relationship table but absent from ",
+        "its lookup table — check the lookup and relationship versions were built ",
+        "together."
+      )
+    )
   )
 
   return(result)

@@ -139,7 +139,18 @@ MAP <- function(
     )
   }
   mapped_codes <- unique(mapping$to)
-  return(CODES(mapped_codes, type = to, lookup_version = lookup_version))
+  # Mapped target codes are looked up for descriptions; if any are absent from
+  # the target lookup, enrich the resulting warning with the likely cause.
+  return(with_lookup_miss_hint(
+    CODES(mapped_codes, type = to, lookup_version = lookup_version),
+    hint = c(
+      "i" = paste0(
+        "These codes are in the {from} to {to} mapping table but absent from the ",
+        "{to} lookup table — check the mapping and lookup versions were built ",
+        "together."
+      )
+    )
+  ))
 }
 
 #' Get the full mapping table for a pair of code types

@@ -301,6 +301,32 @@ CODES_LIKE <- function(
   return(result)
 }
 
+#' Which of `codes` are present in a code type's lookup table
+#'
+#' Existence check used to classify codes that are absent from a relationship
+#' table: those that *are* in the lookup point to a lookup/relationship version
+#' mismatch, while those absent from both are likely invalid codes. Runs without
+#' `col_filters` — a code filtered out by a `col_filter` still exists.
+#'
+#' @param codes Character vector of codes to check.
+#' @param code_type The code type.
+#' @param lookup_version The lookup version.
+#' @param con Database connection.
+#' @return The subset of `codes` present in the lookup table.
+#' @keywords internal
+#' @noRd
+codes_present_in_lookup <- function(codes, code_type, lookup_version, con) {
+  get_lookup_table(
+    code_type,
+    codes = codes,
+    lookup_version = lookup_version,
+    col_filters = NULL,
+    con = con
+  ) |>
+    dplyr::distinct(.data$code) |>
+    dplyr::pull(.data$code)
+}
+
 #' Get the full lookup table for a code type
 #'
 #' Returns a lazy `dplyr::tbl()` containing the lookup table with standardised
