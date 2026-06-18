@@ -146,7 +146,7 @@ MAP <- function(
     hint = c(
       "i" = paste0(
         "These codes are in the {from} to {to} mapping table but absent from the ",
-        "{to} lookup table — check the mapping and lookup versions were built ",
+        "{to} lookup table - check the mapping and lookup versions were built ",
         "together."
       )
     )

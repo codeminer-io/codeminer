@@ -219,7 +219,7 @@ missing_codes_warning <- function(
   # Optional caller-supplied bullets explaining the likely cause (e.g. a
   # lookup/relationship version mismatch). These reference values in the
   # caller's frame (`.envir`), whereas the base message above references this
-  # function's locals — two different environments. Render `extra` here in
+  # function's locals - two different environments. Render `extra` here in
   # `.envir`, then brace-escape so the package-level cli pass below treats the
   # result as literal text and the base message still interpolates correctly.
   if (!is.null(extra)) {
@@ -249,7 +249,7 @@ missing_codes_warning <- function(
 #'
 #' Runs `expr` and, if it raises a `codeminer_missing_codes` warning for a
 #' *lookup* miss (e.g. from [CODES()] when describing codes derived from a
-#' relationship or mapping table), re-raises that warning with `hint` appended —
+#' relationship or mapping table), re-raises that warning with `hint` appended,
 #' explaining the likely lookup/relationship (or mapping) version mismatch.
 #'
 #' The original warning is muffled and the enriched one is raised *after* `expr`

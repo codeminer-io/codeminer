@@ -306,7 +306,7 @@ CODES_LIKE <- function(
 #' Existence check used to classify codes that are absent from a relationship
 #' table: those that *are* in the lookup point to a lookup/relationship version
 #' mismatch, while those absent from both are likely invalid codes. Runs without
-#' `col_filters` — a code filtered out by a `col_filter` still exists.
+#' `col_filters`: a code filtered out by a `col_filter` still exists.
 #'
 #' @param codes Character vector of codes to check.
 #' @param code_type The code type.

@@ -363,7 +363,7 @@ graph_closure_codes <- function(
         c(
           "i" = paste0(
             "{n_in} of these {cli::qty(n_in)}{?is/are} in the {code_type} lookup ",
-            "table but absent from its relationship table — they may have no ",
+            "table but absent from its relationship table - they may have no ",
             "recorded relationships, or the lookup and relationship versions may ",
             "be mismatched."
           )
@@ -373,7 +373,7 @@ graph_closure_codes <- function(
         c(
           "i" = paste0(
             "{n_out} of these {cli::qty(n_out)}{?is/are} not in the {code_type} ",
-            "lookup table either — they may be invalid codes."
+            "lookup table either - they may be invalid codes."
           )
         )
       }
@@ -426,7 +426,7 @@ graph_closure_codes <- function(
     hint = c(
       "i" = paste0(
         "These codes are in the {code_type} relationship table but absent from ",
-        "its lookup table — check the lookup and relationship versions were built ",
+        "its lookup table - check the lookup and relationship versions were built ",
         "together."
       )
     )
