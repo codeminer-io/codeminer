@@ -3,15 +3,16 @@ suppressMessages(create_dummy_database(.local = TRUE))
 # Collect every codeminer_missing_codes warning raised while evaluating `expr`,
 # muffling them so they don't surface as test noise.
 collect_missing_code_warnings <- function(expr) {
-  warns <- list()
+  state <- new.env(parent = emptyenv())
+  state$warns <- list()
   withCallingHandlers(
     force(expr),
     codeminer_missing_codes = function(w) {
-      warns[[length(warns) + 1]] <<- w
+      state$warns <- c(state$warns, list(w))
       invokeRestart("muffleWarning")
     }
   )
-  warns
+  state$warns
 }
 
 test_that("relationship traversal enriches a lookup miss and does not double-warn", {

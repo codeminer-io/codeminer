@@ -267,21 +267,24 @@ missing_codes_warning <- function(
 #' @keywords internal
 #' @noRd
 with_lookup_miss_hint <- function(expr, hint, .envir = rlang::caller_env()) {
-  captured <- NULL
+  # The handler runs in its own scope; stash the intercepted condition in an
+  # explicit environment (rather than via `<<-`) so it survives to be re-raised
+  # after `expr` returns.
+  state <- new.env(parent = emptyenv())
   result <- withCallingHandlers(
     expr,
     codeminer_missing_codes = function(cnd) {
       if (identical(cnd$table_type, "lookup")) {
-        captured <<- cnd
+        state$captured <- cnd
         rlang::cnd_muffle(cnd)
       }
     }
   )
 
-  if (!is.null(captured)) {
+  if (!is.null(state$captured)) {
     missing_codes_warning(
-      captured$missing_codes,
-      table_meta = captured$table_meta,
+      state$captured$missing_codes,
+      table_meta = state$captured$table_meta,
       table_type = "lookup",
       extra = hint,
       .envir = .envir
