@@ -36,7 +36,7 @@ requested, a named list of data frames.
 create_dummy_database()
 #> ✔ Dummy database ready to use!
 #> ℹ To reconnect to your previous database:
-#>   `Sys.setenv(CODEMINER_DB_PATH = "/tmp/RtmpqPRmeg/file1ad2c7eac3e.duckdb")`
+#>   `Sys.setenv(CODEMINER_DB_PATH = "/tmp/RtmpJHulfS/file1a435a1d6c04.duckdb")`
 #>   `codeminer_connect()`
 get_codeminer_metadata()
 #> $lookup
@@ -115,10 +115,10 @@ get_codeminer_metadata()
 #> 3  ICD-10_relationship_UKB v4    ICD-10               UKB v4     from     to
 #> 4 Read v2_relationship_UKB v4   Read v2               UKB v4     from     to
 #>   type_col child_parent_relationship_code
-#> 1     type                           is a
-#> 2     type                           is a
-#> 3     type                           is a
-#> 4     type                           is a
+#> 1     <NA>                           <NA>
+#> 2     <NA>                           <NA>
+#> 3     <NA>                           <NA>
+#> 4     <NA>                           <NA>
 #>                                  relationship_source col_filters
 #> 1 https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592        <NA>
 #> 2 https://biobank.ndph.ox.ac.uk/ukb/refer.cgi?id=592        <NA>

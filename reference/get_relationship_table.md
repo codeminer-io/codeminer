@@ -3,8 +3,9 @@
 Returns a lazy
 [`dplyr::tbl()`](https://dplyr.tidyverse.org/reference/tbl.html)
 containing the relationship table with standardised column names
-(`from`, `to`, `type`, `code_type`) plus all additional columns from the
-underlying database table. Call
+(`from`, `to`, `code_type`, plus `type` for multi-type tables) and all
+additional columns from the underlying database table. Purely
+hierarchical tables have no `type` column. Call
 [`dplyr::collect()`](https://dplyr.tidyverse.org/reference/compute.html)
 to materialise the result.
 
@@ -69,8 +70,8 @@ get_relationship_table(
 ## Value
 
 A lazy [`dplyr::tbl()`](https://dplyr.tidyverse.org/reference/tbl.html)
-with standardised columns (`from`, `to`, `type`, `code_type`) plus all
-other columns from the underlying table.
+with standardised columns (`from`, `to`, `code_type`, plus `type` for
+multi-type tables) and all other columns from the underlying table.
 
 ## Details
 
@@ -104,25 +105,25 @@ Other Clinical code lookups and mappings:
 create_dummy_database()
 #> ✔ Dummy database ready to use!
 #> ℹ To reconnect to your previous database:
-#>   `Sys.setenv(CODEMINER_DB_PATH = "/tmp/RtmpqPRmeg/file1ad25ff0a344.duckdb")`
+#>   `Sys.setenv(CODEMINER_DB_PATH = "/tmp/RtmpJHulfS/file1a43fab9ba2.duckdb")`
 #>   `codeminer_connect()`
 
 # Get the full ICD-10 relationship table
 get_relationship_table("ICD-10") |> dplyr::collect()
 #> ℹ Using 'UKB v4' as latest version
-#> # A tibble: 140 × 4
-#>    from  to    type  code_type
-#>    <chr> <chr> <chr> <chr>    
-#>  1 A000  A00   is a  ICD-10   
-#>  2 A001  A00   is a  ICD-10   
-#>  3 A009  A00   is a  ICD-10   
-#>  4 A020  A02   is a  ICD-10   
-#>  5 A021  A02   is a  ICD-10   
-#>  6 A022  A02   is a  ICD-10   
-#>  7 A028  A02   is a  ICD-10   
-#>  8 A029  A02   is a  ICD-10   
-#>  9 A170  A17   is a  ICD-10   
-#> 10 A171  A17   is a  ICD-10   
+#> # A tibble: 140 × 3
+#>    from  to    code_type
+#>    <chr> <chr> <chr>    
+#>  1 A000  A00   ICD-10   
+#>  2 A001  A00   ICD-10   
+#>  3 A009  A00   ICD-10   
+#>  4 A020  A02   ICD-10   
+#>  5 A021  A02   ICD-10   
+#>  6 A022  A02   ICD-10   
+#>  7 A028  A02   ICD-10   
+#>  8 A029  A02   ICD-10   
+#>  9 A170  A17   ICD-10   
+#> 10 A171  A17   ICD-10   
 #> # ℹ 130 more rows
 
 # Default endpoints = "both": only internal edges of the input set
@@ -131,11 +132,11 @@ get_relationship_table(
   "ICD-10",
   codes = c("E10", "E101", "E102")
 ) |> dplyr::collect()
-#> # A tibble: 2 × 4
-#>   from  to    type  code_type
-#>   <chr> <chr> <chr> <chr>    
-#> 1 E101  E10   is a  ICD-10   
-#> 2 E102  E10   is a  ICD-10   
+#> # A tibble: 2 × 3
+#>   from  to    code_type
+#>   <chr> <chr> <chr>    
+#> 1 E101  E10   ICD-10   
+#> 2 E102  E10   ICD-10   
 
 # endpoints = "either": also surfaces edges crossing the boundary —
 # e.g. the parent of E10 and any siblings of E101 / E102. Rarely
@@ -145,17 +146,17 @@ get_relationship_table(
   codes = c("E10", "E101", "E102"),
   endpoints = "either"
 ) |> dplyr::collect()
-#> # A tibble: 10 × 4
-#>    from  to    type  code_type
-#>    <chr> <chr> <chr> <chr>    
-#>  1 E100  E10   is a  ICD-10   
-#>  2 E101  E10   is a  ICD-10   
-#>  3 E102  E10   is a  ICD-10   
-#>  4 E103  E10   is a  ICD-10   
-#>  5 E104  E10   is a  ICD-10   
-#>  6 E105  E10   is a  ICD-10   
-#>  7 E106  E10   is a  ICD-10   
-#>  8 E107  E10   is a  ICD-10   
-#>  9 E108  E10   is a  ICD-10   
-#> 10 E109  E10   is a  ICD-10   
+#> # A tibble: 10 × 3
+#>    from  to    code_type
+#>    <chr> <chr> <chr>    
+#>  1 E100  E10   ICD-10   
+#>  2 E101  E10   ICD-10   
+#>  3 E102  E10   ICD-10   
+#>  4 E103  E10   ICD-10   
+#>  5 E104  E10   ICD-10   
+#>  6 E105  E10   ICD-10   
+#>  7 E106  E10   ICD-10   
+#>  8 E107  E10   ICD-10   
+#>  9 E108  E10   ICD-10   
+#> 10 E109  E10   ICD-10   
 ```

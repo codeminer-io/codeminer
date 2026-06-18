@@ -14,8 +14,8 @@ relationship_metadata(
   ...,
   from_col = "from",
   to_col = "to",
-  type_col = "type",
-  child_parent_relationship_code = "is a",
+  type_col = NA_character_,
+  child_parent_relationship_code = NA_character_,
   relationship_source = NA_character_,
   col_filters = NULL
 )
@@ -47,12 +47,15 @@ relationship_metadata(
 
 - type_col:
 
-  The column name for the relationship type (default: "type")
+  The column name for the relationship type, or `NA` (default) when the
+  relationship table is purely hierarchical (every edge is child-parent,
+  so there is no type column and no type filtering).
 
 - child_parent_relationship_code:
 
-  The code value that indicates a child-parent (is-a) relationship in
-  the `type_col` column (default: "is a")
+  The value in `type_col` that indicates a child-parent (is-a)
+  relationship, or `NA` (default) for a purely hierarchical table. Must
+  be `NA` if and only if `type_col` is `NA`.
 
 - relationship_source:
 
@@ -75,7 +78,44 @@ A list containing the relationship metadata
 ## Examples
 
 ``` r
-relationship_metadata("SNOMED-CT", relationship_version = "2023")
+# Purely hierarchical table (no type column): `type_col` and
+# `child_parent_relationship_code` both default to `NA`.
+relationship_metadata("ICD-10", relationship_version = "2023")
+#> $relationship_table_name
+#> [1] "ICD-10_relationship_2023"
+#> 
+#> $code_type
+#> [1] "ICD-10"
+#> 
+#> $relationship_version
+#> [1] "2023"
+#> 
+#> $from_col
+#> [1] "from"
+#> 
+#> $to_col
+#> [1] "to"
+#> 
+#> $type_col
+#> [1] NA
+#> 
+#> $child_parent_relationship_code
+#> [1] NA
+#> 
+#> $relationship_source
+#> [1] NA
+#> 
+#> $col_filters
+#> [1] NA
+#> 
+
+# Multi-type table: name the type column and the value selecting is-a edges.
+relationship_metadata(
+  "SNOMED-CT",
+  relationship_version = "2023",
+  type_col = "typeId",
+  child_parent_relationship_code = "116680003"
+)
 #> $relationship_table_name
 #> [1] "SNOMED-CT_relationship_2023"
 #> 
@@ -92,10 +132,10 @@ relationship_metadata("SNOMED-CT", relationship_version = "2023")
 #> [1] "to"
 #> 
 #> $type_col
-#> [1] "type"
+#> [1] "typeId"
 #> 
 #> $child_parent_relationship_code
-#> [1] "is a"
+#> [1] "116680003"
 #> 
 #> $relationship_source
 #> [1] NA
