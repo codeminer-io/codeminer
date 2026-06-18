@@ -39,12 +39,14 @@ workbench connection.}
 }
 \value{
 A lazy \code{dplyr::tbl()} with standardised columns (\code{from}, \code{to},
-\code{type}, \code{code_type}) plus all other columns from the underlying table.
+\code{code_type}, plus \code{type} for multi-type tables) and all other columns from
+the underlying table.
 }
 \description{
 Returns a lazy \code{dplyr::tbl()} containing the relationship table with
-standardised column names (\code{from}, \code{to}, \code{type}, \code{code_type}) plus all
-additional columns from the underlying database table. Call
+standardised column names (\code{from}, \code{to}, \code{code_type}, plus \code{type} for
+multi-type tables) and all additional columns from the underlying database
+table. Purely hierarchical tables have no \code{type} column. Call
 \code{\link[dplyr:compute]{dplyr::collect()}} to materialise the result.
 }
 \details{

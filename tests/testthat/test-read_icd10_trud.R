@@ -158,7 +158,9 @@ test_that("read_icd10_trud() returns relationship table", {
   rel <- result$icd10_relationship$relationship
   expect_s3_class(rel$table, "data.frame")
   expect_equal(rel$metadata$code_type, "ICD-10")
-  expect_equal(rel$metadata$child_parent_relationship_code, "is a")
+  # Purely hierarchical: no type column, so both type fields are NA.
+  expect_equal(rel$metadata$type_col, NA_character_)
+  expect_equal(rel$metadata$child_parent_relationship_code, NA_character_)
 })
 
 test_that("read_icd10_trud() uses custom version", {

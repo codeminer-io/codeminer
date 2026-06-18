@@ -106,11 +106,15 @@ read_read3_trud <- function(
 
   # `read3_lkp` needs the hierarchy to derive each code's chapter category,
   # so always read V3hier.v3 when either table is requested.
+  # V3hier.v3 has a third column: an unused per-edge ordering integer (not a
+  # semantic relationship type). Only the child/parent codes are needed, so
+  # read columns 1-2 and leave the third out entirely.
   hier <- data.table::fread(
     file.path(v3_dir, "V3hier.v3"),
     sep = "|",
     header = FALSE,
-    col.names = c("child_code", "parent_code", "relationship_type"),
+    select = 1:2,
+    col.names = c("child_code", "parent_code"),
     colClasses = "character"
   )
 
@@ -190,17 +194,15 @@ read_read3_trud <- function(
   if ("read3_relationship" %in% tables) {
     cli::cli_inform("Loading Read 3 hierarchy...")
 
-    # CTV3 V3hier.v3's `relationship_type` column is a per-pair sequence
-    # number (not a semantic label like "is a"). Every row is a valid
-    # parent-child edge, so set `child_parent_relationship_code = NA` to tell
-    # `graph_closure()` to skip the type filter entirely.
+    # Every V3hier.v3 row is a child-parent edge (the dropped third column was
+    # only an ordering integer), so this is a purely hierarchical table: leave
+    # `type_col` / `child_parent_relationship_code` as their NA defaults so
+    # traversal follows every edge.
     read3_relationship_metadata <- relationship_metadata(
       code_type = "Read v3",
       relationship_version = version,
       from_col = "child_code",
       to_col = "parent_code",
-      type_col = "relationship_type",
-      child_parent_relationship_code = NA_character_,
       relationship_source = source
     )
 
@@ -230,10 +232,8 @@ read_read3_trud <- function(
 #' @return The same lookup table with a new `category` column.
 #' @noRd
 read3_attach_category <- function(read3_lkp_table, hier_table) {
-  # V3hier.v3 lists one row per (child, parent) pair with `relationship_type`
-  # as a per-pair sequence number (NOT a semantic label like "is a"). Every
-  # row is a valid hierarchical edge for the chapter walk, so dedup on
-  # (child, parent) rather than filtering by relationship_type.
+  # Every V3hier.v3 row is a valid child-parent edge for the chapter walk;
+  # dedup on (child, parent) in case the same edge appears more than once.
   hier_edges <- hier_table |>
     dplyr::distinct(.data$child_code, .data$parent_code)
 

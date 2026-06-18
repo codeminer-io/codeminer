@@ -46,6 +46,7 @@ RELATIONSHIP_TYPES_FROM <- function(
     relationship_version,
     call = rlang::caller_env()
   )
+  abort_if_no_relationship_types(meta, fn = "RELATIONSHIP_TYPES_FROM")
   rel_table <- dplyr::tbl(con, meta$relationship_table_name)
 
   # Apply col_filters to relationship table
@@ -134,6 +135,7 @@ RELATIONSHIP_TYPES_TO <- function(
     relationship_version,
     call = rlang::caller_env()
   )
+  abort_if_no_relationship_types(meta, fn = "RELATIONSHIP_TYPES_TO")
   rel_table <- dplyr::tbl(con, meta$relationship_table_name)
 
   # Apply col_filters to relationship table

@@ -68,7 +68,14 @@ test_that("CHILDREN() and PARENTS() return all hierarchy descendants/ancestors a
     to = c("parent", "parent", "child1", "parent"),
     type = c("is a", "is a", "is a", "has a")
   )
-  add_relationship_table(dummy_relationships, relationship_metadata(test_type))
+  add_relationship_table(
+    dummy_relationships,
+    relationship_metadata(
+      test_type,
+      type_col = "type",
+      child_parent_relationship_code = "is a"
+    )
+  )
 
   children_result <- CHILDREN("parent", type = "dummy")
   expect_identical(

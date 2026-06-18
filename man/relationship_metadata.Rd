@@ -10,8 +10,8 @@ relationship_metadata(
   ...,
   from_col = "from",
   to_col = "to",
-  type_col = "type",
-  child_parent_relationship_code = "is a",
+  type_col = NA_character_,
+  child_parent_relationship_code = NA_character_,
   relationship_source = NA_character_,
   col_filters = NULL
 )
@@ -27,10 +27,13 @@ relationship_metadata(
 
 \item{to_col}{The column name for the target code in the relationship (default: "to")}
 
-\item{type_col}{The column name for the relationship type (default: "type")}
+\item{type_col}{The column name for the relationship type, or \code{NA} (default)
+when the relationship table is purely hierarchical (every edge is
+child-parent, so there is no type column and no type filtering).}
 
-\item{child_parent_relationship_code}{The code value that indicates a
-child-parent (is-a) relationship in the \code{type_col} column (default: "is a")}
+\item{child_parent_relationship_code}{The value in \code{type_col} that indicates a
+child-parent (is-a) relationship, or \code{NA} (default) for a purely
+hierarchical table. Must be \code{NA} if and only if \code{type_col} is \code{NA}.}
 
 \item{relationship_source}{The source of the relationship metadata (default: \code{NA_character_})}
 
@@ -47,7 +50,17 @@ to generate the necessary metadata when adding a new relationship table to
 the database with \code{\link[=add_relationship_table]{add_relationship_table()}}.
 }
 \examples{
-relationship_metadata("SNOMED-CT", relationship_version = "2023")
+# Purely hierarchical table (no type column): `type_col` and
+# `child_parent_relationship_code` both default to `NA`.
+relationship_metadata("ICD-10", relationship_version = "2023")
+
+# Multi-type table: name the type column and the value selecting is-a edges.
+relationship_metadata(
+  "SNOMED-CT",
+  relationship_version = "2023",
+  type_col = "typeId",
+  child_parent_relationship_code = "116680003"
+)
 }
 \seealso{
 \code{\link[=add_relationship_table]{add_relationship_table()}}

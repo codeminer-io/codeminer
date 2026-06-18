@@ -50,7 +50,14 @@ test_that("RELATIONSHIP_TYPES_FROM() and RELATIONSHIP_TYPES_TO() handle multiple
     to = c("attr1", "attr1", "attr2"),
     type = c("type_a", "type_b", "type_c")
   )
-  add_relationship_table(dummy_relationships, relationship_metadata(test_type))
+  add_relationship_table(
+    dummy_relationships,
+    relationship_metadata(
+      test_type,
+      type_col = "type",
+      child_parent_relationship_code = "is a"
+    )
+  )
 
   # Multiple codes in FROM
   types_from <- RELATIONSHIP_TYPES_FROM(
@@ -78,7 +85,14 @@ test_that("RELATIONSHIP_TYPES_FROM() and RELATIONSHIP_TYPES_TO() warn for missin
     to = "attr1",
     type = "has attribute"
   )
-  add_relationship_table(dummy_relationships, relationship_metadata(test_type))
+  add_relationship_table(
+    dummy_relationships,
+    relationship_metadata(
+      test_type,
+      type_col = "type",
+      child_parent_relationship_code = "is a"
+    )
+  )
 
   # Missing codes should trigger warning
   expect_warning(

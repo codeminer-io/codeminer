@@ -64,7 +64,14 @@ test_that("ATTRIBUTES_FOR() and HAS_ATTRIBUTES() filter by relationship_types", 
     to = c("attr1", "attr2", "attr3"),
     type = c("has attribute", "has property", "has attribute")
   )
-  add_relationship_table(dummy_relationships, relationship_metadata(test_type))
+  add_relationship_table(
+    dummy_relationships,
+    relationship_metadata(
+      test_type,
+      type_col = "type",
+      child_parent_relationship_code = "has attribute"
+    )
+  )
 
   # Filter for only "has attribute"
   result <- ATTRIBUTES_FOR(
@@ -211,7 +218,14 @@ test_that("ATTRIBUTES_FOR() only returns immediate attributes (max_depth = 1)", 
     to = c("attr1", "attr2"),
     type = c("has attribute", "has attribute")
   )
-  add_relationship_table(dummy_relationships, relationship_metadata(test_type))
+  add_relationship_table(
+    dummy_relationships,
+    relationship_metadata(
+      test_type,
+      type_col = "type",
+      child_parent_relationship_code = "has attribute"
+    )
+  )
 
   result <- ATTRIBUTES_FOR("code1", type = test_type)
 
@@ -233,7 +247,14 @@ test_that("ATTRIBUTES_FOR() and HAS_ATTRIBUTES() return empty for codes with no 
     to = character(0),
     type = character(0)
   )
-  add_relationship_table(dummy_relationships, relationship_metadata(test_type))
+  add_relationship_table(
+    dummy_relationships,
+    relationship_metadata(
+      test_type,
+      type_col = "type",
+      child_parent_relationship_code = "has attribute"
+    )
+  )
 
   # ATTRIBUTES_FOR
   suppressWarnings(
@@ -288,7 +309,14 @@ test_that("ATTRIBUTES_FOR() works with multiple codes", {
     to = c("attr1", "attr2", "attr3"),
     type = c("has attribute", "has attribute", "has attribute")
   )
-  add_relationship_table(dummy_relationships, relationship_metadata(test_type))
+  add_relationship_table(
+    dummy_relationships,
+    relationship_metadata(
+      test_type,
+      type_col = "type",
+      child_parent_relationship_code = "has attribute"
+    )
+  )
 
   result <- ATTRIBUTES_FOR(
     c("code1", "code2"),

@@ -140,8 +140,6 @@ read_opcs4_trud <- function(
           relationship_version = version,
           from_col = "from",
           to_col = "to",
-          type_col = "type",
-          child_parent_relationship_code = "is a",
           relationship_source = source
         )
       )

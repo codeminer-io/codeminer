@@ -82,6 +82,10 @@ test_that("read_read3_trud() read3_relationship has correct structure", {
     result$read3_relationship$relationship$metadata$code_type,
     "Read v3"
   )
+  # Purely hierarchical (no type dimension): both type fields are NA.
+  expect_true(is.na(
+    result$read3_relationship$relationship$metadata$type_col
+  ))
   expect_true(is.na(
     result$read3_relationship$relationship$metadata$child_parent_relationship_code
   ))
