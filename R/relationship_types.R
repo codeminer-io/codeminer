@@ -1,11 +1,11 @@
 #' Relationship types
 #'
-#' Return relationship types as a [codeminer_codelist][as_codelist], with each
+#' Return relationship types as a `codeminer_codelist`, with each
 #' type's description looked up from the lookup table where available.
 #'
-#' - `RELATIONSHIP_TYPES_FROM()` — types originating from the supplied codes.
-#' - `RELATIONSHIP_TYPES_TO()` — types pointing to the supplied codes.
-#' - `RELATIONSHIP_TYPES()` — all types in a code type's relationship table,
+#' - `RELATIONSHIP_TYPES_FROM()` - types originating from the supplied codes.
+#' - `RELATIONSHIP_TYPES_TO()` - types pointing to the supplied codes.
+#' - `RELATIONSHIP_TYPES()` - all types in a code type's relationship table,
 #'   optionally filtered by a description `pattern` (like [DESCRIPTION()]).
 #'
 #' Relationship types are themselves codes (e.g. a SNOMED CT relationship type
@@ -21,7 +21,7 @@
 #'   by. See [stringr::str_detect()] for details. `NULL` (default) returns all
 #'   types.
 #' @param ignore_case If `TRUE` (default), ignore case when matching `pattern`.
-#' @return A [codeminer_codelist][as_codelist] of relationship types with their
+#' @return A `codeminer_codelist` of relationship types with their
 #'   descriptions.
 #' @family Code relationships
 #' @name relationship_types
@@ -33,7 +33,7 @@
 NULL
 
 #' An empty `codeminer_codelist`
-#' @return A zero-row [codeminer_codelist][as_codelist].
+#' @return A zero-row `codeminer_codelist`.
 #' @keywords internal
 #' @noRd
 empty_codelist <- function() {
@@ -56,7 +56,7 @@ empty_codelist <- function() {
 #' @param type The code type.
 #' @param lookup_version The lookup version.
 #' @param preferred_description_only Passed to [CODES()].
-#' @return A [codeminer_codelist][as_codelist].
+#' @return A `codeminer_codelist`.
 #' @keywords internal
 #' @noRd
 describe_relationship_types <- function(
@@ -111,7 +111,7 @@ describe_relationship_types <- function(
 #' @param fn Calling function name, for the not-applicable guard.
 #' @param empty_warning Warning when no types are found.
 #' @param call Calling environment.
-#' @return A [codeminer_codelist][as_codelist].
+#' @return A `codeminer_codelist`.
 #' @keywords internal
 #' @noRd
 relationship_types_for_codes <- function(
@@ -318,7 +318,7 @@ RELATIONSHIP_TYPES <- function(
   }
 
   # With a pattern, restrict to the type codes whose lookup description matches
-  # (synonyms included, like DESCRIPTION()) — a single-table lookup query
+  # (synonyms included, like DESCRIPTION()) - a single-table lookup query
   # combined in R, never an in-SQL join across the relationship and lookup
   # tables (each may live in a separate backend file).
   lkp <- get_lookup_table(

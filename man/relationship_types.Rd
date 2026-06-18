@@ -56,18 +56,18 @@ types.}
 \item{ignore_case}{If \code{TRUE} (default), ignore case when matching \code{pattern}.}
 }
 \value{
-A \link[=as_codelist]{codeminer_codelist} of relationship types with their
+A \code{codeminer_codelist} of relationship types with their
 descriptions.
 }
 \description{
-Return relationship types as a \link[=as_codelist]{codeminer_codelist}, with each
+Return relationship types as a \code{codeminer_codelist}, with each
 type's description looked up from the lookup table where available.
 }
 \details{
 \itemize{
-\item \code{RELATIONSHIP_TYPES_FROM()} — types originating from the supplied codes.
-\item \code{RELATIONSHIP_TYPES_TO()} — types pointing to the supplied codes.
-\item \code{RELATIONSHIP_TYPES()} — all types in a code type's relationship table,
+\item \code{RELATIONSHIP_TYPES_FROM()} - types originating from the supplied codes.
+\item \code{RELATIONSHIP_TYPES_TO()} - types pointing to the supplied codes.
+\item \code{RELATIONSHIP_TYPES()} - all types in a code type's relationship table,
 optionally filtered by a description \code{pattern} (like \code{\link[=DESCRIPTION]{DESCRIPTION()}}).
 }
 
