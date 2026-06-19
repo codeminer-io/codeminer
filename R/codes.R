@@ -180,18 +180,17 @@ CODES <- function(
 }
 
 # Argument validation helpers
-check_code_type <- function(code_type, call = rlang::caller_env()) {
-  code_type_expr <- rlang::enquo(code_type)
-
-  # nolint next: object_usage_linter.
-  code_type_name <- rlang::as_label(code_type_expr)
-
+check_code_type <- function(
+  code_type,
+  arg = rlang::caller_arg(code_type),
+  call = rlang::caller_env()
+) {
   if (is.null(code_type)) {
     codeminer_abort(
       c(
-        "{.arg {code_type_name}} is required but not provided.",
+        "{.arg {arg}} is required but not provided.",
         "i" = "Either set the option: {.code options(codeminer.code_type = \"ICD-10\")}",
-        "i" = "Or provide {.arg {code_type_name}} explicitly in your function call."
+        "i" = "Or provide {.arg {arg}} explicitly in your function call."
       ),
       call = call
     )
@@ -199,7 +198,7 @@ check_code_type <- function(code_type, call = rlang::caller_env()) {
 
   if (!rlang::is_string(code_type)) {
     codeminer_abort(
-      "{.arg {code_type_name}} must be a string, not {typeof(code_type)} with length {length(code_type)}",
+      "{.arg {arg}} must be a string, not {typeof(code_type)} with length {length(code_type)}",
       call = call
     )
   }
