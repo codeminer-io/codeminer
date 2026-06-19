@@ -13,6 +13,7 @@ missing_codes_warning(
   table_type = c("lookup", "mapping", "relationship"),
   max_show = 10,
   extra = NULL,
+  class = NULL,
   .envir = rlang::caller_env()
 )
 ```
@@ -42,6 +43,14 @@ missing_codes_warning(
   Optional named `cli` message vector appended to the warning (e.g. an
   `"i"` bullet explaining a likely lookup/relationship version
   mismatch). `NULL` (default) adds nothing.
+
+- class:
+
+  Optional character vector of subclass(es) prepended before
+  `codeminer_missing_codes` in the condition's class chain, so a more
+  specific miss (e.g. `codeminer_missing_relationship_types`) can be
+  handled on its own while still being caught by handlers for the base
+  class. `NULL` (default) uses only `codeminer_missing_codes`.
 
 - .envir:
 
@@ -81,7 +90,7 @@ temp_db <- tempfile(fileext = ".duckdb")
 create_dummy_database(temp_db)
 #> ✔ Dummy database ready to use!
 #> ℹ To reconnect to your previous database:
-#>   `Sys.setenv(CODEMINER_DB_PATH = "/tmp/RtmpYmlTfJ/file1a2e3f6461a.duckdb")`
+#>   `Sys.setenv(CODEMINER_DB_PATH = "/tmp/RtmpAaL3tN/file1a633bc66161.duckdb")`
 #>   `codeminer_connect()`
 missing_codes <- table_type <- table_meta <- NULL
 

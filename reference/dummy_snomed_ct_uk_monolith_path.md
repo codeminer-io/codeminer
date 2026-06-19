@@ -46,5 +46,5 @@ to read SNOMED CT data
 
 ``` r
 dummy_snomed_ct_uk_monolith_path()
-#> [1] "/tmp/RtmpYmlTfJ/codeminer_snomed_gps/SnomedCT_GPS_PRODUCTION"
+#> [1] "/tmp/RtmpAaL3tN/codeminer_snomed_gps/SnomedCT_GPS_PRODUCTION"
 ```
