@@ -54,7 +54,9 @@ and can be handled programmatically.</p>
 <span>  <span class="va">missing_codes</span>,</span>
 <span>  <span class="va">table_meta</span>,</span>
 <span>  table_type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"lookup"</span>, <span class="st">"mapping"</span>, <span class="st">"relationship"</span><span class="op">)</span>,</span>
-<span>  max_show <span class="op">=</span> <span class="fl">10</span></span>
+<span>  max_show <span class="op">=</span> <span class="fl">10</span>,</span>
+<span>  extra <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  .envir <span class="op">=</span> <span class="fu">rlang</span><span class="fu">::</span><span class="fu"><a href="https://rlang.r-lib.org/reference/stack.html" class="external-link">caller_env</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -78,6 +80,17 @@ be one of 'relationship', 'lookup', or 'mapping'.</p></dd>
 
 <dt id="arg-max-show">max_show<a class="anchor" aria-label="anchor" href="#arg-max-show"></a></dt>
 <dd><p>Maximum number of missing codes to display. Defaults to 10.</p></dd>
+
+
+<dt id="arg-extra">extra<a class="anchor" aria-label="anchor" href="#arg-extra"></a></dt>
+<dd><p>Optional named <code>cli</code> message vector appended to the warning
+(e.g. an <code>"i"</code> bullet explaining a likely lookup/relationship version
+mismatch). <code>NULL</code> (default) adds nothing.</p></dd>
+
+
+<dt id="arg--envir">.envir<a class="anchor" aria-label="anchor" href="#arg--envir"></a></dt>
+<dd><p>Environment in which to interpolate the message (including
+<code>extra</code>). Defaults to the calling environment.</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -111,7 +124,7 @@ warning, while still preserving full context about where the lookup failed.</p>
 <span class="r-in"><span><span class="fu"><a href="create_dummy_database.html">create_dummy_database</a></span><span class="op">(</span><span class="va">temp_db</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Dummy database ready to use!</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> To reconnect to your previous database:</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>   `Sys.setenv(CODEMINER_DB_PATH = "/tmp/RtmpJHulfS/file1a4374c05f43.duckdb")`</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>   `Sys.setenv(CODEMINER_DB_PATH = "/tmp/RtmpYmlTfJ/file1a2e3f6461a.duckdb")`</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>   `codeminer_connect()`</span>
 <span class="r-in"><span><span class="va">missing_codes</span> <span class="op">&lt;-</span> <span class="va">table_type</span> <span class="op">&lt;-</span> <span class="va">table_meta</span> <span class="op">&lt;-</span> <span class="cn">NULL</span></span></span>
 <span class="r-in"><span></span></span>

@@ -11,7 +11,9 @@ missing_codes_warning(
   missing_codes,
   table_meta,
   table_type = c("lookup", "mapping", "relationship"),
-  max_show = 10
+  max_show = 10,
+  extra = NULL,
+  .envir = rlang::caller_env()
 )
 ```
 
@@ -34,6 +36,17 @@ missing_codes_warning(
 - max_show:
 
   Maximum number of missing codes to display. Defaults to 10.
+
+- extra:
+
+  Optional named `cli` message vector appended to the warning (e.g. an
+  `"i"` bullet explaining a likely lookup/relationship version
+  mismatch). `NULL` (default) adds nothing.
+
+- .envir:
+
+  Environment in which to interpolate the message (including `extra`).
+  Defaults to the calling environment.
 
 ## Value
 
@@ -68,7 +81,7 @@ temp_db <- tempfile(fileext = ".duckdb")
 create_dummy_database(temp_db)
 #> ✔ Dummy database ready to use!
 #> ℹ To reconnect to your previous database:
-#>   `Sys.setenv(CODEMINER_DB_PATH = "/tmp/RtmpJHulfS/file1a4374c05f43.duckdb")`
+#>   `Sys.setenv(CODEMINER_DB_PATH = "/tmp/RtmpYmlTfJ/file1a2e3f6461a.duckdb")`
 #>   `codeminer_connect()`
 missing_codes <- table_type <- table_meta <- NULL
 

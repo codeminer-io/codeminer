@@ -20,7 +20,8 @@ coding systems.
   : Get attributes or codes with attributes
 - [`RELATIONSHIP_TYPES_FROM()`](https://codeminer-io.github.io/codeminer/reference/relationship_types.md)
   [`RELATIONSHIP_TYPES_TO()`](https://codeminer-io.github.io/codeminer/reference/relationship_types.md)
-  : Get relationship types for codes
+  [`RELATIONSHIP_TYPES()`](https://codeminer-io.github.io/codeminer/reference/relationship_types.md)
+  : Relationship types
 - [`MAP()`](https://codeminer-io.github.io/codeminer/reference/MAP.md) :
   Map clinical codes from one coding system to another
 - [`get_lookup_table()`](https://codeminer-io.github.io/codeminer/reference/get_lookup_table.md)
