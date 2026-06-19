@@ -277,7 +277,7 @@ test_that("CHILDREN() uses correct latest version", {
 test_that("CHILDREN() fails for wrong argument types", {
   expect_error(
     CHILDREN("E10", type = c("ICD-10", "icd11")),
-    "`code_type` must be a string"
+    "`type` must be a string"
   )
 
   expect_error(
@@ -313,6 +313,14 @@ test_that("errors are attributed to the function the user called", {
   expect_identical(
     conditionCall(rlang::catch_cnd(N_PARENTS("E10")))[[1]],
     as.name("N_PARENTS")
+  )
+})
+
+test_that("CHILDREN() names the user-facing `type` argument when it is unset", {
+  withr::local_options(codeminer.code_type = NULL)
+  expect_error(
+    CHILDREN("E10"),
+    "`type` is required but not provided"
   )
 })
 
