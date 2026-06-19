@@ -8,7 +8,9 @@ missing_codes_warning(
   missing_codes,
   table_meta,
   table_type = c("lookup", "mapping", "relationship"),
-  max_show = 10
+  max_show = 10,
+  extra = NULL,
+  .envir = rlang::caller_env()
 )
 }
 \arguments{
@@ -21,6 +23,13 @@ expected to be found in.}
 be one of 'relationship', 'lookup', or 'mapping'.}
 
 \item{max_show}{Maximum number of missing codes to display. Defaults to 10.}
+
+\item{extra}{Optional named \code{cli} message vector appended to the warning
+(e.g. an \code{"i"} bullet explaining a likely lookup/relationship version
+mismatch). \code{NULL} (default) adds nothing.}
+
+\item{.envir}{Environment in which to interpolate the message (including
+\code{extra}). Defaults to the calling environment.}
 }
 \value{
 Invisibly returns \code{missing_codes}.

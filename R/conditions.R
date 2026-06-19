@@ -146,6 +146,11 @@ codeminer_interpolate_message <- function(
 #' @param table_meta Data frame of metadata for the table the codes were
 #'   expected to be found in.
 #' @param max_show Maximum number of missing codes to display. Defaults to 10.
+#' @param extra Optional named `cli` message vector appended to the warning
+#'   (e.g. an `"i"` bullet explaining a likely lookup/relationship version
+#'   mismatch). `NULL` (default) adds nothing.
+#' @param .envir Environment in which to interpolate the message (including
+#'   `extra`). Defaults to the calling environment.
 #'
 #' @return Invisibly returns `missing_codes`.
 #'
@@ -180,7 +185,9 @@ missing_codes_warning <- function(
   missing_codes,
   table_meta,
   table_type = c("lookup", "mapping", "relationship"),
-  max_show = 10
+  max_show = 10,
+  extra = NULL,
+  .envir = rlang::caller_env()
 ) {
   if (length(missing_codes) == 0) {
     return(invisible(missing_codes))
@@ -209,6 +216,24 @@ missing_codes_warning <- function(
     )
   }
 
+  # Optional caller-supplied bullets explaining the likely cause (e.g. a
+  # lookup/relationship version mismatch). These reference values in the
+  # caller's frame (`.envir`), whereas the base message above references this
+  # function's locals - two different environments. Render `extra` here in
+  # `.envir`, then brace-escape so the package-level cli pass below treats the
+  # result as literal text and the base message still interpolates correctly.
+  if (!is.null(extra)) {
+    extra <- vapply(
+      extra,
+      function(e) {
+        rendered <- cli::format_inline(e, .envir = .envir)
+        gsub("}", "}}", gsub("{", "{{", rendered, fixed = TRUE), fixed = TRUE)
+      },
+      character(1)
+    )
+    msg <- c(msg, extra)
+  }
+
   codeminer_warn(
     msg,
     class = "codeminer_missing_codes",
@@ -218,4 +243,53 @@ missing_codes_warning <- function(
   )
 
   invisible(missing_codes)
+}
+
+#' Enrich a lookup missing-codes warning with a cause hint
+#'
+#' Runs `expr` and, if it raises a `codeminer_missing_codes` warning for a
+#' *lookup* miss (e.g. from [CODES()] when describing codes derived from a
+#' relationship or mapping table), re-raises that warning with `hint` appended,
+#' explaining the likely lookup/relationship (or mapping) version mismatch.
+#'
+#' The original warning is muffled and the enriched one is raised *after* `expr`
+#' returns, so the still-active handler does not re-enter itself. The canonical
+#' warning is rebuilt from the captured condition's structured fields via
+#' [missing_codes_warning()], so [CODES()] needs no changes.
+#'
+#' @param expr Expression to evaluate (typically a [CODES()] call). Lazily
+#'   evaluated under the handler.
+#' @param hint A named `cli` vector (e.g. `c("i" = "...")`) appended to the
+#'   re-raised warning, interpolated in `.envir`.
+#' @param .envir Environment for interpolating `hint`. Defaults to the caller,
+#'   so glue references like `{code_type}` resolve in the calling function.
+#' @return The value of `expr`.
+#' @keywords internal
+#' @noRd
+with_lookup_miss_hint <- function(expr, hint, .envir = rlang::caller_env()) {
+  # The handler runs in its own scope; stash the intercepted condition in an
+  # explicit environment (rather than via `<<-`) so it survives to be re-raised
+  # after `expr` returns.
+  state <- new.env(parent = emptyenv())
+  result <- withCallingHandlers(
+    expr,
+    codeminer_missing_codes = function(cnd) {
+      if (identical(cnd$table_type, "lookup")) {
+        state$captured <- cnd
+        rlang::cnd_muffle(cnd)
+      }
+    }
+  )
+
+  if (!is.null(state$captured)) {
+    missing_codes_warning(
+      state$captured$missing_codes,
+      table_meta = state$captured$table_meta,
+      table_type = "lookup",
+      extra = hint,
+      .envir = .envir
+    )
+  }
+
+  result
 }
