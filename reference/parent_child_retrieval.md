@@ -32,7 +32,7 @@ N_CHILDREN(
   relationship_version = getOption("codeminer.relationship_version", default = "latest"),
   preferred_description_only = TRUE,
   col_filters = "default",
-  call = rlang::caller_env()
+  call = rlang::current_env()
 )
 
 N_PARENTS(
@@ -43,7 +43,7 @@ N_PARENTS(
   relationship_version = getOption("codeminer.relationship_version", default = "latest"),
   preferred_description_only = TRUE,
   col_filters = "default",
-  call = rlang::caller_env()
+  call = rlang::current_env()
 )
 ```
 
@@ -110,7 +110,7 @@ Other Code relationships:
 create_dummy_database()
 #> ✔ Dummy database ready to use!
 #> ℹ To reconnect to your previous database:
-#>   `Sys.setenv(CODEMINER_DB_PATH = "/tmp/Rtmpt9RQ1W/file1a2130fd7fda.duckdb")`
+#>   `Sys.setenv(CODEMINER_DB_PATH = "/tmp/RtmpwhACQN/file1a1955aab60b.duckdb")`
 #>   `codeminer_connect()`
 PARENTS("E10", "E11", type = "ICD-10")
 #> ℹ Using 'UKB v4' as latest version

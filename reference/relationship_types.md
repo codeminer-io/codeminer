@@ -113,7 +113,7 @@ Other Code relationships:
 create_dummy_database()
 #> ✔ Dummy database ready to use!
 #> ℹ To reconnect to your previous database:
-#>   `Sys.setenv(CODEMINER_DB_PATH = "/tmp/Rtmpt9RQ1W/file1a211a60b82a.duckdb")`
+#>   `Sys.setenv(CODEMINER_DB_PATH = "/tmp/RtmpwhACQN/file1a196e84d3cb.duckdb")`
 #>   `codeminer_connect()`
 # RELATIONSHIP_TYPES_FROM() returns types originating from codes
 # RELATIONSHIP_TYPES_TO() returns types pointing to codes
