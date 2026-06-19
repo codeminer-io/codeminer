@@ -401,8 +401,9 @@ graph_closure_codes <- function(
   # relationship types: they match no edges, so the result would otherwise be
   # silently narrower than the user expects. Non-blocking - traversal proceeds
   # with whatever types do exist. (`require_relationship_types` is only set by
-  # the type-dimension callers, which have already passed the Ask A guard, so
-  # the table is guaranteed to have a type column here.)
+  # the type-dimension callers, which have already passed the
+  # `abort_if_no_relationship_types()` guard, so the table is guaranteed to have
+  # a type column here.)
   if (
     !is.null(require_relationship_types) &&
       length(rel_type) > 0L &&
