@@ -231,3 +231,49 @@ test_that("RELATIONSHIP_TYPES() aborts on a purely hierarchical table", {
     class = "codeminer_no_relationship_types"
   )
 })
+
+test_that("RELATIONSHIP_TYPES() honours col_filters (no inactive-description duplicates)", {
+  test_type <- "rt_colfilters"
+
+  # The type code "T1" has two lookup rows (a current + a retired description);
+  # the default col_filter keeps only the current one. The description lookup
+  # must honour col_filters, otherwise the retired row leaks in as a duplicate.
+  add_lookup_table(
+    data.frame(
+      code = c("d", "f", "T1", "T1"),
+      description = c("Disorder", "Finding", "Type One", "Type One (retired)"),
+      status = c("C", "C", "C", "R")
+    ),
+    lookup_metadata(
+      test_type,
+      col_filters = list(status = list(values = c("C", "R"), defaults = "C"))
+    )
+  )
+  add_relationship_table(
+    data.frame(from = "d", to = "f", type = "T1"),
+    relationship_metadata(
+      test_type,
+      type_col = "type",
+      child_parent_relationship_code = "T1"
+    )
+  )
+
+  # Default col_filters: one row per type, with the current description.
+  rt <- RELATIONSHIP_TYPES(type = test_type)
+  expect_equal(nrow(rt), 1L)
+  expect_equal(nrow(rt), dplyr::n_distinct(rt$code))
+  expect_identical(rt$code, "T1")
+  expect_identical(rt$description, "Type One")
+
+  # The same holds for the code-scoped variant.
+  expect_equal(nrow(RELATIONSHIP_TYPES_FROM("d", type = test_type)), 1L)
+
+  # A pattern matches the current description only.
+  expect_identical(RELATIONSHIP_TYPES("Type One", type = test_type)$code, "T1")
+
+  # Explicit col_filters = NULL still surfaces both rows (override available).
+  expect_equal(
+    nrow(RELATIONSHIP_TYPES(type = test_type, col_filters = NULL)),
+    2L
+  )
+})
