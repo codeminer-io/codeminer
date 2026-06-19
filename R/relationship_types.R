@@ -56,6 +56,10 @@ empty_codelist <- function() {
 #' @param type The code type.
 #' @param lookup_version The lookup version.
 #' @param preferred_description_only Passed to [CODES()].
+#' @param col_filters Column filters applied when looking up descriptions (the
+#'   caller's `col_filters`). Honouring these keeps the description to one row
+#'   per type (e.g. SNOMED's default `active_description` filter), instead of
+#'   surfacing inactive descriptions as duplicate rows.
 #' @return A `codeminer_codelist`.
 #' @keywords internal
 #' @noRd
@@ -63,7 +67,8 @@ describe_relationship_types <- function(
   type_values,
   type,
   lookup_version,
-  preferred_description_only
+  preferred_description_only,
+  col_filters
 ) {
   if (length(type_values) == 0) {
     return(empty_codelist())
@@ -78,7 +83,7 @@ describe_relationship_types <- function(
       type = type,
       lookup_version = lookup_version,
       preferred_description_only = preferred_description_only,
-      col_filters = NULL
+      col_filters = col_filters
     ),
     codeminer_missing_codes = function(w) invokeRestart("muffleWarning")
   )
@@ -184,7 +189,8 @@ relationship_types_for_codes <- function(
     type_values,
     type = type,
     lookup_version = lookup_version,
-    preferred_description_only = preferred_description_only
+    preferred_description_only = preferred_description_only,
+    col_filters = col_filters
   )
 }
 
@@ -313,7 +319,8 @@ RELATIONSHIP_TYPES <- function(
       type_values,
       type = type,
       lookup_version = lookup_version,
-      preferred_description_only = preferred_description_only
+      preferred_description_only = preferred_description_only,
+      col_filters = col_filters
     ))
   }
 
@@ -324,7 +331,7 @@ RELATIONSHIP_TYPES <- function(
   lkp <- get_lookup_table(
     type,
     lookup_version = lookup_version,
-    col_filters = NULL,
+    col_filters = col_filters,
     con = con
   )
   lkp <- dplyr::filter(lkp, .data$code %in% .env$type_values)
@@ -344,6 +351,7 @@ RELATIONSHIP_TYPES <- function(
     matched_codes,
     type = type,
     lookup_version = lookup_version,
-    preferred_description_only = preferred_description_only
+    preferred_description_only = preferred_description_only,
+    col_filters = col_filters
   )
 }
