@@ -352,7 +352,9 @@ graph_closure_codes <- function(
   require_relationship_types = NULL,
   call = rlang::caller_env()
 ) {
-  check_code_type(code_type, call = call)
+  # `code_type` is exposed to users as the `type` argument on CHILDREN()/
+  # PARENTS()/ATTRIBUTES_FOR() etc., so name it that way in any error.
+  check_code_type(code_type, arg = "type", call = call)
 
   con <- get_db_con()
   meta <- get_metadata_for_relationship(
