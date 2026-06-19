@@ -325,3 +325,61 @@ test_that("ATTRIBUTES_FOR() works with multiple codes", {
 
   expect_identical(sort(result$code), c("attr1", "attr2", "attr3"))
 })
+
+test_that("relationship_types absent from the table warn but do not block", {
+  test_type <- "dummy_attr_missing_types"
+
+  add_lookup_table(
+    data.frame(
+      code = c("code1", "attr1", "attr2"),
+      description = c("Code 1", "Attribute 1", "Attribute 2")
+    ),
+    lookup_metadata(test_type)
+  )
+  add_relationship_table(
+    data.frame(
+      from = c("code1", "code1"),
+      to = c("attr1", "attr2"),
+      type = c("has attribute", "has property")
+    ),
+    relationship_metadata(
+      test_type,
+      type_col = "type",
+      child_parent_relationship_code = "has attribute"
+    )
+  )
+
+  # A relationship type that is not in the table warns, with a subclass of
+  # codeminer_missing_codes so it can be handled specifically or generally.
+  w <- rlang::catch_cnd(
+    ATTRIBUTES_FOR(
+      "code1",
+      relationship_types = c("has attribute", "not a real type"),
+      type = test_type
+    ),
+    classes = "codeminer_missing_relationship_types"
+  )
+  expect_s3_class(w, "codeminer_missing_relationship_types")
+  expect_s3_class(w, "codeminer_missing_codes")
+  expect_equal(w$missing_codes, "not a real type")
+
+  # Non-blocking: the valid type still returns its results.
+  result <- suppressWarnings(
+    ATTRIBUTES_FOR(
+      "code1",
+      relationship_types = c("has attribute", "not a real type"),
+      type = test_type
+    )
+  )
+  expect_identical(result$code, "attr1")
+
+  # Valid types only -> no missing-relationship-types warning.
+  expect_no_condition(
+    ATTRIBUTES_FOR(
+      "code1",
+      relationship_types = "has attribute",
+      type = test_type
+    ),
+    class = "codeminer_missing_relationship_types"
+  )
+})
