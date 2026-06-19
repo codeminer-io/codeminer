@@ -34,7 +34,7 @@ N_CHILDREN(
   relationship_version = getOption("codeminer.relationship_version", default = "latest"),
   preferred_description_only = TRUE,
   col_filters = "default",
-  call = rlang::caller_env()
+  call = rlang::current_env()
 )
 
 N_PARENTS(
@@ -45,7 +45,7 @@ N_PARENTS(
   relationship_version = getOption("codeminer.relationship_version", default = "latest"),
   preferred_description_only = TRUE,
   col_filters = "default",
-  call = rlang::caller_env()
+  call = rlang::current_env()
 )
 }
 \arguments{

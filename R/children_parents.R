@@ -53,7 +53,7 @@ CHILDREN <- function(
     relationship_version = relationship_version,
     preferred_description_only = preferred_description_only,
     col_filters = col_filters,
-    call = rlang::caller_env()
+    call = rlang::current_env()
   )
 }
 
@@ -78,7 +78,7 @@ PARENTS <- function(
     relationship_version = relationship_version,
     preferred_description_only = preferred_description_only,
     col_filters = col_filters,
-    call = rlang::caller_env()
+    call = rlang::current_env()
   )
 }
 
@@ -95,7 +95,7 @@ N_CHILDREN <- function(
   ),
   preferred_description_only = TRUE,
   col_filters = "default",
-  call = rlang::caller_env()
+  call = rlang::current_env()
 ) {
   check_depth(depth)
   check_version(lookup_version)
@@ -122,7 +122,8 @@ N_CHILDREN <- function(
     include_self = TRUE,
     max_depth = depth,
     empty_warning = "No valid child codes found.",
-    col_filters = col_filters
+    col_filters = col_filters,
+    call = call
   )
 }
 
@@ -139,7 +140,7 @@ N_PARENTS <- function(
   ),
   preferred_description_only = TRUE,
   col_filters = "default",
-  call = rlang::caller_env()
+  call = rlang::current_env()
 ) {
   check_depth(depth)
   check_version(lookup_version)
@@ -166,6 +167,7 @@ N_PARENTS <- function(
     include_self = TRUE,
     max_depth = depth,
     empty_warning = "No valid parent codes found.",
-    col_filters = col_filters
+    col_filters = col_filters,
+    call = call
   )
 }

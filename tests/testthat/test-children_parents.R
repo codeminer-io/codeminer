@@ -293,6 +293,29 @@ test_that("CHILDREN() fails for missing code_type", {
   )
 })
 
+test_that("errors are attributed to the function the user called", {
+  withr::local_options(codeminer.code_type = NULL)
+
+  # Wrappers must blame themselves, not the internal N_* delegate they call.
+  expect_identical(
+    conditionCall(rlang::catch_cnd(CHILDREN("E10")))[[1]],
+    as.name("CHILDREN")
+  )
+  expect_identical(
+    conditionCall(rlang::catch_cnd(PARENTS("E10")))[[1]],
+    as.name("PARENTS")
+  )
+  # Direct calls to the delegates still blame themselves.
+  expect_identical(
+    conditionCall(rlang::catch_cnd(N_CHILDREN("E10")))[[1]],
+    as.name("N_CHILDREN")
+  )
+  expect_identical(
+    conditionCall(rlang::catch_cnd(N_PARENTS("E10")))[[1]],
+    as.name("N_PARENTS")
+  )
+})
+
 test_that("CHILDREN() names the user-facing `type` argument when it is unset", {
   withr::local_options(codeminer.code_type = NULL)
   expect_error(
