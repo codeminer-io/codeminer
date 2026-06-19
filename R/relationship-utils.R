@@ -396,6 +396,39 @@ graph_closure_codes <- function(
     rel_type <- meta[[as.character(rel_type)]]
   }
 
+  # When the caller supplied explicit relationship types (ATTRIBUTES_FOR /
+  # HAS_ATTRIBUTES), warn about any that are not actually among this table's
+  # relationship types: they match no edges, so the result would otherwise be
+  # silently narrower than the user expects. Non-blocking - traversal proceeds
+  # with whatever types do exist. (`require_relationship_types` is only set by
+  # the type-dimension callers, which have already passed the Ask A guard, so
+  # the table is guaranteed to have a type column here.)
+  if (
+    !is.null(require_relationship_types) &&
+      length(rel_type) > 0L &&
+      !all(is.na(rel_type))
+  ) {
+    available_types <- rel_table |>
+      dplyr::select(dplyr::all_of(meta$type_col)) |>
+      dplyr::distinct() |>
+      dplyr::pull()
+    missing_types <- setdiff(rel_type, available_types)
+    if (length(missing_types) > 0) {
+      missing_codes_warning(
+        missing_types,
+        table_type = "relationship",
+        table_meta = meta,
+        class = "codeminer_missing_relationship_types",
+        extra = c(
+          "i" = paste0(
+            "These were supplied as relationship types but are not among the ",
+            "relationship types for {code_type}."
+          )
+        )
+      )
+    }
+  }
+
   # Warning if any input codes are not present in relationship table
   available_codes <- rel_table |>
     dplyr::filter(

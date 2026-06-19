@@ -149,6 +149,11 @@ codeminer_interpolate_message <- function(
 #' @param extra Optional named `cli` message vector appended to the warning
 #'   (e.g. an `"i"` bullet explaining a likely lookup/relationship version
 #'   mismatch). `NULL` (default) adds nothing.
+#' @param class Optional character vector of subclass(es) prepended before
+#'   `codeminer_missing_codes` in the condition's class chain, so a more specific
+#'   miss (e.g. `codeminer_missing_relationship_types`) can be handled on its own
+#'   while still being caught by handlers for the base class. `NULL` (default)
+#'   uses only `codeminer_missing_codes`.
 #' @param .envir Environment in which to interpolate the message (including
 #'   `extra`). Defaults to the calling environment.
 #'
@@ -187,6 +192,7 @@ missing_codes_warning <- function(
   table_type = c("lookup", "mapping", "relationship"),
   max_show = 10,
   extra = NULL,
+  class = NULL,
   .envir = rlang::caller_env()
 ) {
   if (length(missing_codes) == 0) {
@@ -236,7 +242,7 @@ missing_codes_warning <- function(
 
   codeminer_warn(
     msg,
-    class = "codeminer_missing_codes",
+    class = c(class, "codeminer_missing_codes"),
     missing_codes = missing_codes,
     table_type = table_type,
     table_meta = table_meta

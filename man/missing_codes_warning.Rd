@@ -10,6 +10,7 @@ missing_codes_warning(
   table_type = c("lookup", "mapping", "relationship"),
   max_show = 10,
   extra = NULL,
+  class = NULL,
   .envir = rlang::caller_env()
 )
 }
@@ -27,6 +28,12 @@ be one of 'relationship', 'lookup', or 'mapping'.}
 \item{extra}{Optional named \code{cli} message vector appended to the warning
 (e.g. an \code{"i"} bullet explaining a likely lookup/relationship version
 mismatch). \code{NULL} (default) adds nothing.}
+
+\item{class}{Optional character vector of subclass(es) prepended before
+\code{codeminer_missing_codes} in the condition's class chain, so a more specific
+miss (e.g. \code{codeminer_missing_relationship_types}) can be handled on its own
+while still being caught by handlers for the base class. \code{NULL} (default)
+uses only \code{codeminer_missing_codes}.}
 
 \item{.envir}{Environment in which to interpolate the message (including
 \code{extra}). Defaults to the calling environment.}
