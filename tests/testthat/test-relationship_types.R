@@ -105,3 +105,129 @@ test_that("RELATIONSHIP_TYPES_FROM() and RELATIONSHIP_TYPES_TO() warn for missin
     class = "codeminer_missing_codes"
   )
 })
+
+# A relationship table whose type values are themselves codes in the lookup
+# table (as SNOMED CT relationship types are concept ids).
+setup_typed_ontology <- function(test_type) {
+  add_lookup_table(
+    data.frame(
+      code = c("disorder", "finding", "T1", "T2"),
+      description = c(
+        "Disorder X",
+        "Finding Y",
+        "Is a (attribute)",
+        "Finding site (attribute)"
+      )
+    ),
+    lookup_metadata(test_type)
+  )
+  add_relationship_table(
+    data.frame(
+      from = c("disorder", "disorder"),
+      to = c("finding", "finding"),
+      type = c("T1", "T2")
+    ),
+    relationship_metadata(
+      test_type,
+      type_col = "type",
+      child_parent_relationship_code = "T1"
+    )
+  )
+}
+
+test_that("RELATIONSHIP_TYPES_FROM/TO describe types via the lookup table", {
+  test_type <- "typed_onto_fromto"
+  setup_typed_ontology(test_type)
+
+  from <- RELATIONSHIP_TYPES_FROM("disorder", type = test_type)
+  expect_s3_class(from, "codeminer_codelist")
+  expect_setequal(from$code, c("T1", "T2"))
+  expect_setequal(
+    from$description,
+    c("Is a (attribute)", "Finding site (attribute)")
+  )
+})
+
+test_that("RELATIONSHIP_TYPES_* fall back to the code when no lookup entry", {
+  # `is a` / `has attribute` are not codes in this lookup, so description
+  # falls back to the type value itself.
+  test_type <- "dummy_rel_fallback"
+  add_lookup_table(
+    data.frame(code = c("code1", "attr1"), description = c("Code 1", "Attr 1")),
+    lookup_metadata(test_type)
+  )
+  add_relationship_table(
+    data.frame(from = "code1", to = "attr1", type = "has attribute"),
+    relationship_metadata(
+      test_type,
+      type_col = "type",
+      child_parent_relationship_code = "is a"
+    )
+  )
+
+  res <- RELATIONSHIP_TYPES_FROM("code1", type = test_type)
+  expect_identical(res$code, "has attribute")
+  expect_identical(res$description, "has attribute")
+})
+
+test_that("RELATIONSHIP_TYPES() lists all types for a code type", {
+  test_type <- "typed_onto_all"
+  setup_typed_ontology(test_type)
+
+  res <- RELATIONSHIP_TYPES(type = test_type)
+  expect_s3_class(res, "codeminer_codelist")
+  expect_setequal(res$code, c("T1", "T2"))
+  expect_setequal(
+    res$description,
+    c("Is a (attribute)", "Finding site (attribute)")
+  )
+})
+
+test_that("RELATIONSHIP_TYPES() filters by description pattern", {
+  test_type <- "typed_onto_pattern"
+  setup_typed_ontology(test_type)
+
+  res <- RELATIONSHIP_TYPES("finding site", type = test_type)
+  expect_identical(res$code, "T2")
+
+  # Case-insensitive by default.
+  expect_identical(
+    RELATIONSHIP_TYPES("FINDING SITE", type = test_type)$code,
+    "T2"
+  )
+
+  # No match returns an empty codelist.
+  empty <- RELATIONSHIP_TYPES("no such type", type = test_type)
+  expect_s3_class(empty, "codeminer_codelist")
+  expect_equal(nrow(empty), 0)
+})
+
+test_that("RELATIONSHIP_TYPES() result feeds into ATTRIBUTES_FOR()", {
+  test_type <- "typed_onto_feed"
+  setup_typed_ontology(test_type)
+
+  finding_site <- RELATIONSHIP_TYPES("finding site", type = test_type)
+  res <- ATTRIBUTES_FOR(
+    "disorder",
+    relationship_types = finding_site,
+    type = test_type
+  )
+  expect_identical(res$code, "finding")
+})
+
+test_that("RELATIONSHIP_TYPES() aborts on a purely hierarchical table", {
+  test_type <- "pure_hier_rel_types"
+  add_lookup_table(
+    data.frame(code = c("a", "b"), description = c("A", "B")),
+    lookup_metadata(test_type)
+  )
+  add_relationship_table(
+    data.frame(from = "a", to = "b"),
+    relationship_metadata(test_type)
+  )
+
+  expect_error(
+    RELATIONSHIP_TYPES(type = test_type),
+    class = "codeminer_no_relationship_types"
+  )
+})
