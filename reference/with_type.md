@@ -2,43 +2,12 @@
 
 `with_type()` temporarily sets the active code type so that query
 functions inside `code` use it without needing an explicit `type =`
-argument.
-
-Convenience wrappers (`icd10()`, `sct()`, etc.) call `with_type()` for
-each supported code type.
+argument. It works with any code type present in the database.
 
 ## Usage
 
 ``` r
 with_type(type, code)
-
-icd10(code)
-
-icd9(code)
-
-read3(code)
-
-read2(code)
-
-sct(code)
-
-opcs4(code)
-
-phecode(code)
-
-read2_drugs(code)
-
-bnf(code)
-
-dmd(code)
-
-data_coding_3(code)
-
-data_coding_4(code)
-
-data_coding_5(code)
-
-data_coding_6(code)
 ```
 
 ## Arguments
@@ -65,9 +34,9 @@ The result of evaluating `code`.
 ``` r
 if (FALSE) { # \dontrun{
 with_type("ICD-10", DESCRIPTION("diabetes"))
-icd10(DESCRIPTION("diabetes"))
-bnf(CODES("0204 << Beta-Adrenoceptor Blocking Drugs >>"))
-sct(
+with_type("BNF", CODES("0204 << Beta-Adrenoceptor Blocking Drugs >>"))
+with_type(
+  "SNOMED CT",
   CHILDREN(
     "770765001 << Proliferative retinopathy of right eye due to diabetes mellitus (disorder) >>"
   )

@@ -193,20 +193,6 @@ Miscellaneous utility functions.
   [`` `%NOT%` ``](https://codeminer-io.github.io/codeminer/reference/infix_setops.md)
   : Infix set operations
 - [`with_type()`](https://codeminer-io.github.io/codeminer/reference/with_type.md)
-  [`icd10()`](https://codeminer-io.github.io/codeminer/reference/with_type.md)
-  [`icd9()`](https://codeminer-io.github.io/codeminer/reference/with_type.md)
-  [`read3()`](https://codeminer-io.github.io/codeminer/reference/with_type.md)
-  [`read2()`](https://codeminer-io.github.io/codeminer/reference/with_type.md)
-  [`sct()`](https://codeminer-io.github.io/codeminer/reference/with_type.md)
-  [`opcs4()`](https://codeminer-io.github.io/codeminer/reference/with_type.md)
-  [`phecode()`](https://codeminer-io.github.io/codeminer/reference/with_type.md)
-  [`read2_drugs()`](https://codeminer-io.github.io/codeminer/reference/with_type.md)
-  [`bnf()`](https://codeminer-io.github.io/codeminer/reference/with_type.md)
-  [`dmd()`](https://codeminer-io.github.io/codeminer/reference/with_type.md)
-  [`data_coding_3()`](https://codeminer-io.github.io/codeminer/reference/with_type.md)
-  [`data_coding_4()`](https://codeminer-io.github.io/codeminer/reference/with_type.md)
-  [`data_coding_5()`](https://codeminer-io.github.io/codeminer/reference/with_type.md)
-  [`data_coding_6()`](https://codeminer-io.github.io/codeminer/reference/with_type.md)
   : Set code type context
 - [`collect_codes_input()`](https://codeminer-io.github.io/codeminer/reference/collect_codes_input.md)
   : Collect and validate codes input from ... argument
