@@ -127,6 +127,24 @@ test_that("get_latest_version handles edge cases", {
   expect_identical(get_latest_version(test_versions), "v20")
 })
 
+test_that("get_latest_version message names the table type and key (#165)", {
+  # The message must say which table the resolved version applies to, so the
+  # mapping- and lookup-version messages from a single MAP() call are not
+  # mistaken for a duplicate.
+  expect_message(
+    get_latest_version(
+      "UKB v4",
+      type_label = "mapping",
+      key = "Read v3 > ICD-9"
+    ),
+    "latest mapping version for.*Read v3 > ICD-9"
+  )
+  expect_message(
+    get_latest_version("UKB v4", type_label = "lookup", key = "Read v3"),
+    "latest lookup version for.*Read v3"
+  )
+})
+
 test_that("CODES_LIKE can handle regular expressions", {
   test_pattern <- "^A00"
   result <- CODES_LIKE(

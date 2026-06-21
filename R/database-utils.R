@@ -176,7 +176,11 @@ resolve_versioned_metadata <- function(
     if (!is.null(pinned)) {
       version_val <- pinned
     } else {
-      version_val <- get_latest_version(filtered[[version_col]])
+      version_val <- get_latest_version(
+        filtered[[version_col]],
+        type_label = type_label,
+        key = pin_key
+      )
       if (!is.null(pin_type)) {
         if (is.null(.codeminer_env$active_versions[[pin_type]])) {
           .codeminer_env$active_versions[[pin_type]] <- list()
