@@ -109,9 +109,9 @@ list of data frames:</p>
 <code class="sourceCode R"><span><span class="co"># Create a temporary database with dummy data</span></span>
 <span><span class="op">(</span><span class="va">db_path</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/create_dummy_database.html">create_dummy_database</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Dummy database ready to use!</span></span>
-<span><span class="co">#&gt; [1] "/tmp/Rtmp7XhfA3/file3a368284914.duckdb"</span></span>
+<span><span class="co">#&gt; [1] "/tmp/RtmphHxcvk/file3a0965ae1e89.duckdb"</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/Sys.getenv.html" class="external-link">Sys.getenv</a></span><span class="op">(</span><span class="st">"CODEMINER_DB_PATH"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] "/tmp/Rtmp7XhfA3/file3a368284914.duckdb"</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] "/tmp/RtmphHxcvk/file3a0965ae1e89.duckdb"</span></span></code></pre></div>
 <p><code>codeminer</code> resolves the database location using the
 following precedence:</p>
 <ol style="list-style-type: decimal">
@@ -135,7 +135,7 @@ current connection status with <code><a href="../reference/codeminer_status.html
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/codeminer_status.html">codeminer_status</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Workbench active</span></span>
-<span><span class="co">#&gt;   Main: <span style="color: #0000BB;">/tmp/Rtmp7XhfA3/file3a368284914.duckdb</span></span></span></code></pre></div>
+<span><span class="co">#&gt;   Main: <span style="color: #0000BB;">/tmp/RtmphHxcvk/file3a0965ae1e89.duckdb</span></span></span></code></pre></div>
 <div class="section level3">
 <h3 id="single-file-vs-folder">Single file vs folder<a class="anchor" aria-label="anchor" href="#single-file-vs-folder"></a>
 </h3>
@@ -182,7 +182,7 @@ given code system type</li>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"E10"</span>, <span class="st">"E11"</span><span class="op">)</span>,</span>
 <span>  type <span class="op">=</span> <span class="st">"ICD-10"</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Using 'UKB v4' as latest version</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Using <span style="color: #0000BB;">"UKB v4"</span> as the latest lookup version for <span style="color: #0000BB;">"ICD-10"</span>.</span></span>
 <span><span class="co">#&gt; <span style="color: #0000BB;">&lt;codeminer_codelist&gt;</span>: 2 codes</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Code type: <span style="color: #0000BB;">"ICD-10"</span></span></span>
@@ -227,7 +227,8 @@ analysis or tree rendering (e.g. <code>data.tree</code>,
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">draft</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"E10"</span>, <span class="st">"E11"</span>, <span class="st">"E13"</span>, <span class="st">"E14"</span><span class="op">)</span></span>
 <span><span class="va">tree</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_relationship_tree.html">get_relationship_tree</a></span><span class="op">(</span><span class="va">draft</span>, type <span class="op">=</span> <span class="st">"ICD-10"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Using 'UKB v4' as latest version</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Using <span style="color: #0000BB;">"UKB v4"</span> as the latest relationship version for</span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB;">"ICD-10"</span>.</span></span>
 <span></span>
 <span><span class="va">tree</span><span class="op">$</span><span class="va">nodes</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 44 × 4</span></span></span>
@@ -325,7 +326,7 @@ constructor:</p>
 <span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Lookup table <span style="color: #00BB00;">custom_codes_v1</span> added successfully.</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/CODES.html">CODES</a></span><span class="op">(</span><span class="st">"all"</span>, type <span class="op">=</span> <span class="st">"custom_codes"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Using 'v1' as latest version</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Using <span style="color: #0000BB;">"v1"</span> as the latest lookup version for <span style="color: #0000BB;">"custom_codes"</span>.</span></span>
 <span><span class="co">#&gt; <span style="color: #0000BB;">&lt;codeminer_codelist&gt;</span>: 2 codes</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Code type: <span style="color: #0000BB;">"custom_codes"</span></span></span>

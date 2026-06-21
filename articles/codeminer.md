@@ -50,9 +50,9 @@ of data frames:
 # Create a temporary database with dummy data
 (db_path <- create_dummy_database())
 #> ✔ Dummy database ready to use!
-#> [1] "/tmp/Rtmp7XhfA3/file3a368284914.duckdb"
+#> [1] "/tmp/RtmphHxcvk/file3a0965ae1e89.duckdb"
 Sys.getenv("CODEMINER_DB_PATH")
-#> [1] "/tmp/Rtmp7XhfA3/file3a368284914.duckdb"
+#> [1] "/tmp/RtmphHxcvk/file3a0965ae1e89.duckdb"
 ```
 
 `codeminer` resolves the database location using the following
@@ -88,7 +88,7 @@ connection status with
 
 codeminer_status()
 #> ℹ Workbench active
-#>   Main: /tmp/Rtmp7XhfA3/file3a368284914.duckdb
+#>   Main: /tmp/RtmphHxcvk/file3a0965ae1e89.duckdb
 ```
 
 ### Single file vs folder
@@ -138,7 +138,7 @@ CODES(
   c("E10", "E11"),
   type = "ICD-10"
 )
-#> ℹ Using 'UKB v4' as latest version
+#> ℹ Using "UKB v4" as the latest lookup version for "ICD-10".
 #> <codeminer_codelist>: 2 codes
 #> 
 #> Code type: "ICD-10"
@@ -178,7 +178,8 @@ analysis or tree rendering (e.g. `data.tree`, `ggraph`, `visNetwork`).
 
 draft <- c("E10", "E11", "E13", "E14")
 tree <- get_relationship_tree(draft, type = "ICD-10")
-#> ℹ Using 'UKB v4' as latest version
+#> ℹ Using "UKB v4" as the latest relationship version for
+#> "ICD-10".
 
 tree$nodes
 #> # A tibble: 44 × 4
@@ -285,7 +286,7 @@ add_lookup_table(
 #> ✔ Lookup table custom_codes_v1 added successfully.
 
 CODES("all", type = "custom_codes")
-#> ℹ Using 'v1' as latest version
+#> ℹ Using "v1" as the latest lookup version for "custom_codes".
 #> <codeminer_codelist>: 2 codes
 #> 
 #> Code type: "custom_codes"

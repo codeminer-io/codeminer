@@ -100,12 +100,12 @@ Other Clinical code lookups and mappings:
 create_dummy_database()
 #> ✔ Dummy database ready to use!
 #> ℹ To reconnect to your previous database:
-#>   `Sys.setenv(CODEMINER_DB_PATH = "/tmp/RtmpOxzP4z/file1a24278135c4.duckdb")`
+#>   `Sys.setenv(CODEMINER_DB_PATH = "/tmp/RtmpAg5CCk/file19f8211d9671.duckdb")`
 #>   `codeminer_connect()`
 
 # Get the full ICD-10 lookup table
 get_lookup_table("ICD-10") |> dplyr::collect()
-#> ℹ Using 'UKB v4' as latest version
+#> ℹ Using "UKB v4" as the latest lookup version for "ICD-10".
 #> # A tibble: 197 × 15
 #>    code  description  ICD10_CODE USAGE USAGE_UK MODIFIER_4 MODIFIER_5 QUALIFIERS
 #>    <chr> <chr>        <chr>      <chr> <chr>    <chr>      <chr>      <chr>     

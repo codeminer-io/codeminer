@@ -114,12 +114,12 @@ Other Clinical code lookups and mappings:
 create_dummy_database()
 #> ✔ Dummy database ready to use!
 #> ℹ To reconnect to your previous database:
-#>   `Sys.setenv(CODEMINER_DB_PATH = "/tmp/RtmpOxzP4z/file1a245d0678f6.duckdb")`
+#>   `Sys.setenv(CODEMINER_DB_PATH = "/tmp/RtmpAg5CCk/file19f83d659ad8.duckdb")`
 #>   `codeminer_connect()`
 
 # Get the full ICD-10 relationship table
 get_relationship_table("ICD-10") |> dplyr::collect()
-#> ℹ Using 'UKB v4' as latest version
+#> ℹ Using "UKB v4" as the latest relationship version for "ICD-10".
 #> # A tibble: 140 × 3
 #>    from  to    code_type
 #>    <chr> <chr> <chr>    

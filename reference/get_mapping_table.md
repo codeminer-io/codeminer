@@ -93,12 +93,12 @@ Other Clinical code lookups and mappings:
 create_dummy_database()
 #> ✔ Dummy database ready to use!
 #> ℹ To reconnect to your previous database:
-#>   `Sys.setenv(CODEMINER_DB_PATH = "/tmp/RtmpOxzP4z/file1a2459dfdc9.duckdb")`
+#>   `Sys.setenv(CODEMINER_DB_PATH = "/tmp/RtmpAg5CCk/file19f83f72a7fb.duckdb")`
 #>   `codeminer_connect()`
 
 # Get the full Read 3 to ICD-10 mapping table
 get_mapping_table("Read v3", "ICD-10") |> dplyr::collect()
-#> ℹ Using 'UKB v4' as latest version
+#> ℹ Using "UKB v4" as the latest mapping version for "Read v3 > ICD-10".
 #> # A tibble: 5 × 8
 #>   from  to    mapping_status refine_flag add_code_flag element_num block_num
 #>   <chr> <chr> <chr>          <chr>       <chr>         <chr>       <chr>    

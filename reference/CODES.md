@@ -111,7 +111,7 @@ create_dummy_database(temp_db)
 
 # Multiple arguments
 CODES("E10", "E11", type = "ICD-10")
-#> ℹ Using 'UKB v4' as latest version
+#> ℹ Using "UKB v4" as the latest lookup version for "ICD-10".
 #> <codeminer_codelist>: 2 codes
 #> Code type: "ICD-10"
 #> 

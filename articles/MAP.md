@@ -25,8 +25,8 @@ to map a vector of codes from one clinical coding system to another:
 ``` r
 
 MAP("X40J4", from = "Read v3", to = "ICD-10")
-#> ℹ Using 'UKB v4' as latest version
-#> ℹ Using 'UKB v4' as latest version
+#> ℹ Using "UKB v4" as the latest mapping version for "Read v3 > ICD-10".
+#> ℹ Using "UKB v4" as the latest lookup version for "ICD-10".
 #> <codeminer_codelist>: 1 code
 #> 
 #> Code type: "ICD-10"

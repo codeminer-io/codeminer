@@ -149,12 +149,12 @@ Other Clinical code lookups and mappings:
 create_dummy_database()
 #> ✔ Dummy database ready to use!
 #> ℹ To reconnect to your previous database:
-#>   `Sys.setenv(CODEMINER_DB_PATH = "/tmp/RtmpOxzP4z/file1a246181bdec.duckdb")`
+#>   `Sys.setenv(CODEMINER_DB_PATH = "/tmp/RtmpAg5CCk/file19f8459058f4.duckdb")`
 #>   `codeminer_connect()`
 
 tree <- get_relationship_tree("E10", type = "ICD-10")
-#> ℹ Using 'UKB v4' as latest version
-#> ℹ Using 'UKB v4' as latest version
+#> ℹ Using "UKB v4" as the latest relationship version for "ICD-10".
+#> ℹ Using "UKB v4" as the latest lookup version for "ICD-10".
 tree$nodes
 #> # A tibble: 11 × 4
 #>    code  term                                              category in_input_set
