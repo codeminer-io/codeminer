@@ -269,9 +269,17 @@ get_metadata_for_mapping <- function(
 ) {
   all_meta <- get_mapping_metadata(con = con)
 
-  # Check if we need to swap the from and to types
-  swap <- !(from %in% all_meta$from_code_type) &&
-    from %in% all_meta$to_code_type
+  # Decide whether to reverse an existing table on the requested *pair*, not on
+  # whether `from` appears as a source anywhere. A `to -> from` table is only
+  # reused (reversed) when the forward `from -> to` pair is genuinely absent;
+  # forward always wins when both directions are stored explicitly.
+  forward_exists <- any(
+    all_meta$from_code_type == from & all_meta$to_code_type == to
+  )
+  reverse_exists <- any(
+    all_meta$from_code_type == to & all_meta$to_code_type == from
+  )
+  swap <- !forward_exists && reverse_exists
   if (swap) {
     codeminer_warn(
       c(

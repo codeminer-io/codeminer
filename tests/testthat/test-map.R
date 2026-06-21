@@ -70,6 +70,23 @@ test_that("MAP() swaps `to` and `from` if necessary and warns", {
   expect_identical(unique(result$code_type), test_to)
 })
 
+test_that("MAP() reverses a pair even when `from` is a source in another mapping", {
+  # Regression test for #161. There is no explicit ICD-9 -> Read v3 table, only
+  # the reverse Read v3 -> ICD-9. ICD-9 is also a *source* in the unrelated
+  # ICD-9 -> ICD-10 mapping. The swap must be decided on the requested pair, not
+  # on whether ICD-9 appears as a source anywhere, so MAP() should still reverse
+  # Read v3 -> ICD-9 instead of erroring.
+  test_codes <- c("2500", "250", "6480", "7902") # ICD-9 codes
+  test_from <- "ICD-9"
+  test_to <- "Read v3"
+
+  expect_warning(
+    result <- MAP(test_codes, from = test_from, to = test_to),
+    "No explicit mapping table found"
+  )
+  expect_identical(unique(result$code_type), test_to)
+})
+
 test_that("MAP('all') returns the mapping table", {
   result <- MAP(
     "all",
