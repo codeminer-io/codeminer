@@ -115,12 +115,18 @@ MAP <- function(
 
   con <- get_db_con()
 
+  # Resolve the mapping metadata once and reuse it for both the table lookup and
+  # the missing-codes warning. Resolving it twice would emit the reverse-swap
+  # warning twice for a single MAP() call.
+  this_meta <- get_metadata_for_mapping(con, from, to, map_version)
+
   mapping_table <- get_mapping_table(
     from,
     to,
     map_version,
     col_filters = col_filters,
-    con = con
+    con = con,
+    meta = this_meta
   )
 
   mapping <- dplyr::filter(
@@ -135,7 +141,7 @@ MAP <- function(
     missing_codes_warning(
       missing_codes,
       table_type = "mapping",
-      table_meta = get_metadata_for_mapping(con, from, to, map_version)
+      table_meta = this_meta
     )
   }
   mapped_codes <- unique(mapping$to)
@@ -168,6 +174,11 @@ MAP <- function(
 #' @param col_filters Column filters to apply. See [CODES()] for details.
 #' @param con Optional DBI connection. If `NULL` (default), uses the
 #'   workbench connection.
+#' @param meta Optional pre-resolved mapping metadata row (as returned by the
+#'   internal metadata resolver). When supplied, the metadata is not resolved
+#'   again - callers that have already resolved it pass it through to avoid
+#'   repeating the resolution (and any reverse-swap warning it emits). Defaults
+#'   to `NULL`, which resolves the metadata from `from`/`to`/`map_version`.
 #' @param call The calling environment. Passed to [codeminer_abort].
 #'
 #' @return A lazy `dplyr::tbl()` with standardised columns (`from`, `to`)
@@ -187,10 +198,15 @@ get_mapping_table <- function(
   map_version = "latest",
   col_filters = "default",
   con = NULL,
+  meta = NULL,
   call = rlang::caller_env()
 ) {
   con <- get_db_con(con)
-  this_meta <- get_metadata_for_mapping(con, from, to, map_version, call = call)
+  this_meta <- if (is.null(meta)) {
+    get_metadata_for_mapping(con, from, to, map_version, call = call)
+  } else {
+    meta
+  }
   tbl_name <- this_meta$mapping_table_name
   tbl <- dplyr::tbl(con, tbl_name)
 

@@ -11,6 +11,7 @@ get_relationship_table(
   relationship_version = "latest",
   col_filters = "default",
   con = NULL,
+  meta = NULL,
   call = rlang::caller_env()
 )
 }
@@ -34,6 +35,12 @@ codelist" question, prefer \code{\link[=PARENTS]{PARENTS()}} / \code{\link[=CHIL
 
 \item{con}{Optional DBI connection. If \code{NULL} (default), uses the
 workbench connection.}
+
+\item{meta}{Optional pre-resolved relationship metadata row (as returned by
+the internal metadata resolver). When supplied, the metadata is not
+resolved again - callers that have already resolved it pass it through to
+avoid repeating the resolution. Defaults to \code{NULL}, which resolves the
+metadata from \code{type}/\code{relationship_version}.}
 
 \item{call}{The calling environment. Passed to \link{codeminer_abort}.}
 }

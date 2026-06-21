@@ -149,11 +149,16 @@ CODES <- function(
 
   con <- get_db_con()
 
+  # Resolve the lookup metadata once and reuse it for both the table lookup and
+  # the missing-codes warning, rather than resolving it twice per call.
+  this_meta <- get_metadata_for_lookup(con, type, lookup_version)
+
   lookup_table <- get_lookup_table(
     type,
     lookup_version = lookup_version,
     col_filters = col_filters,
-    con = con
+    con = con,
+    meta = this_meta
   )
 
   result <- lookup_table |>
@@ -165,7 +170,7 @@ CODES <- function(
     missing_codes_warning(
       missing_codes,
       table_type = "lookup",
-      table_meta = get_metadata_for_lookup(con, type, lookup_version)
+      table_meta = this_meta
     )
   }
 
@@ -345,6 +350,11 @@ codes_present_in_lookup <- function(codes, code_type, lookup_version, con) {
 #' @param col_filters Column filters to apply. See [CODES()] for details.
 #' @param con Optional DBI connection. If `NULL` (default), uses the
 #'   workbench connection.
+#' @param meta Optional pre-resolved lookup metadata row (as returned by the
+#'   internal metadata resolver). When supplied, the metadata is not resolved
+#'   again - callers that have already resolved it pass it through to avoid
+#'   repeating the resolution. Defaults to `NULL`, which resolves the metadata
+#'   from `type`/`lookup_version`.
 #' @param call The calling environment. Passed to [codeminer_abort].
 #'
 #' @return A lazy `dplyr::tbl()` with standardised columns (`code`,
@@ -369,10 +379,15 @@ get_lookup_table <- function(
   lookup_version = "latest",
   col_filters = "default",
   con = NULL,
+  meta = NULL,
   call = rlang::caller_env()
 ) {
   con <- get_db_con(con)
-  this_meta <- get_metadata_for_lookup(con, type, lookup_version, call)
+  this_meta <- if (is.null(meta)) {
+    get_metadata_for_lookup(con, type, lookup_version, call)
+  } else {
+    meta
+  }
 
   tbl_name <- this_meta$lookup_table_name
   tbl <- dplyr::tbl(con, tbl_name)

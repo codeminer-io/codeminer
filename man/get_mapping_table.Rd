@@ -10,6 +10,7 @@ get_mapping_table(
   map_version = "latest",
   col_filters = "default",
   con = NULL,
+  meta = NULL,
   call = rlang::caller_env()
 )
 }
@@ -24,6 +25,12 @@ get_mapping_table(
 
 \item{con}{Optional DBI connection. If \code{NULL} (default), uses the
 workbench connection.}
+
+\item{meta}{Optional pre-resolved mapping metadata row (as returned by the
+internal metadata resolver). When supplied, the metadata is not resolved
+again - callers that have already resolved it pass it through to avoid
+repeating the resolution (and any reverse-swap warning it emits). Defaults
+to \code{NULL}, which resolves the metadata from \code{from}/\code{to}/\code{map_version}.}
 
 \item{call}{The calling environment. Passed to \link{codeminer_abort}.}
 }
