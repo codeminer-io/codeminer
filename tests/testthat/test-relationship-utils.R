@@ -30,6 +30,16 @@ test_that("get_relationship_tree() returns list(nodes, edges) with expected colu
   expect_type(tree$nodes$in_input_set, "logical")
 })
 
+test_that("get_relationship_tree() resolves relationship metadata only once (#163)", {
+  # It resolves the metadata directly and then calls get_relationship_table();
+  # the resolved metadata must be threaded through rather than resolved again.
+  n <- count_codeminer_calls(
+    "get_metadata_for_relationship",
+    get_relationship_tree("E10", type = "ICD-10")
+  )
+  expect_identical(n, 1L)
+})
+
 test_that("get_relationship_tree() expand_to_descendants = TRUE pulls in children", {
   tree <- get_relationship_tree("E10", type = "ICD-10")
   # Seed always present, and at least one descendant picked up

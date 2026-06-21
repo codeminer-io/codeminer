@@ -23,6 +23,11 @@
 #' @param col_filters Column filters to apply. See [CODES()] for details.
 #' @param con Optional DBI connection. If `NULL` (default), uses the
 #'   workbench connection.
+#' @param meta Optional pre-resolved relationship metadata row (as returned by
+#'   the internal metadata resolver). When supplied, the metadata is not
+#'   resolved again - callers that have already resolved it pass it through to
+#'   avoid repeating the resolution. Defaults to `NULL`, which resolves the
+#'   metadata from `type`/`relationship_version`.
 #' @param call The calling environment. Passed to [codeminer_abort].
 #'
 #' @return A lazy `dplyr::tbl()` with standardised columns (`from`, `to`,
@@ -64,16 +69,19 @@ get_relationship_table <- function(
   relationship_version = "latest",
   col_filters = "default",
   con = NULL,
+  meta = NULL,
   call = rlang::caller_env()
 ) {
   endpoints <- rlang::arg_match(endpoints)
   con <- get_db_con(con)
-  meta <- get_metadata_for_relationship(
-    con,
-    type,
-    relationship_version,
-    call
-  )
+  if (is.null(meta)) {
+    meta <- get_metadata_for_relationship(
+      con,
+      type,
+      relationship_version,
+      call
+    )
+  }
   tbl <- dplyr::tbl(con, meta$relationship_table_name)
 
   # Apply col_filters
@@ -741,6 +749,7 @@ get_relationship_tree <- function(
     relationship_version = relationship_version,
     col_filters = col_filters,
     con = con,
+    meta = rel_meta,
     call = call
   )
   if (!is.null(hierarchy_rel)) {

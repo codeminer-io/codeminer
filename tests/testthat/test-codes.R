@@ -161,3 +161,13 @@ test_that("CODES validates type when returning codelist as-is", {
     "Conflicting.*type"
   )
 })
+
+test_that("CODES() resolves lookup metadata only once per call (#163)", {
+  # Include a code absent from the lookup so the missing-codes path runs;
+  # previously this resolved the lookup metadata a second time.
+  n <- count_codeminer_calls(
+    "get_metadata_for_lookup",
+    CODES(c("A028", "NOT_A_CODE"), type = "ICD-10", lookup_version = "UKB v4")
+  )
+  expect_identical(n, 1L)
+})
