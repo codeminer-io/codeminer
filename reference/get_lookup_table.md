@@ -17,6 +17,7 @@ get_lookup_table(
   lookup_version = "latest",
   col_filters = "default",
   con = NULL,
+  meta = NULL,
   call = rlang::caller_env()
 )
 ```
@@ -49,6 +50,14 @@ get_lookup_table(
 
   Optional DBI connection. If `NULL` (default), uses the workbench
   connection.
+
+- meta:
+
+  Optional pre-resolved lookup metadata row (as returned by the internal
+  metadata resolver). When supplied, the metadata is not resolved
+  again - callers that have already resolved it pass it through to avoid
+  repeating the resolution. Defaults to `NULL`, which resolves the
+  metadata from `type`/`lookup_version`.
 
 - call:
 
@@ -91,7 +100,7 @@ Other Clinical code lookups and mappings:
 create_dummy_database()
 #> ✔ Dummy database ready to use!
 #> ℹ To reconnect to your previous database:
-#>   `Sys.setenv(CODEMINER_DB_PATH = "/tmp/RtmprScmLr/file1a4d7728fe32.duckdb")`
+#>   `Sys.setenv(CODEMINER_DB_PATH = "/tmp/RtmpOxzP4z/file1a24278135c4.duckdb")`
 #>   `codeminer_connect()`
 
 # Get the full ICD-10 lookup table

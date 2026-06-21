@@ -19,6 +19,7 @@ get_relationship_table(
   relationship_version = "latest",
   col_filters = "default",
   con = NULL,
+  meta = NULL,
   call = rlang::caller_env()
 )
 ```
@@ -61,6 +62,14 @@ get_relationship_table(
 
   Optional DBI connection. If `NULL` (default), uses the workbench
   connection.
+
+- meta:
+
+  Optional pre-resolved relationship metadata row (as returned by the
+  internal metadata resolver). When supplied, the metadata is not
+  resolved again - callers that have already resolved it pass it through
+  to avoid repeating the resolution. Defaults to `NULL`, which resolves
+  the metadata from `type`/`relationship_version`.
 
 - call:
 
@@ -105,7 +114,7 @@ Other Clinical code lookups and mappings:
 create_dummy_database()
 #> ✔ Dummy database ready to use!
 #> ℹ To reconnect to your previous database:
-#>   `Sys.setenv(CODEMINER_DB_PATH = "/tmp/RtmprScmLr/file1a4d65b646ba.duckdb")`
+#>   `Sys.setenv(CODEMINER_DB_PATH = "/tmp/RtmpOxzP4z/file1a245d0678f6.duckdb")`
 #>   `codeminer_connect()`
 
 # Get the full ICD-10 relationship table

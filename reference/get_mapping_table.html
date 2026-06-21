@@ -56,6 +56,7 @@ database table. Call <code><a href="https://dplyr.tidyverse.org/reference/comput
 <span>  map_version <span class="op">=</span> <span class="st">"latest"</span>,</span>
 <span>  col_filters <span class="op">=</span> <span class="st">"default"</span>,</span>
 <span>  con <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  meta <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  call <span class="op">=</span> <span class="fu">rlang</span><span class="fu">::</span><span class="fu"><a href="https://rlang.r-lib.org/reference/stack.html" class="external-link">caller_env</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -83,6 +84,14 @@ database table. Call <code><a href="https://dplyr.tidyverse.org/reference/comput
 <dt id="arg-con">con<a class="anchor" aria-label="anchor" href="#arg-con"></a></dt>
 <dd><p>Optional DBI connection. If <code>NULL</code> (default), uses the
 workbench connection.</p></dd>
+
+
+<dt id="arg-meta">meta<a class="anchor" aria-label="anchor" href="#arg-meta"></a></dt>
+<dd><p>Optional pre-resolved mapping metadata row (as returned by the
+internal metadata resolver). When supplied, the metadata is not resolved
+again - callers that have already resolved it pass it through to avoid
+repeating the resolution (and any reverse-swap warning it emits). Defaults
+to <code>NULL</code>, which resolves the metadata from <code>from</code>/<code>to</code>/<code>map_version</code>.</p></dd>
 
 
 <dt id="arg-call">call<a class="anchor" aria-label="anchor" href="#arg-call"></a></dt>
@@ -116,7 +125,7 @@ returned by <code><a href="MAP.html">MAP()</a></code>.</p>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="create_dummy_database.html">create_dummy_database</a></span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Dummy database ready to use!</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> To reconnect to your previous database:</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>   `Sys.setenv(CODEMINER_DB_PATH = "/tmp/RtmprScmLr/file1a4d6365a2d6.duckdb")`</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>   `Sys.setenv(CODEMINER_DB_PATH = "/tmp/RtmpOxzP4z/file1a2459dfdc9.duckdb")`</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>   `codeminer_connect()`</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Get the full Read 3 to ICD-10 mapping table</span></span></span>
