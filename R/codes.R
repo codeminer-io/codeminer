@@ -474,7 +474,14 @@ get_metadata_for_lookup <- function(
 # NOTE: this helper has a strong assumption that the versions have some numeric component (e.g. "v42")
 # that can be extracted and used to sort, in order to get the latest one
 # This is is not something we enforce, so this may not always return the correct result.
-get_latest_version <- function(versions) {
+#
+# `type_label` ("mapping"/"lookup"/"relationship") and `key` (the code type, or
+# "from > to" pair for mappings) qualify the message so it is clear which table
+# the resolved version applies to. A single MAP() call resolves both a mapping
+# version and a lookup version, so an unqualified message reads as a confusing
+# duplicate. The message is emitted even when only one version exists, so users
+# who have not explicitly pinned versions can see which defaults were chosen.
+get_latest_version <- function(versions, type_label = NULL, key = NULL) {
   versions_numeric <- as.numeric(stringr::str_extract(versions, "\\d+"))
   if (any(is.na(versions_numeric))) {
     # resort to alphabetic ordering
@@ -482,6 +489,12 @@ get_latest_version <- function(versions) {
   } else {
     latest_version <- versions[which.max(versions_numeric)]
   }
-  codeminer_inform(c("i" = "Using '{latest_version}' as latest version"))
+  if (!is.null(type_label) && !is.null(key)) {
+    codeminer_inform(c(
+      "i" = "Using {.val {latest_version}} as the latest {type_label} version for {.val {key}}."
+    ))
+  } else {
+    codeminer_inform(c("i" = "Using {.val {latest_version}} as latest version"))
+  }
   return(latest_version)
 }
