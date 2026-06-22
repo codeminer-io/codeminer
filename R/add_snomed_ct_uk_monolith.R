@@ -30,9 +30,10 @@
 #' @param .icd10_refset_id Character string. The SNOMED CT Concept ID
 #'   identifying the specific Reference Set (Refset) used for ICD-10 mappings.
 #'   Defaults to `"999002271000000101"`. This is an advanced parameter.
-#' @param .opcs4_refset_id Character string. The SNOMED CT Concept ID
+#' @param .opcs4_refset_id Character string or `NULL`. The SNOMED CT Concept ID
 #'   identifying the specific Reference Set (Refset) used for OPCS-4 mappings.
-#'   Defaults to `"999002321000000109"`. This is an advanced parameter.
+#'   Defaults to `NULL`, which auto-detects the latest OPCS-4 complex map
+#'   reference set present in the release. This is an advanced parameter.
 #'
 #' @returns Invisibly returns the result from [read_snomed_ct_uk_monolith()] (a
 #'   named list of tables with metadata).
@@ -90,7 +91,7 @@ add_snomed_ct_uk_monolith <- function(
   version = NULL,
   source = "https://isd.digital.nhs.uk/trud/",
   .icd10_refset_id = "999002271000000101",
-  .opcs4_refset_id = "999002321000000109"
+  .opcs4_refset_id = NULL
 ) {
   if (is.null(version)) {
     version <- basename(path)
