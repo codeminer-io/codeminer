@@ -647,7 +647,14 @@ SNOMED CT code referenced in the mapping table
 must exist in both the concept and description tables. This applies to
 both ICD-10 mappings (<code>refsetId</code> =
 <code>999002271000000101</code>) and OPCS-4 mappings
-(<code>refsetId</code> = <code>999002321000000109</code>).</p>
+(<code>refsetId</code> = <code>999002321000000109</code> in the dummy
+data). Note that the OPCS-4 map <code>refsetId</code> is version
+specific in real releases (a new refset per OPCS-4 edition) and is
+auto-detected at read time from the refset’s description term (see
+<code>.opcs4_refset_id</code> in
+<code><a href="../reference/read_snomed_ct_uk_monolith.html">read_snomed_ct_uk_monolith()</a></code>); the dummy
+<code>999002321000000109</code> therefore also needs a description row
+naming it as an OPCS-4 complex map reference set.</p>
 <p><strong>Relationship Table -&gt; Concept Table</strong>: Both
 <code>sourceId</code> and <code>destinationId</code> in relationship
 entries should reference valid concepts (though
@@ -802,7 +809,8 @@ English)</li>
 <li>ICD-10 map <code>refsetId</code>: <code>999002271000000101</code>
 (UK Extension ICD-10 map)</li>
 <li>OPCS-4 map <code>refsetId</code>: <code>999002321000000109</code>
-(UK Extension OPCS-4 map)</li>
+(dummy value; the real OPCS-4 map refset is version specific and
+auto-detected — see <code>.opcs4_refset_id</code>)</li>
 <li>
 <code>correlationId</code>: <code>447561005</code> (SNOMED CT to
 target code correlation not specified)</li>

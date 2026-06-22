@@ -12,7 +12,7 @@ read_snomed_ct_uk_monolith(
   version = NULL,
   source = "https://isd.digital.nhs.uk/trud/",
   .icd10_refset_id = "999002271000000101",
-  .opcs4_refset_id = "999002321000000109"
+  .opcs4_refset_id = NULL
 )
 ```
 
@@ -63,11 +63,13 @@ read_snomed_ct_uk_monolith(
 
 - .opcs4_refset_id:
 
-  Character string. The SNOMED CT Concept ID identifying the specific
-  Reference Set (Refset) used for OPCS-4 mappings. Defaults to
-  `"999002321000000109"` (UK Clinical Extension Extended Map to OPCS-4).
-  This is an advanced parameter that typically does not need to be
-  changed.
+  Character string or `NULL`. The SNOMED CT Concept ID identifying the
+  specific Reference Set (Refset) used for OPCS-4 mappings. Defaults to
+  `NULL`, which auto-detects the latest OPCS-4 complex map reference set
+  present in the release (the OPCS-4 map refset is version specific and
+  changes with each OPCS-4 edition). Pass an explicit Concept ID to
+  override. This is an advanced parameter that typically does not need
+  to be changed.
 
 ## Value
 

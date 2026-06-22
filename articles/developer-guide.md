@@ -315,7 +315,13 @@ referenced in the mapping table (`referencedComponentId` column in
 `der2_iisssccRefset_GPSExtendedMapSnapshot_INT_20250701.txt`) must exist
 in both the concept and description tables. This applies to both ICD-10
 mappings (`refsetId` = `999002271000000101`) and OPCS-4 mappings
-(`refsetId` = `999002321000000109`).
+(`refsetId` = `999002321000000109` in the dummy data). Note that the
+OPCS-4 map `refsetId` is version specific in real releases (a new refset
+per OPCS-4 edition) and is auto-detected at read time from the refset’s
+description term (see `.opcs4_refset_id` in
+[`read_snomed_ct_uk_monolith()`](https://codeminer-io.github.io/codeminer/reference/read_snomed_ct_uk_monolith.md));
+the dummy `999002321000000109` therefore also needs a description row
+naming it as an OPCS-4 complex map reference set.
 
 **Relationship Table -\> Concept Table**: Both `sourceId` and
 `destinationId` in relationship entries should reference valid concepts
@@ -417,7 +423,9 @@ When adding new entries, use these standard SNOMED CT values:
 - `refsetId`: `900000000000509007` (US English)
 - `acceptabilityId`: `900000000000548007` (preferred)
 - ICD-10 map `refsetId`: `999002271000000101` (UK Extension ICD-10 map)
-- OPCS-4 map `refsetId`: `999002321000000109` (UK Extension OPCS-4 map)
+- OPCS-4 map `refsetId`: `999002321000000109` (dummy value; the real
+  OPCS-4 map refset is version specific and auto-detected — see
+  `.opcs4_refset_id`)
 - `correlationId`: `447561005` (SNOMED CT to target code correlation not
   specified)
 

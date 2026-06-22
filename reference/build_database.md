@@ -41,7 +41,7 @@ build_database(overwrite = FALSE, format = c("duckdb", "parquet"))
 db_path <- tempfile(fileext = ".duckdb")
 Sys.setenv(CODEMINER_DB_PATH = db_path)
 build_database()
-#> Creating new database at /tmp/RtmpAg5CCk/file19f82b248f77.duckdb
+#> Creating new database at /tmp/RtmpdotHK6/file1a2f5283dd76.duckdb
 file.exists(db_path)
 #> [1] TRUE
 ```

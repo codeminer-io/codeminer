@@ -149,7 +149,7 @@ Other Clinical code lookups and mappings:
 create_dummy_database()
 #> ✔ Dummy database ready to use!
 #> ℹ To reconnect to your previous database:
-#>   `Sys.setenv(CODEMINER_DB_PATH = "/tmp/RtmpAg5CCk/file19f8459058f4.duckdb")`
+#>   `Sys.setenv(CODEMINER_DB_PATH = "/tmp/RtmpdotHK6/file1a2ff3fd5da.duckdb")`
 #>   `codeminer_connect()`
 
 tree <- get_relationship_tree("E10", type = "ICD-10")

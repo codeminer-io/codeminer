@@ -53,7 +53,7 @@ SNOMED CT UK Monolith Edition release files."></head><body>
 <span>  version <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  source <span class="op">=</span> <span class="st">"https://isd.digital.nhs.uk/trud/"</span>,</span>
 <span>  .icd10_refset_id <span class="op">=</span> <span class="st">"999002271000000101"</span>,</span>
-<span>  .opcs4_refset_id <span class="op">=</span> <span class="st">"999002321000000109"</span></span>
+<span>  .opcs4_refset_id <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -97,11 +97,13 @@ changed.</p></dd>
 
 
 <dt id="arg--opcs-refset-id">.opcs4_refset_id<a class="anchor" aria-label="anchor" href="#arg--opcs-refset-id"></a></dt>
-<dd><p>Character string. The SNOMED CT Concept ID
+<dd><p>Character string or <code>NULL</code>. The SNOMED CT Concept ID
 identifying the specific Reference Set (Refset) used for OPCS-4 mappings.
-Defaults to <code>"999002321000000109"</code> (UK Clinical Extension Extended Map to
-OPCS-4). This is an advanced parameter that typically does not need to be
-changed.</p></dd>
+Defaults to <code>NULL</code>, which auto-detects the latest OPCS-4 complex map
+reference set present in the release (the OPCS-4 map refset is version
+specific and changes with each OPCS-4 edition). Pass an explicit Concept ID
+to override. This is an advanced parameter that typically does not need to
+be changed.</p></dd>
 
 </dl></div>
     <div class="section level2">
