@@ -32,11 +32,13 @@
 #'   Defaults to `"999002271000000101"` (UK Clinical Extension Extended Map to
 #'   ICD-10). This is an advanced parameter that typically does not need to be
 #'   changed.
-#' @param .opcs4_refset_id Character string. The SNOMED CT Concept ID
+#' @param .opcs4_refset_id Character string or `NULL`. The SNOMED CT Concept ID
 #'   identifying the specific Reference Set (Refset) used for OPCS-4 mappings.
-#'   Defaults to `"999002321000000109"` (UK Clinical Extension Extended Map to
-#'   OPCS-4). This is an advanced parameter that typically does not need to be
-#'   changed.
+#'   Defaults to `NULL`, which auto-detects the latest OPCS-4 complex map
+#'   reference set present in the release (the OPCS-4 map refset is version
+#'   specific and changes with each OPCS-4 edition). Pass an explicit Concept ID
+#'   to override. This is an advanced parameter that typically does not need to
+#'   be changed.
 #'
 #' @return A named list with elements corresponding to requested tables, each
 #'   containing tables and metadata:
@@ -81,7 +83,7 @@ read_snomed_ct_uk_monolith <- function(
   version = NULL,
   source = "https://isd.digital.nhs.uk/trud/",
   .icd10_refset_id = "999002271000000101",
-  .opcs4_refset_id = "999002321000000109"
+  .opcs4_refset_id = NULL
 ) {
   # Constants
   snomed_code_type <- "SNOMED CT"
@@ -176,9 +178,15 @@ read_snomed_ct_uk_monolith <- function(
   # Determine which files need to be loaded
   need_terminology <- any(c("sct_lookup", "sct_relationship") %in% tables)
   need_map <- any(c("sct_icd10", "sct_opcs4") %in% tables)
+  # Descriptions are also needed (just to read the refset concept terms) when
+  # auto-detecting the OPCS-4 map refset, even for map-only builds.
+  need_desc <- need_terminology ||
+    ("sct_opcs4" %in% tables && is.null(.opcs4_refset_id))
 
-  if (need_terminology) {
+  if (need_desc) {
     path_desc <- find_snomed_file(term_dir, "^sct2_Description_.*Snapshot")
+  }
+  if (need_terminology) {
     path_conc <- find_snomed_file(term_dir, "^sct2_Concept_.*Snapshot")
   }
 
@@ -304,6 +312,15 @@ read_snomed_ct_uk_monolith <- function(
         mapTarget = strip_icd10_x_placeholder(.data$mapTarget)
       )
 
+    # Fail loudly if the ICD-10 refset is absent, rather than silently storing
+    # an empty mapping table.
+    if (nrow(sct_icd10_table) == 0) {
+      cli::cli_abort(c(
+        "x" = "No rows found for ICD-10 map refset {.val {(.icd10_refset_id)}}.",
+        "i" = "The refset id may have changed in this release; pass an explicit {.arg .icd10_refset_id}."
+      ))
+    }
+
     sct_icd10_metadata <- mapping_metadata(
       from_code_type = snomed_code_type,
       to_code_type = icd10_code_type,
@@ -322,10 +339,25 @@ read_snomed_ct_uk_monolith <- function(
   }
 
   if ("sct_opcs4" %in% tables) {
+    # The OPCS-4 map refset id is version specific (a new refset per OPCS-4
+    # edition), so auto-detect the latest one present unless overridden. Only
+    # refsets actually in `raw_maps` are candidates, so we never pick a map we
+    # cannot load.
+    opcs4_refset_id <- .opcs4_refset_id
+    if (is.null(opcs4_refset_id)) {
+      opcs4_refset_id <- detect_opcs4_refset_id(
+        path_desc,
+        unique(raw_maps$refsetId)
+      )
+      cli::cli_inform(
+        "Auto-detected OPCS-4 map reference set {.val {opcs4_refset_id}}"
+      )
+    }
+
     # Filter for OPCS-4 Refset ID and exclude blocks
     sct_opcs4_table <- raw_maps |>
       dplyr::filter(
-        .data$refsetId == .env$.opcs4_refset_id,
+        .data$refsetId == .env$opcs4_refset_id,
         !stringr::str_detect(.data$mapTarget, "#")
       )
 
@@ -349,6 +381,66 @@ read_snomed_ct_uk_monolith <- function(
   # 4. Return ---------------------------------------------------------------
 
   result
+}
+
+#' Auto-detect the latest OPCS-4 map reference set
+#'
+#' @description Resolves the SNOMED CT Concept ID of the latest OPCS-4 complex
+#' map reference set by matching the refset concept terms in the description
+#' file. The OPCS-4 map refset id is version specific (one refset per OPCS-4
+#' edition, e.g. 4.9, 4.10, 4.11), so the highest minor version is chosen.
+#'
+#' The match is pinned to the `Version 4.x` family on purpose: the code type is
+#' `"OPCS-4"`, so a future OPCS-5 classification must not be silently absorbed
+#' here.
+#'
+#' @param path_desc Path to the SNOMED CT description snapshot file.
+#' @param candidate_refset_ids Character vector of refset ids actually present
+#'   in the map data, so we only ever pick a loadable map.
+#' @param call The execution environment, for error reporting.
+#'
+#' @return A character scalar: the Concept ID of the latest OPCS-4 map refset.
+#' @noRd
+detect_opcs4_refset_id <- function(
+  path_desc,
+  candidate_refset_ids,
+  call = rlang::caller_env()
+) {
+  desc <- fread_sct(path_desc)
+
+  cand <- desc |>
+    dplyr::filter(
+      .data$conceptId %in% .env$candidate_refset_ids,
+      .data$active == "1",
+      stringr::str_detect(
+        .data$term,
+        stringr::regex(
+          "Classification of Interventions and Procedures Version 4\\.\\d+.*complex map reference set",
+          ignore_case = TRUE
+        )
+      )
+    ) |>
+    dplyr::mutate(
+      opcs4_version = as.integer(
+        stringr::str_match(.data$term, "Version 4\\.(\\d+)")[, 2]
+      )
+    ) |>
+    dplyr::filter(!is.na(.data$opcs4_version)) |>
+    dplyr::distinct(.data$conceptId, .keep_all = TRUE)
+
+  if (nrow(cand) == 0) {
+    cli::cli_abort(
+      c(
+        "x" = "Could not auto-detect an OPCS-4 map reference set in this release.",
+        "i" = "Pass an explicit {.arg .opcs4_refset_id}."
+      ),
+      call = call
+    )
+  }
+
+  cand |>
+    dplyr::slice_max(.data$opcs4_version, n = 1, with_ties = FALSE) |>
+    dplyr::pull(.data$conceptId)
 }
 
 #' Find a SNOMED file by pattern

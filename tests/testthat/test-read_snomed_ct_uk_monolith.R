@@ -194,11 +194,82 @@ test_that("read_snomed_ct_uk_monolith() filters mappings correctly", {
   expect_equal(cp_row$mapTarget, "J312")
   expect_true(is.na(cp_row$icd10_dagger_asterisk))
 
-  # Check OPCS-4 table has correct refset and no blocks
+  # Check OPCS-4 table has correct refset and no blocks. The refset id is
+  # auto-detected from the description terms (default `.opcs4_refset_id = NULL`);
+  # the dummy release describes refset 999002321000000109 as an OPCS-4 complex
+  # map, so detection resolves back to it.
   expect_true(all(
     result$sct_opcs4$mapping$table$refsetId == "999002321000000109"
   ))
   expect_false(any(grepl("#", result$sct_opcs4$mapping$table$mapTarget)))
+})
+
+test_that("detect_opcs4_refset_id() picks the highest OPCS-4 version", {
+  desc_file <- withr::local_tempfile(fileext = ".txt")
+  opcs4_term <- function(v) {
+    paste0(
+      "Office of Population Censuses and Surveys Classification of ",
+      "Interventions and Procedures Version 4.",
+      v,
+      " complex map reference set"
+    )
+  }
+  desc <- data.frame(
+    id = c("1", "2", "3"),
+    effectiveTime = "20260101",
+    active = "1",
+    moduleId = "m",
+    conceptId = c("1126441000000105", "1382401000000109", "1891651000000103"),
+    languageCode = "en",
+    typeId = "t",
+    term = vapply(c(9L, 10L, 11L), opcs4_term, character(1)),
+    caseSignificanceId = "c",
+    stringsAsFactors = FALSE
+  )
+  utils::write.table(
+    desc,
+    desc_file,
+    sep = "\t",
+    quote = FALSE,
+    row.names = FALSE
+  )
+
+  # 4.11 > 4.10 > 4.9, despite 4.9 sorting last lexically among the ids
+  candidates <- c("1126441000000105", "1382401000000109", "1891651000000103")
+  expect_equal(
+    detect_opcs4_refset_id(desc_file, candidates),
+    "1891651000000103"
+  )
+
+  # Only loadable refsets are candidates: drop 4.11 and we fall back to 4.10
+  expect_equal(
+    detect_opcs4_refset_id(
+      desc_file,
+      c("1126441000000105", "1382401000000109")
+    ),
+    "1382401000000109"
+  )
+
+  # No OPCS-4 refset present -> clear error
+  expect_error(
+    detect_opcs4_refset_id(desc_file, "999999999999999999"),
+    "Could not auto-detect an OPCS-4 map reference set"
+  )
+})
+
+test_that("read_snomed_ct_uk_monolith() honours an explicit .opcs4_refset_id", {
+  result <- suppressMessages(
+    read_snomed_ct_uk_monolith(
+      dummy_snomed_ct_uk_monolith_path(),
+      tables = "sct_opcs4",
+      .opcs4_refset_id = "999002321000000109"
+    )
+  )
+
+  expect_gt(nrow(result$sct_opcs4$mapping$table), 0)
+  expect_true(all(
+    result$sct_opcs4$mapping$table$refsetId == "999002321000000109"
+  ))
 })
 
 # Error handling tests ----------------------------------------------------
@@ -316,16 +387,17 @@ test_that("read_snomed_ct_uk_monolith() defaults relationships to active edges o
   expect_equal(cf$active$defaults, "1")
 })
 
-test_that("read_snomed_ct_uk_monolith() uses custom refset IDs", {
-  # This won't find any matches with dummy data, but tests parameter passing
-  result <- suppressMessages(
-    read_snomed_ct_uk_monolith(
-      dummy_snomed_ct_uk_monolith_path(),
-      tables = "sct_icd10",
-      .icd10_refset_id = "999999999999999999"
-    )
+test_that("read_snomed_ct_uk_monolith() errors on an unmatched ICD-10 refset", {
+  # A non-matching .icd10_refset_id should fail loudly rather than silently
+  # storing an empty mapping table (the guard that was missing for OPCS-4).
+  expect_error(
+    suppressMessages(
+      read_snomed_ct_uk_monolith(
+        dummy_snomed_ct_uk_monolith_path(),
+        tables = "sct_icd10",
+        .icd10_refset_id = "999999999999999999"
+      )
+    ),
+    "No rows found for ICD-10 map refset"
   )
-
-  # Should return empty table since refset ID won't match
-  expect_equal(nrow(result$sct_icd10$mapping$table), 0)
 })
