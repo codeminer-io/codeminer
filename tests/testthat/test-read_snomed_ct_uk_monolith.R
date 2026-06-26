@@ -158,6 +158,39 @@ test_that("read_snomed_ct_uk_monolith() attaches FSN-derived category to lookup"
   expect_true(all(ms_rows$category == "Disorder"))
 })
 
+test_that("read_snomed_ct_uk_monolith() declares moduleId_concept as a no-default filter", {
+  result <- suppressMessages(
+    read_snomed_ct_uk_monolith(
+      dummy_snomed_ct_uk_monolith_path(),
+      tables = "sct_lookup"
+    )
+  )
+
+  tbl <- result$sct_lookup$lookup$table
+  cf <- deserialise_col_filters(
+    result$sct_lookup$lookup$metadata$col_filters
+  )
+
+  # moduleId_concept is declared as a filterable column...
+  expect_true("moduleId_concept" %in% names(cf))
+  # ...with its `values` derived from the data (every module present)...
+  expect_setequal(
+    cf$moduleId_concept$values,
+    sort(unique(tbl$moduleId_concept[!is.na(tbl$moduleId_concept)]))
+  )
+  # ...and empty `defaults`, so the default "SNOMED CT" query is not filtered
+  # by module and still returns the full UK release.
+  expect_length(cf$moduleId_concept$defaults, 0)
+
+  resolved <- resolve_col_filters(
+    "default",
+    result$sct_lookup$lookup$metadata$col_filters,
+    pin_type = "lookup",
+    pin_key = "SNOMED CT"
+  )
+  expect_false("moduleId_concept" %in% names(resolved))
+})
+
 test_that("read_snomed_ct_uk_monolith() filters mappings correctly", {
   result <- suppressMessages(
     read_snomed_ct_uk_monolith(
