@@ -295,7 +295,10 @@ relationship_metadata <- function(
     type_col = type_col,
     child_parent_relationship_code = child_parent_relationship_code,
     relationship_source = relationship_source,
-    col_filters = serialise_col_filters(col_filters)
+    col_filters = serialise_col_filters(col_filters),
+    # Physical-storage reference; defaults to the identity key. See
+    # `lookup_metadata()` for the role of this field.
+    storage_table_name = relationship_table_name
   ))
 }
 

@@ -373,13 +373,27 @@ validate_metadata_row <- function(metadata_row, type) {
 
 # Shared helpers ----------------------------------------------------------
 
-# Internal: resolve the primary-key column name for a metadata type.
+# Internal: resolve the primary-key (identity) column name for a metadata type.
 backend_id_col <- function(type) {
   switch(
     type,
     lookup = "lookup_table_name",
     mapping = "mapping_table_name",
     relationship = "relationship_table_name",
+    codeminer_abort("Invalid metadata type: {.val {type}}.")
+  )
+}
+
+# Internal: the physical-storage reference column. A single shared column name
+# across all three metadata types, holding the name of the data table a row
+# reads from. Decoupled from `backend_id_col()` so several metadata rows can
+# point at one physical table.
+backend_storage_col <- function(type) {
+  switch(
+    type,
+    lookup = ,
+    mapping = ,
+    relationship = "storage_table_name",
     codeminer_abort("Invalid metadata type: {.val {type}}.")
   )
 }

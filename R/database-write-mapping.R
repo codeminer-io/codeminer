@@ -264,7 +264,10 @@ mapping_metadata <- function(
     from_col = from_col,
     to_col = to_col,
     map_source = map_source,
-    col_filters = serialise_col_filters(col_filters)
+    col_filters = serialise_col_filters(col_filters),
+    # Physical-storage reference; defaults to the identity key. See
+    # `lookup_metadata()` for the role of this field.
+    storage_table_name = mapping_table_name
   ))
 }
 

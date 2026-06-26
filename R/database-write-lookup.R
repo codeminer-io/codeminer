@@ -289,7 +289,11 @@ lookup_metadata <- function(
     lookup_source = lookup_source,
     preferred_description_col = preferred_description_col,
     preferred_description_indicator = preferred_description_indicator,
-    col_filters = serialise_col_filters(col_filters)
+    col_filters = serialise_col_filters(col_filters),
+    # Physical-storage reference. Defaults to the identity key, so storage ==
+    # identity for an ordinarily-added table. A view (registered via
+    # `reuse_from`) re-stamps this at add time to point at an existing table.
+    storage_table_name = lookup_table_name
   ))
 }
 

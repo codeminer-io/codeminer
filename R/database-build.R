@@ -230,7 +230,13 @@ required_lookup_metadata_columns <- function() {
     "lookup_source",
     "preferred_description_col",
     "preferred_description_indicator",
-    "col_filters"
+    "col_filters",
+    # Physical-storage reference: the name of the data table this metadata row
+    # reads from. Defaults to the identity key (`paste(code_type, version)`),
+    # so storage == identity for ordinarily-added tables. Multiple rows may
+    # share one `storage_table_name`, letting one physical table back several
+    # typed / filtered lookups (see `reuse_from` in `lookup_metadata()`).
+    "storage_table_name"
   )
 }
 
@@ -242,7 +248,9 @@ required_mapping_metadata_columns <- function() {
     "from_col",
     "to_col",
     "map_source",
-    "col_filters"
+    "col_filters",
+    # See `required_lookup_metadata_columns()` for the role of this column.
+    "storage_table_name"
   )
 }
 
@@ -259,7 +267,9 @@ required_relationship_metadata_columns <- function() {
     "type_col",
     "child_parent_relationship_code", # Code for child -> parent relationship (e.g. SNOMED 'is a')
     "relationship_source",
-    "col_filters"
+    "col_filters",
+    # See `required_lookup_metadata_columns()` for the role of this column.
+    "storage_table_name"
   )
 }
 
