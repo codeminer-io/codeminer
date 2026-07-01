@@ -64,9 +64,12 @@ read_nhsbsa_bnf_snomed <- function(
   col_names <- stringr::str_remove_all(col_names, "plus_")
   names(bnf_dmd) <- col_names
 
+  # dm+d codes are SNOMED CT concept IDs (the UK drug extension), so the mapping
+  # target is typed as "SNOMED CT" to chain to the SNOMED CT lookup. The dm+d
+  # subset can be isolated via the SNOMED lookup's `moduleId_concept` filter.
   meta <- mapping_metadata(
     from_code_type = "BNF",
-    to_code_type = "DM+D",
+    to_code_type = "SNOMED CT",
     map_version = version,
     from_col = "bnf_code",
     to_col = "snomed_code",
