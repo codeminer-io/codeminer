@@ -63,7 +63,7 @@ lookup_table
 # Using a temporary database
 Sys.setenv(CODEMINER_DB_PATH = tempfile())
 build_database()
-#> Creating new database at /tmp/RtmpcSIMAS/file1ac84a30d39d
+#> Creating new database at /tmp/Rtmpzf3RPN/file19e64711fd86
 add_lookup_table(
   lookup_table,
   lookup_metadata("capital_letters", lookup_version = "v3")

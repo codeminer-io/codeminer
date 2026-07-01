@@ -11,7 +11,7 @@ codeminer_status()
 
 ## Value
 
-A named list of attached database paths, invisibly.
+The attached database path, invisibly (`NULL` if none attached).
 
 ## See also
 

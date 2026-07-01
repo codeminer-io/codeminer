@@ -267,6 +267,13 @@ clinical coding systems.
   : Read the NHSBSA BNF-SNOMED mapping file into a mapping table
 - [`add_nhsbsa_bnf_snomed()`](https://codeminer-io.github.io/codeminer/reference/add_nhsbsa_bnf_snomed.md)
   : Add NHSBSA BNF-SNOMED mapping table to CodeMiner database
+- [`get_pseudobnf()`](https://codeminer-io.github.io/codeminer/reference/get_pseudobnf.md)
+  : Get NHS BSA BNF code information (pseudo-BNF)
+- [`read_pseudobnf()`](https://codeminer-io.github.io/codeminer/reference/read_pseudobnf.md)
+  : Read NHS BSA BNF code information (pseudo-BNF) into lookup and
+  relationship tables
+- [`add_pseudobnf()`](https://codeminer-io.github.io/codeminer/reference/add_pseudobnf.md)
+  : Add NHS BSA BNF code information (pseudo-BNF) to CodeMiner database
 - [`get_nhs_data_migration()`](https://codeminer-io.github.io/codeminer/reference/get_nhs_data_migration.md)
   : Get NHS Data Migration mapping tables from NHS TRUD
 - [`read_nhs_data_migration()`](https://codeminer-io.github.io/codeminer/reference/read_nhs_data_migration.md)
@@ -346,6 +353,8 @@ Dummy data for tests.
   : Dummy Phecode Map 1.2 with ICD-10 codes (beta) file path
 - [`dummy_phecode_lkp_path()`](https://codeminer-io.github.io/codeminer/reference/dummy_phecode_lkp_path.md)
   : Dummy Phecode definitions file path
+- [`dummy_pseudobnf_path()`](https://codeminer-io.github.io/codeminer/reference/dummy_pseudobnf_path.md)
+  : Dummy NHS BSA BNF code information (pseudo-BNF) file path
 - [`dummy_snomed_ct_uk_monolith_path()`](https://codeminer-io.github.io/codeminer/reference/dummy_snomed_ct_uk_monolith_path.md)
   : Get full path to the dummy SNOMED CT GPS RF2 files
 - [`dummy_ukb_codings_path()`](https://codeminer-io.github.io/codeminer/reference/dummy_ukb_codings_path.md)

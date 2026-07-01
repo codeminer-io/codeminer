@@ -87,7 +87,7 @@ Other Code relationships:
 create_dummy_database()
 #> ✔ Dummy database ready to use!
 #> ℹ To reconnect to your previous database:
-#>   `Sys.setenv(CODEMINER_DB_PATH = "/tmp/RtmpcSIMAS/file1ac853982c65")`
+#>   `Sys.setenv(CODEMINER_DB_PATH = "/tmp/Rtmpzf3RPN/file19e6508c667e")`
 #>   `codeminer_connect()`
 # ATTRIBUTES_FOR returns attributes for codes
 # HAS_ATTRIBUTES returns codes that have the specified attributes
