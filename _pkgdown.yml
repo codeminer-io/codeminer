@@ -51,6 +51,9 @@ reference:
       - get_nhsbsa_bnf_snomed
       - read_nhsbsa_bnf_snomed
       - add_nhsbsa_bnf_snomed
+      - get_pseudobnf
+      - read_pseudobnf
+      - add_pseudobnf
       - get_nhs_data_migration
       - read_nhs_data_migration
       - add_nhs_data_migration
