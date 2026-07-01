@@ -56,8 +56,11 @@ Suggests:
     foreign,
     jsonlite,
     knitr,
+    nhsbsa,
     rmarkdown,
     testthat (>= 3.0.0),
     trud
 VignetteBuilder: knitr
 Config/testthat/edition: 3
+Remotes:
+    rmgpanw/nhsbsa

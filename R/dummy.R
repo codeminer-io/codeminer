@@ -114,3 +114,24 @@ read_icd10_phecode_map_dummy <- function() {
     col_types = readr::cols(.default = "c")
   )
 }
+
+## Pseudo-BNF ----------------------------------------------------------------
+
+#' Dummy NHS BSA BNF code information (pseudo-BNF) file path
+#'
+#' Returns the file path to a dummy NHS BSA "BNF Code Information" csv file (a
+#' small subset of the full dataset, which may be downloaded with
+#' [get_pseudobnf()]).
+#'
+#' @return A string.
+#' @export
+#' @family Dummy data
+#' @examples
+#' dummy_pseudobnf_path()
+dummy_pseudobnf_path <- function() {
+  system.file(
+    "extdata",
+    "dummy_bnf_code_information.csv",
+    package = "codeminer"
+  )
+}
