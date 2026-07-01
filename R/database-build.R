@@ -280,7 +280,7 @@ connect_to_db <- function(..., read_only = TRUE, .envir = parent.frame()) {
   workbench_active <- exists("con", envir = .codeminer_env) &&
     DBI::dbIsValid(.codeminer_env$con)
   workbench_holds_file <- workbench_active &&
-    identical(.codeminer_env$db_paths$main, target_path)
+    identical(.codeminer_env$db_path, target_path)
 
   if (workbench_holds_file) {
     # Switch to the in-memory catalog first -- DuckDB won't DETACH the
@@ -289,11 +289,11 @@ connect_to_db <- function(..., read_only = TRUE, .envir = parent.frame()) {
     DBI::dbExecute(
       .codeminer_env$con,
       glue::glue_sql(
-        "DETACH {`CODEMINER_ALIAS_MAIN`}",
+        "DETACH {`CODEMINER_SCHEMA`}",
         .con = .codeminer_env$con
       )
     )
-    .codeminer_env$db_paths$main <- NULL
+    .codeminer_env$db_path <- NULL
     withr::defer(
       {
         # Only re-ATTACH if workbench is still active and core is still
@@ -301,15 +301,15 @@ connect_to_db <- function(..., read_only = TRUE, .envir = parent.frame()) {
         # reconnected.
         wb_alive <- exists("con", envir = .codeminer_env) &&
           DBI::dbIsValid(.codeminer_env$con)
-        if (wb_alive && is.null(.codeminer_env$db_paths$main)) {
+        if (wb_alive && is.null(.codeminer_env$db_path)) {
           DBI::dbExecute(
             .codeminer_env$con,
             glue::glue_sql(
-              "ATTACH {target_path} AS {`CODEMINER_ALIAS_MAIN`} (READ_ONLY)",
+              "ATTACH {target_path} AS {`CODEMINER_SCHEMA`} (READ_ONLY)",
               .con = .codeminer_env$con
             )
           )
-          .codeminer_env$db_paths$main <- target_path
+          .codeminer_env$db_path <- target_path
           codeminer_set_search_path()
           codeminer_refresh_cache()
         }

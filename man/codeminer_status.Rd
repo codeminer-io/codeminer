@@ -7,7 +7,7 @@
 codeminer_status()
 }
 \value{
-A named list of attached database paths, invisibly.
+The attached database path, invisibly (\code{NULL} if none attached).
 }
 \description{
 Prints the current state of the workbench connection, including

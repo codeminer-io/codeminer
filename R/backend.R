@@ -283,7 +283,7 @@ acquire_writable_workbench <- function(path, .envir = parent.frame()) {
   workbench_active <- exists("con", envir = .codeminer_env) &&
     DBI::dbIsValid(.codeminer_env$con)
   workbench_holds_file <- workbench_active &&
-    identical(.codeminer_env$db_paths$main, path)
+    identical(.codeminer_env$db_path, path)
 
   if (kind == "duckdb_file" && workbench_holds_file) {
     # Switch to the in-memory catalog first -- DuckDB won't DETACH the
@@ -292,18 +292,18 @@ acquire_writable_workbench <- function(path, .envir = parent.frame()) {
     DBI::dbExecute(
       .codeminer_env$con,
       glue::glue_sql(
-        "DETACH {`CODEMINER_ALIAS_MAIN`}",
+        "DETACH {`CODEMINER_SCHEMA`}",
         .con = .codeminer_env$con
       )
     )
-    .codeminer_env$db_paths$main <- NULL
+    .codeminer_env$db_path <- NULL
     withr::defer(
       {
         wb_alive <- exists("con", envir = .codeminer_env) &&
           DBI::dbIsValid(.codeminer_env$con)
-        if (wb_alive && is.null(.codeminer_env$db_paths$main)) {
-          backend_attach(.codeminer_env$con, CODEMINER_ALIAS_MAIN, path)
-          .codeminer_env$db_paths$main <- path
+        if (wb_alive && is.null(.codeminer_env$db_path)) {
+          backend_attach(.codeminer_env$con, CODEMINER_SCHEMA, path)
+          .codeminer_env$db_path <- path
           codeminer_set_search_path()
           codeminer_refresh_cache()
         }
@@ -320,7 +320,7 @@ acquire_writable_workbench <- function(path, .envir = parent.frame()) {
         if (wb_alive) {
           # Idempotent: CREATE OR REPLACE VIEW handles existing names and
           # picks up the new data table view.
-          backend_attach(.codeminer_env$con, CODEMINER_ALIAS_MAIN, path)
+          backend_attach(.codeminer_env$con, CODEMINER_SCHEMA, path)
           codeminer_refresh_cache()
         }
       },

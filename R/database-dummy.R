@@ -40,8 +40,8 @@ create_dummy_database <- function(
   # Capture previous state for reconnection message
   previous_env <- Sys.getenv("CODEMINER_DB_PATH", unset = NA)
   had_previous_db <-
-    exists("db_paths", envir = .codeminer_env) &&
-    !is.null(.codeminer_env$db_paths$main)
+    exists("db_path", envir = .codeminer_env) &&
+    !is.null(.codeminer_env$db_path)
 
   if (.local) {
     withr::local_envvar(
