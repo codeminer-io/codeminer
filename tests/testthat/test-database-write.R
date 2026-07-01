@@ -18,6 +18,27 @@ test_that("add_lookup_table works with dummy data", {
   ))
 })
 
+test_that("add_lookup_table handles a table name ending in a data-file extension (#171)", {
+  local_build_temp_database()
+
+  test_table <- data.frame(
+    code = c("01", "0101"),
+    description = c("Chapter", "Section")
+  )
+  # A version derived from a CSV file name yields a table name ending in
+  # ".csv"; DuckDB's replacement scan would otherwise treat it as a file and
+  # abort the write transaction.
+  test_metadata <- lookup_metadata(
+    "BNF",
+    lookup_version = "bnf_code_current_202503_version_88.csv"
+  )
+
+  expect_no_error(add_lookup_table(test_table, test_metadata))
+
+  result <- dplyr::collect(get_lookup_table("BNF"))
+  expect_setequal(result$code, c("01", "0101"))
+})
+
 test_that("add_lookup_table fails without valid database", {
   # Uninitialised db
   local_temp_database()

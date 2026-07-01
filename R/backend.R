@@ -436,6 +436,32 @@ backend_read_schema_version_duckdb_file <- function(path) {
   read_db_schema_version(con)
 }
 
+# Write `data_df` into `con` as a new table named `table_name`, robust to names
+# that end in a data-file extension (.csv/.tsv/.json/.parquet). `dbWriteTable()`
+# registers the frame as a temp view and `CREATE TABLE ... AS SELECT`s from it;
+# inside an explicit transaction a file-looking name makes DuckDB's replacement
+# scan treat it as a file and abort the transaction. Registering the frame
+# ourselves and issuing an explicitly quoted CREATE avoids this, at the same
+# bulk-load cost as `dbWriteTable()`.
+backend_write_data_table <- function(con, table_name, data_df) {
+  view <- paste0(
+    "_codeminer_src_",
+    format(Sys.time(), "%Y%m%d%H%M%S"),
+    "_",
+    sample.int(.Machine$integer.max, 1L)
+  )
+  duckdb::duckdb_register(con, view, as.data.frame(data_df))
+  withr::defer(try(duckdb::duckdb_unregister(con, view), silent = TRUE))
+  DBI::dbExecute(
+    con,
+    glue::glue_sql(
+      "CREATE TABLE {`table_name`} AS SELECT * FROM {`view`}",
+      .con = con
+    )
+  )
+  invisible(TRUE)
+}
+
 backend_add_table_duckdb_file <- function(path, type, metadata_row, data_df) {
   validate_metadata_row(metadata_row, type)
 
@@ -463,12 +489,7 @@ backend_add_table_duckdb_file <- function(path, type, metadata_row, data_df) {
   tryCatch(
     {
       DBI::dbAppendTable(con, tbl_name, as.data.frame(metadata_row))
-      DBI::dbWriteTable(
-        con,
-        name = table_name,
-        value = data_df,
-        overwrite = FALSE
-      )
+      backend_write_data_table(con, table_name, data_df)
       DBI::dbExecute(con, "COMMIT")
     },
     error = on_error
