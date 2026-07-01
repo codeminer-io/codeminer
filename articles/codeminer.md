@@ -50,9 +50,9 @@ of data frames:
 # Create a temporary database with dummy data
 (db_path <- create_dummy_database())
 #> ✔ Dummy database ready to use!
-#> [1] "/tmp/Rtmp7OudNH/file3a7a13915b6f.duckdb"
+#> [1] "/tmp/RtmpFblKF1/file3b172e0af456.duckdb"
 Sys.getenv("CODEMINER_DB_PATH")
-#> [1] "/tmp/Rtmp7OudNH/file3a7a13915b6f.duckdb"
+#> [1] "/tmp/RtmpFblKF1/file3b172e0af456.duckdb"
 ```
 
 `codeminer` resolves the database location using the following
@@ -88,7 +88,7 @@ connection status with
 
 codeminer_status()
 #> ℹ Workbench active
-#>   Main: /tmp/Rtmp7OudNH/file3a7a13915b6f.duckdb
+#>   Main: /tmp/RtmpFblKF1/file3b172e0af456.duckdb
 ```
 
 ### Single file vs folder

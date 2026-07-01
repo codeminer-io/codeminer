@@ -109,9 +109,9 @@ list of data frames:</p>
 <code class="sourceCode R"><span><span class="co"># Create a temporary database with dummy data</span></span>
 <span><span class="op">(</span><span class="va">db_path</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/create_dummy_database.html">create_dummy_database</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Dummy database ready to use!</span></span>
-<span><span class="co">#&gt; [1] "/tmp/Rtmp7OudNH/file3a7a13915b6f.duckdb"</span></span>
+<span><span class="co">#&gt; [1] "/tmp/RtmpFblKF1/file3b172e0af456.duckdb"</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/Sys.getenv.html" class="external-link">Sys.getenv</a></span><span class="op">(</span><span class="st">"CODEMINER_DB_PATH"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] "/tmp/Rtmp7OudNH/file3a7a13915b6f.duckdb"</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] "/tmp/RtmpFblKF1/file3b172e0af456.duckdb"</span></span></code></pre></div>
 <p><code>codeminer</code> resolves the database location using the
 following precedence:</p>
 <ol style="list-style-type: decimal">
@@ -135,7 +135,7 @@ current connection status with <code><a href="../reference/codeminer_status.html
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/codeminer_status.html">codeminer_status</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Workbench active</span></span>
-<span><span class="co">#&gt;   Main: <span style="color: #0000BB;">/tmp/Rtmp7OudNH/file3a7a13915b6f.duckdb</span></span></span></code></pre></div>
+<span><span class="co">#&gt;   Main: <span style="color: #0000BB;">/tmp/RtmpFblKF1/file3b172e0af456.duckdb</span></span></span></code></pre></div>
 <div class="section level3">
 <h3 id="single-file-vs-folder">Single file vs folder<a class="anchor" aria-label="anchor" href="#single-file-vs-folder"></a>
 </h3>
