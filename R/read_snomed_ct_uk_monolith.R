@@ -229,6 +229,29 @@ read_snomed_ct_uk_monolith <- function(
     # category via the join.
     sct_lookup_table <- snomed_attach_category(sct_lookup_table)
 
+    # SNOMED modules present in this release. The modules are themselves
+    # concepts in the lookup (e.g. the UK drug extension module,
+    # "999000011000001104", which carries the dm+d content), so derive the
+    # set from the data rather than hard-coding it — it then stays accurate
+    # across releases. Declared as a filterable column with empty `defaults`,
+    # so the default "SNOMED CT" query still returns the full UK release;
+    # users can opt into a single module via `col_filters` (e.g.
+    # `col_filters = list(moduleId_concept = "999000011000001104")` for a
+    # drug-extension-only view).
+    module_ids <- sct_lookup_table$moduleId_concept
+    module_ids <- sort(unique(module_ids[!is.na(module_ids)]))
+
+    sct_lookup_col_filters <- list(
+      active_concept = list(values = c("0", "1"), defaults = c("0", "1")),
+      active_description = list(values = c("0", "1"), defaults = c("1"))
+    )
+    if (length(module_ids) > 0) {
+      sct_lookup_col_filters$moduleId_concept <- list(
+        values = module_ids,
+        defaults = character(0)
+      )
+    }
+
     sct_lookup_metadata <- lookup_metadata(
       code_type = snomed_code_type,
       lookup_version = version,
@@ -238,10 +261,7 @@ read_snomed_ct_uk_monolith <- function(
       lookup_source = source,
       preferred_description_col = "typeId_description",
       preferred_description_indicator = "900000000000003001",
-      col_filters = list(
-        active_concept = list(values = c("0", "1"), defaults = c("0", "1")),
-        active_description = list(values = c("0", "1"), defaults = c("1"))
-      )
+      col_filters = sct_lookup_col_filters
     )
 
     result$sct_lookup <- list(
