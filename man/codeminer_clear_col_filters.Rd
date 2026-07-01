@@ -10,8 +10,9 @@ codeminer_clear_col_filters()
 \code{NULL}, invisibly.
 }
 \description{
-Removes all column filter pins set by \code{\link[=codeminer_set_col_filters]{codeminer_set_col_filters()}},
-returning to the metadata-defined defaults.
+Removes all column filter pins set by \code{\link[=codeminer_set_col_filters]{codeminer_set_col_filters()}}
+(including a session-wide \code{NA} "no filtering" state), returning to the
+metadata-defined defaults.
 }
 \seealso{
 Other Workbench management: 

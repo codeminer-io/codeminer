@@ -6,20 +6,18 @@
 #'   codelist with code_type.
 #' @param to Coding system to map codes to.
 #' @param map_version Version of the mapping table to use.
-#' @param col_filters Column filters to apply to the **mapping table**. One of:
-#'   - `"default"` (default): apply session-pinned or metadata-defined default
-#'     filters
-#'   - `NULL`: no filtering (return all rows)
-#'   - A named list of `column_name = c(values)` pairs for explicit filtering
-#'
-#'   Note: this controls filtering of the mapping table, not the target lookup
-#'   table (which uses its own default col_filters).
 #' @inheritParams CODES
 #'
 #' @details If no mapping table matching the `from -> to` direction is found,
 #' but there is a table for `to -> from`, `MAP()` will return the reverse
 #' mapping with a warning. Note that this is not guaranteed to be correct, as
 #' most mapping tables only work one way.
+#'
+#' `MAP()` touches two tables: the mapping table (keyed `"from > to"` under
+#' `mapping`) and the target lookup (keyed by `to` under `lookup`). The
+#' `col_filters` argument reaches both, so the target lookup can be
+#' restricted alongside the mapping table in one call; `col_filters = NULL`
+#' un-filters both.
 #'
 #' @return A `codeminer_codelist` of the mapped codes with their descriptions.
 #'
@@ -64,6 +62,11 @@ MAP <- function(
   lookup_version = getOption("codeminer.lookup_version", default = "latest"),
   col_filters = "default"
 ) {
+  # Apply the col_filters argument as a call-scoped overlay: both the mapping
+  # table read and the internal target-lookup CODES() resolve against it.
+  old_cf <- push_col_filters(col_filters, call = rlang::current_env())
+  on.exit(pop_col_filters(old_cf), add = TRUE)
+
   # Collect and validate input
   collected <- collect_codes_input(
     ...,
@@ -95,7 +98,6 @@ MAP <- function(
       from,
       to,
       map_version,
-      col_filters = col_filters,
       con = con
     )
     return(dplyr::collect(mapping_table))
@@ -124,7 +126,6 @@ MAP <- function(
     from,
     to,
     map_version,
-    col_filters = col_filters,
     con = con,
     meta = this_meta
   )
@@ -141,7 +142,17 @@ MAP <- function(
     missing_codes_warning(
       missing_codes,
       table_type = "mapping",
-      table_meta = this_meta
+      table_meta = this_meta,
+      extra = active_col_filters_hint(
+        this_meta$col_filters,
+        "mapping",
+        pin_key = paste(from, ">", to),
+        alt_keys = paste(
+          this_meta$from_code_type,
+          ">",
+          this_meta$to_code_type
+        )
+      )
     )
   }
   mapped_codes <- unique(mapping$to)
@@ -201,6 +212,9 @@ get_mapping_table <- function(
   meta = NULL,
   call = rlang::caller_env()
 ) {
+  old_cf <- push_col_filters(col_filters, call = call)
+  on.exit(pop_col_filters(old_cf), add = TRUE)
+
   con <- get_db_con(con)
   this_meta <- if (is.null(meta)) {
     get_metadata_for_mapping(con, from, to, map_version, call = call)
@@ -210,13 +224,20 @@ get_mapping_table <- function(
   tbl_name <- this_meta$mapping_table_name
   tbl <- dplyr::tbl(con, tbl_name)
 
-  # Apply col_filters BEFORE column renaming (filter on original column names)
+  # Apply col_filters BEFORE column renaming (filter on original column names).
+  # A filter may be keyed by the requested direction (which wins) or, after a
+  # reverse swap, by the registered direction.
   pin_key <- paste(from, ">", to)
+  registered_key <- paste(
+    this_meta$from_code_type,
+    ">",
+    this_meta$to_code_type
+  )
   resolved <- resolve_col_filters(
-    col_filters,
     this_meta$col_filters,
     pin_type = "mapping",
-    pin_key = pin_key
+    pin_key = pin_key,
+    alt_keys = setdiff(registered_key, pin_key)
   )
   tbl <- apply_col_filters(tbl, resolved, tbl_name = tbl_name, call = call)
 

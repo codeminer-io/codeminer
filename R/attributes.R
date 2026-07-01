@@ -35,6 +35,9 @@ ATTRIBUTES_FOR <- function(
   preferred_description_only = TRUE,
   col_filters = "default"
 ) {
+  old_cf <- push_col_filters(col_filters, call = rlang::current_env())
+  on.exit(pop_col_filters(old_cf), add = TRUE)
+
   check_version(lookup_version)
   check_version(relationship_version)
   check_logical_scalar(preferred_description_only, "preferred_description_only")
@@ -68,7 +71,6 @@ ATTRIBUTES_FOR <- function(
     include_self = FALSE,
     max_depth = 1,
     empty_warning = "No codes found with the specified attributes.",
-    col_filters = col_filters,
     require_relationship_types = "ATTRIBUTES_FOR"
   )
 }
@@ -87,6 +89,9 @@ HAS_ATTRIBUTES <- function(
   preferred_description_only = TRUE,
   col_filters = "default"
 ) {
+  old_cf <- push_col_filters(col_filters, call = rlang::current_env())
+  on.exit(pop_col_filters(old_cf), add = TRUE)
+
   check_version(lookup_version)
   check_version(relationship_version)
   check_logical_scalar(preferred_description_only, "preferred_description_only")
@@ -120,7 +125,6 @@ HAS_ATTRIBUTES <- function(
     include_self = FALSE,
     max_depth = 1,
     empty_warning = "No codes found with the specified attributes.",
-    col_filters = col_filters,
     require_relationship_types = "HAS_ATTRIBUTES"
   )
 }

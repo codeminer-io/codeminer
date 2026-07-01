@@ -56,10 +56,6 @@ empty_codelist <- function() {
 #' @param type The code type.
 #' @param lookup_version The lookup version.
 #' @param preferred_description_only Passed to [CODES()].
-#' @param col_filters Column filters applied when looking up descriptions (the
-#'   caller's `col_filters`). Honouring these keeps the description to one row
-#'   per type (e.g. SNOMED's default `active_description` filter), instead of
-#'   surfacing inactive descriptions as duplicate rows.
 #' @return A `codeminer_codelist`.
 #' @keywords internal
 #' @noRd
@@ -67,8 +63,7 @@ describe_relationship_types <- function(
   type_values,
   type,
   lookup_version,
-  preferred_description_only,
-  col_filters
+  preferred_description_only
 ) {
   if (length(type_values) == 0) {
     return(empty_codelist())
@@ -77,13 +72,16 @@ describe_relationship_types <- function(
   # A relationship type that is not a code in the lookup is expected (only
   # ontologies like SNOMED CT model types as concepts), so muffle the otherwise
   # confusing "not found in the lookup table" warning and fall back below.
+  # The caller's col_filters reach the lookup via the session filter state;
+  # honouring them keeps the description to one row per type (e.g. SNOMED's
+  # default `active_description` filter), instead of surfacing inactive
+  # descriptions as duplicate rows.
   described <- withCallingHandlers(
     CODES(
       type_values,
       type = type,
       lookup_version = lookup_version,
-      preferred_description_only = preferred_description_only,
-      col_filters = col_filters
+      preferred_description_only = preferred_description_only
     ),
     codeminer_missing_codes = function(w) invokeRestart("muffleWarning")
   )
@@ -112,7 +110,6 @@ describe_relationship_types <- function(
 #' @param direction `"from"` (codes in the `from` column) or `"to"`.
 #' @param relationship_version,lookup_version Versions to use.
 #' @param preferred_description_only Passed to [CODES()].
-#' @param col_filters Column filters applied to the relationship table.
 #' @param fn Calling function name, for the not-applicable guard.
 #' @param empty_warning Warning when no types are found.
 #' @param call Calling environment.
@@ -126,7 +123,6 @@ relationship_types_for_codes <- function(
   relationship_version,
   lookup_version,
   preferred_description_only,
-  col_filters,
   fn,
   empty_warning,
   call = rlang::caller_env()
@@ -146,7 +142,6 @@ relationship_types_for_codes <- function(
 
   rel_table <- dplyr::tbl(con, meta$relationship_table_name)
   resolved <- resolve_col_filters(
-    col_filters,
     meta$col_filters,
     pin_type = "relationship",
     pin_key = type
@@ -189,8 +184,7 @@ relationship_types_for_codes <- function(
     type_values,
     type = type,
     lookup_version = lookup_version,
-    preferred_description_only = preferred_description_only,
-    col_filters = col_filters
+    preferred_description_only = preferred_description_only
   )
 }
 
@@ -207,6 +201,9 @@ RELATIONSHIP_TYPES_FROM <- function(
   preferred_description_only = TRUE,
   col_filters = "default"
 ) {
+  old_cf <- push_col_filters(col_filters, call = rlang::current_env())
+  on.exit(pop_col_filters(old_cf), add = TRUE)
+
   collected <- collect_codes_input(..., type = type)
   codes_vec <- collected$codes
   if (!is.null(collected$code_type)) {
@@ -220,7 +217,6 @@ RELATIONSHIP_TYPES_FROM <- function(
     relationship_version = relationship_version,
     lookup_version = lookup_version,
     preferred_description_only = preferred_description_only,
-    col_filters = col_filters,
     fn = "RELATIONSHIP_TYPES_FROM",
     empty_warning = "No relationship types found originating from the specified codes."
   )
@@ -239,6 +235,9 @@ RELATIONSHIP_TYPES_TO <- function(
   preferred_description_only = TRUE,
   col_filters = "default"
 ) {
+  old_cf <- push_col_filters(col_filters, call = rlang::current_env())
+  on.exit(pop_col_filters(old_cf), add = TRUE)
+
   collected <- collect_codes_input(..., type = type)
   codes_vec <- collected$codes
   if (!is.null(collected$code_type)) {
@@ -252,7 +251,6 @@ RELATIONSHIP_TYPES_TO <- function(
     relationship_version = relationship_version,
     lookup_version = lookup_version,
     preferred_description_only = preferred_description_only,
-    col_filters = col_filters,
     fn = "RELATIONSHIP_TYPES_TO",
     empty_warning = "No relationship types found pointing to the specified codes."
   )
@@ -272,6 +270,9 @@ RELATIONSHIP_TYPES <- function(
   preferred_description_only = TRUE,
   col_filters = "default"
 ) {
+  old_cf <- push_col_filters(col_filters, call = rlang::current_env())
+  on.exit(pop_col_filters(old_cf), add = TRUE)
+
   check_code_type(type)
   check_version(relationship_version)
   check_version(lookup_version)
@@ -292,7 +293,6 @@ RELATIONSHIP_TYPES <- function(
 
   rel_table <- dplyr::tbl(con, meta$relationship_table_name)
   resolved <- resolve_col_filters(
-    col_filters,
     meta$col_filters,
     pin_type = "relationship",
     pin_key = type
@@ -319,8 +319,7 @@ RELATIONSHIP_TYPES <- function(
       type_values,
       type = type,
       lookup_version = lookup_version,
-      preferred_description_only = preferred_description_only,
-      col_filters = col_filters
+      preferred_description_only = preferred_description_only
     ))
   }
 
@@ -331,7 +330,6 @@ RELATIONSHIP_TYPES <- function(
   lkp <- get_lookup_table(
     type,
     lookup_version = lookup_version,
-    col_filters = col_filters,
     con = con
   )
   lkp <- dplyr::filter(lkp, .data$code %in% .env$type_values)
@@ -351,7 +349,6 @@ RELATIONSHIP_TYPES <- function(
     matched_codes,
     type = type,
     lookup_version = lookup_version,
-    preferred_description_only = preferred_description_only,
-    col_filters = col_filters
+    preferred_description_only = preferred_description_only
   )
 }

@@ -40,8 +40,9 @@ option.}
 \item{lookup_version}{Lookup table version. Defaults to \code{"latest"}. Can
 be configured via the \code{codeminer.lookup_version} option.}
 
-\item{col_filters}{Column filters to apply to both the relationship
-and lookup tables. See \code{\link[=CODES]{CODES()}} for details.}
+\item{col_filters}{Column filters for the tables this query touches (the
+relationship table and the lookup table, each addressed by its own
+type + key). See \code{\link[=CODES]{CODES()}} for details.}
 
 \item{preferred_description_only}{Logical. If \code{TRUE} (default), node
 \code{term} is the preferred description only (one row per code).}

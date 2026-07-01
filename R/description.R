@@ -28,6 +28,9 @@ DESCRIPTION <- function(
   preferred_description_only = TRUE,
   col_filters = "default"
 ) {
+  old_cf <- push_col_filters(col_filters, call = rlang::current_env())
+  on.exit(pop_col_filters(old_cf), add = TRUE)
+
   check_pattern(pattern)
   check_code_type(type)
   check_version(lookup_version)
@@ -38,7 +41,6 @@ DESCRIPTION <- function(
   lkp_table <- get_lookup_table(
     type,
     lookup_version = lookup_version,
-    col_filters = col_filters,
     con = con
   )
   code_col <- "code"
@@ -72,8 +74,7 @@ DESCRIPTION <- function(
     codes,
     type = type,
     lookup_version = lookup_version,
-    preferred_description_only = preferred_description_only,
-    col_filters = col_filters
+    preferred_description_only = preferred_description_only
   )
 
   return(result)
