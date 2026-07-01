@@ -40,7 +40,7 @@ test_that("codeminer_disconnect() tears down connection", {
   codeminer_disconnect()
 
   expect_false(exists("con", envir = .codeminer_env))
-  expect_false(exists("db_paths", envir = .codeminer_env))
+  expect_false(exists("db_path", envir = .codeminer_env))
   expect_false(exists("metadata", envir = .codeminer_env))
 })
 
@@ -77,7 +77,7 @@ test_that("main database is attached as READ_ONLY", {
       .codeminer_env$con,
       paste0(
         "CREATE TABLE ",
-        CODEMINER_ALIAS_MAIN,
+        CODEMINER_SCHEMA,
         "._test_write (x INTEGER)"
       )
     )
@@ -91,13 +91,13 @@ test_that("connect_to_db(read_only=FALSE) detaches and re-attaches", {
 
   # Workbench should have the main db attached
 
-  expect_identical(.codeminer_env$db_paths$main, temp_db)
+  expect_identical(.codeminer_env$db_path, temp_db)
 
   # Open a write connection (this should DETACH main from workbench)
   write_con <- connect_to_db(read_only = FALSE)
 
   # While write_con is open, workbench should not hold the file
-  expect_null(.codeminer_env$db_paths$main)
+  expect_null(.codeminer_env$db_path)
 
   # Write connection should be valid and writable
   expect_true(DBI::dbIsValid(write_con))

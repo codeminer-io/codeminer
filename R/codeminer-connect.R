@@ -1,6 +1,6 @@
-# DuckDB ATTACH alias. "main" is reserved in DuckDB (the default schema for
-# any connection), so we use "core" for the read-only ontology database.
-CODEMINER_ALIAS_MAIN <- "core"
+# Schema the read-only ontology database is attached under. "main" is reserved
+# in DuckDB (the default schema for any connection), so we use "core".
+CODEMINER_SCHEMA <- "core"
 
 #' Connect to the codeminer workbench
 #'
@@ -44,7 +44,7 @@ codeminer_connect <- function(main = NULL) {
 
   # Create in-memory workbench
   .codeminer_env$con <- DBI::dbConnect(duckdb::duckdb(), ":memory:")
-  .codeminer_env$db_paths <- list()
+  .codeminer_env$db_path <- NULL
 
   # If anything below throws (gate refusal, failed ATTACH, ...) the
   # workbench would be left valid but with no main file attached. The
@@ -68,7 +68,7 @@ codeminer_connect <- function(main = NULL) {
         if (exists("con", envir = .codeminer_env)) {
           rm("con", envir = .codeminer_env)
         }
-        .codeminer_env$db_paths <- list()
+        .codeminer_env$db_path <- NULL
       }
     },
     add = TRUE
@@ -93,8 +93,8 @@ codeminer_connect <- function(main = NULL) {
     # rebuild request can open its own write connection without lock
     # contention.
     enforce_schema_gate(main)
-    backend_attach(.codeminer_env$con, CODEMINER_ALIAS_MAIN, main)
-    .codeminer_env$db_paths$main <- main
+    backend_attach(.codeminer_env$con, CODEMINER_SCHEMA, main)
+    .codeminer_env$db_path <- main
     codeminer_set_search_path()
   }
 
@@ -124,7 +124,7 @@ codeminer_disconnect <- function() {
   }
   for (field in c(
     "con",
-    "db_paths",
+    "db_path",
     "metadata",
     "active_versions",
     "active_col_filters"
@@ -141,7 +141,7 @@ codeminer_disconnect <- function() {
 #' Prints the current state of the workbench connection, including
 #' which databases are attached.
 #'
-#' @return A named list of attached database paths, invisibly.
+#' @return The attached database path, invisibly (`NULL` if none attached).
 #' @export
 #' @family Workbench management
 codeminer_status <- function() {
@@ -150,12 +150,15 @@ codeminer_status <- function() {
       !DBI::dbIsValid(.codeminer_env$con)
   ) {
     cli::cli_inform("No active workbench connection.")
-    return(invisible(list()))
+    return(invisible(NULL))
   }
-  main_path <- .codeminer_env$db_paths$main %||% "not attached"
+  db_path <- .codeminer_env$db_path
+  if (is.null(db_path) || !nzchar(db_path)) {
+    db_path <- "not attached"
+  }
   msgs <- c(
     "i" = "Workbench active",
-    " " = "Main: {.file {main_path}}"
+    " " = "Database: {.file {db_path}}"
   )
 
   # Show pinned versions if any
@@ -198,7 +201,7 @@ codeminer_status <- function() {
   }
 
   cli::cli_inform(msgs)
-  invisible(.codeminer_env$db_paths)
+  invisible(.codeminer_env$db_path)
 }
 
 #' Refresh the metadata cache
@@ -219,11 +222,11 @@ codeminer_refresh_cache <- function() {
   con <- .codeminer_env$con
   .codeminer_env$metadata <- list()
 
-  if (is.null(.codeminer_env$db_paths$main)) {
+  if (is.null(.codeminer_env$db_path)) {
     return(invisible())
   }
 
-  schema <- CODEMINER_ALIAS_MAIN
+  schema <- CODEMINER_SCHEMA
   for (type in c("lookup", "mapping", "relationship")) {
     tbl_name <- codeminer_metadata_table_names[[type]]
     if (schema_table_exists(con, schema, tbl_name)) {
@@ -558,12 +561,12 @@ with_col_filters <- function(
 #' Set the DuckDB search path to the attached main database
 #' @noRd
 codeminer_set_search_path <- function() {
-  if (is.null(.codeminer_env$db_paths$main)) {
+  if (is.null(.codeminer_env$db_path)) {
     return(invisible())
   }
   DBI::dbExecute(
     .codeminer_env$con,
-    paste0("SET search_path = '", CODEMINER_ALIAS_MAIN, "'")
+    paste0("SET search_path = '", CODEMINER_SCHEMA, "'")
   )
 }
 

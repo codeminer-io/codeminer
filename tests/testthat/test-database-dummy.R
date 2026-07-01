@@ -23,7 +23,7 @@ test_that("create_dummy_database() connects the workbench", {
 
   # Workbench should already be connected — no lazy init needed
   expect_true(DBI::dbIsValid(.codeminer_env$con))
-  expect_equal(.codeminer_env$db_paths$main, temp_db)
+  expect_equal(.codeminer_env$db_path, temp_db)
 })
 
 test_that("create_dummy_database() uses default temp path", {

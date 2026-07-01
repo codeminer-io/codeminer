@@ -22,9 +22,9 @@ get_db_con <- function(con = NULL) {
 
   # Also reconnect if CODEMINER_DB_PATH changed since last connect
   # (but not while core is temporarily DETACHed during a write)
-  if (!needs_connect && !is.null(.codeminer_env$db_paths$main)) {
+  if (!needs_connect && !is.null(.codeminer_env$db_path)) {
     needs_connect <- !identical(
-      .codeminer_env$db_paths$main,
+      .codeminer_env$db_path,
       db_path()
     )
   }
