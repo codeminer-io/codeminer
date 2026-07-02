@@ -139,7 +139,24 @@ read_nhs_data_migration <- function(
         map_version = version,
         from_col = "CTV3_CONCEPTID",
         to_col = "SCT_CONCEPTID",
-        map_source = source
+        map_source = source,
+        # Default to active, clinically assured mappings (see #167 for the
+        # wider source/default-filter audit). Value meanings are from the
+        # NHS Data Migration cross-map documentation.
+        col_filters = list(
+          IS_ASSURED = list(
+            values = c("0", "1"),
+            defaults = c("1"),
+            description = "Clinical assurance status of the mapping. Defaults to assured mappings only.",
+            value_labels = c("1" = "Assured", "0" = "Not assured")
+          ),
+          MAPSTATUS = list(
+            values = c("0", "1"),
+            defaults = c("1"),
+            description = "Whether the mapping is active. Defaults to active mappings only.",
+            value_labels = c("1" = "Active", "0" = "Inactive")
+          )
+        )
       ),
       rcsctmap2 = mapping_metadata(
         from_code_type = "Read v2",
@@ -147,7 +164,24 @@ read_nhs_data_migration <- function(
         map_version = version,
         from_col = "ReadCode",
         to_col = "ConceptId",
-        map_source = source
+        map_source = source,
+        # Default to active, clinically assured mappings (see #167 for the
+        # wider source/default-filter audit). Value meanings are from the
+        # NHS Data Migration cross-map documentation.
+        col_filters = list(
+          IS_ASSURED = list(
+            values = c("0", "1"),
+            defaults = c("1"),
+            description = "Clinical assurance status of the mapping. Defaults to assured mappings only.",
+            value_labels = c("1" = "Assured", "0" = "Not assured")
+          ),
+          MapStatus = list(
+            values = c("0", "1"),
+            defaults = c("1"),
+            description = "Whether the mapping is active. Defaults to active mappings only.",
+            value_labels = c("1" = "Active", "0" = "Inactive")
+          )
+        )
       ),
       read2_ctv3 = mapping_metadata(
         from_code_type = "Read v2",

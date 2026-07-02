@@ -46,6 +46,13 @@ test_that("read_nhs_data_migration() ctv3sctmap2 has correct metadata", {
   expect_true(all(
     c(meta$from_col, meta$to_col) %in% names(result$ctv3sctmap2$mapping$table)
   ))
+
+  # Defaults to active, clinically assured mappings only.
+  cf <- deserialise_col_filters(meta$col_filters)
+  expect_identical(cf$IS_ASSURED$defaults, "1")
+  expect_identical(cf$MAPSTATUS$defaults, "1")
+  expect_identical(cf$IS_ASSURED$value_labels[["1"]], "Assured")
+  expect_identical(cf$MAPSTATUS$value_labels[["0"]], "Inactive")
 })
 
 test_that("read_nhs_data_migration() rcsctmap2 has correct metadata", {
@@ -63,6 +70,12 @@ test_that("read_nhs_data_migration() rcsctmap2 has correct metadata", {
   expect_true(all(
     c(meta$from_col, meta$to_col) %in% names(result$rcsctmap2$mapping$table)
   ))
+
+  # Defaults to active, clinically assured mappings only.
+  cf <- deserialise_col_filters(meta$col_filters)
+  expect_identical(cf$IS_ASSURED$defaults, "1")
+  expect_identical(cf$MapStatus$defaults, "1")
+  expect_identical(cf$MapStatus$value_labels[["1"]], "Active")
 })
 
 test_that("read_nhs_data_migration() read2_ctv3 has correct metadata", {

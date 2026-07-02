@@ -46,7 +46,8 @@ descriptions for the same code (default: \code{NA_character_}).}
 
 \item{col_filters}{Optional column filter specification. A named list where
 each element is a list with \code{values} (all valid values) and \code{defaults}
-(default filter values). See \strong{Details} for the format. \code{NULL} (default)
+(default filter values), plus the optional \code{description} and \code{value_labels}
+documentation fields. See \strong{Details} for the format. \code{NULL} (default)
 means no column filters.}
 }
 \value{
@@ -62,12 +63,20 @@ The \code{col_filters} argument specifies which columns in the lookup table are
 filterable and what the default filter values are. The format is:
 
 \if{html}{\out{<div class="sourceCode">}}\preformatted{list(
-  column_name = list(values = c("val1", "val2"), defaults = c("val1"))
+  column_name = list(
+    values       = c("val1", "val2"),
+    defaults     = c("val1"),
+    description  = "What this column means (optional).",
+    value_labels = c(val1 = "Human label for val1")  # optional, partial
+  )
 )
 }\if{html}{\out{</div>}}
 
-When \code{col_filters} is set, query functions like \code{\link[=CODES]{CODES()}} will automatically
-filter the lookup table to only include rows matching the default values.
+\code{description} (a single string) and \code{value_labels} (a named character vector
+whose names are a subset of \code{values}) are optional and make a filter
+self-documenting; omit either to leave it unset. When \code{col_filters} is set,
+query functions like \code{\link[=CODES]{CODES()}} will automatically filter the lookup table to
+only include rows matching the default values.
 }
 \examples{
 lookup_metadata("ICD-10", lookup_version = "2023")

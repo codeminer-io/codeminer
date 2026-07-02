@@ -241,14 +241,31 @@ read_snomed_ct_uk_monolith <- function(
     module_ids <- sct_lookup_table$moduleId_concept
     module_ids <- sort(unique(module_ids[!is.na(module_ids)]))
 
+    active_labels <- c("1" = "Active", "0" = "Inactive")
+
     sct_lookup_col_filters <- list(
-      active_concept = list(values = c("0", "1"), defaults = c("0", "1")),
-      active_description = list(values = c("0", "1"), defaults = c("1"))
+      active_concept = list(
+        values = c("0", "1"),
+        defaults = c("0", "1"),
+        description = "Whether the concept is active in the release. Inactive concepts are retained for history.",
+        value_labels = active_labels
+      ),
+      active_description = list(
+        values = c("0", "1"),
+        defaults = c("1"),
+        description = "Whether the description (term) is active. Defaults to active descriptions only.",
+        value_labels = active_labels
+      )
     )
     if (length(module_ids) > 0) {
+      # Each module is itself a concept in the lookup, so its human label is
+      # derived from its own FSN (see `snomed_module_labels()`) rather than
+      # hard-coded — self-documenting and accurate across releases.
       sct_lookup_col_filters$moduleId_concept <- list(
         values = module_ids,
-        defaults = character(0)
+        defaults = character(0),
+        description = "SNOMED CT module the concept belongs to. Filter to the UK drug extension for dm+d-only results.",
+        value_labels = snomed_module_labels(sct_lookup_table, module_ids)
       )
     }
 
@@ -291,7 +308,12 @@ read_snomed_ct_uk_monolith <- function(
       # don't follow withdrawn is-a links; users can opt back in with
       # `col_filters = NULL`.
       col_filters = list(
-        active = list(values = c("0", "1"), defaults = c("1"))
+        active = list(
+          values = c("0", "1"),
+          defaults = c("1"),
+          description = "Whether the relationship edge is active. Defaults to active edges only.",
+          value_labels = c("1" = "Active", "0" = "Inactive")
+        )
       )
     )
 
@@ -532,6 +554,40 @@ fread_sct <- function(file_path) {
 #' Non-FSN rows for the same concept inherit the category via the left
 #' join on `conceptId`.
 #'
+#' Derive human labels for SNOMED module ids from their own FSNs
+#'
+#' Each SNOMED module is itself a concept in the lookup, so its label is its
+#' active Fully Specified Name with the trailing "(...)" semantic tag stripped
+#' (e.g. "SNOMED CT UK drug extension module (core metadata concept)" ->
+#' "SNOMED CT UK drug extension module"). Used to populate the `value_labels`
+#' of the `moduleId_concept` column filter. Modules with no active FSN in the
+#' release are omitted, so `names()` of the result is a subset of `module_ids`.
+#'
+#' @param sct_lookup_table The merged description/concept lookup table.
+#' @param module_ids Character vector of module concept ids present in the
+#'   release.
+#' @return A named character vector mapping module id to label (possibly
+#'   empty).
+#' @noRd
+snomed_module_labels <- function(sct_lookup_table, module_ids) {
+  fsn_type_id <- "900000000000003001"
+
+  rows <- sct_lookup_table |>
+    dplyr::filter(
+      .data$conceptId %in% .env$module_ids,
+      .data$active_description == "1",
+      .data$typeId_description == .env$fsn_type_id
+    ) |>
+    dplyr::distinct(.data$conceptId, .keep_all = TRUE)
+
+  labels <- stringr::str_remove(
+    rows$term_description,
+    "\\s*\\([^()]*\\)\\s*$"
+  )
+  names(labels) <- rows$conceptId
+  labels
+}
+
 #' @param sct_lookup_table The merged description/concept lookup table.
 #' @return The same table with a new `category` column.
 #' @noRd

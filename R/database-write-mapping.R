@@ -229,7 +229,10 @@ update_mapping_metadata <- function(
 #'   `NA_character_`)
 #' @param col_filters Optional column filter specification. A named list where
 #'   each element is a list with `values` (all valid values) and `defaults`
-#'   (default filter values). `NULL` (default) means no column filters.
+#'   (default filter values), plus the optional `description` (single string)
+#'   and `value_labels` (named character vector, names a subset of `values`)
+#'   documentation fields. See [lookup_metadata()] for the full format. `NULL`
+#'   (default) means no column filters.
 #'
 #' @return A list containing the mapping metadata
 #'

@@ -11,7 +11,9 @@
 # gate will then refuse pre-bump DBs with a "rebuild required" message.
 # See CLAUDE.md for what counts as a format change.
 current_schema_version <- function() {
-  4L
+  # v5 (#179): the `col_filters` JSON gained optional per-column `description`
+  # and `value_labels` documentation fields.
+  5L
 }
 
 required_db_metadata_columns <- function() {

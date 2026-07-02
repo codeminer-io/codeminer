@@ -46,8 +46,9 @@ format_filter_values <- function(values) {
 #'   pairs (or `column = list(values =, defaults =)` when `full_spec`), the
 #'   `NA` sentinel, or an empty list.
 #' @param full_spec Whether entries hold the full `values`/`defaults` spec.
-#' @return A character vector: one line per column, or a single
-#'   `"(unfiltered)"` / `"(no filters)"` line.
+#' @return A character vector: one or more lines per column, or a single
+#'   `"(unfiltered)"` / `"(no filters)"` line. In `full_spec` mode a column
+#'   may contribute extra indented `description` / `value_labels` lines.
 #' @keywords internal
 #' @noRd
 format_filter_entry <- function(entry, full_spec = FALSE) {
@@ -57,26 +58,40 @@ format_filter_entry <- function(entry, full_spec = FALSE) {
   if (length(entry) == 0) {
     return("(no filters)")
   }
-  vapply(
-    names(entry),
-    function(col) {
-      value <- entry[[col]]
-      if (full_spec) {
-        paste0(
-          col,
-          ": defaults ",
-          format_filter_values(value$defaults),
-          " (values: ",
-          format_filter_values(value$values),
-          ")"
-        )
-      } else if (is_col_filters_off(value)) {
-        paste0(col, ": (unfiltered)")
-      } else {
-        paste0(col, ": ", format_filter_values(value))
+  unlist(
+    lapply(
+      names(entry),
+      function(col) {
+        value <- entry[[col]]
+        if (full_spec) {
+          lines <- paste0(
+            col,
+            ": defaults ",
+            format_filter_values(value$defaults),
+            " (values: ",
+            format_filter_values(value$values),
+            ")"
+          )
+          if (!is.null(value$description)) {
+            lines <- c(lines, paste0("  description: ", value$description))
+          }
+          if (!is.null(value$value_labels)) {
+            labels <- value$value_labels
+            lines <- c(
+              lines,
+              "  value_labels:",
+              paste0("    ", names(labels), " = ", labels)
+            )
+          }
+          lines
+        } else if (is_col_filters_off(value)) {
+          paste0(col, ": (unfiltered)")
+        } else {
+          paste0(col, ": ", format_filter_values(value))
+        }
       }
-    },
-    character(1)
+    ),
+    use.names = FALSE
   )
 }
 

@@ -182,12 +182,66 @@ test_that("read_snomed_ct_uk_monolith() declares moduleId_concept as a no-defaul
   # by module and still returns the full UK release.
   expect_length(cf$moduleId_concept$defaults, 0)
 
+  # ...carrying a self-documenting description. `value_labels` are derived from
+  # the modules' own FSNs, so names are always a subset of `values` (the GP
+  # subset fixture has no module concept rows, so the set may be empty here —
+  # see the snomed_module_labels() unit test for the derivation itself).
+  expect_match(cf$moduleId_concept$description, "^SNOMED CT module")
+  labels <- cf$moduleId_concept$value_labels
+  expect_true(
+    is.null(labels) || all(names(labels) %in% cf$moduleId_concept$values)
+  )
+
   resolved <- resolve_col_filters(
     result$sct_lookup$lookup$metadata$col_filters,
     pin_type = "lookup",
     pin_key = "SNOMED CT"
   )
   expect_false("moduleId_concept" %in% names(resolved))
+})
+
+test_that("snomed_module_labels() derives labels from active FSNs, tag stripped", {
+  tbl <- tibble::tribble(
+    ~conceptId                                                   ,
+    ~typeId_description                                          ,
+    ~active_description                                          ,
+    ~term_description                                            ,
+    # Module: active FSN (used) plus a synonym (ignored).
+    "999000011000001104"                                         ,
+    "900000000000003001"                                         ,
+    "1"                                                          ,
+    "SNOMED CT UK drug extension module (core metadata concept)" ,
+    "999000011000001104"                                         ,
+    "900000000000013009"                                         ,
+    "1"                                                          ,
+    "dm+d module synonym"                                        ,
+    # Module: only an inactive FSN -> left unlabelled.
+    "900000000000207008"                                         ,
+    "900000000000003001"                                         ,
+    "0"                                                          ,
+    "SNOMED CT core module (core metadata concept)"              ,
+    # Non-module concept -> excluded.
+    "22298006"                                                   ,
+    "900000000000003001"                                         ,
+    "1"                                                          ,
+    "Myocardial infarction (disorder)"
+  )
+
+  labs <- snomed_module_labels(
+    tbl,
+    module_ids = c("999000011000001104", "900000000000207008")
+  )
+
+  # Active FSN, trailing "(...)" tag stripped; synonym and non-module ignored.
+  expect_identical(
+    labs[["999000011000001104"]],
+    "SNOMED CT UK drug extension module"
+  )
+  # Module with only an inactive FSN is omitted, so names stay a subset of ids.
+  expect_false("900000000000207008" %in% names(labs))
+  expect_true(all(
+    names(labs) %in% c("999000011000001104", "900000000000207008")
+  ))
 })
 
 test_that("read_snomed_ct_uk_monolith() filters mappings correctly", {

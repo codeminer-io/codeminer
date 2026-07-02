@@ -171,14 +171,23 @@ read_read3_trud <- function(
         # (clinically valid but non-preferred subtype/synonym); E = Extinct
         # (withdrawn); R = Redundant. Default keeps C + O so CHILDREN()
         # walks surface clinically meaningful subtypes / complications;
-        # E and R stay filtered.
+        # E and R stay filtered. See #167 for the wider source/default-filter
+        # documentation audit.
         status = list(
           values = status_values,
-          defaults = intersect(c("C", "O"), status_values)
+          defaults = intersect(c("C", "O"), status_values),
+          description = "NHS Read v3 concept status. Defaults to current and optional concepts.",
+          value_labels = c(
+            "C" = "Current",
+            "O" = "Optional",
+            "E" = "Extinct",
+            "R" = "Redundant"
+          )[c("C", "O", "E", "R") %in% status_values]
         ),
         term_type = list(
           values = term_type_values,
-          defaults = "C"
+          defaults = "C",
+          description = "Read v3 term type. Defaults to a single term type per code."
         )
       )
     )

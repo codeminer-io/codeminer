@@ -647,9 +647,12 @@ process_read_v2_icd10 <- function(.df, version, source) {
         to_col = "icd10_code",
         map_source = source,
         col_filters = list(
+          # The individual codes are not enumerated in the source definitions,
+          # so only the column is described (see #167 for the wider audit).
           icd10_code_def = list(
             values = c("1", "15", "3", "5", "7", "8", "2"),
-            defaults = c("1", "15", "3", "5", "7", "8")
+            defaults = c("1", "15", "3", "5", "7", "8"),
+            description = "Nature of the Read v2 to ICD-10 match (single code, parent-to-children, dagger/asterisk)."
           )
         )
       )
@@ -685,7 +688,12 @@ process_read_v2_read_ctv3 <- function(.df, version, source) {
         to_col = "READV3_CODE",
         map_source = source,
         col_filters = list(
-          IS_ASSURED = list(values = c("1"), defaults = c("1"))
+          IS_ASSURED = list(
+            values = c("1"),
+            defaults = c("1"),
+            description = "Whether the mapping has been assured (quality-checked). Only assured mappings are included.",
+            value_labels = c("1" = "Assured")
+          )
         )
       )
     )
@@ -761,22 +769,41 @@ process_read_ctv3_icd10 <- function(.df, version, source) {
         from_col = "read_code",
         to_col = "icd10_code",
         map_source = source,
+        # Value meanings taken from the source cross-map field definitions
+        # (see #167 for the wider source/default-filter audit).
         col_filters = list(
           mapping_status = list(
             values = c("E", "G", "D", "R", "A", "U"),
-            defaults = c("E", "G", "D")
+            defaults = c("E", "G", "D"),
+            description = "Nature of the Read v3 to ICD-10 mapping.",
+            value_labels = c(
+              "E" = "Exact one-to-one mapping",
+              "G" = "Target concept more general",
+              "D" = "Default mapping",
+              "R" = "Requires checking",
+              "A" = "Alternative mapping",
+              "U" = "Unspecified (not used)"
+            )
           ),
           refine_flag = list(
             values = c("C", "P", "M"),
-            defaults = c("C", "P")
+            defaults = c("C", "P"),
+            description = "Whether the target ICD-10 code is refined enough to be acceptable.",
+            value_labels = c(
+              "C" = "Completely refined",
+              "P" = "Possible but not mandatory to refine further",
+              "M" = "Mandatory to refine further"
+            )
           ),
           element_num = list(
             values = as.character(0:3),
-            defaults = c("0")
+            defaults = c("0"),
+            description = "Element number grouping alternative target codes; starts at 0."
           ),
           block_num = list(
             values = as.character(0:14),
-            defaults = c("0")
+            defaults = c("0"),
+            description = "Block number identifying a complete set of target codes; numbered from 0."
           )
         )
       )
@@ -812,7 +839,12 @@ process_read_ctv3_read_v2 <- function(.df, version, source) {
         to_col = "READV2_CODE",
         map_source = source,
         col_filters = list(
-          IS_ASSURED = list(values = c("1"), defaults = c("1"))
+          IS_ASSURED = list(
+            values = c("1"),
+            defaults = c("1"),
+            description = "Whether the mapping has been assured (quality-checked). Only assured mappings are included.",
+            value_labels = c("1" = "Assured")
+          )
         )
       )
     )

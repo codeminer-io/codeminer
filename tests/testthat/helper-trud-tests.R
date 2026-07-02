@@ -278,28 +278,51 @@ create_dummy_nhs_data_migration_dir <- function(.envir = parent.frame()) {
   dir.create(assured_dir, recursive = TRUE)
 
   # ctv3sctmap2: CTV3 -> SNOMED CT (clinically assured). Column names
-  # match the real TRUD file so the metadata's from_col/to_col line up
-  # with what's actually on disk.
+  # match the real TRUD file (incl. MAPSTATUS and IS_ASSURED, which the
+  # registered col_filters default to "1") so the metadata's from_col/to_col
+  # and filter columns line up with what's actually on disk.
   writeLines(
     c(
       paste(
         c(
-          "MapId",
-          "MapVersion",
-          "SCT_CONCEPTID",
-          "DescriptionId",
-          "CTV3_TERMID",
+          "MAPID",
           "CTV3_CONCEPTID",
-          "MapStatus"
+          "CTV3_TERMID",
+          "CTV3_TERMTYPE",
+          "SCT_CONCEPTID",
+          "SCT_DESCRIPTIONID",
+          "MAPSTATUS",
+          "EFFECTIVEDATE",
+          "IS_ASSURED"
         ),
         collapse = "\t"
       ),
       paste(
-        c("M1", "1", "12345678", "1111", "Y0001", "X40J5", "1"),
+        c(
+          "M1",
+          "X40J5",
+          "Y0001",
+          "P",
+          "12345678",
+          "1111",
+          "1",
+          "20200401",
+          "1"
+        ),
         collapse = "\t"
       ),
       paste(
-        c("M2", "1", "87654321", "2222", "Y0002", "X40J6", "1"),
+        c(
+          "M2",
+          "X40J6",
+          "Y0002",
+          "P",
+          "87654321",
+          "2222",
+          "1",
+          "20200401",
+          "1"
+        ),
         collapse = "\t"
       )
     ),

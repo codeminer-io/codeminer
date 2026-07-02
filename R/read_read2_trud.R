@@ -170,9 +170,14 @@ read_read2_trud <- function(
       preferred_description_col = "TERMTYPE",
       preferred_description_indicator = "P",
       col_filters = list(
+        # CCSTATUS is the Read v2 code status; default to current codes only.
+        # Label only the value we can name unambiguously (see #167 for the
+        # wider source/default-filter documentation audit).
         CCSTATUS = list(
           values = ccstatus_values,
-          defaults = "C"
+          defaults = "C",
+          description = "Read v2 code status. Defaults to current codes only.",
+          value_labels = c("C" = "Current")[c("C") %in% ccstatus_values]
         )
       )
     )

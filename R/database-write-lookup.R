@@ -231,7 +231,8 @@ update_lookup_metadata <- function(
 #'   (default: `NA_character_`)
 #' @param col_filters Optional column filter specification. A named list where
 #'   each element is a list with `values` (all valid values) and `defaults`
-#'   (default filter values). See **Details** for the format. `NULL` (default)
+#'   (default filter values), plus the optional `description` and `value_labels`
+#'   documentation fields. See **Details** for the format. `NULL` (default)
 #'   means no column filters.
 #'
 #' @details
@@ -240,12 +241,20 @@ update_lookup_metadata <- function(
 #'
 #' ```
 #' list(
-#'   column_name = list(values = c("val1", "val2"), defaults = c("val1"))
+#'   column_name = list(
+#'     values       = c("val1", "val2"),
+#'     defaults     = c("val1"),
+#'     description  = "What this column means (optional).",
+#'     value_labels = c(val1 = "Human label for val1")  # optional, partial
+#'   )
 #' )
 #' ```
 #'
-#' When `col_filters` is set, query functions like [CODES()] will automatically
-#' filter the lookup table to only include rows matching the default values.
+#' `description` (a single string) and `value_labels` (a named character vector
+#' whose names are a subset of `values`) are optional and make a filter
+#' self-documenting; omit either to leave it unset. When `col_filters` is set,
+#' query functions like [CODES()] will automatically filter the lookup table to
+#' only include rows matching the default values.
 #'
 #' @return A list containing the lookup metadata
 #'
