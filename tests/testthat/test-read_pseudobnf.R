@@ -89,8 +89,5 @@ test_that("read_pseudobnf() errors clearly when expected columns are missing", {
 
 test_that("read_pseudobnf() derives the version label from the file name", {
   meta <- read_pseudobnf(dummy_pseudobnf_path())$bnf_lkp$lookup$metadata
-  expect_equal(
-    meta$lookup_version,
-    as.character(fs::path_ext_remove(basename(dummy_pseudobnf_path())))
-  )
+  expect_equal(meta$lookup_version, basename(dummy_pseudobnf_path()))
 })

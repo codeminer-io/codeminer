@@ -27,7 +27,8 @@ add_pseudobnf <- function(
   source = "https://opendata.nhsbsa.net/dataset/bnf-code-information-current-year"
 ) {
   if (is.null(version)) {
-    version <- as.character(fs::path_ext_remove(basename(path)))
+    # Full resource file name (incl. extension), matching the NHS BSA portal.
+    version <- basename(path)
   }
 
   expected_names <- c(

@@ -37,7 +37,9 @@ read_pseudobnf <- function(
   source = "https://opendata.nhsbsa.net/dataset/bnf-code-information-current-year"
 ) {
   if (is.null(version)) {
-    version <- as.character(fs::path_ext_remove(basename(path)))
+    # Use the full resource file name (incl. extension) so the version label
+    # matches the file published on the NHS BSA portal.
+    version <- basename(path)
   }
 
   raw <- readr::read_csv(
