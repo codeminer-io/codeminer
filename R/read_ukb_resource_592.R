@@ -647,12 +647,12 @@ process_read_v2_icd10 <- function(.df, version, source) {
         to_col = "icd10_code",
         map_source = source,
         col_filters = list(
-          # Mapping-scenario indicator; individual codes are not labelled here
-          # (see #167 for the wider source/default-filter documentation audit).
+          # The individual codes are not enumerated in the source definitions,
+          # so only the column is described (see #167 for the wider audit).
           icd10_code_def = list(
             values = c("1", "15", "3", "5", "7", "8", "2"),
             defaults = c("1", "15", "3", "5", "7", "8"),
-            description = "ICD-10 mapping scenario indicator for the Read v2 to ICD-10 map."
+            description = "Nature of the Read v2 to ICD-10 match (single code, parent-to-children, dagger/asterisk)."
           )
         )
       )
@@ -769,28 +769,41 @@ process_read_ctv3_icd10 <- function(.df, version, source) {
         from_col = "read_code",
         to_col = "icd10_code",
         map_source = source,
-        # Individual mapping_status / refine_flag codes are not labelled here
-        # pending the source/default-filter documentation audit (see #167).
+        # Value meanings taken from the source cross-map field definitions
+        # (see #167 for the wider source/default-filter audit).
         col_filters = list(
           mapping_status = list(
             values = c("E", "G", "D", "R", "A", "U"),
             defaults = c("E", "G", "D"),
-            description = "NHS Read v3 to ICD-10 map status. Defaults to the codes retained for analysis."
+            description = "Nature of the Read v3 to ICD-10 mapping.",
+            value_labels = c(
+              "E" = "Exact one-to-one mapping",
+              "G" = "Target concept more general",
+              "D" = "Default mapping",
+              "R" = "Requires checking",
+              "A" = "Alternative mapping",
+              "U" = "Unspecified (not used)"
+            )
           ),
           refine_flag = list(
             values = c("C", "P", "M"),
             defaults = c("C", "P"),
-            description = "Read v3 to ICD-10 mapping refinement flag."
+            description = "Whether the target ICD-10 code is refined enough to be acceptable.",
+            value_labels = c(
+              "C" = "Completely refined",
+              "P" = "Possible but not mandatory to refine further",
+              "M" = "Mandatory to refine further"
+            )
           ),
           element_num = list(
             values = as.character(0:3),
             defaults = c("0"),
-            description = "Map element number for compound ICD-10 mappings (0 = primary element)."
+            description = "Element number grouping alternative target codes; starts at 0."
           ),
           block_num = list(
             values = as.character(0:14),
             defaults = c("0"),
-            description = "Map block number for alternative ICD-10 mappings (0 = primary block)."
+            description = "Block number identifying a complete set of target codes; numbered from 0."
           )
         )
       )
