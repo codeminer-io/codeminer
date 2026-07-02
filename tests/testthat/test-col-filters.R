@@ -181,10 +181,37 @@ test_that("CODES with custom col_filters applies custom filter", {
   result <- CODES(
     "all",
     type = "filtered_type",
-    col_filters = list(status = c("0"))
+    col_filters = list(lookup = list("filtered_type" = list(status = c("0"))))
   )
   expect_equal(nrow(result), 2)
   expect_true(all(result$code %in% c("B1", "B2")))
+})
+
+test_that("legacy flat col_filters and malformed shapes abort", {
+  local_build_temp_database()
+
+  table <- data.frame(code = "A", description = "a", status = "1")
+  suppressMessages(add_lookup_table(table, lookup_metadata("shape_test")))
+
+  # The pre-#170 flat form
+  expect_error(
+    CODES("all", type = "shape_test", col_filters = list(status = "1")),
+    class = "codeminer_col_filters_invalid"
+  )
+  # Not a list at all
+  expect_error(
+    CODES("all", type = "shape_test", col_filters = "everything"),
+    class = "codeminer_col_filters_invalid"
+  )
+  # Full specification (values + defaults) instead of applied values
+  expect_error(
+    CODES(
+      "all",
+      type = "shape_test",
+      col_filters = get_col_filters(defaults_only = FALSE)
+    ),
+    class = "codeminer_col_filters_invalid"
+  )
 })
 
 test_that("CODES with no col_filters in metadata returns all rows for 'default'", {
@@ -335,7 +362,7 @@ test_that("codeminer_set_col_filters overrides metadata defaults", {
 })
 
 test_that("codeminer_set_col_filters validates input", {
-  # Must provide at least one type
+  # Must provide at least one argument
   expect_error(
     codeminer_set_col_filters(),
     "At least one"
@@ -347,12 +374,29 @@ test_that("codeminer_set_col_filters validates input", {
     "named list"
   )
 
-  # Filter values must be character
+  # Filter values must be atomic (numeric values are coerced, lists abort)
   expect_error(
     codeminer_set_col_filters(
-      lookup = list("test" = list(col = 123))
+      lookup = list("test" = list(col = list("a")))
     ),
-    "character vector"
+    "atomic"
+  )
+
+  # The whole object and the per-type args are mutually exclusive
+  expect_error(
+    codeminer_set_col_filters(
+      col_filters = list(lookup = list("test" = list(col = "a"))),
+      lookup = list("test" = list(col = "a"))
+    ),
+    "not both"
+  )
+
+  # A whole object passed as a per-type argument gets a pointed hint
+  expect_error(
+    codeminer_set_col_filters(
+      lookup = list(lookup = list("test" = list(col = "a")))
+    ),
+    "col_filters = x"
   )
 })
 
@@ -377,17 +421,28 @@ test_that("with_col_filters temporarily overrides filters", {
   # Default: only active
   expect_equal(nrow(CODES("all", type = "with_test")), 1)
 
-  # Temporary override: include all
+  # Temporary override: include all (filters first, code last)
   result <- with_col_filters(
-    {
-      CODES("all", type = "with_test")
-    },
-    lookup = list("with_test" = list(status = c("0", "1")))
+    list(lookup = list("with_test" = list(status = c("0", "1")))),
+    CODES("all", type = "with_test")
   )
   expect_equal(nrow(result), 2)
 
+  # NA disables filtering for the scope
+  result_na <- with_col_filters(NA, CODES("all", type = "with_test"))
+  expect_equal(nrow(result_na), 2)
+
   # After block: back to default
   expect_equal(nrow(CODES("all", type = "with_test")), 1)
+
+  # The old code-first / per-type-args signature is gone
+  expect_error(
+    with_col_filters(
+      CODES("all", type = "with_test"),
+      lookup = list("with_test" = list(status = c("0", "1")))
+    ),
+    "unused argument"
+  )
 })
 
 test_that("with_col_filters restores state even on error", {
@@ -408,10 +463,8 @@ test_that("with_col_filters restores state even on error", {
 
   expect_error(
     with_col_filters(
-      {
-        stop("intentional error")
-      },
-      lookup = list("error_test" = list(status = c("0", "1")))
+      list(lookup = list("error_test" = list(status = c("0", "1")))),
+      stop("intentional error")
     ),
     "intentional error"
   )
@@ -559,4 +612,551 @@ test_that("get_col_filters returns empty list when no col_filters set", {
     is.null(result$lookup$no_cf_test) ||
       length(result$lookup$no_cf_test) == 0
   )
+})
+
+# === Table-keyed col_filters argument (issue #170) ==========================
+
+test_that("MAP col_filters reaches the target lookup (issue #170)", {
+  local_build_temp_database()
+
+  # Target lookup with a filterable (no-default) status column
+  target <- data.frame(
+    code = c("T1", "T2", "T3"),
+    description = c("Target 1", "Target 2", "Target 3"),
+    status = c("1", "0", "1")
+  )
+  suppressMessages(add_lookup_table(
+    target,
+    lookup_metadata(
+      "map_target",
+      col_filters = list(
+        status = list(values = c("0", "1"), defaults = character(0))
+      )
+    )
+  ))
+  source <- data.frame(
+    code = c("S1", "S2", "S3"),
+    description = c("Source 1", "Source 2", "Source 3")
+  )
+  suppressMessages(add_lookup_table(source, lookup_metadata("map_source")))
+  mapping <- data.frame(
+    from = c("S1", "S2", "S3"),
+    to = c("T1", "T2", "T3"),
+    quality = c("good", "good", "poor")
+  )
+  suppressMessages(add_mapping_table(
+    mapping,
+    mapping_metadata("map_source", "map_target")
+  ))
+
+  # Unfiltered: all three targets come back
+  result_all <- suppressMessages(
+    MAP("S1", "S2", "S3", from = "map_source", to = "map_target")
+  )
+  expect_setequal(result_all$code, c("T1", "T2", "T3"))
+
+  # Filter the TARGET LOOKUP via the col_filters argument (previously
+  # impossible: the argument only reached the mapping table). T2 is dropped
+  # by the lookup filter, so its code goes missing with a warning.
+  expect_warning(
+    result <- suppressMessages(MAP(
+      "S1",
+      "S2",
+      "S3",
+      from = "map_source",
+      to = "map_target",
+      col_filters = list(lookup = list("map_target" = list(status = "1")))
+    )),
+    class = "codeminer_missing_codes"
+  )
+  expect_setequal(result$code, c("T1", "T3"))
+
+  # Both tables filtered in one call: the mapping filter drops S3 -> T3 and
+  # the lookup filter drops T2, leaving T1 only.
+  suppressWarnings(
+    both <- suppressMessages(MAP(
+      "S1",
+      "S2",
+      "S3",
+      from = "map_source",
+      to = "map_target",
+      col_filters = list(
+        mapping = list("map_source > map_target" = list(quality = "good")),
+        lookup = list("map_target" = list(status = "1"))
+      )
+    ))
+  )
+  expect_identical(both$code, "T1")
+
+  # A session pin on the target lookup reaches it too
+  suppressMessages(codeminer_set_col_filters(
+    lookup = list("map_target" = list(status = "1"))
+  ))
+  suppressWarnings(
+    pinned <- suppressMessages(
+      MAP("S1", "S2", "S3", from = "map_source", to = "map_target")
+    )
+  )
+  expect_setequal(pinned$code, c("T1", "T3"))
+  codeminer_clear_col_filters()
+})
+
+test_that("a col_filters entry replaces that table's defaults wholesale", {
+  local_build_temp_database()
+
+  table <- data.frame(
+    code = c("A", "B", "C", "D"),
+    description = c("a", "b", "c", "d"),
+    status = c("1", "1", "0", "0"),
+    region = c("north", "south", "north", "south")
+  )
+  meta <- lookup_metadata(
+    "replace_test",
+    col_filters = list(
+      status = list(values = c("0", "1"), defaults = "1"),
+      region = list(values = c("north", "south"), defaults = "north")
+    )
+  )
+  suppressMessages(add_lookup_table(table, meta))
+
+  # Defaults: status "1" AND region "north" -> A only
+  expect_identical(
+    suppressMessages(CODES("all", type = "replace_test"))$code,
+    "A"
+  )
+
+  # An entry naming only region REPLACES the whole set: the status default
+  # is dropped, not merged
+  result <- suppressMessages(CODES(
+    "all",
+    type = "replace_test",
+    col_filters = list(lookup = list("replace_test" = list(region = "south")))
+  ))
+  expect_setequal(result$code, c("B", "D"))
+
+  # Key-level NA un-filters the table
+  result_na <- suppressMessages(CODES(
+    "all",
+    type = "replace_test",
+    col_filters = list(lookup = list("replace_test" = NA))
+  ))
+  expect_setequal(result_na$code, c("A", "B", "C", "D"))
+
+  # Round-trip: amend get_col_filters() output to change one column while
+  # keeping the other defaults
+  cf <- get_col_filters()
+  cf$lookup[["replace_test"]]$region <- c("north", "south")
+  result_rt <- suppressMessages(CODES(
+    "all",
+    type = "replace_test",
+    col_filters = cf
+  ))
+  expect_setequal(result_rt$code, c("A", "B"))
+
+  # An empty selection matches no rows
+  result_none <- suppressMessages(CODES(
+    "all",
+    type = "replace_test",
+    col_filters = list(
+      lookup = list("replace_test" = list(status = character(0)))
+    )
+  ))
+  expect_equal(nrow(result_none), 0)
+})
+
+test_that("col_filters argument overrides a session pin for that call only", {
+  local_build_temp_database()
+
+  table <- data.frame(
+    code = c("A", "B"),
+    description = c("a", "b"),
+    status = c("1", "0")
+  )
+  meta <- lookup_metadata(
+    "arg_pin_test",
+    col_filters = list(status = list(values = c("0", "1"), defaults = "1"))
+  )
+  suppressMessages(add_lookup_table(table, meta))
+
+  suppressMessages(codeminer_set_col_filters(
+    lookup = list("arg_pin_test" = list(status = c("0", "1")))
+  ))
+  expect_equal(nrow(suppressMessages(CODES("all", type = "arg_pin_test"))), 2)
+
+  # The argument replaces the pin for this call
+  result <- suppressMessages(CODES(
+    "all",
+    type = "arg_pin_test",
+    col_filters = list(lookup = list("arg_pin_test" = list(status = "0")))
+  ))
+  expect_identical(result$code, "B")
+
+  # The pin is untouched afterwards
+  expect_equal(nrow(suppressMessages(CODES("all", type = "arg_pin_test"))), 2)
+  codeminer_clear_col_filters()
+})
+
+test_that("col_filters round-trips through JSON", {
+  local_build_temp_database()
+
+  table <- data.frame(
+    code = c("A", "B"),
+    description = c("a", "b"),
+    status = c("1", "0")
+  )
+  meta <- lookup_metadata(
+    "json_test",
+    col_filters = list(status = list(values = c("0", "1"), defaults = "1"))
+  )
+  suppressMessages(add_lookup_table(table, meta))
+
+  # auto_unbox = TRUE turns single values into JSON scalars; they still work
+  cf <- list(lookup = list(json_test = list(status = "0")))
+  cf_json <- jsonlite::fromJSON(
+    jsonlite::toJSON(cf, auto_unbox = TRUE),
+    simplifyVector = TRUE
+  )
+  result <- suppressMessages(CODES(
+    "all",
+    type = "json_test",
+    col_filters = cf_json
+  ))
+  expect_identical(result$code, "B")
+
+  # A JSON null at key level un-filters the table (parses to a
+  # present-but-NULL element, treated like NA)
+  null_json <- jsonlite::fromJSON(
+    '{"lookup": {"json_test": null}}',
+    simplifyVector = TRUE
+  )
+  result_null <- suppressMessages(CODES(
+    "all",
+    type = "json_test",
+    col_filters = null_json
+  ))
+  expect_equal(nrow(result_null), 2)
+})
+
+test_that("mapping col_filters apply across a reverse swap, keyed either way", {
+  local_build_temp_database()
+
+  a <- data.frame(code = c("A1", "A2"), description = c("a1", "a2"))
+  b <- data.frame(code = c("B1", "B2"), description = c("b1", "b2"))
+  suppressMessages(add_lookup_table(a, lookup_metadata("type_a")))
+  suppressMessages(add_lookup_table(b, lookup_metadata("type_b")))
+  mapping <- data.frame(
+    from = c("A1", "A2"),
+    to = c("B1", "B2"),
+    assured = c("Y", "N")
+  )
+  suppressMessages(add_mapping_table(
+    mapping,
+    mapping_metadata("type_a", "type_b")
+  ))
+
+  # Only "type_a > type_b" is registered; calling the reverse triggers the
+  # swap warning. A filter keyed by the REQUESTED direction applies...
+  w1 <- capture_warnings(
+    rev1 <- suppressMessages(MAP(
+      "all",
+      from = "type_b",
+      to = "type_a",
+      col_filters = list(
+        mapping = list("type_b > type_a" = list(assured = "Y"))
+      )
+    ))
+  )
+  expect_true(any(grepl("reverse", w1)))
+  expect_false(any(grepl("do not match", w1)))
+  expect_identical(rev1$from, "B1")
+
+  # ...and so does one keyed by the REGISTERED direction
+  w2 <- capture_warnings(
+    rev2 <- suppressMessages(MAP(
+      "all",
+      from = "type_b",
+      to = "type_a",
+      col_filters = list(
+        mapping = list("type_a > type_b" = list(assured = "Y"))
+      )
+    ))
+  )
+  expect_true(any(grepl("reverse", w2)))
+  expect_false(any(grepl("do not match", w2)))
+  expect_identical(rev2$from, "B1")
+})
+
+# === Typo guard =============================================================
+
+test_that("col_filters typo guard warns on unknown keys, columns, and values", {
+  local_build_temp_database()
+
+  table <- data.frame(code = c("A"), description = c("a"), status = c("1"))
+  meta <- lookup_metadata(
+    "guard_test",
+    col_filters = list(status = list(values = c("0", "1"), defaults = "1"))
+  )
+  suppressMessages(add_lookup_table(table, meta))
+
+  # Unknown key (matches no registered table)
+  expect_warning(
+    suppressMessages(CODES(
+      "all",
+      type = "guard_test",
+      col_filters = list(lookup = list("gaurd_test" = list(status = "1")))
+    )),
+    class = "codeminer_col_filters_unmatched"
+  )
+
+  # Unknown column on a known key
+  expect_warning(
+    suppressMessages(CODES(
+      "all",
+      type = "guard_test",
+      col_filters = list(lookup = list("guard_test" = list(staus = "1")))
+    )),
+    class = "codeminer_col_filters_unmatched"
+  )
+
+  # Value outside the column's registered values
+  expect_warning(
+    suppressMessages(CODES(
+      "all",
+      type = "guard_test",
+      col_filters = list(lookup = list("guard_test" = list(status = "yes")))
+    )),
+    class = "codeminer_col_filters_unmatched"
+  )
+
+  # A real column with no registered spec accepts any value silently
+  expect_no_warning(
+    suppressMessages(CODES(
+      "all",
+      type = "guard_test",
+      col_filters = list(lookup = list("guard_test" = list(description = "a")))
+    ))
+  )
+
+  # An entry for a registered table the query does not use is silent
+  suppressMessages(add_lookup_table(
+    data.frame(code = "B", description = "b"),
+    lookup_metadata("other_test")
+  ))
+  expect_no_warning(
+    suppressMessages(CODES(
+      "all",
+      type = "other_test",
+      col_filters = list(lookup = list("guard_test" = list(status = "1")))
+    ))
+  )
+})
+
+test_that("col_filters validation is silent when no database is connected", {
+  # No local_build_temp_database(): fresh state, no metadata cache
+  if (
+    exists("con", envir = .codeminer_env) &&
+      DBI::dbIsValid(.codeminer_env$con)
+  ) {
+    codeminer_disconnect()
+  }
+  expect_no_warning(
+    codeminer_set_col_filters(
+      lookup = list("nowhere" = list(anything = "1"))
+    )
+  )
+  codeminer_clear_col_filters()
+})
+
+# === Setter ergonomics ======================================================
+
+test_that("codeminer_set_col_filters accepts a whole object and NA", {
+  local_build_temp_database()
+
+  table <- data.frame(
+    code = c("A", "B"),
+    description = c("a", "b"),
+    status = c("1", "0")
+  )
+  meta <- lookup_metadata(
+    "setter_test",
+    col_filters = list(status = list(values = c("0", "1"), defaults = "1"))
+  )
+  suppressMessages(add_lookup_table(table, meta))
+
+  # Amend-then-pin round trip with the classed object
+  cf <- get_col_filters()
+  cf$lookup[["setter_test"]]$status <- c("0", "1")
+  suppressMessages(codeminer_set_col_filters(col_filters = cf))
+  expect_equal(nrow(suppressMessages(CODES("all", type = "setter_test"))), 2)
+
+  # NA disables all filtering for the session; clear restores defaults
+  codeminer_set_col_filters(NA)
+  expect_equal(nrow(suppressMessages(CODES("all", type = "setter_test"))), 2)
+  codeminer_clear_col_filters()
+  expect_equal(nrow(suppressMessages(CODES("all", type = "setter_test"))), 1)
+
+  # Setting pins replaces a session-wide NA
+  codeminer_set_col_filters(NA)
+  suppressMessages(codeminer_set_col_filters(
+    lookup = list("setter_test" = list(status = "0"))
+  ))
+  expect_identical(
+    suppressMessages(CODES("all", type = "setter_test"))$code,
+    "B"
+  )
+  codeminer_clear_col_filters()
+
+  # Numeric values are coerced to character
+  suppressMessages(codeminer_set_col_filters(
+    lookup = list("setter_test" = list(status = 1))
+  ))
+  expect_identical(
+    suppressMessages(CODES("all", type = "setter_test"))$code,
+    "A"
+  )
+  codeminer_clear_col_filters()
+})
+
+test_that("setter informs when a pin drops registered defaults", {
+  local_build_temp_database()
+
+  table <- data.frame(
+    code = c("A", "B"),
+    description = c("a", "b"),
+    status = c("1", "0"),
+    region = c("north", "south")
+  )
+  meta <- lookup_metadata(
+    "inform_test",
+    col_filters = list(status = list(values = c("0", "1"), defaults = "1"))
+  )
+  suppressMessages(add_lookup_table(table, meta))
+
+  # Pin names a different column: the status default is dropped -> inform
+  expect_message(
+    codeminer_set_col_filters(
+      lookup = list("inform_test" = list(region = "south"))
+    ),
+    "replaces its default filter"
+  )
+  codeminer_clear_col_filters()
+
+  # Pin restates the default column: silent
+  expect_no_message(
+    codeminer_set_col_filters(
+      lookup = list("inform_test" = list(status = "0"))
+    )
+  )
+  codeminer_clear_col_filters()
+
+  # Un-filtering via NA is explicit intent: silent
+  expect_no_message(
+    codeminer_set_col_filters(lookup = list("inform_test" = NA))
+  )
+  codeminer_clear_col_filters()
+
+  # Scoped filters never inform
+  expect_no_message(
+    with_col_filters(
+      list(lookup = list("inform_test" = list(region = "south"))),
+      NULL
+    )
+  )
+})
+
+# === Class and print ========================================================
+
+test_that("get_col_filters returns a classed object with a print method", {
+  local_build_temp_database()
+
+  table <- data.frame(code = "A", description = "a", status = "1")
+  meta <- lookup_metadata(
+    "class_test",
+    col_filters = list(status = list(values = c("0", "1"), defaults = "1"))
+  )
+  suppressMessages(add_lookup_table(table, meta))
+
+  cf <- get_col_filters()
+  expect_s3_class(cf, "codeminer_col_filters")
+  expect_output(print(cf), "codeminer_col_filters")
+  expect_output(print(cf), "status: 1")
+
+  # Plain assignment keeps the class
+  cf$lookup[["class_test"]]$status <- c("0", "1")
+  expect_s3_class(cf, "codeminer_col_filters")
+
+  # Empty object
+  expect_output(
+    print(new_col_filters(list())),
+    "No column filters registered"
+  )
+
+  # Full specification prints values and defaults
+  full <- get_col_filters(defaults_only = FALSE)
+  expect_s3_class(full, "codeminer_col_filters")
+  expect_output(print(full), "values")
+})
+
+# === Missing-codes hint =====================================================
+
+test_that("missing-codes warning mentions active column filters", {
+  local_build_temp_database()
+
+  table <- data.frame(
+    code = c("A", "B"),
+    description = c("a", "b"),
+    status = c("1", "0")
+  )
+  meta <- lookup_metadata(
+    "hint_test",
+    col_filters = list(status = list(values = c("0", "1"), defaults = "1"))
+  )
+  suppressMessages(add_lookup_table(table, meta))
+
+  # B is excluded by the default filter: the miss warning carries the hint
+  expect_warning(
+    suppressMessages(CODES("B", type = "hint_test")),
+    "Active column filters"
+  )
+
+  # With filtering off, the hint is absent
+  w <- capture_warnings(
+    suppressMessages(CODES("Z", type = "hint_test", col_filters = NULL))
+  )
+  expect_true(length(w) > 0)
+  expect_false(any(grepl("Active column filters", w)))
+})
+
+# === Getters accept the keyed argument ======================================
+
+test_that("table getters accept the table-keyed col_filters argument", {
+  local_build_temp_database()
+
+  table <- data.frame(
+    code = c("A", "B"),
+    description = c("a", "b"),
+    status = c("1", "0")
+  )
+  meta <- lookup_metadata(
+    "getter_test",
+    col_filters = list(status = list(values = c("0", "1"), defaults = "1"))
+  )
+  suppressMessages(add_lookup_table(table, meta))
+
+  rows <- suppressMessages(
+    get_lookup_table(
+      "getter_test",
+      col_filters = list(lookup = list(getter_test = list(status = "0")))
+    ) |>
+      dplyr::collect()
+  )
+  expect_identical(rows$code, "B")
+
+  # Query construction happens inside the getter, so filters stay baked into
+  # a lazy tbl collected after the scope has been restored
+  lazy <- suppressMessages(with_col_filters(
+    NA,
+    get_lookup_table("getter_test")
+  ))
+  expect_equal(nrow(dplyr::collect(lazy)), 2)
 })

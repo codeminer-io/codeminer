@@ -12,15 +12,19 @@ filter values. If \code{FALSE}, return the full specification including all
 available values (useful for Shiny UI checkboxes).}
 }
 \value{
-A named list with entries for \code{lookup}, \code{mapping}, and
-\code{relationship}. Each entry is a named list keyed by code type (or
-\code{"from > to"} for mappings), containing either:
+A \code{codeminer_col_filters} object (a list with entries for
+\code{lookup}, \code{mapping}, and \code{relationship}). Each entry is a named list
+keyed by code type (or \code{"from > to"} for mappings), containing either:
 \itemize{
 \item If \code{defaults_only = TRUE}: a flat \code{list(col = c(default_values))}
 \item If \code{defaults_only = FALSE}: a full \code{list(col = list(values = ..., defaults = ...))}
 }
 
-Returns an empty list if no database is connected.
+The \code{defaults_only = TRUE} form is the shape accepted by the
+\code{col_filters} argument on query functions (see \code{\link[=CODES]{CODES()}}),
+\code{\link[=codeminer_set_col_filters]{codeminer_set_col_filters()}}, and \code{\link[=with_col_filters]{with_col_filters()}} — amend it with
+plain assignment and pass it back. Returns an empty object if no
+database is connected.
 }
 \description{
 Reads \code{col_filters} from all metadata tables in the connected database.

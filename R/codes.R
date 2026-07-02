@@ -23,11 +23,25 @@
 #'   option.
 #' @param preferred_description_only logical. If `TRUE`, only returns the
 #'   preferred description for each code. Default: `FALSE`.
-#' @param col_filters Column filters to apply. One of:
-#'   - `"default"` (default): apply session-pinned or metadata-defined default
-#'     filters
-#'   - `NULL`: no filtering (return all rows)
-#'   - A named list of `column_name = c(values)` pairs for explicit filtering
+#' @param col_filters Column filters for the tables this query touches. One
+#'   of:
+#'   - `"default"` (default): apply session-pinned filters
+#'     ([codeminer_set_col_filters()]) where set, else the metadata-defined
+#'     default filters.
+#'   - `NULL` (or `NA`): no filtering for any table this query touches.
+#'   - A table-keyed list — the shape returned by [get_col_filters()] — with
+#'     top-level names `lookup` / `relationship` / `mapping`, keyed by code
+#'     type (or `"from > to"` pair for mappings), e.g.
+#'     `list(lookup = list("SNOMED CT" = list(active_concept = "1")))`.
+#'     Each table entry *replaces* that table's pinned/default filters
+#'     wholesale; tables the list does not name keep their pins/defaults.
+#'     `NA` as a table entry un-filters that one table. The filters reach
+#'     every table the query touches (e.g. both the mapping table and the
+#'     target lookup in [MAP()]).
+#'
+#'   To tweak one column while keeping a table's other default filters,
+#'   amend [get_col_filters()] output and pass it back. Entries that match
+#'   no registered table or column trigger a warning.
 #'
 #' @return A `codeminer_codelist` object (tibble) containing the codes and their
 #'   descriptions
@@ -66,6 +80,11 @@ CODES <- function(
   preferred_description_only = TRUE,
   col_filters = "default"
 ) {
+  # Apply the col_filters argument as a call-scoped overlay: every table read
+  # this query makes (directly or via internal helpers) resolves against it.
+  old_cf <- push_col_filters(col_filters, call = rlang::current_env())
+  on.exit(pop_col_filters(old_cf), add = TRUE)
+
   # Validate logical parameter
   check_logical_scalar(preferred_description_only, "preferred_description_only")
 
@@ -128,7 +147,6 @@ CODES <- function(
     lookup_table <- get_lookup_table(
       type,
       lookup_version = lookup_version,
-      col_filters = col_filters,
       con = con
     )
     result <- dplyr::collect(lookup_table)
@@ -156,7 +174,6 @@ CODES <- function(
   lookup_table <- get_lookup_table(
     type,
     lookup_version = lookup_version,
-    col_filters = col_filters,
     con = con,
     meta = this_meta
   )
@@ -170,7 +187,8 @@ CODES <- function(
     missing_codes_warning(
       missing_codes,
       table_type = "lookup",
-      table_meta = this_meta
+      table_meta = this_meta,
+      extra = active_col_filters_hint(this_meta$col_filters, "lookup", type)
     )
   }
 
@@ -276,6 +294,9 @@ CODES_LIKE <- function(
   preferred_description_only = TRUE,
   col_filters = "default"
 ) {
+  old_cf <- push_col_filters(col_filters, call = rlang::current_env())
+  on.exit(pop_col_filters(old_cf), add = TRUE)
+
   check_pattern(pattern)
   check_code_type(type)
   check_version(lookup_version)
@@ -286,7 +307,6 @@ CODES_LIKE <- function(
   lookup_table <- get_lookup_table(
     type,
     lookup_version = lookup_version,
-    col_filters = col_filters,
     con = con
   )
   like_codes <- dplyr::filter(
@@ -299,8 +319,7 @@ CODES_LIKE <- function(
     unique(like_codes),
     type = type,
     lookup_version = lookup_version,
-    preferred_description_only = preferred_description_only,
-    col_filters = col_filters
+    preferred_description_only = preferred_description_only
   )
   return(result)
 }
@@ -382,6 +401,9 @@ get_lookup_table <- function(
   meta = NULL,
   call = rlang::caller_env()
 ) {
+  old_cf <- push_col_filters(col_filters, call = call)
+  on.exit(pop_col_filters(old_cf), add = TRUE)
+
   con <- get_db_con(con)
   this_meta <- if (is.null(meta)) {
     get_metadata_for_lookup(con, type, lookup_version, call)
@@ -394,7 +416,6 @@ get_lookup_table <- function(
 
   # Apply col_filters BEFORE column renaming (filter on original column names)
   resolved <- resolve_col_filters(
-    col_filters,
     this_meta$col_filters,
     pin_type = "lookup",
     pin_key = type

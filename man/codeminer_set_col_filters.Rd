@@ -4,11 +4,22 @@
 \alias{codeminer_set_col_filters}
 \title{Pin column filters for the session}
 \usage{
-codeminer_set_col_filters(lookup = NULL, relationship = NULL, mapping = NULL)
+codeminer_set_col_filters(
+  col_filters = NULL,
+  lookup = NULL,
+  relationship = NULL,
+  mapping = NULL
+)
 }
 \arguments{
+\item{col_filters}{A whole type-layered filter object — the shape returned
+by \code{\link[=get_col_filters]{get_col_filters()}}, i.e. \code{list(lookup =, relationship =, mapping =)}
+— or \code{NA} to disable all filtering (pins \emph{and} metadata defaults) for
+the session. Cannot be combined with the per-type arguments.}
+
 \item{lookup}{Named list of column filters for lookup tables, keyed by
-code type. Each value is a named list of \code{column_name = c(values)} pairs.
+code type. Each value is a named list of \code{column_name = c(values)} pairs,
+or \code{NA} to un-filter that table.
 E.g. \code{list("SNOMED CT" = list(active_concept = c("1")))}.}
 
 \item{relationship}{Named list of column filters for relationship tables,
@@ -27,11 +38,18 @@ filters persist until cleared with \code{\link[=codeminer_clear_col_filters]{cod
 \code{\link[=codeminer_disconnect]{codeminer_disconnect()}}.
 }
 \details{
-Pinned filters only affect \code{col_filters = "default"} resolution. Explicit
-\code{col_filters} arguments on query functions always take precedence.
+A pin \strong{replaces} the metadata-defined default filters for its table
+wholesale (it does not merge column-by-column) — a message lists any
+default columns the pin drops. To tweak one column while keeping the
+rest, amend \code{\link[=get_col_filters]{get_col_filters()}} output and pin that.
 
-New pins are merged with existing ones. To replace all pins, call
-\code{\link[=codeminer_clear_col_filters]{codeminer_clear_col_filters()}} first.
+Pinned filters apply when queries run with \code{col_filters = "default"}; an
+explicit \code{col_filters} argument on a query function overrides the pin for
+that call (again whole-key, per table).
+
+New pins are merged with existing ones by table key. To replace all pins,
+call \code{\link[=codeminer_clear_col_filters]{codeminer_clear_col_filters()}} first. Pins that match no registered
+table, column, or value trigger a warning.
 }
 \examples{
 \dontrun{
@@ -45,12 +63,21 @@ codeminer_set_col_filters(
   mapping = list("Read 3 > ICD-10" = list(mapping_status = c("E", "G")))
 )
 
-# Clear all filter pins
+# Amend the registered defaults and pin the result
+cf <- get_col_filters()
+cf$lookup[["SNOMED CT"]]$moduleId_concept <- "999000011000001104"
+codeminer_set_col_filters(col_filters = cf)
+
+# Disable all filtering for the session
+codeminer_set_col_filters(NA)
+
+# Clear all filter pins (back to metadata defaults)
 codeminer_clear_col_filters()
 }
 }
 \seealso{
-\code{\link[=with_col_filters]{with_col_filters()}}, \code{\link[=codeminer_clear_col_filters]{codeminer_clear_col_filters()}}
+\code{\link[=with_col_filters]{with_col_filters()}}, \code{\link[=codeminer_clear_col_filters]{codeminer_clear_col_filters()}},
+\code{\link[=get_col_filters]{get_col_filters()}}
 
 Other Workbench management: 
 \code{\link{codeminer_clear_col_filters}()},

@@ -183,7 +183,6 @@ test_that("read_snomed_ct_uk_monolith() declares moduleId_concept as a no-defaul
   expect_length(cf$moduleId_concept$defaults, 0)
 
   resolved <- resolve_col_filters(
-    "default",
     result$sct_lookup$lookup$metadata$col_filters,
     pin_type = "lookup",
     pin_key = "SNOMED CT"

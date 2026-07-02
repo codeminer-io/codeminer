@@ -4,39 +4,43 @@
 \alias{with_col_filters}
 \title{Temporarily override column filters}
 \usage{
-with_col_filters(code, lookup = NULL, relationship = NULL, mapping = NULL)
+with_col_filters(col_filters, code)
 }
 \arguments{
-\item{code}{Code to execute with the temporary filters.}
+\item{col_filters}{The filters to apply: a type-layered list or
+\code{\link[=get_col_filters]{get_col_filters()}} object (each table entry replaces that table's
+pins/defaults wholesale), or \code{NULL} / \code{NA} for no filtering at all.}
 
-\item{lookup}{Named list of column filters for lookup tables, keyed by
-code type. Each value is a named list of \code{column_name = c(values)} pairs.
-E.g. \code{list("SNOMED CT" = list(active_concept = c("1")))}.}
-
-\item{relationship}{Named list of column filters for relationship tables,
-keyed by code type.}
-
-\item{mapping}{Named list of column filters for mapping tables, keyed by
-\code{"from > to"} pairs.
-E.g. \code{list("Read 3 > ICD-10" = list(mapping_status = c("E", "G")))}.}
+\item{code}{Code to execute with the temporary filters. The scope covers
+query \emph{construction}: every codeminer read made while \code{code} evaluates
+resolves against the temporary filters.}
 }
 \value{
 The result of evaluating \code{code}.
 }
 \description{
-Sets column filter pins for the duration of the supplied code block,
-then restores the previous state. This is useful when you need different
-filters for a group of calls without permanently changing session state.
+Applies column filters for the duration of the supplied expression, then
+restores the previous state (even on error). This is useful when you need
+different filters for a group of calls without permanently changing
+session state. For a single call, prefer the \code{col_filters} argument on
+the query function itself (see \code{\link[=CODES]{CODES()}}) — it has the same semantics,
+scoped to that call.
+}
+\details{
+Note the argument order (filters first, code last, as in
+\verb{withr::with_*()}): wrap the expression rather than piping into this
+function.
 }
 \examples{
 \dontrun{
 # Temporarily include inactive SNOMED concepts
 with_col_filters(
-  {
-    CODES("all", type = "SNOMED CT")
-  },
-  lookup = list("SNOMED CT" = list(active_concept = c("0", "1")))
+  list(lookup = list("SNOMED CT" = list(active_concept = c("0", "1")))),
+  CODES("all", type = "SNOMED CT")
 )
+
+# Temporarily disable all filtering
+with_col_filters(NA, CODES("all", type = "SNOMED CT"))
 }
 }
 \seealso{

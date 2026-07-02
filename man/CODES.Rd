@@ -48,13 +48,27 @@ option.}
 \item{preferred_description_only}{logical. If \code{TRUE}, only returns the
 preferred description for each code. Default: \code{FALSE}.}
 
-\item{col_filters}{Column filters to apply. One of:
+\item{col_filters}{Column filters for the tables this query touches. One
+of:
 \itemize{
-\item \code{"default"} (default): apply session-pinned or metadata-defined default
-filters
-\item \code{NULL}: no filtering (return all rows)
-\item A named list of \code{column_name = c(values)} pairs for explicit filtering
-}}
+\item \code{"default"} (default): apply session-pinned filters
+(\code{\link[=codeminer_set_col_filters]{codeminer_set_col_filters()}}) where set, else the metadata-defined
+default filters.
+\item \code{NULL} (or \code{NA}): no filtering for any table this query touches.
+\item A table-keyed list — the shape returned by \code{\link[=get_col_filters]{get_col_filters()}} — with
+top-level names \code{lookup} / \code{relationship} / \code{mapping}, keyed by code
+type (or \code{"from > to"} pair for mappings), e.g.
+\code{list(lookup = list("SNOMED CT" = list(active_concept = "1")))}.
+Each table entry \emph{replaces} that table's pinned/default filters
+wholesale; tables the list does not name keep their pins/defaults.
+\code{NA} as a table entry un-filters that one table. The filters reach
+every table the query touches (e.g. both the mapping table and the
+target lookup in \code{\link[=MAP]{MAP()}}).
+}
+
+To tweak one column while keeping a table's other default filters,
+amend \code{\link[=get_col_filters]{get_col_filters()}} output and pass it back. Entries that match
+no registered table or column trigger a warning.}
 
 \item{pattern}{a regular expression to search for}
 }

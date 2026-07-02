@@ -247,13 +247,14 @@ deserialise_col_filters <- function(json_string) {
 
   result <- jsonlite::fromJSON(json_string, simplifyVector = TRUE)
 
-  # jsonlite may return a data.frame or nested list — normalise to named list
-  # of lists with character vectors
+  # jsonlite may return a data.frame or nested list — normalise `values` and
+  # `defaults` to character vectors, preserving any other per-column fields
+  # a future spec revision may add.
   lapply(result, function(entry) {
-    list(
-      values = as.character(entry$values),
-      defaults = as.character(entry$defaults)
-    )
+    entry <- as.list(entry)
+    entry$values <- as.character(entry$values)
+    entry$defaults <- as.character(entry$defaults)
+    entry
   })
 }
 
@@ -388,50 +389,50 @@ validate_col_filters_columns <- function(
 
 # --- col_filters resolution and application -----------------------------------
 
-#' Resolve col_filters for a query
+#' Resolve column filters for a single table read
 #'
-#' Determines the effective col_filters to apply, following the resolution order:
-#' explicit list > session pin > metadata defaults > NULL (no filtering).
+#' Determines the effective filters for one table from the session filter
+#' state: a call-scoped overlay (the `col_filters` argument, applied via
+#' `push_col_filters()`) or session pin for the table's key wins over the
+#' metadata defaults, whole-key. The `NA` sentinel — as the whole state or as
+#' a key's entry — means no filtering.
 #'
-#' @param col_filters The col_filters argument from the calling function:
-#'   `"default"` to resolve from pins/metadata, `NULL` for no filtering, or a
-#'   named list for explicit override.
 #' @param metadata_col_filters The serialised JSON col_filters string from
 #'   the metadata table.
 #' @param pin_type Key into `.codeminer_env$active_col_filters` (one of
 #'   "lookup", "mapping", or "relationship").
-#' @param pin_key Key to look up in the pinned col_filters list (e.g.
-#'   code_type or "from > to" mapping key).
+#' @param pin_key Key to look up in the filter state (e.g. code_type or
+#'   "from > to" mapping key).
+#' @param alt_keys Optional fallback keys tried after `pin_key` — used for
+#'   reverse-swapped mappings, where a filter may be keyed by the registered
+#'   direction rather than the requested one.
 #' @return A named list of `col_name = c(values)` pairs for filtering, or
 #'   `NULL` if no filtering should be applied.
 #' @noRd
 resolve_col_filters <- function(
-  col_filters,
   metadata_col_filters,
   pin_type,
-  pin_key
+  pin_key,
+  alt_keys = NULL
 ) {
-  # Explicit NULL → no filtering
-  if (is.null(col_filters)) {
+  state <- .codeminer_env$active_col_filters
+
+  # The whole-state NA sentinel disables all filtering (pins and defaults)
+  if (is_col_filters_off(state)) {
     return(NULL)
   }
 
-  # Explicit list → use directly
-  if (is.list(col_filters)) {
-    return(col_filters)
-  }
-
-  # Must be "default" at this point
-  if (!identical(col_filters, "default")) {
-    codeminer_abort(
-      '{.arg col_filters} must be "default", NULL, or a named list.'
-    )
-  }
-
-  # Check session pin first
-  pinned <- .codeminer_env$active_col_filters[[pin_type]][[pin_key]]
-  if (!is.null(pinned)) {
-    return(pinned)
+  # Check the filter state (call-scoped overlays and session pins share it);
+  # the requested key wins over any fallback keys.
+  for (key in c(pin_key, alt_keys)) {
+    pinned <- state[[pin_type]][[key]]
+    if (!is.null(pinned)) {
+      # A key-level NA sentinel un-filters this one table
+      if (is_col_filters_off(pinned)) {
+        return(NULL)
+      }
+      return(pinned)
+    }
   }
 
   # Fall back to metadata defaults
@@ -456,10 +457,15 @@ resolve_col_filters <- function(
 #' For each column name → values pair, applies a `dplyr::filter()` to keep only
 #' rows where the column value is in the specified values.
 #'
+#' Columns absent from the table are silently skipped: user-supplied filters
+#' (the `col_filters` argument and session pins) are checked against the
+#' table's real columns when they are set, and metadata defaults are checked
+#' when they are written.
+#'
 #' @param tbl A lazy dplyr table (from `dplyr::tbl()`).
 #' @param col_filters A named list of `col_name = c(values)` pairs, or `NULL`.
-#' @param tbl_name The table name (for warning messages).
-#' @param call The calling environment for warning messages.
+#' @param tbl_name The table name (unused; kept for call-site symmetry).
+#' @param call The calling environment (unused; kept for call-site symmetry).
 #' @return The filtered lazy dplyr table.
 #' @noRd
 apply_col_filters <- function(
@@ -476,17 +482,16 @@ apply_col_filters <- function(
 
   for (col_name in names(col_filters)) {
     if (!col_name %in% tbl_cols) {
-      codeminer_warn(
-        c(
-          "Column {.field {col_name}} not found in table {.field {tbl_name}}.",
-          "i" = "Skipping this col_filter."
-        ),
-        call = call
-      )
       next
     }
 
     values <- col_filters[[col_name]]
+    # An empty selection matches no rows. Filter explicitly rather than
+    # relying on the backend translation of `%in% character(0)`.
+    if (length(values) == 0) {
+      tbl <- dplyr::filter(tbl, FALSE)
+      next
+    }
     tbl <- dplyr::filter(tbl, .data[[col_name]] %in% values)
   }
 
@@ -503,13 +508,17 @@ apply_col_filters <- function(
 #'   filter values. If `FALSE`, return the full specification including all
 #'   available values (useful for Shiny UI checkboxes).
 #'
-#' @return A named list with entries for `lookup`, `mapping`, and
-#'   `relationship`. Each entry is a named list keyed by code type (or
-#'   `"from > to"` for mappings), containing either:
+#' @return A `codeminer_col_filters` object (a list with entries for
+#'   `lookup`, `mapping`, and `relationship`). Each entry is a named list
+#'   keyed by code type (or `"from > to"` for mappings), containing either:
 #'   - If `defaults_only = TRUE`: a flat `list(col = c(default_values))`
 #'   - If `defaults_only = FALSE`: a full `list(col = list(values = ..., defaults = ...))`
 #'
-#'   Returns an empty list if no database is connected.
+#'   The `defaults_only = TRUE` form is the shape accepted by the
+#'   `col_filters` argument on query functions (see [CODES()]),
+#'   [codeminer_set_col_filters()], and [with_col_filters()] — amend it with
+#'   plain assignment and pass it back. Returns an empty object if no
+#'   database is connected.
 #' @export
 #' @family Workbench management
 get_col_filters <- function(defaults_only = TRUE) {
@@ -562,7 +571,7 @@ get_col_filters <- function(defaults_only = TRUE) {
     }
   )
 
-  result
+  new_col_filters(result, defaults_only = defaults_only)
 }
 
 #' Default column filters

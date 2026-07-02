@@ -97,6 +97,11 @@ N_CHILDREN <- function(
   col_filters = "default",
   call = rlang::current_env()
 ) {
+  # Apply the col_filters argument as a call-scoped overlay: the relationship
+  # traversal and the internal description lookup both resolve against it.
+  old_cf <- push_col_filters(col_filters, call = call)
+  on.exit(pop_col_filters(old_cf), add = TRUE)
+
   check_depth(depth)
   check_version(lookup_version)
   check_version(relationship_version)
@@ -122,7 +127,6 @@ N_CHILDREN <- function(
     include_self = TRUE,
     max_depth = depth,
     empty_warning = "No valid child codes found.",
-    col_filters = col_filters,
     call = call
   )
 }
@@ -142,6 +146,11 @@ N_PARENTS <- function(
   col_filters = "default",
   call = rlang::current_env()
 ) {
+  # Apply the col_filters argument as a call-scoped overlay: the relationship
+  # traversal and the internal description lookup both resolve against it.
+  old_cf <- push_col_filters(col_filters, call = call)
+  on.exit(pop_col_filters(old_cf), add = TRUE)
+
   check_depth(depth)
   check_version(lookup_version)
   check_version(relationship_version)
@@ -167,7 +176,6 @@ N_PARENTS <- function(
     include_self = TRUE,
     max_depth = depth,
     empty_warning = "No valid parent codes found.",
-    col_filters = col_filters,
     call = call
   )
 }

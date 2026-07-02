@@ -72,6 +72,9 @@ get_relationship_table <- function(
   meta = NULL,
   call = rlang::caller_env()
 ) {
+  old_cf <- push_col_filters(col_filters, call = call)
+  on.exit(pop_col_filters(old_cf), add = TRUE)
+
   endpoints <- rlang::arg_match(endpoints)
   con <- get_db_con(con)
   if (is.null(meta)) {
@@ -86,7 +89,6 @@ get_relationship_table <- function(
 
   # Apply col_filters
   resolved <- resolve_col_filters(
-    col_filters,
     meta$col_filters,
     pin_type = "relationship",
     pin_key = type
@@ -356,7 +358,6 @@ graph_closure_codes <- function(
   include_self = TRUE,
   max_depth = Inf,
   empty_warning = "No valid codes found.",
-  col_filters = "default",
   require_relationship_types = NULL,
   call = rlang::caller_env()
 ) {
@@ -387,7 +388,6 @@ graph_closure_codes <- function(
 
   # Apply col_filters to relationship table before traversal
   resolved <- resolve_col_filters(
-    col_filters,
     meta$col_filters,
     pin_type = "relationship",
     pin_key = code_type
@@ -494,7 +494,10 @@ graph_closure_codes <- function(
       missing_codes,
       table_type = "relationship",
       table_meta = meta,
-      extra = extra
+      extra = c(
+        extra,
+        active_col_filters_hint(meta$col_filters, "relationship", code_type)
+      )
     )
   }
 
@@ -531,8 +534,7 @@ graph_closure_codes <- function(
       result_codes,
       type = code_type,
       lookup_version = lookup_version,
-      preferred_description_only = preferred_description_only,
-      col_filters = col_filters
+      preferred_description_only = preferred_description_only
     ),
     hint = c(
       "i" = paste0(
@@ -576,8 +578,9 @@ graph_closure_codes <- function(
 #'   option.
 #' @param lookup_version Lookup table version. Defaults to `"latest"`. Can
 #'   be configured via the `codeminer.lookup_version` option.
-#' @param col_filters Column filters to apply to both the relationship
-#'   and lookup tables. See [CODES()] for details.
+#' @param col_filters Column filters for the tables this query touches (the
+#'   relationship table and the lookup table, each addressed by its own
+#'   type + key). See [CODES()] for details.
 #' @param preferred_description_only Logical. If `TRUE` (default), node
 #'   `term` is the preferred description only (one row per code).
 #' @param con Optional DBI connection. If `NULL` (default), uses the
@@ -632,6 +635,11 @@ get_relationship_tree <- function(
   con = NULL,
   call = rlang::caller_env()
 ) {
+  # Apply the col_filters argument as a call-scoped overlay: the expansion,
+  # edges, and nodes reads all resolve against it.
+  old_cf <- push_col_filters(col_filters, call = call)
+  on.exit(pop_col_filters(old_cf), add = TRUE)
+
   # Validate inputs
   check_code_type(type, call = call)
   check_version(relationship_version, call = call)
@@ -689,7 +697,6 @@ get_relationship_tree <- function(
   )
   rel_tbl <- dplyr::tbl(con, rel_meta$relationship_table_name)
   resolved <- resolve_col_filters(
-    col_filters,
     rel_meta$col_filters,
     pin_type = "relationship",
     pin_key = type
@@ -747,7 +754,6 @@ get_relationship_tree <- function(
     codes = expanded,
     endpoints = "both",
     relationship_version = relationship_version,
-    col_filters = col_filters,
     con = con,
     meta = rel_meta,
     call = call
@@ -764,7 +770,6 @@ get_relationship_tree <- function(
     type = type,
     codes = expanded,
     lookup_version = lookup_version,
-    col_filters = col_filters,
     con = con,
     call = call
   )
