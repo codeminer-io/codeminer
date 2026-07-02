@@ -79,6 +79,27 @@ can be changed without re-adding the data via
 [`update_lookup_metadata()`](https://codeminer-io.github.io/codeminer/reference/update_lookup_metadata.md)
 (and the mapping/relationship equivalents).
 
+Each column may also carry two optional documentation fields, so filters
+are self-describing rather than opaque:
+
+- `description`: a single string explaining what the column means.
+- `value_labels`: a named character vector mapping values to
+  human-readable labels. Its names must be a subset of `values`;
+  labelling is optional and may be partial (only some values need a
+  label).
+
+``` r
+
+col_filters = list(
+  moduleId_concept = list(
+    values       = module_ids,
+    defaults     = character(0),
+    description  = "SNOMED CT module the concept belongs to. Filter to the UK drug extension for dm+d-only results.",
+    value_labels = c("999000011000001104" = "UK drug extension (dm+d)")
+  )
+)
+```
+
 ## The `col_filters` argument
 
 Every query function accepts `col_filters`:
@@ -263,8 +284,9 @@ motivating example).
 ## Discovering available filters
 
 `get_col_filters(defaults_only = FALSE)` returns the full specification
-— every filterable column with all its `values` and the `defaults` —
-which is what a UI needs to render filter choices:
+— every filterable column with all its `values` and the `defaults`, plus
+any `description` and `value_labels` the filter declares — which is what
+a UI needs to render labelled filter choices:
 
 ``` r
 
@@ -276,6 +298,17 @@ get_col_filters(defaults_only = FALSE)$mapping[["Read v3 > ICD-10"]]
 #> $mapping_status$defaults
 #> [1] "E" "G" "D"
 #> 
+#> $mapping_status$description
+#> [1] "Nature of the Read v3 to ICD-10 mapping."
+#> 
+#> $mapping_status$value_labels
+#>                             E                             G 
+#>    "Exact one-to-one mapping" "Target concept more general" 
+#>                             D                             R 
+#>             "Default mapping"           "Requires checking" 
+#>                             A                             U 
+#>         "Alternative mapping"      "Unspecified (not used)" 
+#> 
 #> 
 #> $refine_flag
 #> $refine_flag$values
@@ -283,6 +316,17 @@ get_col_filters(defaults_only = FALSE)$mapping[["Read v3 > ICD-10"]]
 #> 
 #> $refine_flag$defaults
 #> [1] "C" "P"
+#> 
+#> $refine_flag$description
+#> [1] "Whether the target ICD-10 code is refined enough to be acceptable."
+#> 
+#> $refine_flag$value_labels
+#>                                              C 
+#>                           "Completely refined" 
+#>                                              P 
+#> "Possible but not mandatory to refine further" 
+#>                                              M 
+#>                  "Mandatory to refine further" 
 #> 
 #> 
 #> $element_num
@@ -292,6 +336,9 @@ get_col_filters(defaults_only = FALSE)$mapping[["Read v3 > ICD-10"]]
 #> $element_num$defaults
 #> [1] "0"
 #> 
+#> $element_num$description
+#> [1] "Element number grouping alternative target codes; starts at 0."
+#> 
 #> 
 #> $block_num
 #> $block_num$values
@@ -299,4 +346,7 @@ get_col_filters(defaults_only = FALSE)$mapping[["Read v3 > ICD-10"]]
 #> 
 #> $block_num$defaults
 #> [1] "0"
+#> 
+#> $block_num$description
+#> [1] "Block number identifying a complete set of target codes; numbered from 0."
 ```

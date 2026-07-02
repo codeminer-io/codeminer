@@ -202,6 +202,14 @@ the value that means “is a”, the source URL, and
 <code>required_mapping_metadata_columns()</code>, and
 <code>required_relationship_metadata_columns()</code> — these are the
 source of truth and are checked in <code><a href="../reference/build_database.html">build_database()</a></code>.</p>
+<p>The <code>col_filters</code> cell holds a JSON object keyed by column
+name; each column carries <code>values</code> and <code>defaults</code>
+arrays, plus two optional documentation fields —
+<code>description</code> (a string) and <code>value_labels</code> (a
+value → label object, whose keys are a subset of <code>values</code>). A
+column with neither optional field serialises exactly as before.
+<code>serialise_col_filters()</code> /
+<code>deserialise_col_filters()</code> own this shape.</p>
 </div>
 <div class="section level3">
 <h3 id="the-_db_metadata-stamp-table">The <code>_db_metadata</code> stamp table<a class="anchor" aria-label="anchor" href="#the-_db_metadata-stamp-table"></a>
@@ -362,15 +370,20 @@ for <code>*_table_name</code>
 <td>yes</td>
 </tr>
 <tr class="even">
+<td>Add an optional field to the <code>col_filters</code> JSON
+(e.g. <code>description</code> / <code>value_labels</code>, v5)</td>
+<td>yes</td>
+</tr>
+<tr class="odd">
 <td>New top-level R function</td>
 <td>no</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>Change how <code><a href="../reference/get_lookup_table.html">get_lookup_table()</a></code> renames columns at read
 time</td>
 <td>no</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>Bug fix that doesn’t alter stored data</td>
 <td>no</td>
 </tr>

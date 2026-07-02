@@ -65,7 +65,11 @@ relationship_metadata(
 
   Optional column filter specification. A named list where each element
   is a list with `values` (all valid values) and `defaults` (default
-  filter values). `NULL` (default) means no column filters.
+  filter values), plus the optional `description` (single string) and
+  `value_labels` (named character vector, names a subset of `values`)
+  documentation fields. See
+  [`lookup_metadata()`](https://codeminer-io.github.io/codeminer/reference/lookup_metadata.md)
+  for the full format. `NULL` (default) means no column filters.
 
 ## Value
 

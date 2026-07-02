@@ -135,6 +135,27 @@ purely opt-in filter (nothing is filtered until you ask). Filters on an
 existing table can be changed without re-adding the data via
 <code><a href="../reference/update_lookup_metadata.html">update_lookup_metadata()</a></code> (and the mapping/relationship
 equivalents).</p>
+<p>Each column may also carry two optional documentation fields, so
+filters are self-describing rather than opaque:</p>
+<ul>
+<li>
+<code>description</code>: a single string explaining what the column
+means.</li>
+<li>
+<code>value_labels</code>: a named character vector mapping values
+to human-readable labels. Its names must be a subset of
+<code>values</code>; labelling is optional and may be partial (only some
+values need a label).</li>
+</ul>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">col_filters</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>  moduleId_concept <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>    values       <span class="op">=</span> <span class="va">module_ids</span>,</span>
+<span>    defaults     <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">character</a></span><span class="op">(</span><span class="fl">0</span><span class="op">)</span>,</span>
+<span>    description  <span class="op">=</span> <span class="st">"SNOMED CT module the concept belongs to. Filter to the UK drug extension for dm+d-only results."</span>,</span>
+<span>    value_labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"999000011000001104"</span> <span class="op">=</span> <span class="st">"UK drug extension (dm+d)"</span><span class="op">)</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="the-col_filters-argument">The <code>col_filters</code> argument<a class="anchor" aria-label="anchor" href="#the-col_filters-argument"></a>
@@ -153,7 +174,7 @@ filtering for any table this query touches.</li>
 unnamed tables keep their pins/defaults. <code>NA</code> as a table
 entry un-filters that one table.</li>
 </ul>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># The dummy Read v3 &gt; ICD-10 mapping declares a mapping_status filter with</span></span>
 <span><span class="co"># defaults E, G, D. Restrict this call to exact ("E") mappings only:</span></span>
 <span><span class="fu"><a href="../reference/MAP.html">MAP</a></span><span class="op">(</span></span>
@@ -200,7 +221,7 @@ available.</p>
 <p><code><a href="../reference/codeminer_set_col_filters.html">codeminer_set_col_filters()</a></code> pins filters for the session
 — the same shape, the same replacement rule, applied whenever a query
 runs with <code>col_filters = "default"</code>:</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/codeminer_set_col_filters.html">codeminer_set_col_filters</a></span><span class="op">(</span></span>
 <span>  mapping <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"Read v3 &gt; ICD-10"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>mapping_status <span class="op">=</span> <span class="st">"E"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
@@ -224,7 +245,7 @@ state.</p>
 <p><code>with_col_filters(col_filters, code)</code> applies filters for
 the duration of an expression, then restores the previous state (even on
 error):</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/with_col_filters.html">with_col_filters</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>mapping <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"Read v3 &gt; ICD-10"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>mapping_status <span class="op">=</span> <span class="st">"E"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>  <span class="fu"><a href="../reference/MAP.html">MAP</a></span><span class="op">(</span><span class="st">"all"</span>, from <span class="op">=</span> <span class="st">"Read v3"</span>, to <span class="op">=</span> <span class="st">"ICD-10"</span><span class="op">)</span></span>
@@ -234,7 +255,7 @@ error):</p>
 <p>The scope is the <em>expression</em>: every codeminer read made while
 it evaluates resolves against the temporary filters, so a multi-step
 pipeline can be wrapped as a whole, or step by step:</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># One scope for both steps: CHILDREN()'s lookup reads are filtered too</span></span>
 <span><span class="fu"><a href="../reference/with_col_filters.html">with_col_filters</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>lookup <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"SNOMED CT"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>moduleId_concept <span class="op">=</span> <span class="st">"999..."</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>,</span>
@@ -263,7 +284,7 @@ ended.</p>
 default filters for every table, in exactly the shape the
 <code>col_filters</code> argument (and the pins) accept. Amend it with
 plain assignment and pass it back:</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">cf</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_col_filters.html">get_col_filters</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">cf</span><span class="op">)</span></span>
 <span><span class="co">#&gt; &lt;codeminer_col_filters&gt;</span></span>
@@ -319,9 +340,10 @@ the place you pin.</li>
 </h2>
 <p><code>get_col_filters(defaults_only = FALSE)</code> returns the full
 specification — every filterable column with all its <code>values</code>
-and the <code>defaults</code> — which is what a UI needs to render
-filter choices:</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+and the <code>defaults</code>, plus any <code>description</code> and
+<code>value_labels</code> the filter declares — which is what a UI needs
+to render labelled filter choices:</p>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/get_col_filters.html">get_col_filters</a></span><span class="op">(</span>defaults_only <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">$</span><span class="va">mapping</span><span class="op">[[</span><span class="st">"Read v3 &gt; ICD-10"</span><span class="op">]</span><span class="op">]</span></span>
 <span><span class="co">#&gt; $mapping_status</span></span>
 <span><span class="co">#&gt; $mapping_status$values</span></span>
@@ -329,6 +351,17 @@ filter choices:</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $mapping_status$defaults</span></span>
 <span><span class="co">#&gt; [1] "E" "G" "D"</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $mapping_status$description</span></span>
+<span><span class="co">#&gt; [1] "Nature of the Read v3 to ICD-10 mapping."</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $mapping_status$value_labels</span></span>
+<span><span class="co">#&gt;                             E                             G </span></span>
+<span><span class="co">#&gt;    "Exact one-to-one mapping" "Target concept more general" </span></span>
+<span><span class="co">#&gt;                             D                             R </span></span>
+<span><span class="co">#&gt;             "Default mapping"           "Requires checking" </span></span>
+<span><span class="co">#&gt;                             A                             U </span></span>
+<span><span class="co">#&gt;         "Alternative mapping"      "Unspecified (not used)" </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $refine_flag</span></span>
@@ -338,6 +371,17 @@ filter choices:</p>
 <span><span class="co">#&gt; $refine_flag$defaults</span></span>
 <span><span class="co">#&gt; [1] "C" "P"</span></span>
 <span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $refine_flag$description</span></span>
+<span><span class="co">#&gt; [1] "Whether the target ICD-10 code is refined enough to be acceptable."</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $refine_flag$value_labels</span></span>
+<span><span class="co">#&gt;                                              C </span></span>
+<span><span class="co">#&gt;                           "Completely refined" </span></span>
+<span><span class="co">#&gt;                                              P </span></span>
+<span><span class="co">#&gt; "Possible but not mandatory to refine further" </span></span>
+<span><span class="co">#&gt;                                              M </span></span>
+<span><span class="co">#&gt;                  "Mandatory to refine further" </span></span>
+<span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $element_num</span></span>
 <span><span class="co">#&gt; $element_num$values</span></span>
@@ -346,13 +390,19 @@ filter choices:</p>
 <span><span class="co">#&gt; $element_num$defaults</span></span>
 <span><span class="co">#&gt; [1] "0"</span></span>
 <span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $element_num$description</span></span>
+<span><span class="co">#&gt; [1] "Element number grouping alternative target codes; starts at 0."</span></span>
+<span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $block_num</span></span>
 <span><span class="co">#&gt; $block_num$values</span></span>
 <span><span class="co">#&gt;  [1] "0"  "1"  "2"  "3"  "4"  "5"  "6"  "7"  "8"  "9"  "10" "11" "12" "13" "14"</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $block_num$defaults</span></span>
-<span><span class="co">#&gt; [1] "0"</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] "0"</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $block_num$description</span></span>
+<span><span class="co">#&gt; [1] "Block number identifying a complete set of target codes; numbered from 0."</span></span></code></pre></div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>

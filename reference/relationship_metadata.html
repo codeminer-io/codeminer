@@ -107,7 +107,10 @@ hierarchical table. Must be <code>NA</code> if and only if <code>type_col</code>
 <dt id="arg-col-filters">col_filters<a class="anchor" aria-label="anchor" href="#arg-col-filters"></a></dt>
 <dd><p>Optional column filter specification. A named list where
 each element is a list with <code>values</code> (all valid values) and <code>defaults</code>
-(default filter values). <code>NULL</code> (default) means no column filters.</p></dd>
+(default filter values), plus the optional <code>description</code> (single string)
+and <code>value_labels</code> (named character vector, names a subset of <code>values</code>)
+documentation fields. See <code><a href="lookup_metadata.html">lookup_metadata()</a></code> for the full format. <code>NULL</code>
+(default) means no column filters.</p></dd>
 
 </dl></div>
     <div class="section level2">

@@ -61,6 +61,13 @@ The exact column lists live in `required_lookup_metadata_columns()`,
 truth and are checked in
 [`build_database()`](https://codeminer-io.github.io/codeminer/reference/build_database.md).
 
+The `col_filters` cell holds a JSON object keyed by column name; each
+column carries `values` and `defaults` arrays, plus two optional
+documentation fields — `description` (a string) and `value_labels` (a
+value → label object, whose keys are a subset of `values`). A column
+with neither optional field serialises exactly as before.
+`serialise_col_filters()` / `deserialise_col_filters()` own this shape.
+
 ### The `_db_metadata` stamp table
 
 A fourth metadata table — `_db_metadata` — is *DB-level state*, not a
@@ -129,6 +136,7 @@ Bump if and only if your change alters **what is stored on disk**. See
 | New column in `required_lookup_metadata_columns()` | yes |
 | Rename a column in an existing metadata table | yes |
 | Change the `paste(code_type, lookup_version, ...)` rule for `*_table_name` | yes |
+| Add an optional field to the `col_filters` JSON (e.g. `description` / `value_labels`, v5) | yes |
 | New top-level R function | no |
 | Change how [`get_lookup_table()`](https://codeminer-io.github.io/codeminer/reference/get_lookup_table.md) renames columns at read time | no |
 | Bug fix that doesn’t alter stored data | no |
