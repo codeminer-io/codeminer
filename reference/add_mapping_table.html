@@ -21,7 +21,8 @@ is not possible to overwrite an existing mapping table."></head><body>
 <li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/developer-guide.html">Developer Guide</a></li>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/col_filters.html">Column filters</a></li>
+    <li><a class="dropdown-item" href="../articles/developer-guide.html">Developer Guide</a></li>
     <li><a class="dropdown-item" href="../articles/MAP.html">Mapping between clinical coding systems</a></li>
   </ul></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
@@ -99,7 +100,7 @@ table.</p>
 <span class="r-in"><span><span class="co"># Using a temporary database</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/Sys.setenv.html" class="external-link">Sys.setenv</a></span><span class="op">(</span>CODEMINER_DB_PATH <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="build_database.html">build_database</a></span><span class="op">(</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Creating new database at <span style="color: #0000BB;">/tmp/Rtmph3dB7E/file1a4a458c3b6a</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Creating new database at <span style="color: #0000BB;">/tmp/RtmpcEDjrS/file1a526e850da7</span></span>
 <span class="r-in"><span><span class="fu">add_mapping_table</span><span class="op">(</span><span class="va">mapping_table</span>, <span class="fu"><a href="mapping_metadata.html">mapping_metadata</a></span><span class="op">(</span><span class="st">"capital"</span>, <span class="st">"lowercase"</span>, map_version <span class="op">=</span> <span class="st">"v3"</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Mapping table <span style="color: #00BB00;">capital_lowercase_v3</span> added successfully.</span>
 </code></pre></div>

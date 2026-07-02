@@ -21,7 +21,8 @@ flexible input: character vectors, || separated strings, or data frames."></head
 <li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/developer-guide.html">Developer Guide</a></li>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/col_filters.html">Column filters</a></li>
+    <li><a class="dropdown-item" href="../articles/developer-guide.html">Developer Guide</a></li>
     <li><a class="dropdown-item" href="../articles/MAP.html">Mapping between clinical coding systems</a></li>
   </ul></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
@@ -98,11 +99,23 @@ preferred description for each code. Default: <code>FALSE</code>.</p></dd>
 
 
 <dt id="arg-col-filters">col_filters<a class="anchor" aria-label="anchor" href="#arg-col-filters"></a></dt>
-<dd><p>Column filters to apply. One of:</p><ul><li><p><code>"default"</code> (default): apply session-pinned or metadata-defined default
-filters</p></li>
-<li><p><code>NULL</code>: no filtering (return all rows)</p></li>
-<li><p>A named list of <code>column_name = c(values)</code> pairs for explicit filtering</p></li>
-</ul></dd>
+<dd><p>Column filters for the tables this query touches. One
+of:</p><ul><li><p><code>"default"</code> (default): apply session-pinned filters
+(<code><a href="codeminer_set_col_filters.html">codeminer_set_col_filters()</a></code>) where set, else the metadata-defined
+default filters.</p></li>
+<li><p><code>NULL</code> (or <code>NA</code>): no filtering for any table this query touches.</p></li>
+<li><p>A table-keyed list — the shape returned by <code><a href="get_col_filters.html">get_col_filters()</a></code> — with
+top-level names <code>lookup</code> / <code>relationship</code> / <code>mapping</code>, keyed by code
+type (or <code>"from &gt; to"</code> pair for mappings), e.g.
+<code>list(lookup = list("SNOMED CT" = list(active_concept = "1")))</code>.
+Each table entry <em>replaces</em> that table's pinned/default filters
+wholesale; tables the list does not name keep their pins/defaults.
+<code>NA</code> as a table entry un-filters that one table. The filters reach
+every table the query touches (e.g. both the mapping table and the
+target lookup in <code><a href="MAP.html">MAP()</a></code>).</p></li>
+</ul><p>To tweak one column while keeping a table's other default filters,
+amend <code><a href="get_col_filters.html">get_col_filters()</a></code> output and pass it back. Entries that match
+no registered table or column trigger a warning.</p></dd>
 
 
 <dt id="arg-pattern">pattern<a class="anchor" aria-label="anchor" href="#arg-pattern"></a></dt>

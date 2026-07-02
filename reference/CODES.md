@@ -65,15 +65,31 @@ CODES_LIKE(
 
 - col_filters:
 
-  Column filters to apply. One of:
+  Column filters for the tables this query touches. One of:
 
-  - `"default"` (default): apply session-pinned or metadata-defined
-    default filters
+  - `"default"` (default): apply session-pinned filters
+    ([`codeminer_set_col_filters()`](https://codeminer-io.github.io/codeminer/reference/codeminer_set_col_filters.md))
+    where set, else the metadata-defined default filters.
 
-  - `NULL`: no filtering (return all rows)
+  - `NULL` (or `NA`): no filtering for any table this query touches.
 
-  - A named list of `column_name = c(values)` pairs for explicit
-    filtering
+  - A table-keyed list — the shape returned by
+    [`get_col_filters()`](https://codeminer-io.github.io/codeminer/reference/get_col_filters.md)
+    — with top-level names `lookup` / `relationship` / `mapping`, keyed
+    by code type (or `"from > to"` pair for mappings), e.g.
+    `list(lookup = list("SNOMED CT" = list(active_concept = "1")))`.
+    Each table entry *replaces* that table's pinned/default filters
+    wholesale; tables the list does not name keep their pins/defaults.
+    `NA` as a table entry un-filters that one table. The filters reach
+    every table the query touches (e.g. both the mapping table and the
+    target lookup in
+    [`MAP()`](https://codeminer-io.github.io/codeminer/reference/MAP.md)).
+
+  To tweak one column while keeping a table's other default filters,
+  amend
+  [`get_col_filters()`](https://codeminer-io.github.io/codeminer/reference/get_col_filters.md)
+  output and pass it back. Entries that match no registered table or
+  column trigger a warning.
 
 - pattern:
 

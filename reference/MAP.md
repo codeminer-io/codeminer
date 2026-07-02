@@ -43,18 +43,30 @@ MAP(
 
 - col_filters:
 
-  Column filters to apply to the **mapping table**. One of:
+  Column filters for the tables this query touches. One of:
 
-  - `"default"` (default): apply session-pinned or metadata-defined
-    default filters
+  - `"default"` (default): apply session-pinned filters
+    ([`codeminer_set_col_filters()`](https://codeminer-io.github.io/codeminer/reference/codeminer_set_col_filters.md))
+    where set, else the metadata-defined default filters.
 
-  - `NULL`: no filtering (return all rows)
+  - `NULL` (or `NA`): no filtering for any table this query touches.
 
-  - A named list of `column_name = c(values)` pairs for explicit
-    filtering
+  - A table-keyed list — the shape returned by
+    [`get_col_filters()`](https://codeminer-io.github.io/codeminer/reference/get_col_filters.md)
+    — with top-level names `lookup` / `relationship` / `mapping`, keyed
+    by code type (or `"from > to"` pair for mappings), e.g.
+    `list(lookup = list("SNOMED CT" = list(active_concept = "1")))`.
+    Each table entry *replaces* that table's pinned/default filters
+    wholesale; tables the list does not name keep their pins/defaults.
+    `NA` as a table entry un-filters that one table. The filters reach
+    every table the query touches (e.g. both the mapping table and the
+    target lookup in `MAP()`).
 
-  Note: this controls filtering of the mapping table, not the target
-  lookup table (which uses its own default col_filters).
+  To tweak one column while keeping a table's other default filters,
+  amend
+  [`get_col_filters()`](https://codeminer-io.github.io/codeminer/reference/get_col_filters.md)
+  output and pass it back. Entries that match no registered table or
+  column trigger a warning.
 
 ## Value
 
@@ -73,6 +85,12 @@ If no mapping table matching the `from -> to` direction is found, but
 there is a table for `to -> from`, `MAP()` will return the reverse
 mapping with a warning. Note that this is not guaranteed to be correct,
 as most mapping tables only work one way.
+
+`MAP()` touches two tables: the mapping table (keyed `"from > to"` under
+`mapping`) and the target lookup (keyed by `to` under `lookup`). The
+`col_filters` argument reaches both, so the target lookup can be
+restricted alongside the mapping table in one call; `col_filters = NULL`
+un-filters both.
 
 ## See also
 
@@ -94,7 +112,7 @@ temp_db <- tempfile(fileext = ".duckdb")
 create_dummy_database(temp_db)
 #> ✔ Dummy database ready to use!
 #> ℹ To reconnect to your previous database:
-#>   `Sys.setenv(CODEMINER_DB_PATH = "/tmp/Rtmph3dB7E/file1a4abfbb431.duckdb")`
+#>   `Sys.setenv(CODEMINER_DB_PATH = "/tmp/RtmpcEDjrS/file1a524011f64d.duckdb")`
 #>   `codeminer_connect()`
 
 # Single code
@@ -113,6 +131,8 @@ MAP("X40J4", from = "Read v3", to = "ICD-10")
 MAP("X40J4", "X40J5", from = "Read v3", to = "ICD-10")
 #> Warning: ! The following codes were not found in the mapping table:
 #> • `X40J5`
+#> ℹ Active column filters may exclude codes - see `codeminer_status()` and the
+#>   `col_filters` argument.
 #> <codeminer_codelist>: 1 code
 #> Code type: "ICD-10"
 #> 
@@ -125,6 +145,8 @@ MAP("X40J4", "X40J5", from = "Read v3", to = "ICD-10")
 MAP("X40J4 || X40J5", from = "Read v3", to = "ICD-10")
 #> Warning: ! The following codes were not found in the mapping table:
 #> • `X40J5`
+#> ℹ Active column filters may exclude codes - see `codeminer_status()` and the
+#>   `col_filters` argument.
 #> <codeminer_codelist>: 1 code
 #> Code type: "ICD-10"
 #> 
@@ -142,6 +164,8 @@ df <- data.frame(
 MAP(df, to = "ICD-10")
 #> Warning: ! The following codes were not found in the mapping table:
 #> • `X40J5`
+#> ℹ Active column filters may exclude codes - see `codeminer_status()` and the
+#>   `col_filters` argument.
 #> <codeminer_codelist>: 1 code
 #> Code type: "ICD-10"
 #> 

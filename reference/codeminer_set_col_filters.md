@@ -9,15 +9,29 @@ or
 ## Usage
 
 ``` r
-codeminer_set_col_filters(lookup = NULL, relationship = NULL, mapping = NULL)
+codeminer_set_col_filters(
+  col_filters = NULL,
+  lookup = NULL,
+  relationship = NULL,
+  mapping = NULL
+)
 ```
 
 ## Arguments
 
+- col_filters:
+
+  A whole type-layered filter object — the shape returned by
+  [`get_col_filters()`](https://codeminer-io.github.io/codeminer/reference/get_col_filters.md),
+  i.e. `list(lookup =, relationship =, mapping =)` — or `NA` to disable
+  all filtering (pins *and* metadata defaults) for the session. Cannot
+  be combined with the per-type arguments.
+
 - lookup:
 
   Named list of column filters for lookup tables, keyed by code type.
-  Each value is a named list of `column_name = c(values)` pairs. E.g.
+  Each value is a named list of `column_name = c(values)` pairs, or `NA`
+  to un-filter that table. E.g.
   `list("SNOMED CT" = list(active_concept = c("1")))`.
 
 - relationship:
@@ -37,18 +51,28 @@ The current pinned col_filters (a list), invisibly.
 
 ## Details
 
-Pinned filters only affect `col_filters = "default"` resolution.
-Explicit `col_filters` arguments on query functions always take
-precedence.
+A pin **replaces** the metadata-defined default filters for its table
+wholesale (it does not merge column-by-column) — a message lists any
+default columns the pin drops. To tweak one column while keeping the
+rest, amend
+[`get_col_filters()`](https://codeminer-io.github.io/codeminer/reference/get_col_filters.md)
+output and pin that.
 
-New pins are merged with existing ones. To replace all pins, call
+Pinned filters apply when queries run with `col_filters = "default"`; an
+explicit `col_filters` argument on a query function overrides the pin
+for that call (again whole-key, per table).
+
+New pins are merged with existing ones by table key. To replace all
+pins, call
 [`codeminer_clear_col_filters()`](https://codeminer-io.github.io/codeminer/reference/codeminer_clear_col_filters.md)
-first.
+first. Pins that match no registered table, column, or value trigger a
+warning.
 
 ## See also
 
 [`with_col_filters()`](https://codeminer-io.github.io/codeminer/reference/with_col_filters.md),
-[`codeminer_clear_col_filters()`](https://codeminer-io.github.io/codeminer/reference/codeminer_clear_col_filters.md)
+[`codeminer_clear_col_filters()`](https://codeminer-io.github.io/codeminer/reference/codeminer_clear_col_filters.md),
+[`get_col_filters()`](https://codeminer-io.github.io/codeminer/reference/get_col_filters.md)
 
 Other Workbench management:
 [`codeminer_clear_col_filters()`](https://codeminer-io.github.io/codeminer/reference/codeminer_clear_col_filters.md),
@@ -76,7 +100,15 @@ codeminer_set_col_filters(
   mapping = list("Read 3 > ICD-10" = list(mapping_status = c("E", "G")))
 )
 
-# Clear all filter pins
+# Amend the registered defaults and pin the result
+cf <- get_col_filters()
+cf$lookup[["SNOMED CT"]]$moduleId_concept <- "999000011000001104"
+codeminer_set_col_filters(col_filters = cf)
+
+# Disable all filtering for the session
+codeminer_set_col_filters(NA)
+
+# Clear all filter pins (back to metadata defaults)
 codeminer_clear_col_filters()
 } # }
 ```

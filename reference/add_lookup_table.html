@@ -21,7 +21,8 @@ Note that it is not possible to overwrite an existing lookup table."></head><bod
 <li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/developer-guide.html">Developer Guide</a></li>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/col_filters.html">Column filters</a></li>
+    <li><a class="dropdown-item" href="../articles/developer-guide.html">Developer Guide</a></li>
     <li><a class="dropdown-item" href="../articles/MAP.html">Mapping between clinical coding systems</a></li>
   </ul></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
@@ -102,7 +103,7 @@ to add a new version of the lookup table for the given <code>code_type</code>.</
 <span class="r-in"><span><span class="co"># Using a temporary database</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/Sys.setenv.html" class="external-link">Sys.setenv</a></span><span class="op">(</span>CODEMINER_DB_PATH <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="build_database.html">build_database</a></span><span class="op">(</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Creating new database at <span style="color: #0000BB;">/tmp/Rtmph3dB7E/file1a4a735e9770</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Creating new database at <span style="color: #0000BB;">/tmp/RtmpcEDjrS/file1a5234854b78</span></span>
 <span class="r-in"><span><span class="fu">add_lookup_table</span><span class="op">(</span></span></span>
 <span class="r-in"><span>  <span class="va">lookup_table</span>,</span></span>
 <span class="r-in"><span>  <span class="fu"><a href="lookup_metadata.html">lookup_metadata</a></span><span class="op">(</span><span class="st">"capital_letters"</span>, lookup_version <span class="op">=</span> <span class="st">"v3"</span><span class="op">)</span></span></span>

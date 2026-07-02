@@ -20,16 +20,23 @@ get_col_filters(defaults_only = TRUE)
 
 ## Value
 
-A named list with entries for `lookup`, `mapping`, and `relationship`.
-Each entry is a named list keyed by code type (or `"from > to"` for
-mappings), containing either:
+A `codeminer_col_filters` object (a list with entries for `lookup`,
+`mapping`, and `relationship`). Each entry is a named list keyed by code
+type (or `"from > to"` for mappings), containing either:
 
 - If `defaults_only = TRUE`: a flat `list(col = c(default_values))`
 
 - If `defaults_only = FALSE`: a full
   `list(col = list(values = ..., defaults = ...))`
 
-Returns an empty list if no database is connected.
+The `defaults_only = TRUE` form is the shape accepted by the
+`col_filters` argument on query functions (see
+[`CODES()`](https://codeminer-io.github.io/codeminer/reference/CODES.md)),
+[`codeminer_set_col_filters()`](https://codeminer-io.github.io/codeminer/reference/codeminer_set_col_filters.md),
+and
+[`with_col_filters()`](https://codeminer-io.github.io/codeminer/reference/with_col_filters.md)
+— amend it with plain assignment and pass it back. Returns an empty
+object if no database is connected.
 
 ## See also
 

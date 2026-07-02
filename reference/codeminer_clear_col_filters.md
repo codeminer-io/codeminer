@@ -1,8 +1,9 @@
 # Clear all pinned column filters
 
 Removes all column filter pins set by
-[`codeminer_set_col_filters()`](https://codeminer-io.github.io/codeminer/reference/codeminer_set_col_filters.md),
-returning to the metadata-defined defaults.
+[`codeminer_set_col_filters()`](https://codeminer-io.github.io/codeminer/reference/codeminer_set_col_filters.md)
+(including a session-wide `NA` "no filtering" state), returning to the
+metadata-defined defaults.
 
 ## Usage
 

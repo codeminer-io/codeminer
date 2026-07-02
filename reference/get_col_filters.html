@@ -23,7 +23,8 @@ mapping pair)."></head><body>
 <li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/developer-guide.html">Developer Guide</a></li>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/col_filters.html">Column filters</a></li>
+    <li><a class="dropdown-item" href="../articles/developer-guide.html">Developer Guide</a></li>
     <li><a class="dropdown-item" href="../articles/MAP.html">Mapping between clinical coding systems</a></li>
   </ul></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
@@ -65,11 +66,15 @@ available values (useful for Shiny UI checkboxes).</p></dd>
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>A named list with entries for <code>lookup</code>, <code>mapping</code>, and
-<code>relationship</code>. Each entry is a named list keyed by code type (or
-<code>"from &gt; to"</code> for mappings), containing either:</p><ul><li><p>If <code>defaults_only = TRUE</code>: a flat <code>list(col = c(default_values))</code></p></li>
+    <p>A <code>codeminer_col_filters</code> object (a list with entries for
+<code>lookup</code>, <code>mapping</code>, and <code>relationship</code>). Each entry is a named list
+keyed by code type (or <code>"from &gt; to"</code> for mappings), containing either:</p><ul><li><p>If <code>defaults_only = TRUE</code>: a flat <code>list(col = c(default_values))</code></p></li>
 <li><p>If <code>defaults_only = FALSE</code>: a full <code>list(col = list(values = ..., defaults = ...))</code></p></li>
-</ul><p>Returns an empty list if no database is connected.</p>
+</ul><p>The <code>defaults_only = TRUE</code> form is the shape accepted by the
+<code>col_filters</code> argument on query functions (see <code><a href="CODES.html">CODES()</a></code>),
+<code><a href="codeminer_set_col_filters.html">codeminer_set_col_filters()</a></code>, and <code><a href="with_col_filters.html">with_col_filters()</a></code> — amend it with
+plain assignment and pass it back. Returns an empty object if no
+database is connected.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>

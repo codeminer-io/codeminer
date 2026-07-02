@@ -60,7 +60,7 @@ relationship_table
 # Using a temporary database
 Sys.setenv(CODEMINER_DB_PATH = tempfile())
 build_database()
-#> Creating new database at /tmp/Rtmph3dB7E/file1a4a2a0ce7d5
+#> Creating new database at /tmp/RtmpcEDjrS/file1a52441d7459
 add_relationship_table(
   relationship_table,
   relationship_metadata(
