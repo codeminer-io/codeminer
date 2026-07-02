@@ -258,24 +258,14 @@ read_snomed_ct_uk_monolith <- function(
       )
     )
     if (length(module_ids) > 0) {
-      # Human labels for the known SNOMED CT UK modules. `value_labels` names
-      # must be a subset of `values`, and the modules present vary by release,
-      # so subset the label table to those actually in this release. See #167
-      # for the wider audit of source/default-filter documentation.
-      module_labels <- c(
-        "900000000000012004" = "SNOMED CT model component module",
-        "900000000000207008" = "SNOMED CT core module",
-        "999000041000000102" = "SNOMED CT UK Edition module",
-        "999000011000001104" = "SNOMED CT UK drug extension module (dm+d)",
-        "999000021000001108" = "SNOMED CT UK drug extension reference set module",
-        "999000011000000103" = "SNOMED CT UK clinical extension module",
-        "999000021000000109" = "SNOMED CT UK clinical extension reference set module"
-      )
+      # Each module is itself a concept in the lookup, so its human label is
+      # derived from its own FSN (see `snomed_module_labels()`) rather than
+      # hard-coded — self-documenting and accurate across releases.
       sct_lookup_col_filters$moduleId_concept <- list(
         values = module_ids,
         defaults = character(0),
         description = "SNOMED CT module the concept belongs to. Filter to the UK drug extension for dm+d-only results.",
-        value_labels = module_labels[names(module_labels) %in% module_ids]
+        value_labels = snomed_module_labels(sct_lookup_table, module_ids)
       )
     }
 
@@ -564,6 +554,40 @@ fread_sct <- function(file_path) {
 #' Non-FSN rows for the same concept inherit the category via the left
 #' join on `conceptId`.
 #'
+#' Derive human labels for SNOMED module ids from their own FSNs
+#'
+#' Each SNOMED module is itself a concept in the lookup, so its label is its
+#' active Fully Specified Name with the trailing "(...)" semantic tag stripped
+#' (e.g. "SNOMED CT UK drug extension module (core metadata concept)" ->
+#' "SNOMED CT UK drug extension module"). Used to populate the `value_labels`
+#' of the `moduleId_concept` column filter. Modules with no active FSN in the
+#' release are omitted, so `names()` of the result is a subset of `module_ids`.
+#'
+#' @param sct_lookup_table The merged description/concept lookup table.
+#' @param module_ids Character vector of module concept ids present in the
+#'   release.
+#' @return A named character vector mapping module id to label (possibly
+#'   empty).
+#' @noRd
+snomed_module_labels <- function(sct_lookup_table, module_ids) {
+  fsn_type_id <- "900000000000003001"
+
+  rows <- sct_lookup_table |>
+    dplyr::filter(
+      .data$conceptId %in% .env$module_ids,
+      .data$active_description == "1",
+      .data$typeId_description == .env$fsn_type_id
+    ) |>
+    dplyr::distinct(.data$conceptId, .keep_all = TRUE)
+
+  labels <- stringr::str_remove(
+    rows$term_description,
+    "\\s*\\([^()]*\\)\\s*$"
+  )
+  names(labels) <- rows$conceptId
+  labels
+}
+
 #' @param sct_lookup_table The merged description/concept lookup table.
 #' @return The same table with a new `category` column.
 #' @noRd
