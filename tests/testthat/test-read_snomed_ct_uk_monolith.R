@@ -182,6 +182,17 @@ test_that("read_snomed_ct_uk_monolith() declares moduleId_concept as a no-defaul
   # by module and still returns the full UK release.
   expect_length(cf$moduleId_concept$defaults, 0)
 
+  # ...carrying a curated description and value labels (self-documenting).
+  expect_match(cf$moduleId_concept$description, "^SNOMED CT module")
+  labels <- cf$moduleId_concept$value_labels
+  # Labels are optional/partial but their names must be a subset of `values`,
+  # and any labelled module maps to its official name.
+  expect_true(all(names(labels) %in% cf$moduleId_concept$values))
+  expect_identical(
+    labels[["900000000000207008"]],
+    "SNOMED CT core module"
+  )
+
   resolved <- resolve_col_filters(
     result$sct_lookup$lookup$metadata$col_filters,
     pin_type = "lookup",

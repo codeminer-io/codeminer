@@ -83,6 +83,25 @@ A column may declare an empty `defaults` — it is then a purely opt-in filter
 changed without re-adding the data via `update_lookup_metadata()` (and the
 mapping/relationship equivalents).
 
+Each column may also carry two optional documentation fields, so filters are
+self-describing rather than opaque:
+
+- `description`: a single string explaining what the column means.
+- `value_labels`: a named character vector mapping values to human-readable
+  labels. Its names must be a subset of `values`; labelling is optional and may
+  be partial (only some values need a label).
+
+```r
+col_filters = list(
+  moduleId_concept = list(
+    values       = module_ids,
+    defaults     = character(0),
+    description  = "SNOMED CT module the concept belongs to. Filter to the UK drug extension for dm+d-only results.",
+    value_labels = c("999000011000001104" = "UK drug extension (dm+d)")
+  )
+)
+```
+
 # The `col_filters` argument
 
 Every query function accepts `col_filters`:
@@ -218,8 +237,9 @@ table can be filtered (like `moduleId_concept` in the motivating example).
 # Discovering available filters
 
 `get_col_filters(defaults_only = FALSE)` returns the full specification —
-every filterable column with all its `values` and the `defaults` — which is
-what a UI needs to render filter choices:
+every filterable column with all its `values` and the `defaults`, plus any
+`description` and `value_labels` the filter declares — which is what a UI needs
+to render labelled filter choices:
 
 ```{r discover}
 get_col_filters(defaults_only = FALSE)$mapping[["Read v3 > ICD-10"]]

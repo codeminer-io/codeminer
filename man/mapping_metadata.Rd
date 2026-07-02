@@ -35,7 +35,10 @@ ICD-10, SNOMED-CT)}
 
 \item{col_filters}{Optional column filter specification. A named list where
 each element is a list with \code{values} (all valid values) and \code{defaults}
-(default filter values). \code{NULL} (default) means no column filters.}
+(default filter values), plus the optional \code{description} (single string)
+and \code{value_labels} (named character vector, names a subset of \code{values})
+documentation fields. See \code{\link[=lookup_metadata]{lookup_metadata()}} for the full format. \code{NULL}
+(default) means no column filters.}
 }
 \value{
 A list containing the mapping metadata

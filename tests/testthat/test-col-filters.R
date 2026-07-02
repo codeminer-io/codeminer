@@ -63,6 +63,65 @@ test_that("serialise validates structure", {
   )
 })
 
+test_that("serialise/deserialise round-trips description and value_labels", {
+  spec <- list(
+    moduleId_concept = list(
+      values = c("111", "222", "333"),
+      defaults = character(0),
+      description = "SNOMED CT module the concept belongs to.",
+      value_labels = c("111" = "Core module", "333" = "UK drug extension")
+    )
+  )
+
+  json <- serialise_col_filters(spec)
+  result <- deserialise_col_filters(json)
+
+  # Full round-trip, including value_labels' names surviving.
+  expect_identical(result, spec)
+  expect_identical(
+    names(result$moduleId_concept$value_labels),
+    c("111", "333")
+  )
+})
+
+test_that("a spec with neither field serialises byte-for-byte as before", {
+  spec <- list(
+    active_concept = list(values = c("0", "1"), defaults = c("1"))
+  )
+  # The documentation fields are purely additive: omitting them must not
+  # change the on-disk JSON at all.
+  expect_identical(
+    as.character(serialise_col_filters(spec)),
+    "{\"active_concept\":{\"values\":[\"0\",\"1\"],\"defaults\":[\"1\"]}}"
+  )
+})
+
+test_that("serialise rejects a value_labels name not in values", {
+  expect_error(
+    serialise_col_filters(list(
+      col = list(
+        values = c("a", "b"),
+        defaults = c("a"),
+        value_labels = c("a" = "Ay", "c" = "See")
+      )
+    )),
+    "value_labels.*subset|subset.*values"
+  )
+})
+
+test_that("serialise rejects a non-string description", {
+  expect_error(
+    serialise_col_filters(list(
+      col = list(
+        values = c("a", "b"),
+        defaults = c("a"),
+        description = c("too", "long")
+      )
+    )),
+    "description.*single string"
+  )
+})
+
 # === lookup_metadata with col_filters =======================================
 
 test_that("lookup_metadata() includes serialised col_filters", {
@@ -572,6 +631,32 @@ test_that("get_col_filters returns full spec when defaults_only = FALSE", {
   expect_true("gcf_test" %in% names(full$lookup))
   expect_identical(full$lookup$gcf_test$status$values, c("0", "1"))
   expect_identical(full$lookup$gcf_test$status$defaults, c("1"))
+})
+
+test_that("get_col_filters(defaults_only = FALSE) surfaces description and value_labels", {
+  local_build_temp_database()
+
+  table <- data.frame(
+    code = c("X"),
+    description = c("Test"),
+    status = c("1")
+  )
+  meta <- lookup_metadata(
+    "gcf_doc_test",
+    col_filters = list(
+      status = list(
+        values = c("0", "1"),
+        defaults = c("1"),
+        description = "Whether the code is active.",
+        value_labels = c("1" = "Active", "0" = "Inactive")
+      )
+    )
+  )
+  suppressMessages(add_lookup_table(table, meta))
+
+  spec <- get_col_filters(defaults_only = FALSE)$lookup$gcf_doc_test$status
+  expect_identical(spec$description, "Whether the code is active.")
+  expect_identical(spec$value_labels, c("1" = "Active", "0" = "Inactive"))
 })
 
 test_that("get_col_filters returns defaults only when defaults_only = TRUE", {
@@ -1095,6 +1180,29 @@ test_that("get_col_filters returns a classed object with a print method", {
   full <- get_col_filters(defaults_only = FALSE)
   expect_s3_class(full, "codeminer_col_filters")
   expect_output(print(full), "values")
+})
+
+test_that("print renders description and value_labels in full-spec mode", {
+  local_build_temp_database()
+
+  table <- data.frame(code = "A", description = "a", status = "1")
+  meta <- lookup_metadata(
+    "print_doc_test",
+    col_filters = list(
+      status = list(
+        values = c("0", "1"),
+        defaults = "1",
+        description = "Whether the code is active.",
+        value_labels = c("1" = "Active", "0" = "Inactive")
+      )
+    )
+  )
+  suppressMessages(add_lookup_table(table, meta))
+
+  full <- get_col_filters(defaults_only = FALSE)
+  expect_output(print(full), "description: Whether the code is active\\.")
+  expect_output(print(full), "value_labels:")
+  expect_output(print(full), "1 = Active")
 })
 
 # === Missing-codes hint =====================================================

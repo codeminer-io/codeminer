@@ -216,8 +216,11 @@ resolve_versioned_metadata <- function(
 #'
 #' @param col_filters A named list where each element is a list with `values`
 #'   (character vector of all valid values) and `defaults` (character vector of
-#'   default values, must be a subset of `values`). `NULL` is allowed and
-#'   returns `NA_character_`.
+#'   default values, must be a subset of `values`). Each element may also carry
+#'   two optional documentation fields: `description` (a single string) and
+#'   `value_labels` (a named character vector mapping values to human-readable
+#'   labels, with `names(value_labels)` a subset of `values`). `NULL` is allowed
+#'   and returns `NA_character_`.
 #' @param call The calling environment for error messages.
 #' @return A single JSON string, or `NA_character_` if `col_filters` is `NULL`.
 #' @noRd
@@ -227,6 +230,19 @@ serialise_col_filters <- function(col_filters, call = rlang::caller_env()) {
   }
 
   validate_col_filters_structure(col_filters, call = call)
+
+  # `value_labels` is a named character vector, but jsonlite::toJSON() drops the
+  # names of a named *atomic* vector (serialising it as a plain array). Convert
+  # it to a named list so the value -> label mapping is written as a JSON
+  # object; deserialise_col_filters() restores the named vector via unlist().
+  # Entries without `value_labels` are returned unchanged, so a spec with
+  # neither optional field serialises byte-for-byte as before.
+  col_filters <- lapply(col_filters, function(entry) {
+    if (!is.null(entry$value_labels)) {
+      entry$value_labels <- as.list(entry$value_labels)
+    }
+    entry
+  })
 
   jsonlite::toJSON(col_filters, auto_unbox = FALSE)
 }
@@ -249,11 +265,18 @@ deserialise_col_filters <- function(json_string) {
 
   # jsonlite may return a data.frame or nested list — normalise `values` and
   # `defaults` to character vectors, preserving any other per-column fields
-  # a future spec revision may add.
+  # (e.g. the optional `description` / `value_labels` documentation fields).
   lapply(result, function(entry) {
     entry <- as.list(entry)
     entry$values <- as.character(entry$values)
     entry$defaults <- as.character(entry$defaults)
+    # `value_labels` is a named value -> label map, serialised as a JSON object.
+    # `unlist()` restores the named character vector; `as.character()` would
+    # strip the names. Only touch it when present so absent-field specs are
+    # deserialised unchanged.
+    if (!is.null(entry$value_labels)) {
+      entry$value_labels <- unlist(entry$value_labels)
+    }
     entry
   })
 }
@@ -262,7 +285,9 @@ deserialise_col_filters <- function(json_string) {
 #'
 #' Checks that a col_filters list has the correct structure: a named list where
 #' each element contains `values` and `defaults` character vectors, with
-#' `defaults` being a subset of `values`.
+#' `defaults` being a subset of `values`. Each element may also carry the
+#' optional `description` (single string) and `value_labels` (named character
+#' vector, with `names(value_labels)` a subset of `values`) documentation fields.
 #'
 #' @param col_filters The col_filters list to validate.
 #' @param call The calling environment for error messages.
@@ -343,6 +368,57 @@ validate_col_filters_structure <- function(
         ),
         call = call
       )
+    }
+
+    # Optional documentation fields.
+    if (!is.null(entry$description)) {
+      if (
+        !is.character(entry$description) ||
+          length(entry$description) != 1 ||
+          is.na(entry$description)
+      ) {
+        codeminer_abort(
+          "{.field description} for column {.field {nm}} must be a single string.",
+          call = call
+        )
+      }
+    }
+
+    if (!is.null(entry$value_labels)) {
+      labels <- entry$value_labels
+      label_names <- names(labels)
+
+      if (
+        !is.character(labels) ||
+          is.null(label_names) ||
+          any(label_names == "") ||
+          anyNA(label_names) ||
+          anyNA(labels)
+      ) {
+        codeminer_abort(
+          "{.field value_labels} for column {.field {nm}} must be a named character vector.",
+          call = call
+        )
+      }
+
+      if (anyDuplicated(label_names)) {
+        dups <- label_names[duplicated(label_names)]
+        codeminer_abort(
+          "Duplicate names in {.field value_labels} for column {.field {nm}}: {.val {dups}}.",
+          call = call
+        )
+      }
+
+      unknown <- setdiff(label_names, values)
+      if (length(unknown) > 0) {
+        codeminer_abort(
+          c(
+            "{.field value_labels} names must be a subset of {.field values} for column {.field {nm}}.",
+            "x" = "Not found in values: {.val {unknown}}."
+          ),
+          call = call
+        )
+      }
     }
   }
 

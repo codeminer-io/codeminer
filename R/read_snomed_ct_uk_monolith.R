@@ -241,14 +241,41 @@ read_snomed_ct_uk_monolith <- function(
     module_ids <- sct_lookup_table$moduleId_concept
     module_ids <- sort(unique(module_ids[!is.na(module_ids)]))
 
+    active_labels <- c("1" = "Active", "0" = "Inactive")
+
     sct_lookup_col_filters <- list(
-      active_concept = list(values = c("0", "1"), defaults = c("0", "1")),
-      active_description = list(values = c("0", "1"), defaults = c("1"))
+      active_concept = list(
+        values = c("0", "1"),
+        defaults = c("0", "1"),
+        description = "Whether the concept is active in the release. Inactive concepts are retained for history.",
+        value_labels = active_labels
+      ),
+      active_description = list(
+        values = c("0", "1"),
+        defaults = c("1"),
+        description = "Whether the description (term) is active. Defaults to active descriptions only.",
+        value_labels = active_labels
+      )
     )
     if (length(module_ids) > 0) {
+      # Human labels for the known SNOMED CT UK modules. `value_labels` names
+      # must be a subset of `values`, and the modules present vary by release,
+      # so subset the label table to those actually in this release. See #167
+      # for the wider audit of source/default-filter documentation.
+      module_labels <- c(
+        "900000000000012004" = "SNOMED CT model component module",
+        "900000000000207008" = "SNOMED CT core module",
+        "999000041000000102" = "SNOMED CT UK Edition module",
+        "999000011000001104" = "SNOMED CT UK drug extension module (dm+d)",
+        "999000021000001108" = "SNOMED CT UK drug extension reference set module",
+        "999000011000000103" = "SNOMED CT UK clinical extension module",
+        "999000021000000109" = "SNOMED CT UK clinical extension reference set module"
+      )
       sct_lookup_col_filters$moduleId_concept <- list(
         values = module_ids,
-        defaults = character(0)
+        defaults = character(0),
+        description = "SNOMED CT module the concept belongs to. Filter to the UK drug extension for dm+d-only results.",
+        value_labels = module_labels[names(module_labels) %in% module_ids]
       )
     }
 
@@ -291,7 +318,12 @@ read_snomed_ct_uk_monolith <- function(
       # don't follow withdrawn is-a links; users can opt back in with
       # `col_filters = NULL`.
       col_filters = list(
-        active = list(values = c("0", "1"), defaults = c("1"))
+        active = list(
+          values = c("0", "1"),
+          defaults = c("1"),
+          description = "Whether the relationship edge is active. Defaults to active edges only.",
+          value_labels = c("1" = "Active", "0" = "Inactive")
+        )
       )
     )
 
