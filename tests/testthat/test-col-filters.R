@@ -680,6 +680,81 @@ test_that("get_col_filters returns defaults only when defaults_only = TRUE", {
   expect_identical(defaults$lookup$gcf_default_test$status, c("1"))
 })
 
+test_that("get_col_filters(defaults_only = TRUE) round-trips reproducing the default", {
+  local_build_temp_database()
+
+  table <- data.frame(
+    code = c("A", "B", "C"),
+    description = c("a", "b", "c"),
+    status = c("1", "1", "0"),
+    module = c("m1", "m2", "m1")
+  )
+  meta <- lookup_metadata(
+    "rt_test",
+    col_filters = list(
+      status = list(values = c("0", "1"), defaults = "1"),
+      # All values listed as defaults -> included in full by default.
+      module = list(values = c("m1", "m2"), defaults = c("m1", "m2"))
+    )
+  )
+  suppressMessages(add_lookup_table(table, meta))
+
+  # Each column's default is its applied value set (the full set for `module`).
+  d <- get_col_filters(defaults_only = TRUE)$lookup$rt_test
+  expect_identical(d$status, "1")
+  expect_identical(d$module, c("m1", "m2"))
+
+  # Round-trip: passing the applied defaults back reproduces the default query.
+  n_default <- nrow(dplyr::collect(suppressMessages(get_lookup_table(
+    "rt_test"
+  ))))
+  n_passback <- nrow(dplyr::collect(suppressMessages(get_lookup_table(
+    "rt_test",
+    col_filters = get_col_filters(TRUE)
+  ))))
+  expect_identical(n_default, n_passback)
+
+  # Narrowing a column (plain assignment) filters further.
+  cf <- get_col_filters(TRUE)
+  cf$lookup$rt_test$module <- "m1"
+  n_m1 <- nrow(dplyr::collect(suppressMessages(get_lookup_table(
+    "rt_test",
+    col_filters = cf
+  ))))
+  expect_true(n_m1 < n_default)
+})
+
+test_that("an empty default is an empty allow-set (excludes everything)", {
+  local_build_temp_database()
+
+  table <- data.frame(
+    code = c("A", "B"),
+    description = c("a", "b"),
+    flag = c("x", "y")
+  )
+  meta <- lookup_metadata(
+    "empty_default_test",
+    col_filters = list(
+      # Empty default -> empty allow-set: matches no rows by default.
+      flag = list(values = c("x", "y"), defaults = character(0))
+    )
+  )
+  suppressMessages(add_lookup_table(table, meta))
+
+  # `[]` means "exclude everything" for a default just as for an explicit
+  # selection — a column is left unfiltered only by NA / omission.
+  n_default <- nrow(dplyr::collect(suppressMessages(get_lookup_table(
+    "empty_default_test"
+  ))))
+  expect_identical(n_default, 0L)
+
+  # The empty default is surfaced as-is and round-trips (still 0 rows).
+  expect_identical(
+    get_col_filters(TRUE)$lookup$empty_default_test$flag,
+    character(0)
+  )
+})
+
 test_that("get_col_filters returns empty list when no col_filters set", {
   local_build_temp_database()
 
@@ -704,7 +779,8 @@ test_that("get_col_filters returns empty list when no col_filters set", {
 test_that("MAP col_filters reaches the target lookup (issue #170)", {
   local_build_temp_database()
 
-  # Target lookup with a filterable (no-default) status column
+  # Target lookup with a filterable status column, unrestricted by default
+  # (its defaults list all values).
   target <- data.frame(
     code = c("T1", "T2", "T3"),
     description = c("Target 1", "Target 2", "Target 3"),
@@ -715,7 +791,7 @@ test_that("MAP col_filters reaches the target lookup (issue #170)", {
     lookup_metadata(
       "map_target",
       col_filters = list(
-        status = list(values = c("0", "1"), defaults = character(0))
+        status = list(values = c("0", "1"), defaults = c("0", "1"))
       )
     )
   ))

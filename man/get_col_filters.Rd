@@ -7,9 +7,10 @@
 get_col_filters(defaults_only = TRUE)
 }
 \arguments{
-\item{defaults_only}{Logical. If \code{TRUE} (default), return only the default
-filter values. If \code{FALSE}, return the full specification including all
-available values (useful for Shiny UI checkboxes).}
+\item{defaults_only}{Logical. If \code{TRUE} (default), return the applied default
+filters — the shape you amend and pass back to filter a query. If \code{FALSE},
+return the full specification (all \code{values}, the \code{defaults}, and any
+\code{description} / \code{value_labels}), useful for building filter UIs.}
 }
 \value{
 A \code{codeminer_col_filters} object (a list with entries for
@@ -17,19 +18,25 @@ A \code{codeminer_col_filters} object (a list with entries for
 keyed by code type (or \code{"from > to"} for mappings), containing either:
 \itemize{
 \item If \code{defaults_only = TRUE}: a flat \code{list(col = c(default_values))}
-\item If \code{defaults_only = FALSE}: a full \code{list(col = list(values = ..., defaults = ...))}
+\item If \code{defaults_only = FALSE}: a full \code{list(col = list(values = ..., defaults = ..., description = ..., value_labels = ...))}
 }
 
 The \code{defaults_only = TRUE} form is the shape accepted by the
 \code{col_filters} argument on query functions (see \code{\link[=CODES]{CODES()}}),
 \code{\link[=codeminer_set_col_filters]{codeminer_set_col_filters()}}, and \code{\link[=with_col_filters]{with_col_filters()}} — amend it with
-plain assignment and pass it back. Returns an empty object if no
-database is connected.
+plain assignment and pass it back. Each column's default is its applied
+value set (a column included in full by default lists all of its values),
+so passing the output back unchanged reproduces the default query exactly.
+Narrow a column by assigning a subset (e.g.
+\code{cf$lookup[["SNOMED CT"]]$moduleId_concept <- "999000011000001104"}), drop
+a column's filter with \code{NA}, or clear a whole table with \code{NA}. Returns an
+empty object if no database is connected.
 }
 \description{
-Reads \code{col_filters} from all metadata tables in the connected database.
-Returns a nested list keyed by table type and table key (code type or
-mapping pair).
+Reads the registered \code{col_filters} from the metadata tables of the connected
+database. Returns a nested list keyed by table type and table key (code type
+or mapping pair). This reflects the \strong{registered defaults}, not the active
+session pins — use \code{\link[=codeminer_status]{codeminer_status()}} to inspect the currently pinned state.
 }
 \seealso{
 Other Workbench management: 

@@ -39,18 +39,19 @@ A single query often reads more than one table. `MAP()` reads a mapping table
 lookup that describes the results. The `col_filters` argument is table-keyed,
 so one argument addresses each table by its own name:
 
-```r
-# Map BNF codes to SNOMED CT, keeping only assured mapping rows, and
-# restrict the *target lookup* to the UK drug extension (dm+d) module:
+```{r motivation-example}
+# `MAP()` reads the Read v3 -> ICD-10 mapping table. Keep only exact + general
+# ("E", "G") mappings. The same table-keyed argument can also address the
+# *target lookup* by name (demonstrated with the `Demo` lookup below).
 MAP(
-  bnf_codes,
-  from = "BNF",
-  to = "SNOMED CT",
+  "all",
+  from = "Read v3",
+  to = "ICD-10",
   col_filters = list(
-    mapping = list("BNF > SNOMED CT" = list(assured = "Y")),
-    lookup  = list("SNOMED CT" = list(moduleId_concept = "999000011000001104"))
+    mapping = list("Read v3 > ICD-10" = list(mapping_status = c("E", "G")))
   )
-)
+) |>
+  head()
 ```
 
 The top-level names are the table types (`lookup`, `relationship`,
@@ -61,46 +62,54 @@ different queries.
 
 # Where filters come from
 
-Filters are declared in table metadata as a specification per column, with
-`values` (all valid options) and `defaults` (applied when nothing overrides
-them):
+Filters are declared in table metadata, per column, with `values` (all valid
+options) and `defaults` (applied when nothing overrides them). A column may
+also carry two optional documentation fields, so filters are self-describing:
 
-```r
+- `description`: a single string explaining what the column means.
+- `value_labels`: a named character vector mapping values to human-readable
+  labels (its names must be a subset of `values`; labelling may be partial).
+
+`defaults` is the value set applied by default. To **include every value** by
+default, list them all — the column is then unrestricted by default but still
+available to narrow. To **exclude everything** by default, use an empty
+`defaults` (rarely wanted).
+
+The rest of this vignette uses a small lookup registered on the dummy database.
+`status` is filtered to active codes by default; `module` lists both of its
+values as `defaults`, so all modules are included by default:
+
+```{r register-demo}
+demo_lookup <- data.frame(
+  code = c("A", "B", "C"),
+  description = c("apple", "banana", "cherry"),
+  status = c("1", "1", "0"),
+  module = c("core", "ext", "core")
+)
+
 add_lookup_table(
-  my_snomed_lookup,
+  demo_lookup,
   lookup_metadata(
-    "SNOMED CT",
-    lookup_version = "v1",
+    "Demo",
     col_filters = list(
-      active_concept = list(values = c("0", "1"), defaults = c("1"))
+      status = list(
+        values = c("0", "1"),
+        defaults = "1",
+        description = "Whether the code is active.",
+        value_labels = c("1" = "Active", "0" = "Inactive")
+      ),
+      module = list(
+        values = c("core", "ext"),
+        defaults = c("core", "ext"), # all values -> all included by default
+        description = "Which module the code belongs to."
+      )
     )
   )
 )
 ```
 
-A column may declare an empty `defaults` — it is then a purely opt-in filter
-(nothing is filtered until you ask). Filters on an existing table can be
-changed without re-adding the data via `update_lookup_metadata()` (and the
-mapping/relationship equivalents).
-
-Each column may also carry two optional documentation fields, so filters are
-self-describing rather than opaque:
-
-- `description`: a single string explaining what the column means.
-- `value_labels`: a named character vector mapping values to human-readable
-  labels. Its names must be a subset of `values`; labelling is optional and may
-  be partial (only some values need a label).
-
-```r
-col_filters = list(
-  moduleId_concept = list(
-    values       = module_ids,
-    defaults     = character(0),
-    description  = "SNOMED CT module the concept belongs to. Filter to the UK drug extension for dm+d-only results.",
-    value_labels = c("999000011000001104" = "UK drug extension (dm+d)")
-  )
-)
-```
+Filters on an existing table can be changed without re-adding the data via
+`update_lookup_metadata()` (and the mapping/relationship equivalents).
 
 # The `col_filters` argument
 
@@ -138,6 +147,85 @@ is done in data space: take the current filters, amend, pass back (see
 Typos don't fail silently: an entry that matches no registered table, a
 column absent from its table, or a value outside a column's registered
 `values` each trigger a warning naming what *is* available.
+
+## What a filter value means
+
+The distinction that most often surprises people is **empty selection**
+versus **unfiltered** — they are deliberately different. Reading from the
+inside out:
+
+**Per column** (inside a table entry):
+
+| You set a column to | Meaning |
+|---|---|
+| `c("a", "b")` | keep rows where the column is `"a"` or `"b"` (a whitelist) |
+| `character(0)` (JSON `[]`) | keep **no** rows — an empty allow-set excludes everything |
+| `NA` (JSON `null`) | do **not** filter this column (unfiltered) |
+| *column omitted* | not filtered — an overlay only constrains the columns it names |
+
+**Per table** (a key under `lookup` / `mapping` / `relationship`):
+
+| Table entry | Meaning |
+|---|---|
+| a named list of column filters | **replaces** that table's defaults wholesale |
+| `NA` | un-filter the whole table |
+| *table omitted* | keeps its pins / metadata defaults |
+
+**Whole argument** (`col_filters =`):
+
+| Value | Meaning |
+|---|---|
+| `"default"` | session pins where set, else metadata defaults |
+| `NULL` / `NA` | no filtering for any table this query touches |
+| a table-keyed list | as in the tables above |
+
+So an empty selection is a real, useful state ("exclude everything, return
+nothing"), and it is **not** the same as removing the constraint. To stop
+filtering a column, set it to `NA` or omit it — not `character(0)`. On the
+`Demo` table:
+
+```{r sentinels}
+# Default: status filtered to "1"; module lists all values, so all included
+CODES("all", type = "Demo")$code
+
+# Empty selection on status excludes everything
+CODES(
+  "all",
+  type = "Demo",
+  col_filters = list(lookup = list(Demo = list(status = character(0))))
+) |>
+  nrow()
+
+# NA leaves status unfiltered (all statuses returned)
+CODES(
+  "all",
+  type = "Demo",
+  col_filters = list(lookup = list(Demo = list(status = NA)))
+)$code
+```
+
+## The round-trip guarantee
+
+Because each column's default is its full applied value set — including columns
+that are unrestricted by default (they simply list all their values) —
+`get_col_filters()` output passed straight back reproduces the default query
+exactly:
+
+```{r roundtrip}
+identical(
+  CODES("all", type = "Demo")$code,
+  CODES("all", type = "Demo", col_filters = get_col_filters())$code
+)
+
+# Narrow a column by assigning a subset:
+cf <- get_col_filters()
+cf$lookup$Demo$module <- "core"
+CODES("all", type = "Demo", col_filters = cf)$code
+```
+
+Opt-in columns are still fully visible under
+`get_col_filters(defaults_only = FALSE)` for discovery — they are only absent
+from the applied-defaults shape.
 
 # Session pins and scoped overrides
 

@@ -158,7 +158,7 @@ test_that("read_snomed_ct_uk_monolith() attaches FSN-derived category to lookup"
   expect_true(all(ms_rows$category == "Disorder"))
 })
 
-test_that("read_snomed_ct_uk_monolith() declares moduleId_concept as a no-default filter", {
+test_that("read_snomed_ct_uk_monolith() includes all modules by default", {
   result <- suppressMessages(
     read_snomed_ct_uk_monolith(
       dummy_snomed_ct_uk_monolith_path(),
@@ -171,16 +171,14 @@ test_that("read_snomed_ct_uk_monolith() declares moduleId_concept as a no-defaul
     result$sct_lookup$lookup$metadata$col_filters
   )
 
-  # moduleId_concept is declared as a filterable column...
+  # moduleId_concept is declared as a filterable column, with `values` derived
+  # from the data (every module present)...
   expect_true("moduleId_concept" %in% names(cf))
-  # ...with its `values` derived from the data (every module present)...
-  expect_setequal(
-    cf$moduleId_concept$values,
-    sort(unique(tbl$moduleId_concept[!is.na(tbl$moduleId_concept)]))
-  )
-  # ...and empty `defaults`, so the default "SNOMED CT" query is not filtered
-  # by module and still returns the full UK release.
-  expect_length(cf$moduleId_concept$defaults, 0)
+  present <- sort(unique(tbl$moduleId_concept[!is.na(tbl$moduleId_concept)]))
+  expect_setequal(cf$moduleId_concept$values, present)
+  # ...and `defaults` listing every value, so all modules are included by
+  # default and the default "SNOMED CT" query returns the full UK release.
+  expect_setequal(cf$moduleId_concept$defaults, present)
 
   # ...carrying a self-documenting description. `value_labels` are derived from
   # the modules' own FSNs, so names are always a subset of `values` (the GP
@@ -192,12 +190,13 @@ test_that("read_snomed_ct_uk_monolith() declares moduleId_concept as a no-defaul
     is.null(labels) || all(names(labels) %in% cf$moduleId_concept$values)
   )
 
+  # The module filter is applied by default (all values), so it resolves.
   resolved <- resolve_col_filters(
     result$sct_lookup$lookup$metadata$col_filters,
     pin_type = "lookup",
     pin_key = "SNOMED CT"
   )
-  expect_false("moduleId_concept" %in% names(resolved))
+  expect_setequal(resolved$moduleId_concept, present)
 })
 
 test_that("snomed_module_labels() derives labels from active FSNs, tag stripped", {
