@@ -233,9 +233,9 @@ read_snomed_ct_uk_monolith <- function(
     # concepts in the lookup (e.g. the UK drug extension module,
     # "999000011000001104", which carries the dm+d content), so derive the
     # set from the data rather than hard-coding it — it then stays accurate
-    # across releases. Declared as a filterable column with empty `defaults`,
-    # so the default "SNOMED CT" query still returns the full UK release;
-    # users can opt into a single module via `col_filters` (e.g.
+    # across releases. All modules are included by default (defaults list every
+    # value), so the default "SNOMED CT" query returns the full UK release;
+    # narrow to a single module via `col_filters` (e.g.
     # `col_filters = list(moduleId_concept = "999000011000001104")` for a
     # drug-extension-only view).
     module_ids <- sct_lookup_table$moduleId_concept
@@ -263,7 +263,7 @@ read_snomed_ct_uk_monolith <- function(
       # hard-coded — self-documenting and accurate across releases.
       sct_lookup_col_filters$moduleId_concept <- list(
         values = module_ids,
-        defaults = character(0),
+        defaults = module_ids,
         description = "SNOMED CT module the concept belongs to. Filter to the UK drug extension for dm+d-only results.",
         value_labels = snomed_module_labels(sct_lookup_table, module_ids)
       )

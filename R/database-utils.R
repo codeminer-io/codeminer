@@ -517,11 +517,12 @@ resolve_col_filters <- function(
     return(NULL)
   }
 
-  # Extract just the defaults from each entry
+  # Apply each column's default value set as-is. An empty default is an empty
+  # allow-set (matches no rows), consistent with an explicit empty selection;
+  # a column is left unfiltered only by `NA` or omission, never by an empty
+  # default. To include every value by default, a column's `defaults` lists all
+  # of its `values`.
   defaults <- lapply(full_spec, function(entry) entry$defaults)
-  # Drop entries with empty defaults (no default filtering for that column)
-  defaults <- Filter(function(x) length(x) > 0, defaults)
-
   if (length(defaults) == 0) {
     return(NULL)
   }
@@ -576,25 +577,33 @@ apply_col_filters <- function(
 
 #' Extract column filters from database metadata
 #'
-#' Reads `col_filters` from all metadata tables in the connected database.
-#' Returns a nested list keyed by table type and table key (code type or
-#' mapping pair).
+#' Reads the registered `col_filters` from the metadata tables of the connected
+#' database. Returns a nested list keyed by table type and table key (code type
+#' or mapping pair). This reflects the **registered defaults**, not the active
+#' session pins — use [codeminer_status()] to inspect the currently pinned state.
 #'
-#' @param defaults_only Logical. If `TRUE` (default), return only the default
-#'   filter values. If `FALSE`, return the full specification including all
-#'   available values (useful for Shiny UI checkboxes).
+#' @param defaults_only Logical. If `TRUE` (default), return the applied default
+#'   filters — the shape you amend and pass back to filter a query. If `FALSE`,
+#'   return the full specification (all `values`, the `defaults`, and any
+#'   `description` / `value_labels`), useful for building filter UIs.
 #'
 #' @return A `codeminer_col_filters` object (a list with entries for
 #'   `lookup`, `mapping`, and `relationship`). Each entry is a named list
 #'   keyed by code type (or `"from > to"` for mappings), containing either:
 #'   - If `defaults_only = TRUE`: a flat `list(col = c(default_values))`
-#'   - If `defaults_only = FALSE`: a full `list(col = list(values = ..., defaults = ...))`
+#'   - If `defaults_only = FALSE`: a full `list(col = list(values = ...,
+#'     defaults = ..., description = ..., value_labels = ...))`
 #'
 #'   The `defaults_only = TRUE` form is the shape accepted by the
 #'   `col_filters` argument on query functions (see [CODES()]),
 #'   [codeminer_set_col_filters()], and [with_col_filters()] — amend it with
-#'   plain assignment and pass it back. Returns an empty object if no
-#'   database is connected.
+#'   plain assignment and pass it back. Each column's default is its applied
+#'   value set (a column included in full by default lists all of its values),
+#'   so passing the output back unchanged reproduces the default query exactly.
+#'   Narrow a column by assigning a subset (e.g.
+#'   `cf$lookup[["SNOMED CT"]]$moduleId_concept <- "999000011000001104"`), drop
+#'   a column's filter with `NA`, or clear a whole table with `NA`. Returns an
+#'   empty object if no database is connected.
 #' @export
 #' @family Workbench management
 get_col_filters <- function(defaults_only = TRUE) {
