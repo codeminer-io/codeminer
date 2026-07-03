@@ -95,6 +95,69 @@ format_filter_entry <- function(entry, full_spec = FALSE) {
   )
 }
 
+#' Format one filter leaf (a column's value vector) for the tree display
+#'
+#' @param value An atomic vector (values / defaults / description), a named
+#'   vector (`value_labels`, shown as `name = value`), the `NA` sentinel, or
+#'   an empty vector.
+#' @return A single string.
+#' @keywords internal
+#' @noRd
+format_col_filter_leaf <- function(value) {
+  if (is_col_filters_off(value)) {
+    return("(unfiltered)")
+  }
+  if (length(value) == 0) {
+    return("(none)")
+  }
+  nms <- names(value)
+  rendered <- if (!is.null(nms) && all(nzchar(nms))) {
+    # Named leaf (e.g. value_labels): show the value -> label mapping.
+    paste(paste0(nms, " = ", value), collapse = ", ")
+  } else {
+    paste(value, collapse = ", ")
+  }
+  # Keep lines tidy: long descriptions / label sets are truncated for display.
+  if (nchar(rendered) > 60) {
+    rendered <- paste0(substr(rendered, 1, 59), "\u2026")
+  }
+  rendered
+}
+
+#' Render a nested named list as a tree with box-drawing connectors
+#'
+#' Structural display shared by [print.codeminer_col_filters()]. Branch nodes
+#' (lists) print their name; leaf nodes print `name: value`. Styled after
+#' `lobstr::tree()`.
+#'
+#' @param x A named list.
+#' @param prefix The accumulated indentation prefix for this level.
+#' @keywords internal
+#' @noRd
+cat_col_filter_tree <- function(x, prefix = "") {
+  nms <- names(x)
+  n <- length(x)
+  for (i in seq_len(n)) {
+    last <- i == n
+    connector <- if (last) "\u2514\u2500" else "\u251c\u2500"
+    child_prefix <- paste0(prefix, if (last) "  " else "\u2502 ")
+    value <- x[[i]]
+    if (is.list(value)) {
+      cli::cat_line(prefix, connector, nms[[i]])
+      cat_col_filter_tree(value, child_prefix)
+    } else {
+      cli::cat_line(
+        prefix,
+        connector,
+        nms[[i]],
+        ": ",
+        format_col_filter_leaf(value)
+      )
+    }
+  }
+  invisible(x)
+}
+
 #' Print method for codeminer_col_filters
 #'
 #' @param x A `codeminer_col_filters` object.
@@ -104,28 +167,18 @@ format_filter_entry <- function(entry, full_spec = FALSE) {
 print.codeminer_col_filters <- function(x, ...) {
   # cat_line rather than cli_text throughout: print methods write to stdout,
   # and cli trims the leading whitespace that renders the tree.
-  cli::cat_line("<codeminer_col_filters>")
   full_spec <- identical(attr(x, "defaults_only"), FALSE)
-  if (full_spec) {
-    cli::cat_line("Full specification (values + defaults)")
-  }
-  if (length(x) == 0) {
+  cli::cat_line(
+    "<codeminer_col_filters>",
+    if (full_spec) "  (full specification)" else ""
+  )
+  body <- unclass(x)
+  attr(body, "defaults_only") <- NULL
+  if (length(body) == 0) {
     cli::cat_line("No column filters registered.")
     return(invisible(x))
   }
-  for (type in names(x)) {
-    cli::cat_line(type)
-    layer <- x[[type]]
-    for (key in names(layer)) {
-      lines <- format_filter_entry(layer[[key]], full_spec = full_spec)
-      if (length(lines) == 1 && grepl("^\\(", lines[[1]])) {
-        cli::cat_line('  "', key, '": ', lines)
-      } else {
-        cli::cat_line('  "', key, '"')
-        cli::cat_line(paste0("    ", lines))
-      }
-    }
-  }
+  cat_col_filter_tree(body)
   invisible(x)
 }
 
