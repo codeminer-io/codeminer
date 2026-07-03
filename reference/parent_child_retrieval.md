@@ -110,7 +110,7 @@ Other Code relationships:
 create_dummy_database()
 #> ✔ Dummy database ready to use!
 #> ℹ To reconnect to your previous database:
-#>   `Sys.setenv(CODEMINER_DB_PATH = "/tmp/RtmpHp6yaU/file1a07390e48b4.duckdb")`
+#>   `Sys.setenv(CODEMINER_DB_PATH = "/tmp/RtmpGGV5Wj/file1a4e72240419.duckdb")`
 #>   `codeminer_connect()`
 PARENTS("E10", "E11", type = "ICD-10")
 #> ℹ Using "UKB v4" as the latest relationship version for "ICD-10".

@@ -95,17 +95,24 @@ lookup that describes the results. The <code>col_filters</code> argument
 is table-keyed, so one argument addresses each table by its own
 name:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Map BNF codes to SNOMED CT, keeping only assured mapping rows, and</span></span>
-<span><span class="co"># restrict the *target lookup* to the UK drug extension (dm+d) module:</span></span>
+<code class="sourceCode R"><span><span class="co"># `MAP()` reads the Read v3 -&gt; ICD-10 mapping table. Keep only exact + general</span></span>
+<span><span class="co"># ("E", "G") mappings. The same table-keyed argument can also address the</span></span>
+<span><span class="co"># *target lookup* by name (demonstrated with the `Demo` lookup below).</span></span>
 <span><span class="fu"><a href="../reference/MAP.html">MAP</a></span><span class="op">(</span></span>
-<span>  <span class="va">bnf_codes</span>,</span>
-<span>  from <span class="op">=</span> <span class="st">"BNF"</span>,</span>
-<span>  to <span class="op">=</span> <span class="st">"SNOMED CT"</span>,</span>
+<span>  <span class="st">"all"</span>,</span>
+<span>  from <span class="op">=</span> <span class="st">"Read v3"</span>,</span>
+<span>  to <span class="op">=</span> <span class="st">"ICD-10"</span>,</span>
 <span>  col_filters <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
-<span>    mapping <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"BNF &gt; SNOMED CT"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>assured <span class="op">=</span> <span class="st">"Y"</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>    lookup  <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"SNOMED CT"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>moduleId_concept <span class="op">=</span> <span class="st">"999000011000001104"</span><span class="op">)</span><span class="op">)</span></span>
+<span>    mapping <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"Read v3 &gt; ICD-10"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>mapping_status <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"E"</span>, <span class="st">"G"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
 <span>  <span class="op">)</span></span>
-<span><span class="op">)</span></span></code></pre></div>
+<span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Using <span style="color: #0000BB;">"UKB v4"</span> as the latest mapping version for</span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB;">"Read v3 &gt; ICD-10"</span>.</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 0 × 8</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 8 variables: from &lt;chr&gt;, to &lt;chr&gt;, mapping_status &lt;chr&gt;, refine_flag &lt;chr&gt;,</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;">#   add_code_flag &lt;chr&gt;, element_num &lt;chr&gt;, block_num &lt;chr&gt;,</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;">#   icd10_dagger_asterisk &lt;chr&gt;</span></span></span></code></pre></div>
 <p>The top-level names are the table types (<code>lookup</code>,
 <code>relationship</code>, <code>mapping</code>); the keys are code
 types, or <code>"from &gt; to"</code> pairs for mappings; the leaves are
@@ -116,46 +123,59 @@ across different queries.</p>
 <div class="section level2">
 <h2 id="where-filters-come-from">Where filters come from<a class="anchor" aria-label="anchor" href="#where-filters-come-from"></a>
 </h2>
-<p>Filters are declared in table metadata as a specification per column,
-with <code>values</code> (all valid options) and <code>defaults</code>
-(applied when nothing overrides them):</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/add_lookup_table.html">add_lookup_table</a></span><span class="op">(</span></span>
-<span>  <span class="va">my_snomed_lookup</span>,</span>
-<span>  <span class="fu"><a href="../reference/lookup_metadata.html">lookup_metadata</a></span><span class="op">(</span></span>
-<span>    <span class="st">"SNOMED CT"</span>,</span>
-<span>    lookup_version <span class="op">=</span> <span class="st">"v1"</span>,</span>
-<span>    col_filters <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
-<span>      active_concept <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>values <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"0"</span>, <span class="st">"1"</span><span class="op">)</span>, defaults <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"1"</span><span class="op">)</span><span class="op">)</span></span>
-<span>    <span class="op">)</span></span>
-<span>  <span class="op">)</span></span>
-<span><span class="op">)</span></span></code></pre></div>
-<p>A column may declare an empty <code>defaults</code> — it is then a
-purely opt-in filter (nothing is filtered until you ask). Filters on an
-existing table can be changed without re-adding the data via
-<code><a href="../reference/update_lookup_metadata.html">update_lookup_metadata()</a></code> (and the mapping/relationship
-equivalents).</p>
-<p>Each column may also carry two optional documentation fields, so
-filters are self-describing rather than opaque:</p>
+<p>Filters are declared in table metadata, per column, with
+<code>values</code> (all valid options) and <code>defaults</code>
+(applied when nothing overrides them). A column may also carry two
+optional documentation fields, so filters are self-describing:</p>
 <ul>
 <li>
 <code>description</code>: a single string explaining what the column
 means.</li>
 <li>
 <code>value_labels</code>: a named character vector mapping values
-to human-readable labels. Its names must be a subset of
-<code>values</code>; labelling is optional and may be partial (only some
-values need a label).</li>
+to human-readable labels (its names must be a subset of
+<code>values</code>; labelling may be partial).</li>
 </ul>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">col_filters</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
-<span>  moduleId_concept <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
-<span>    values       <span class="op">=</span> <span class="va">module_ids</span>,</span>
-<span>    defaults     <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">character</a></span><span class="op">(</span><span class="fl">0</span><span class="op">)</span>,</span>
-<span>    description  <span class="op">=</span> <span class="st">"SNOMED CT module the concept belongs to. Filter to the UK drug extension for dm+d-only results."</span>,</span>
-<span>    value_labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"999000011000001104"</span> <span class="op">=</span> <span class="st">"UK drug extension (dm+d)"</span><span class="op">)</span></span>
+<p><code>defaults</code> is the value set applied by default. To
+<strong>include every value</strong> by default, list them all — the
+column is then unrestricted by default but still available to narrow. To
+<strong>exclude everything</strong> by default, use an empty
+<code>defaults</code> (rarely wanted).</p>
+<p>The rest of this vignette uses a small lookup registered on the dummy
+database. <code>status</code> is filtered to active codes by default;
+<code>module</code> lists both of its values as <code>defaults</code>,
+so all modules are included by default:</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">demo_lookup</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
+<span>  code <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"A"</span>, <span class="st">"B"</span>, <span class="st">"C"</span><span class="op">)</span>,</span>
+<span>  description <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"apple"</span>, <span class="st">"banana"</span>, <span class="st">"cherry"</span><span class="op">)</span>,</span>
+<span>  status <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"1"</span>, <span class="st">"1"</span>, <span class="st">"0"</span><span class="op">)</span>,</span>
+<span>  module <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"core"</span>, <span class="st">"ext"</span>, <span class="st">"core"</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="../reference/add_lookup_table.html">add_lookup_table</a></span><span class="op">(</span></span>
+<span>  <span class="va">demo_lookup</span>,</span>
+<span>  <span class="fu"><a href="../reference/lookup_metadata.html">lookup_metadata</a></span><span class="op">(</span></span>
+<span>    <span class="st">"Demo"</span>,</span>
+<span>    col_filters <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>      status <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>        values <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"0"</span>, <span class="st">"1"</span><span class="op">)</span>,</span>
+<span>        defaults <span class="op">=</span> <span class="st">"1"</span>,</span>
+<span>        description <span class="op">=</span> <span class="st">"Whether the code is active."</span>,</span>
+<span>        value_labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"1"</span> <span class="op">=</span> <span class="st">"Active"</span>, <span class="st">"0"</span> <span class="op">=</span> <span class="st">"Inactive"</span><span class="op">)</span></span>
+<span>      <span class="op">)</span>,</span>
+<span>      module <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>        values <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"core"</span>, <span class="st">"ext"</span><span class="op">)</span>,</span>
+<span>        defaults <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"core"</span>, <span class="st">"ext"</span><span class="op">)</span>, <span class="co"># all values -&gt; all included by default</span></span>
+<span>        description <span class="op">=</span> <span class="st">"Which module the code belongs to."</span></span>
+<span>      <span class="op">)</span></span>
+<span>    <span class="op">)</span></span>
 <span>  <span class="op">)</span></span>
-<span><span class="op">)</span></span></code></pre></div>
+<span><span class="op">)</span></span>
+<span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Lookup table <span style="color: #00BB00;">Demo_v0</span> added successfully.</span></span></code></pre></div>
+<p>Filters on an existing table can be changed without re-adding the
+data via <code><a href="../reference/update_lookup_metadata.html">update_lookup_metadata()</a></code> (and the
+mapping/relationship equivalents).</p>
 </div>
 <div class="section level2">
 <h2 id="the-col_filters-argument">The <code>col_filters</code> argument<a class="anchor" aria-label="anchor" href="#the-col_filters-argument"></a>
@@ -174,7 +194,7 @@ filtering for any table this query touches.</li>
 unnamed tables keep their pins/defaults. <code>NA</code> as a table
 entry un-filters that one table.</li>
 </ul>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># The dummy Read v3 &gt; ICD-10 mapping declares a mapping_status filter with</span></span>
 <span><span class="co"># defaults E, G, D. Restrict this call to exact ("E") mappings only:</span></span>
 <span><span class="fu"><a href="../reference/MAP.html">MAP</a></span><span class="op">(</span></span>
@@ -186,8 +206,6 @@ entry un-filters that one table.</li>
 <span>  <span class="op">)</span></span>
 <span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Using <span style="color: #0000BB;">"UKB v4"</span> as the latest mapping version for</span></span>
-<span><span class="co">#&gt; <span style="color: #0000BB;">"Read v3 &gt; ICD-10"</span>.</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 0 × 8</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 8 variables: from &lt;chr&gt;, to &lt;chr&gt;, mapping_status &lt;chr&gt;, refine_flag &lt;chr&gt;,</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;">#   add_code_flag &lt;chr&gt;, element_num &lt;chr&gt;, block_num &lt;chr&gt;,</span></span></span>
@@ -214,6 +232,147 @@ workflow</a>).</p>
 a column absent from its table, or a value outside a column’s registered
 <code>values</code> each trigger a warning naming what <em>is</em>
 available.</p>
+<div class="section level3">
+<h3 id="what-a-filter-value-means">What a filter value means<a class="anchor" aria-label="anchor" href="#what-a-filter-value-means"></a>
+</h3>
+<p>The distinction that most often surprises people is <strong>empty
+selection</strong> versus <strong>unfiltered</strong> — they are
+deliberately different. Reading from the inside out:</p>
+<p><strong>Per column</strong> (inside a table entry):</p>
+<table class="table">
+<colgroup>
+<col width="50%">
+<col width="50%">
+</colgroup>
+<thead><tr class="header">
+<th>You set a column to</th>
+<th>Meaning</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td><code>c("a", "b")</code></td>
+<td>keep rows where the column is <code>"a"</code> or <code>"b"</code>
+(a whitelist)</td>
+</tr>
+<tr class="even">
+<td>
+<code>character(0)</code> (JSON <code>[]</code>)</td>
+<td>keep <strong>no</strong> rows — an empty allow-set excludes
+everything</td>
+</tr>
+<tr class="odd">
+<td>
+<code>NA</code> (JSON <code>null</code>)</td>
+<td>do <strong>not</strong> filter this column (unfiltered)</td>
+</tr>
+<tr class="even">
+<td><em>column omitted</em></td>
+<td>not filtered — an overlay only constrains the columns it names</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Per table</strong> (a key under <code>lookup</code> /
+<code>mapping</code> / <code>relationship</code>):</p>
+<table class="table">
+<colgroup>
+<col width="50%">
+<col width="50%">
+</colgroup>
+<thead><tr class="header">
+<th>Table entry</th>
+<th>Meaning</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td>a named list of column filters</td>
+<td>
+<strong>replaces</strong> that table’s defaults wholesale</td>
+</tr>
+<tr class="even">
+<td><code>NA</code></td>
+<td>un-filter the whole table</td>
+</tr>
+<tr class="odd">
+<td><em>table omitted</em></td>
+<td>keeps its pins / metadata defaults</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Whole argument</strong> (<code>col_filters =</code>):</p>
+<table class="table">
+<thead><tr class="header">
+<th>Value</th>
+<th>Meaning</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td><code>"default"</code></td>
+<td>session pins where set, else metadata defaults</td>
+</tr>
+<tr class="even">
+<td>
+<code>NULL</code> / <code>NA</code>
+</td>
+<td>no filtering for any table this query touches</td>
+</tr>
+<tr class="odd">
+<td>a table-keyed list</td>
+<td>as in the tables above</td>
+</tr>
+</tbody>
+</table>
+<p>So an empty selection is a real, useful state (“exclude everything,
+return nothing”), and it is <strong>not</strong> the same as removing
+the constraint. To stop filtering a column, set it to <code>NA</code> or
+omit it — not <code>character(0)</code>. On the <code>Demo</code>
+table:</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Default: status filtered to "1"; module lists all values, so all included</span></span>
+<span><span class="fu"><a href="../reference/CODES.html">CODES</a></span><span class="op">(</span><span class="st">"all"</span>, type <span class="op">=</span> <span class="st">"Demo"</span><span class="op">)</span><span class="op">$</span><span class="va">code</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Using <span style="color: #0000BB;">"v0"</span> as the latest lookup version for</span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB;">"Demo"</span>.</span></span>
+<span><span class="co">#&gt; [1] "A" "B"</span></span>
+<span></span>
+<span><span class="co"># Empty selection on status excludes everything</span></span>
+<span><span class="fu"><a href="../reference/CODES.html">CODES</a></span><span class="op">(</span></span>
+<span>  <span class="st">"all"</span>,</span>
+<span>  type <span class="op">=</span> <span class="st">"Demo"</span>,</span>
+<span>  col_filters <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>lookup <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>Demo <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>status <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">character</a></span><span class="op">(</span><span class="fl">0</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 0</span></span>
+<span></span>
+<span><span class="co"># NA leaves status unfiltered (all statuses returned)</span></span>
+<span><span class="fu"><a href="../reference/CODES.html">CODES</a></span><span class="op">(</span></span>
+<span>  <span class="st">"all"</span>,</span>
+<span>  type <span class="op">=</span> <span class="st">"Demo"</span>,</span>
+<span>  col_filters <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>lookup <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>Demo <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>status <span class="op">=</span> <span class="cn">NA</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="op">)</span><span class="op">$</span><span class="va">code</span></span>
+<span><span class="co">#&gt; [1] "A" "B" "C"</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="the-round-trip-guarantee">The round-trip guarantee<a class="anchor" aria-label="anchor" href="#the-round-trip-guarantee"></a>
+</h3>
+<p>Because each column’s default is its full applied value set —
+including columns that are unrestricted by default (they simply list all
+their values) — <code><a href="../reference/get_col_filters.html">get_col_filters()</a></code> output passed straight
+back reproduces the default query exactly:</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="../reference/CODES.html">CODES</a></span><span class="op">(</span><span class="st">"all"</span>, type <span class="op">=</span> <span class="st">"Demo"</span><span class="op">)</span><span class="op">$</span><span class="va">code</span>,</span>
+<span>  <span class="fu"><a href="../reference/CODES.html">CODES</a></span><span class="op">(</span><span class="st">"all"</span>, type <span class="op">=</span> <span class="st">"Demo"</span>, col_filters <span class="op">=</span> <span class="fu"><a href="../reference/get_col_filters.html">get_col_filters</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span><span class="op">$</span><span class="va">code</span></span>
+<span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] TRUE</span></span>
+<span></span>
+<span><span class="co"># Narrow a column by assigning a subset:</span></span>
+<span><span class="va">cf</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_col_filters.html">get_col_filters</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="va">cf</span><span class="op">$</span><span class="va">lookup</span><span class="op">$</span><span class="va">Demo</span><span class="op">$</span><span class="va">module</span> <span class="op">&lt;-</span> <span class="st">"core"</span></span>
+<span><span class="fu"><a href="../reference/CODES.html">CODES</a></span><span class="op">(</span><span class="st">"all"</span>, type <span class="op">=</span> <span class="st">"Demo"</span>, col_filters <span class="op">=</span> <span class="va">cf</span><span class="op">)</span><span class="op">$</span><span class="va">code</span></span>
+<span><span class="co">#&gt; [1] "A"</span></span></code></pre></div>
+<p>Opt-in columns are still fully visible under
+<code>get_col_filters(defaults_only = FALSE)</code> for discovery — they
+are only absent from the applied-defaults shape.</p>
+</div>
 </div>
 <div class="section level2">
 <h2 id="session-pins-and-scoped-overrides">Session pins and scoped overrides<a class="anchor" aria-label="anchor" href="#session-pins-and-scoped-overrides"></a>
@@ -221,7 +380,7 @@ available.</p>
 <p><code><a href="../reference/codeminer_set_col_filters.html">codeminer_set_col_filters()</a></code> pins filters for the session
 — the same shape, the same replacement rule, applied whenever a query
 runs with <code>col_filters = "default"</code>:</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/codeminer_set_col_filters.html">codeminer_set_col_filters</a></span><span class="op">(</span></span>
 <span>  mapping <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"Read v3 &gt; ICD-10"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>mapping_status <span class="op">=</span> <span class="st">"E"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
@@ -245,7 +404,7 @@ state.</p>
 <p><code>with_col_filters(col_filters, code)</code> applies filters for
 the duration of an expression, then restores the previous state (even on
 error):</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/with_col_filters.html">with_col_filters</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>mapping <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"Read v3 &gt; ICD-10"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>mapping_status <span class="op">=</span> <span class="st">"E"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>  <span class="fu"><a href="../reference/MAP.html">MAP</a></span><span class="op">(</span><span class="st">"all"</span>, from <span class="op">=</span> <span class="st">"Read v3"</span>, to <span class="op">=</span> <span class="st">"ICD-10"</span><span class="op">)</span></span>
@@ -255,7 +414,7 @@ error):</p>
 <p>The scope is the <em>expression</em>: every codeminer read made while
 it evaluates resolves against the temporary filters, so a multi-step
 pipeline can be wrapped as a whole, or step by step:</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># One scope for both steps: CHILDREN()'s lookup reads are filtered too</span></span>
 <span><span class="fu"><a href="../reference/with_col_filters.html">with_col_filters</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>lookup <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"SNOMED CT"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>moduleId_concept <span class="op">=</span> <span class="st">"999..."</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>,</span>
@@ -284,22 +443,26 @@ ended.</p>
 default filters for every table, in exactly the shape the
 <code>col_filters</code> argument (and the pins) accept. Amend it with
 plain assignment and pass it back:</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">cf</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_col_filters.html">get_col_filters</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">cf</span><span class="op">)</span></span>
 <span><span class="co">#&gt; &lt;codeminer_col_filters&gt;</span></span>
-<span><span class="co">#&gt; mapping</span></span>
-<span><span class="co">#&gt;   "Read v2 &gt; ICD-10"</span></span>
-<span><span class="co">#&gt;     icd10_code_def: 1, 15, 3, 5, 7, 8</span></span>
-<span><span class="co">#&gt;   "Read v2 &gt; Read v3"</span></span>
-<span><span class="co">#&gt;     IS_ASSURED: 1</span></span>
-<span><span class="co">#&gt;   "Read v3 &gt; ICD-10"</span></span>
-<span><span class="co">#&gt;     mapping_status: E, G, D</span></span>
-<span><span class="co">#&gt;     refine_flag: C, P</span></span>
-<span><span class="co">#&gt;     element_num: 0</span></span>
-<span><span class="co">#&gt;     block_num: 0</span></span>
-<span><span class="co">#&gt;   "Read v3 &gt; Read v2"</span></span>
-<span><span class="co">#&gt;     IS_ASSURED: 1</span></span>
+<span><span class="co">#&gt; ├─lookup</span></span>
+<span><span class="co">#&gt; │ └─Demo</span></span>
+<span><span class="co">#&gt; │   ├─status: 1</span></span>
+<span><span class="co">#&gt; │   └─module: core, ext</span></span>
+<span><span class="co">#&gt; └─mapping</span></span>
+<span><span class="co">#&gt;   ├─Read v2 &gt; ICD-10</span></span>
+<span><span class="co">#&gt;   │ └─icd10_code_def: 1, 15, 3, 5, 7, 8</span></span>
+<span><span class="co">#&gt;   ├─Read v2 &gt; Read v3</span></span>
+<span><span class="co">#&gt;   │ └─IS_ASSURED: 1</span></span>
+<span><span class="co">#&gt;   ├─Read v3 &gt; ICD-10</span></span>
+<span><span class="co">#&gt;   │ ├─mapping_status: E, G, D</span></span>
+<span><span class="co">#&gt;   │ ├─refine_flag: C, P</span></span>
+<span><span class="co">#&gt;   │ ├─element_num: 0</span></span>
+<span><span class="co">#&gt;   │ └─block_num: 0</span></span>
+<span><span class="co">#&gt;   └─Read v3 &gt; Read v2</span></span>
+<span><span class="co">#&gt;     └─IS_ASSURED: 1</span></span>
 <span></span>
 <span><span class="co"># Change one column's selection while keeping everything else</span></span>
 <span><span class="va">cf</span><span class="op">$</span><span class="va">mapping</span><span class="op">[[</span><span class="st">"Read v3 &gt; ICD-10"</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">mapping_status</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"E"</span>, <span class="st">"G"</span><span class="op">)</span></span>
@@ -343,7 +506,7 @@ specification — every filterable column with all its <code>values</code>
 and the <code>defaults</code>, plus any <code>description</code> and
 <code>value_labels</code> the filter declares — which is what a UI needs
 to render labelled filter choices:</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/get_col_filters.html">get_col_filters</a></span><span class="op">(</span>defaults_only <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">$</span><span class="va">mapping</span><span class="op">[[</span><span class="st">"Read v3 &gt; ICD-10"</span><span class="op">]</span><span class="op">]</span></span>
 <span><span class="co">#&gt; $mapping_status</span></span>
 <span><span class="co">#&gt; $mapping_status$values</span></span>

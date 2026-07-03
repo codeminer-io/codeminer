@@ -34,17 +34,24 @@ each table by its own name:
 
 ``` r
 
-# Map BNF codes to SNOMED CT, keeping only assured mapping rows, and
-# restrict the *target lookup* to the UK drug extension (dm+d) module:
+# `MAP()` reads the Read v3 -> ICD-10 mapping table. Keep only exact + general
+# ("E", "G") mappings. The same table-keyed argument can also address the
+# *target lookup* by name (demonstrated with the `Demo` lookup below).
 MAP(
-  bnf_codes,
-  from = "BNF",
-  to = "SNOMED CT",
+  "all",
+  from = "Read v3",
+  to = "ICD-10",
   col_filters = list(
-    mapping = list("BNF > SNOMED CT" = list(assured = "Y")),
-    lookup  = list("SNOMED CT" = list(moduleId_concept = "999000011000001104"))
+    mapping = list("Read v3 > ICD-10" = list(mapping_status = c("E", "G")))
   )
-)
+) |>
+  head()
+#> ℹ Using "UKB v4" as the latest mapping version for
+#> "Read v3 > ICD-10".
+#> # A tibble: 0 × 8
+#> # ℹ 8 variables: from <chr>, to <chr>, mapping_status <chr>, refine_flag <chr>,
+#> #   add_code_flag <chr>, element_num <chr>, block_num <chr>,
+#> #   icd10_dagger_asterisk <chr>
 ```
 
 The top-level names are the table types (`lookup`, `relationship`,
@@ -55,50 +62,61 @@ can be reused across different queries.
 
 ## Where filters come from
 
-Filters are declared in table metadata as a specification per column,
-with `values` (all valid options) and `defaults` (applied when nothing
-overrides them):
-
-``` r
-
-add_lookup_table(
-  my_snomed_lookup,
-  lookup_metadata(
-    "SNOMED CT",
-    lookup_version = "v1",
-    col_filters = list(
-      active_concept = list(values = c("0", "1"), defaults = c("1"))
-    )
-  )
-)
-```
-
-A column may declare an empty `defaults` — it is then a purely opt-in
-filter (nothing is filtered until you ask). Filters on an existing table
-can be changed without re-adding the data via
-[`update_lookup_metadata()`](https://codeminer-io.github.io/codeminer/reference/update_lookup_metadata.md)
-(and the mapping/relationship equivalents).
-
-Each column may also carry two optional documentation fields, so filters
-are self-describing rather than opaque:
+Filters are declared in table metadata, per column, with `values` (all
+valid options) and `defaults` (applied when nothing overrides them). A
+column may also carry two optional documentation fields, so filters are
+self-describing:
 
 - `description`: a single string explaining what the column means.
 - `value_labels`: a named character vector mapping values to
-  human-readable labels. Its names must be a subset of `values`;
-  labelling is optional and may be partial (only some values need a
-  label).
+  human-readable labels (its names must be a subset of `values`;
+  labelling may be partial).
+
+`defaults` is the value set applied by default. To **include every
+value** by default, list them all — the column is then unrestricted by
+default but still available to narrow. To **exclude everything** by
+default, use an empty `defaults` (rarely wanted).
+
+The rest of this vignette uses a small lookup registered on the dummy
+database. `status` is filtered to active codes by default; `module`
+lists both of its values as `defaults`, so all modules are included by
+default:
 
 ``` r
 
-col_filters = list(
-  moduleId_concept = list(
-    values       = module_ids,
-    defaults     = character(0),
-    description  = "SNOMED CT module the concept belongs to. Filter to the UK drug extension for dm+d-only results.",
-    value_labels = c("999000011000001104" = "UK drug extension (dm+d)")
+demo_lookup <- data.frame(
+  code = c("A", "B", "C"),
+  description = c("apple", "banana", "cherry"),
+  status = c("1", "1", "0"),
+  module = c("core", "ext", "core")
+)
+
+add_lookup_table(
+  demo_lookup,
+  lookup_metadata(
+    "Demo",
+    col_filters = list(
+      status = list(
+        values = c("0", "1"),
+        defaults = "1",
+        description = "Whether the code is active.",
+        value_labels = c("1" = "Active", "0" = "Inactive")
+      ),
+      module = list(
+        values = c("core", "ext"),
+        defaults = c("core", "ext"), # all values -> all included by default
+        description = "Which module the code belongs to."
+      )
+    )
   )
 )
+#> ✔ Lookup table Demo_v0 added successfully.
 ```
+
+Filters on an existing table can be changed without re-adding the data
+via
+[`update_lookup_metadata()`](https://codeminer-io.github.io/codeminer/reference/update_lookup_metadata.md)
+(and the mapping/relationship equivalents).
 
 ## The `col_filters` argument
 
@@ -124,8 +142,6 @@ MAP(
   )
 ) |>
   head()
-#> ℹ Using "UKB v4" as the latest mapping version for
-#> "Read v3 > ICD-10".
 #> # A tibble: 0 × 8
 #> # ℹ 8 variables: from <chr>, to <chr>, mapping_status <chr>, refine_flag <chr>,
 #> #   add_code_flag <chr>, element_num <chr>, block_num <chr>,
@@ -154,6 +170,95 @@ workflow](#amending-filters-the-round-trip-workflow)).
 Typos don’t fail silently: an entry that matches no registered table, a
 column absent from its table, or a value outside a column’s registered
 `values` each trigger a warning naming what *is* available.
+
+### What a filter value means
+
+The distinction that most often surprises people is **empty selection**
+versus **unfiltered** — they are deliberately different. Reading from
+the inside out:
+
+**Per column** (inside a table entry):
+
+| You set a column to | Meaning |
+|----|----|
+| `c("a", "b")` | keep rows where the column is `"a"` or `"b"` (a whitelist) |
+| `character(0)` (JSON `[]`) | keep **no** rows — an empty allow-set excludes everything |
+| `NA` (JSON `null`) | do **not** filter this column (unfiltered) |
+| *column omitted* | not filtered — an overlay only constrains the columns it names |
+
+**Per table** (a key under `lookup` / `mapping` / `relationship`):
+
+| Table entry | Meaning |
+|----|----|
+| a named list of column filters | **replaces** that table’s defaults wholesale |
+| `NA` | un-filter the whole table |
+| *table omitted* | keeps its pins / metadata defaults |
+
+**Whole argument** (`col_filters =`):
+
+| Value              | Meaning                                        |
+|--------------------|------------------------------------------------|
+| `"default"`        | session pins where set, else metadata defaults |
+| `NULL` / `NA`      | no filtering for any table this query touches  |
+| a table-keyed list | as in the tables above                         |
+
+So an empty selection is a real, useful state (“exclude everything,
+return nothing”), and it is **not** the same as removing the constraint.
+To stop filtering a column, set it to `NA` or omit it — not
+`character(0)`. On the `Demo` table:
+
+``` r
+
+# Default: status filtered to "1"; module lists all values, so all included
+CODES("all", type = "Demo")$code
+#> ℹ Using "v0" as the latest lookup version for
+#> "Demo".
+#> [1] "A" "B"
+
+# Empty selection on status excludes everything
+CODES(
+  "all",
+  type = "Demo",
+  col_filters = list(lookup = list(Demo = list(status = character(0))))
+) |>
+  nrow()
+#> [1] 0
+
+# NA leaves status unfiltered (all statuses returned)
+CODES(
+  "all",
+  type = "Demo",
+  col_filters = list(lookup = list(Demo = list(status = NA)))
+)$code
+#> [1] "A" "B" "C"
+```
+
+### The round-trip guarantee
+
+Because each column’s default is its full applied value set — including
+columns that are unrestricted by default (they simply list all their
+values) —
+[`get_col_filters()`](https://codeminer-io.github.io/codeminer/reference/get_col_filters.md)
+output passed straight back reproduces the default query exactly:
+
+``` r
+
+identical(
+  CODES("all", type = "Demo")$code,
+  CODES("all", type = "Demo", col_filters = get_col_filters())$code
+)
+#> [1] TRUE
+
+# Narrow a column by assigning a subset:
+cf <- get_col_filters()
+cf$lookup$Demo$module <- "core"
+CODES("all", type = "Demo", col_filters = cf)$code
+#> [1] "A"
+```
+
+Opt-in columns are still fully visible under
+`get_col_filters(defaults_only = FALSE)` for discovery — they are only
+absent from the applied-defaults shape.
 
 ## Session pins and scoped overrides
 
@@ -242,18 +347,22 @@ Amend it with plain assignment and pass it back:
 cf <- get_col_filters()
 print(cf)
 #> <codeminer_col_filters>
-#> mapping
-#>   "Read v2 > ICD-10"
-#>     icd10_code_def: 1, 15, 3, 5, 7, 8
-#>   "Read v2 > Read v3"
-#>     IS_ASSURED: 1
-#>   "Read v3 > ICD-10"
-#>     mapping_status: E, G, D
-#>     refine_flag: C, P
-#>     element_num: 0
-#>     block_num: 0
-#>   "Read v3 > Read v2"
-#>     IS_ASSURED: 1
+#> ├─lookup
+#> │ └─Demo
+#> │   ├─status: 1
+#> │   └─module: core, ext
+#> └─mapping
+#>   ├─Read v2 > ICD-10
+#>   │ └─icd10_code_def: 1, 15, 3, 5, 7, 8
+#>   ├─Read v2 > Read v3
+#>   │ └─IS_ASSURED: 1
+#>   ├─Read v3 > ICD-10
+#>   │ ├─mapping_status: E, G, D
+#>   │ ├─refine_flag: C, P
+#>   │ ├─element_num: 0
+#>   │ └─block_num: 0
+#>   └─Read v3 > Read v2
+#>     └─IS_ASSURED: 1
 
 # Change one column's selection while keeping everything else
 cf$mapping[["Read v3 > ICD-10"]]$mapping_status <- c("E", "G")

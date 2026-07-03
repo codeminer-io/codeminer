@@ -1,8 +1,11 @@
 # Extract column filters from database metadata
 
-Reads `col_filters` from all metadata tables in the connected database.
-Returns a nested list keyed by table type and table key (code type or
-mapping pair).
+Reads the registered `col_filters` from the metadata tables of the
+connected database. Returns a nested list keyed by table type and table
+key (code type or mapping pair). This reflects the **registered
+defaults**, not the active session pins — use
+[`codeminer_status()`](https://codeminer-io.github.io/codeminer/reference/codeminer_status.md)
+to inspect the currently pinned state.
 
 ## Usage
 
@@ -14,9 +17,10 @@ get_col_filters(defaults_only = TRUE)
 
 - defaults_only:
 
-  Logical. If `TRUE` (default), return only the default filter values.
-  If `FALSE`, return the full specification including all available
-  values (useful for Shiny UI checkboxes).
+  Logical. If `TRUE` (default), return the applied default filters — the
+  shape you amend and pass back to filter a query. If `FALSE`, return
+  the full specification (all `values`, the `defaults`, and any
+  `description` / `value_labels`), useful for building filter UIs.
 
 ## Value
 
@@ -27,7 +31,7 @@ type (or `"from > to"` for mappings), containing either:
 - If `defaults_only = TRUE`: a flat `list(col = c(default_values))`
 
 - If `defaults_only = FALSE`: a full
-  `list(col = list(values = ..., defaults = ...))`
+  `list(col = list(values = ..., defaults = ..., description = ..., value_labels = ...))`
 
 The `defaults_only = TRUE` form is the shape accepted by the
 `col_filters` argument on query functions (see
@@ -35,8 +39,13 @@ The `defaults_only = TRUE` form is the shape accepted by the
 [`codeminer_set_col_filters()`](https://codeminer-io.github.io/codeminer/reference/codeminer_set_col_filters.md),
 and
 [`with_col_filters()`](https://codeminer-io.github.io/codeminer/reference/with_col_filters.md)
-— amend it with plain assignment and pass it back. Returns an empty
-object if no database is connected.
+— amend it with plain assignment and pass it back. Each column's default
+is its applied value set (a column included in full by default lists all
+of its values), so passing the output back unchanged reproduces the
+default query exactly. Narrow a column by assigning a subset (e.g.
+`cf$lookup[["SNOMED CT"]]$moduleId_concept <- "999000011000001104"`),
+drop a column's filter with `NA`, or clear a whole table with `NA`.
+Returns an empty object if no database is connected.
 
 ## See also
 
