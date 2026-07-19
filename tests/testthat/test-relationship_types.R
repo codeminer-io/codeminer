@@ -202,6 +202,16 @@ test_that("RELATIONSHIP_TYPES() filters by description pattern", {
   expect_equal(nrow(empty), 0)
 })
 
+test_that("RELATIONSHIP_TYPES() rejects an invalid regular expression", {
+  test_type <- "typed_onto_bad_pattern"
+  setup_typed_ontology(test_type)
+
+  expect_error(
+    RELATIONSHIP_TYPES("*", type = test_type),
+    class = "codeminer_invalid_pattern"
+  )
+})
+
 test_that("RELATIONSHIP_TYPES() result feeds into ATTRIBUTES_FOR()", {
   test_type <- "typed_onto_feed"
   setup_typed_ontology(test_type)

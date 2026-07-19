@@ -278,6 +278,37 @@ check_pattern <- function(pattern, call = rlang::caller_env()) {
   }
 }
 
+# Confirm `pattern` compiles as a regular expression by asking the backend's own
+# engine (RE2), rather than R's, which accepts a different dialect. A table-less
+# scalar query is enough to force compilation without scanning anything.
+check_pattern_valid_regex <- function(
+  pattern,
+  con,
+  call = rlang::caller_env()
+) {
+  compile_error <- tryCatch(
+    {
+      DBI::dbGetQuery(
+        con,
+        "SELECT regexp_matches('', ?)",
+        params = list(pattern)
+      )
+      NULL
+    },
+    error = function(cnd) cnd
+  )
+  if (!is.null(compile_error)) {
+    codeminer_abort(
+      c(
+        "x" = "{.arg pattern} is not a valid regular expression: {.val {pattern}}.",
+        "i" = "Searches use regular expressions. To match any text, use {.code .*}."
+      ),
+      class = "codeminer_invalid_pattern",
+      call = call
+    )
+  }
+}
+
 #' @param pattern a regular expression to search for
 #'
 #' @details `CODES_LIKE` searches for codes that match a given regular
@@ -303,6 +334,7 @@ CODES_LIKE <- function(
   check_logical_scalar(preferred_description_only, "preferred_description_only")
 
   con <- get_db_con()
+  check_pattern_valid_regex(pattern, con)
 
   lookup_table <- get_lookup_table(
     type,

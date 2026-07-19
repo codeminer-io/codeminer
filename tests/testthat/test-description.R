@@ -28,6 +28,17 @@ test_that("DESCRIPTION() works with regular expressions", {
   )
 })
 
+test_that("DESCRIPTION() rejects an invalid regular expression", {
+  expect_error(
+    DESCRIPTION("*", "fruits"),
+    class = "codeminer_invalid_pattern"
+  )
+  expect_error(
+    DESCRIPTION("[", "fruits"),
+    class = "codeminer_invalid_pattern"
+  )
+})
+
 test_that("DESCRIPTION() can be configured to be case insenstive", {
   ignore_case <- DESCRIPTION("Apple", "fruits", ignore_case = TRUE)
   expect_identical(ignore_case$code, c("f1", "f4"))
