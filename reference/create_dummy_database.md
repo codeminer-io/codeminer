@@ -59,10 +59,10 @@ temp_db <- tempfile(fileext = ".duckdb")
 create_dummy_database(temp_db)
 #> ✔ Dummy database ready to use!
 #> ℹ To reconnect to your previous database:
-#>   `Sys.setenv(CODEMINER_DB_PATH = "/tmp/RtmpGGV5Wj/file1a4e7fb7808a.duckdb")`
+#>   `Sys.setenv(CODEMINER_DB_PATH = "/tmp/RtmpzrC8Cz/file1b3d665919da.duckdb")`
 #>   `codeminer_connect()`
 
 # This also sets the environment variable `CODEMINER_DB_PATH`
 Sys.getenv("CODEMINER_DB_PATH")
-#> [1] "/tmp/RtmpGGV5Wj/file1a4e6588d118.duckdb"
+#> [1] "/tmp/RtmpzrC8Cz/file1b3d1be3acdb.duckdb"
 ```
