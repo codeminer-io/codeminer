@@ -38,6 +38,8 @@ DESCRIPTION <- function(
   check_logical_scalar(preferred_description_only, "preferred_description_only")
 
   con <- get_db_con()
+  check_pattern_valid_regex(pattern, con)
+
   lkp_table <- get_lookup_table(
     type,
     lookup_version = lookup_version,

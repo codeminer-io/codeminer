@@ -283,6 +283,9 @@ RELATIONSHIP_TYPES <- function(
   }
 
   con <- get_db_con()
+  if (!is.null(pattern)) {
+    check_pattern_valid_regex(pattern, con)
+  }
   meta <- get_metadata_for_relationship(
     con,
     type,
