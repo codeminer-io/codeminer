@@ -202,6 +202,90 @@ CODES <- function(
   return(as_codelist(result))
 }
 
+#' Chunked, bounded "all codes of a type" fetch
+#'
+#' Bounded variant of `CODES("all", ...)` for callers that need to keep any
+#' single call's work small (e.g. to stay under a network-layer request
+#' timeout), rather than materialising the whole code type in one unbounded
+#' scan. See [DESCRIPTION_CHUNK()] for the equivalent for a description
+#' search - this is simpler, since there's no search predicate: each chunk is
+#' just the `rowid`-bounded slice of the lookup table, read directly.
+#'
+#' @inheritParams DESCRIPTION_CHUNK
+#' @param preferred_description_only Logical. If `TRUE`, return only the
+#'   preferred description for each code.
+#'
+#' @return A list with `result`, `next_cursor`, `total_rows`, and `exhausted`
+#'   - see [DESCRIPTION_CHUNK()] for the shape.
+#' @export
+#' @family Clinical code lookups and mappings
+#' @examples
+#' create_dummy_database()
+#' chunk <- CODES_ALL_CHUNK(type = "ICD-10", batch_size = 100)
+#' chunk$result
+#' chunk$exhausted
+CODES_ALL_CHUNK <- function(
+  type = getOption("codeminer.code_type"),
+  cursor = 0L,
+  batch_size = getOption("codeminer.chunk_batch_size", default = 2000L),
+  total_rows = NULL,
+  accumulated_so_far = 0L,
+  max_rows = getOption("codeminer.max_leaf_rows", default = 30000L),
+  lookup_version = getOption("codeminer.lookup_version", default = "latest"),
+  preferred_description_only = TRUE,
+  col_filters = "default"
+) {
+  old_cf <- push_col_filters(col_filters, call = rlang::current_env())
+  on.exit(pop_col_filters(old_cf), add = TRUE)
+
+  check_code_type(type)
+  check_version(lookup_version)
+  check_logical_scalar(preferred_description_only, "preferred_description_only")
+
+  con <- get_db_con()
+  assert_chunking_supported()
+
+  this_meta <- get_metadata_for_lookup(con, type, lookup_version)
+
+  # Raw physical row count - see DESCRIPTION_CHUNK() for why this bypasses
+  # get_lookup_table()/col_filters.
+  if (is.null(total_rows)) {
+    total_rows <- dplyr::tbl(con, this_meta$lookup_table_name) |>
+      dplyr::tally() |>
+      dplyr::collect() |>
+      dplyr::pull("n") |>
+      as.integer()
+  }
+
+  cursor <- as.integer(cursor)
+  batch_size <- as.integer(batch_size)
+  to <- min(cursor + batch_size, total_rows)
+
+  chunk_tbl <- get_lookup_table(
+    type,
+    lookup_version = lookup_version,
+    con = con,
+    meta = this_meta,
+    rowid_range = c(cursor, to)
+  )
+  result <- dplyr::collect(chunk_tbl)
+
+  if (preferred_description_only) {
+    result <- dplyr::filter(result, .data$preferred_description)
+  }
+  result <- dplyr::select(result, dplyr::all_of(codelist_cols()))
+  result <- as_codelist(result)
+
+  abort_if_leaf_rows_exceeded(accumulated_so_far + nrow(result), max_rows)
+
+  list(
+    result = result,
+    next_cursor = to,
+    total_rows = total_rows,
+    exhausted = to >= total_rows
+  )
+}
+
 # Argument validation helpers
 check_code_type <- function(
   code_type,
@@ -356,6 +440,101 @@ CODES_LIKE <- function(
   return(result)
 }
 
+#' Chunked, bounded CODES_LIKE search
+#'
+#' Bounded variant of [CODES_LIKE()] for callers that need to keep any single
+#' call's work small (e.g. to stay under a network-layer request timeout),
+#' rather than materialising every match in one unbounded scan. Same shape as
+#' [DESCRIPTION_CHUNK()], matching on `code` instead of `description`.
+#'
+#' @inheritParams DESCRIPTION_CHUNK
+#'
+#' @return A list with `result`, `next_cursor`, `total_rows`, and `exhausted`
+#'   - see [DESCRIPTION_CHUNK()] for the shape.
+#' @export
+#' @family Clinical code lookups and mappings
+#' @examples
+#' create_dummy_database()
+#' chunk <- CODES_LIKE_CHUNK("^E1", type = "ICD-10", batch_size = 100)
+#' chunk$result
+#' chunk$exhausted
+CODES_LIKE_CHUNK <- function(
+  pattern,
+  type = getOption("codeminer.code_type"),
+  cursor = 0L,
+  batch_size = getOption("codeminer.chunk_batch_size", default = 2000L),
+  total_rows = NULL,
+  accumulated_so_far = 0L,
+  max_rows = getOption("codeminer.max_leaf_rows", default = 30000L),
+  lookup_version = getOption("codeminer.lookup_version", default = "latest"),
+  preferred_description_only = TRUE,
+  col_filters = "default"
+) {
+  old_cf <- push_col_filters(col_filters, call = rlang::current_env())
+  on.exit(pop_col_filters(old_cf), add = TRUE)
+
+  check_pattern(pattern)
+  check_code_type(type)
+  check_version(lookup_version)
+  check_logical_scalar(preferred_description_only, "preferred_description_only")
+
+  con <- get_db_con()
+  check_pattern_valid_regex(pattern, con)
+  assert_chunking_supported()
+
+  this_meta <- get_metadata_for_lookup(con, type, lookup_version)
+
+  if (is.null(total_rows)) {
+    total_rows <- dplyr::tbl(con, this_meta$lookup_table_name) |>
+      dplyr::tally() |>
+      dplyr::collect() |>
+      dplyr::pull("n") |>
+      as.integer()
+  }
+
+  cursor <- as.integer(cursor)
+  batch_size <- as.integer(batch_size)
+  to <- min(cursor + batch_size, total_rows)
+
+  chunk_tbl <- get_lookup_table(
+    type,
+    lookup_version = lookup_version,
+    con = con,
+    meta = this_meta,
+    rowid_range = c(cursor, to)
+  )
+  like_codes <- dplyr::filter(
+    chunk_tbl,
+    stringr::str_detect(.data$code, pattern)
+  ) |>
+    dplyr::pull("code")
+  like_codes <- unique(like_codes)
+
+  result <- if (length(like_codes) == 0) {
+    empty_cols <- stats::setNames(
+      replicate(3, character(), simplify = FALSE),
+      codelist_cols()
+    )
+    as_codelist(tibble::as_tibble(empty_cols))
+  } else {
+    CODES(
+      like_codes,
+      type = type,
+      lookup_version = lookup_version,
+      preferred_description_only = preferred_description_only
+    )
+  }
+
+  abort_if_leaf_rows_exceeded(accumulated_so_far + nrow(result), max_rows)
+
+  list(
+    result = result,
+    next_cursor = to,
+    total_rows = total_rows,
+    exhausted = to >= total_rows
+  )
+}
+
 #' Which of `codes` are present in a code type's lookup table
 #'
 #' Existence check used to classify codes that are absent from a relationship
@@ -406,6 +585,14 @@ codes_present_in_lookup <- function(codes, code_type, lookup_version, con) {
 #'   again - callers that have already resolved it pass it through to avoid
 #'   repeating the resolution. Defaults to `NULL`, which resolves the metadata
 #'   from `type`/`lookup_version`.
+#' @param rowid_range Optional length-2 integer vector `c(from, to)` bounding
+#'   the scan to `rowid >= from & rowid < to` on the underlying table, applied
+#'   before any other filter so DuckDB can row-group-prune rather than
+#'   scanning the whole table. Used by the `*_CHUNK()` functions to bound work
+#'   per call; `NULL` (default) scans the whole table as before. Only
+#'   supported when the "main" database is `duckdb_file`-backed (see
+#'   `backend_kind()`) - `rowid` is not addressable through the views the
+#'   other two backend shapes use.
 #' @param call The calling environment. Passed to [codeminer_abort].
 #'
 #' @return A lazy `dplyr::tbl()` with standardised columns (`code`,
@@ -431,6 +618,7 @@ get_lookup_table <- function(
   col_filters = "default",
   con = NULL,
   meta = NULL,
+  rowid_range = NULL,
   call = rlang::caller_env()
 ) {
   old_cf <- push_col_filters(col_filters, call = call)
@@ -445,6 +633,13 @@ get_lookup_table <- function(
 
   tbl_name <- this_meta$lookup_table_name
   tbl <- dplyr::tbl(con, tbl_name)
+
+  if (!is.null(rowid_range)) {
+    assert_chunking_supported(call = call)
+    from <- as.integer(rowid_range[[1]])
+    to <- as.integer(rowid_range[[2]])
+    tbl <- dplyr::filter(tbl, .data$rowid >= .env$from, .data$rowid < .env$to)
+  }
 
   # Apply col_filters BEFORE column renaming (filter on original column names)
   resolved <- resolve_col_filters(
@@ -503,6 +698,52 @@ get_lookup_table <- function(
   }
 
   return(tbl)
+}
+
+# Chunked reads bound the scan via the `rowid` pseudo-column, which is only
+# addressable against a real base table. `codeminer_folder`/`parquet_folder`
+# expose data tables as views (see `backend.R`), where `rowid` fails with a
+# clean Binder Error rather than silently returning wrong data - so this
+# checks the shape upfront and aborts with a clear message instead of letting
+# that DuckDB error surface directly.
+assert_chunking_supported <- function(call = rlang::caller_env()) {
+  main_path <- .codeminer_env$db_paths$main
+  if (is.null(main_path)) {
+    return(invisible(TRUE))
+  }
+  kind <- backend_kind(main_path)
+  if (!identical(kind, "duckdb_file")) {
+    codeminer_abort(
+      c(
+        "Chunked queries require a {.val duckdb_file}-backed database, not {.val {kind}}.",
+        "i" = "The {.arg rowid}-based chunking mechanism only works against a real base table, not the views {.val codeminer_folder}/{.val parquet_folder} expose."
+      ),
+      call = call
+    )
+  }
+  invisible(TRUE)
+}
+
+# Shared guard for the `*_CHUNK()` functions' row-count ceiling, mirroring
+# `get_relationship_tree()`'s `max_codes` pattern (same mechanics, different
+# semantic class since this guards a search-result size, not a tree
+# expansion).
+abort_if_leaf_rows_exceeded <- function(
+  n,
+  max_rows,
+  call = rlang::caller_env()
+) {
+  if (n > max_rows) {
+    codeminer_abort(
+      c(
+        "This part of the query has matched {n} rows, exceeding {.code max_rows} ({max_rows}).",
+        "i" = "Refine the query, or raise the limit by passing {.code max_rows} or setting {.code options(codeminer.max_leaf_rows = N)}."
+      ),
+      class = "codeminer_max_leaf_rows_exceeded",
+      call = call
+    )
+  }
+  invisible(TRUE)
 }
 
 get_metadata_for_lookup <- function(
