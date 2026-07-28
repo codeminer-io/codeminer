@@ -739,8 +739,8 @@ abort_if_leaf_rows_exceeded <- function(
   if (n > max_rows) {
     codeminer_abort(
       c(
-        "This part of the query has matched {n} rows, exceeding {.code max_rows} ({max_rows}).",
-        "i" = "Refine the query, or raise the limit by passing {.code max_rows} or setting {.code options(codeminer.max_leaf_rows = N)}."
+        "Part of your query matched {n} rows, but only a max of {max_rows} are allowed.",
+        "i" = "Try narrowing your search (e.g. a more specific pattern, or extra filters), then run it again."
       ),
       class = "codeminer_max_leaf_rows_exceeded",
       call = call
@@ -763,8 +763,8 @@ abort_if_chunk_match_limit_exceeded <- function(
   if (n > max_matches) {
     codeminer_abort(
       c(
-        "This chunk matched {n} codes, exceeding {.code max_chunk_matches} ({max_matches}).",
-        "i" = "The query pattern is too broad for a single chunk to expand safely. Refine the query, or raise the limit by passing {.code max_chunk_matches} or setting {.code options(codeminer.max_chunk_matches = N)}."
+        "This search matched {n} codes, more than the {max_matches} that can be processed at once.",
+        "i" = "Try a more specific search pattern to narrow the results, then run it again."
       ),
       class = "codeminer_chunk_match_limit_exceeded",
       call = call
