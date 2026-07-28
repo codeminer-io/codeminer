@@ -114,11 +114,14 @@ CODES_LIKE("^E1", type = "ICD-10")
 \seealso{
 \code{\link[=add_lookup_table]{add_lookup_table()}} for adding new lookup tables to the database.
 
-Other Clinical code lookups and mappings: 
-\code{\link{MAP}()},
-\code{\link{get_lookup_table}()},
-\code{\link{get_mapping_table}()},
-\code{\link{get_relationship_table}()},
-\code{\link{get_relationship_tree}()}
+Other Clinical code lookups and mappings:
+\code{\link[=CODES_ALL_CHUNK]{CODES_ALL_CHUNK()}},
+\code{\link[=CODES_LIKE_CHUNK]{CODES_LIKE_CHUNK()}},
+\code{\link[=DESCRIPTION_CHUNK]{DESCRIPTION_CHUNK()}},
+\code{\link[=MAP]{MAP()}},
+\code{\link[=get_lookup_table]{get_lookup_table()}},
+\code{\link[=get_mapping_table]{get_mapping_table()}},
+\code{\link[=get_relationship_table]{get_relationship_table()}},
+\code{\link[=get_relationship_tree]{get_relationship_tree()}}
 }
 \concept{Clinical code lookups and mappings}

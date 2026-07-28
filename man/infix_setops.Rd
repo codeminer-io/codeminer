@@ -20,7 +20,7 @@ orders) and compatible types.}
 }
 \description{
 Infix versions of \link[dplyr:setops]{dplyr::setops}. \verb{\%AND\%}, \verb{\%OR\%} and \verb{\%NOT\%} are the
-equivalents of \code{\link[dplyr:setops]{dplyr::intersect()}}, \code{\link[dplyr:setops]{dplyr::union()}} and \code{\link[dplyr:setops]{dplyr::setdiff()}}
+equivalents of \code{\link[dplyr:intersect]{dplyr::intersect()}}, \code{\link[dplyr:union]{dplyr::union()}} and \code{\link[dplyr:setdiff]{dplyr::setdiff()}}
 respectively.
 }
 \examples{

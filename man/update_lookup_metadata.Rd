@@ -32,9 +32,9 @@ data. Currently supports updating \code{col_filters}.
 \seealso{
 \code{\link[=lookup_metadata]{lookup_metadata()}}, \code{\link[=add_lookup_table]{add_lookup_table()}}
 
-Other Database management: 
-\code{\link{update_mapping_metadata}()},
-\code{\link{update_relationship_metadata}()},
-\code{\link{validate_database}()}
+Other Database management:
+\code{\link[=update_mapping_metadata]{update_mapping_metadata()}},
+\code{\link[=update_relationship_metadata]{update_relationship_metadata()}},
+\code{\link[=validate_database]{validate_database()}}
 }
 \concept{Database management}

@@ -23,7 +23,7 @@ build. Defaults to \code{FALSE} for cleaner output.}
 
 \item{.local}{If \code{FALSE} (default), sets \code{CODEMINER_DB_PATH} globally
 via \code{\link[=Sys.setenv]{Sys.setenv()}}. The dummy database persists until you reconnect
-manually. If \code{TRUE}, uses \code{\link[withr:with_envvar]{withr::local_envvar()}} scoped to \code{.envir}
+manually. If \code{TRUE}, uses \code{\link[withr:local_envvar]{withr::local_envvar()}} scoped to \code{.envir}
 so the environment variable and workbench are automatically cleaned up
 when \code{.envir} exits. Use \code{.local = TRUE} in tests and functions that
 need automatic teardown.}

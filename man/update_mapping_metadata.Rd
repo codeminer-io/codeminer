@@ -35,9 +35,9 @@ data. Currently supports updating \code{col_filters}.
 \seealso{
 \code{\link[=mapping_metadata]{mapping_metadata()}}, \code{\link[=add_mapping_table]{add_mapping_table()}}
 
-Other Database management: 
-\code{\link{update_lookup_metadata}()},
-\code{\link{update_relationship_metadata}()},
-\code{\link{validate_database}()}
+Other Database management:
+\code{\link[=update_lookup_metadata]{update_lookup_metadata()}},
+\code{\link[=update_relationship_metadata]{update_relationship_metadata()}},
+\code{\link[=validate_database]{validate_database()}}
 }
 \concept{Database management}

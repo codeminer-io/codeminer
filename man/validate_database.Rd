@@ -46,9 +46,9 @@ issues <- validate_database()
 }
 }
 \seealso{
-Other Database management: 
-\code{\link{update_lookup_metadata}()},
-\code{\link{update_mapping_metadata}()},
-\code{\link{update_relationship_metadata}()}
+Other Database management:
+\code{\link[=update_lookup_metadata]{update_lookup_metadata()}},
+\code{\link[=update_mapping_metadata]{update_mapping_metadata()}},
+\code{\link[=update_relationship_metadata]{update_relationship_metadata()}}
 }
 \concept{Database management}

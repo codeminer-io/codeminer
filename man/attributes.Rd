@@ -64,7 +64,7 @@ create_dummy_database()
 # HAS_ATTRIBUTES returns codes that have the specified attributes
 }
 \seealso{
-Other Code relationships: 
+Other Code relationships:
 \code{\link{parent_child_retrieval}},
 \code{\link{relationship_types}}
 }

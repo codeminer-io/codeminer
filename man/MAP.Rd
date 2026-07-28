@@ -104,11 +104,14 @@ MAP("all", from = "Read v3", to = "ICD-10")
 \code{\link[=add_mapping_table]{add_mapping_table()}} for adding new mapping tables to the codeminer
 database.
 
-Other Clinical code lookups and mappings: 
-\code{\link{CODES}()},
-\code{\link{get_lookup_table}()},
-\code{\link{get_mapping_table}()},
-\code{\link{get_relationship_table}()},
-\code{\link{get_relationship_tree}()}
+Other Clinical code lookups and mappings:
+\code{\link[=CODES]{CODES()}},
+\code{\link[=CODES_ALL_CHUNK]{CODES_ALL_CHUNK()}},
+\code{\link[=CODES_LIKE_CHUNK]{CODES_LIKE_CHUNK()}},
+\code{\link[=DESCRIPTION_CHUNK]{DESCRIPTION_CHUNK()}},
+\code{\link[=get_lookup_table]{get_lookup_table()}},
+\code{\link[=get_mapping_table]{get_mapping_table()}},
+\code{\link[=get_relationship_table]{get_relationship_table()}},
+\code{\link[=get_relationship_tree]{get_relationship_tree()}}
 }
 \concept{Clinical code lookups and mappings}

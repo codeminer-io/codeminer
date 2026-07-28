@@ -41,7 +41,7 @@ plus all other columns from the underlying table.
 \description{
 Returns a lazy \code{dplyr::tbl()} containing the mapping table with standardised
 column names (\code{from}, \code{to}) plus all additional columns from the underlying
-database table. Call \code{\link[dplyr:compute]{dplyr::collect()}} to materialise the result.
+database table. Call \code{\link[dplyr:collect]{dplyr::collect()}} to materialise the result.
 }
 \details{
 This is useful for inspecting columns beyond the standard codelist output
@@ -57,11 +57,14 @@ get_mapping_table("Read v3", "ICD-10") |> dplyr::collect()
 \code{\link[=MAP]{MAP()}} for standardised codelist output,
 \code{\link[=get_codeminer_metadata]{get_codeminer_metadata()}} for discovering available tables.
 
-Other Clinical code lookups and mappings: 
-\code{\link{CODES}()},
-\code{\link{MAP}()},
-\code{\link{get_lookup_table}()},
-\code{\link{get_relationship_table}()},
-\code{\link{get_relationship_tree}()}
+Other Clinical code lookups and mappings:
+\code{\link[=CODES]{CODES()}},
+\code{\link[=CODES_ALL_CHUNK]{CODES_ALL_CHUNK()}},
+\code{\link[=CODES_LIKE_CHUNK]{CODES_LIKE_CHUNK()}},
+\code{\link[=DESCRIPTION_CHUNK]{DESCRIPTION_CHUNK()}},
+\code{\link[=MAP]{MAP()}},
+\code{\link[=get_lookup_table]{get_lookup_table()}},
+\code{\link[=get_relationship_table]{get_relationship_table()}},
+\code{\link[=get_relationship_tree]{get_relationship_tree()}}
 }
 \concept{Clinical code lookups and mappings}

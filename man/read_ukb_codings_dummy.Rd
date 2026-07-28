@@ -17,12 +17,12 @@ tsv file into R.
 read_ukb_codings_dummy()
 }
 \seealso{
-Other Dummy data: 
-\code{\link{dummy_icd10_phecode_map_path}()},
-\code{\link{dummy_phecode_lkp_path}()},
-\code{\link{dummy_pseudobnf_path}()},
-\code{\link{dummy_ukb_codings_path}()},
-\code{\link{read_icd10_phecode_map_dummy}()},
-\code{\link{read_phecode_lkp_dummy}()}
+Other Dummy data:
+\code{\link[=dummy_icd10_phecode_map_path]{dummy_icd10_phecode_map_path()}},
+\code{\link[=dummy_phecode_lkp_path]{dummy_phecode_lkp_path()}},
+\code{\link[=dummy_pseudobnf_path]{dummy_pseudobnf_path()}},
+\code{\link[=dummy_ukb_codings_path]{dummy_ukb_codings_path()}},
+\code{\link[=read_icd10_phecode_map_dummy]{read_icd10_phecode_map_dummy()}},
+\code{\link[=read_phecode_lkp_dummy]{read_phecode_lkp_dummy()}}
 }
 \concept{Dummy data}
