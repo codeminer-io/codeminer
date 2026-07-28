@@ -227,7 +227,7 @@ CODES <- function(
 CODES_ALL_CHUNK <- function(
   type = getOption("codeminer.code_type"),
   cursor = 0L,
-  batch_size = getOption("codeminer.chunk_batch_size", default = 2000L),
+  batch_size = getOption("codeminer.chunk_batch_size", default = 200000L),
   total_rows = NULL,
   accumulated_so_far = 0L,
   max_rows = getOption("codeminer.max_leaf_rows", default = 30000L),
@@ -462,10 +462,11 @@ CODES_LIKE_CHUNK <- function(
   pattern,
   type = getOption("codeminer.code_type"),
   cursor = 0L,
-  batch_size = getOption("codeminer.chunk_batch_size", default = 2000L),
+  batch_size = getOption("codeminer.chunk_batch_size", default = 200000L),
   total_rows = NULL,
   accumulated_so_far = 0L,
   max_rows = getOption("codeminer.max_leaf_rows", default = 30000L),
+  max_chunk_matches = getOption("codeminer.max_chunk_matches", default = 20000L),
   lookup_version = getOption("codeminer.lookup_version", default = "latest"),
   preferred_description_only = TRUE,
   col_filters = "default"
@@ -509,6 +510,8 @@ CODES_LIKE_CHUNK <- function(
   ) |>
     dplyr::pull("code")
   like_codes <- unique(like_codes)
+
+  abort_if_chunk_match_limit_exceeded(length(like_codes), max_chunk_matches)
 
   result <- if (length(like_codes) == 0) {
     empty_cols <- stats::setNames(
@@ -740,6 +743,30 @@ abort_if_leaf_rows_exceeded <- function(
         "i" = "Refine the query, or raise the limit by passing {.code max_rows} or setting {.code options(codeminer.max_leaf_rows = N)}."
       ),
       class = "codeminer_max_leaf_rows_exceeded",
+      call = call
+    )
+  }
+  invisible(TRUE)
+}
+
+# Guards the cost of the CODES() expansion step within a single chunk.
+# Matched codes drive CODES()'s cost (confirmed empirically: ~20s for ~18,000
+# matched codes), not rows scanned - so a chunk that happens to match densely
+# can still risk the network-layer timeout even though its `batch_size` (rows
+# scanned) is itself small. This aborts before paying that cost, rather than
+# discovering it mid-CODES()-call.
+abort_if_chunk_match_limit_exceeded <- function(
+  n,
+  max_matches,
+  call = rlang::caller_env()
+) {
+  if (n > max_matches) {
+    codeminer_abort(
+      c(
+        "This chunk matched {n} codes, exceeding {.code max_chunk_matches} ({max_matches}).",
+        "i" = "The query pattern is too broad for a single chunk to expand safely. Refine the query, or raise the limit by passing {.code max_chunk_matches} or setting {.code options(codeminer.max_chunk_matches = N)}."
+      ),
+      class = "codeminer_chunk_match_limit_exceeded",
       call = call
     )
   }

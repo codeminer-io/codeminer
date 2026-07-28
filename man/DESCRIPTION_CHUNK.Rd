@@ -8,10 +8,11 @@ DESCRIPTION_CHUNK(
   pattern,
   type = getOption("codeminer.code_type"),
   cursor = 0L,
-  batch_size = getOption("codeminer.chunk_batch_size", default = 2000L),
+  batch_size = getOption("codeminer.chunk_batch_size", default = 200000L),
   total_rows = NULL,
   accumulated_so_far = 0L,
   max_rows = getOption("codeminer.max_leaf_rows", default = 30000L),
+  max_chunk_matches = getOption("codeminer.max_chunk_matches", default = 20000L),
   lookup_version = getOption("codeminer.lookup_version", default = "latest"),
   ignore_case = TRUE,
   preferred_description_only = TRUE,
@@ -48,6 +49,14 @@ call.}
 across all chunks. Aborts with class \code{codeminer_max_leaf_rows_exceeded}
 if exceeded. Defaults to
 \code{getOption("codeminer.max_leaf_rows", default = 30000)}.}
+
+\item{max_chunk_matches}{Integer. Ceiling on the number of codes matched
+\emph{within this single chunk}, checked before the matches are expanded via
+\code{\link[=CODES]{CODES()}}. Guards against a chunk whose scan range happens to match
+densely - \code{\link[=CODES]{CODES()}}'s cost scales with match count, not rows scanned, so
+this bounds a single call's worst case independently of \code{batch_size}.
+Aborts with class \code{codeminer_chunk_match_limit_exceeded} if exceeded.
+Defaults to \code{getOption("codeminer.max_chunk_matches", default = 20000)}.}
 
 \item{lookup_version}{character. Version of the lookup table to use. Default:
 \code{"latest"}. Can be configured through the \code{codeminer.lookup_version}

@@ -7,7 +7,7 @@
 CODES_ALL_CHUNK(
   type = getOption("codeminer.code_type"),
   cursor = 0L,
-  batch_size = getOption("codeminer.chunk_batch_size", default = 2000L),
+  batch_size = getOption("codeminer.chunk_batch_size", default = 200000L),
   total_rows = NULL,
   accumulated_so_far = 0L,
   max_rows = getOption("codeminer.max_leaf_rows", default = 30000L),

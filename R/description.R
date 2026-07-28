@@ -112,6 +112,13 @@ DESCRIPTION <- function(
 #'   across all chunks. Aborts with class `codeminer_max_leaf_rows_exceeded`
 #'   if exceeded. Defaults to
 #'   `getOption("codeminer.max_leaf_rows", default = 30000)`.
+#' @param max_chunk_matches Integer. Ceiling on the number of codes matched
+#'   *within this single chunk*, checked before the matches are expanded via
+#'   [CODES()]. Guards against a chunk whose scan range happens to match
+#'   densely - [CODES()]'s cost scales with match count, not rows scanned, so
+#'   this bounds a single call's worst case independently of `batch_size`.
+#'   Aborts with class `codeminer_chunk_match_limit_exceeded` if exceeded.
+#'   Defaults to `getOption("codeminer.max_chunk_matches", default = 20000)`.
 #'
 #' @return A list with `result` (a `codeminer_codelist` of this chunk's
 #'   matches), `next_cursor` (integer, pass back as `cursor` next call),
@@ -129,10 +136,11 @@ DESCRIPTION_CHUNK <- function(
   pattern,
   type = getOption("codeminer.code_type"),
   cursor = 0L,
-  batch_size = getOption("codeminer.chunk_batch_size", default = 2000L),
+  batch_size = getOption("codeminer.chunk_batch_size", default = 200000L),
   total_rows = NULL,
   accumulated_so_far = 0L,
   max_rows = getOption("codeminer.max_leaf_rows", default = 30000L),
+  max_chunk_matches = getOption("codeminer.max_chunk_matches", default = 20000L),
   lookup_version = getOption("codeminer.lookup_version", default = "latest"),
   ignore_case = TRUE,
   preferred_description_only = TRUE,
@@ -198,6 +206,8 @@ DESCRIPTION_CHUNK <- function(
 
   codes <- unique(filtered[["code"]])
   codes <- codes[!is.na(codes)]
+
+  abort_if_chunk_match_limit_exceeded(length(codes), max_chunk_matches)
 
   result <- if (length(codes) == 0) {
     empty_cols <- stats::setNames(
