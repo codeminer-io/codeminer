@@ -14,16 +14,16 @@ Prints the current state of the workbench connection, including
 which databases are attached.
 }
 \seealso{
-Other Workbench management: 
-\code{\link{codeminer_clear_col_filters}()},
-\code{\link{codeminer_clear_versions}()},
-\code{\link{codeminer_connect}()},
-\code{\link{codeminer_disconnect}()},
-\code{\link{codeminer_refresh_cache}()},
-\code{\link{codeminer_set_col_filters}()},
-\code{\link{codeminer_set_version}()},
-\code{\link{default_col_filters}()},
-\code{\link{get_col_filters}()},
-\code{\link{with_col_filters}()}
+Other Workbench management:
+\code{\link[=codeminer_clear_col_filters]{codeminer_clear_col_filters()}},
+\code{\link[=codeminer_clear_versions]{codeminer_clear_versions()}},
+\code{\link[=codeminer_connect]{codeminer_connect()}},
+\code{\link[=codeminer_disconnect]{codeminer_disconnect()}},
+\code{\link[=codeminer_refresh_cache]{codeminer_refresh_cache()}},
+\code{\link[=codeminer_set_col_filters]{codeminer_set_col_filters()}},
+\code{\link[=codeminer_set_version]{codeminer_set_version()}},
+\code{\link[=default_col_filters]{default_col_filters()}},
+\code{\link[=get_col_filters]{get_col_filters()}},
+\code{\link[=with_col_filters]{with_col_filters()}}
 }
 \concept{Workbench management}

@@ -11,6 +11,7 @@ get_lookup_table(
   col_filters = "default",
   con = NULL,
   meta = NULL,
+  rowid_range = NULL,
   call = rlang::caller_env()
 )
 }
@@ -35,6 +36,15 @@ again - callers that have already resolved it pass it through to avoid
 repeating the resolution. Defaults to \code{NULL}, which resolves the metadata
 from \code{type}/\code{lookup_version}.}
 
+\item{rowid_range}{Optional length-2 integer vector \code{c(from, to)} bounding
+the scan to \code{rowid >= from & rowid < to} on the underlying table, applied
+before any other filter so DuckDB can row-group-prune rather than
+scanning the whole table. Used by the \verb{*_CHUNK()} functions to bound work
+per call; \code{NULL} (default) scans the whole table as before. Only
+supported when the "main" database is \code{duckdb_file}-backed (see
+\code{backend_kind()}) - \code{rowid} is not addressable through the views the
+other two backend shapes use.}
+
 \item{call}{The calling environment. Passed to \link{codeminer_abort}.}
 }
 \value{
@@ -47,7 +57,7 @@ systems without a populated category source.
 Returns a lazy \code{dplyr::tbl()} containing the lookup table with standardised
 column names (\code{code}, \code{description}, \code{code_type}, \code{preferred_description},
 \code{category}) plus all additional columns from the underlying database table.
-Call \code{\link[dplyr:compute]{dplyr::collect()}} to materialise the result.
+Call \code{\link[dplyr:collect]{dplyr::collect()}} to materialise the result.
 }
 \details{
 This is useful for inspecting columns beyond the standard codelist output
@@ -66,11 +76,14 @@ get_lookup_table("ICD-10", codes = c("E10", "E11")) |> dplyr::collect()
 \code{\link[=CODES]{CODES()}} for standardised codelist output,
 \code{\link[=get_codeminer_metadata]{get_codeminer_metadata()}} for discovering available tables.
 
-Other Clinical code lookups and mappings: 
-\code{\link{CODES}()},
-\code{\link{MAP}()},
-\code{\link{get_mapping_table}()},
-\code{\link{get_relationship_table}()},
-\code{\link{get_relationship_tree}()}
+Other Clinical code lookups and mappings:
+\code{\link[=CODES]{CODES()}},
+\code{\link[=CODES_ALL_CHUNK]{CODES_ALL_CHUNK()}},
+\code{\link[=CODES_LIKE_CHUNK]{CODES_LIKE_CHUNK()}},
+\code{\link[=DESCRIPTION_CHUNK]{DESCRIPTION_CHUNK()}},
+\code{\link[=MAP]{MAP()}},
+\code{\link[=get_mapping_table]{get_mapping_table()}},
+\code{\link[=get_relationship_table]{get_relationship_table()}},
+\code{\link[=get_relationship_tree]{get_relationship_tree()}}
 }
 \concept{Clinical code lookups and mappings}

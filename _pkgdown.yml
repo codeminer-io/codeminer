@@ -7,8 +7,11 @@ reference:
     desc: Functions for looking up clinical codes and mapping between different coding systems.
   - contents:
       - DESCRIPTION
+      - DESCRIPTION_CHUNK
       - CODES
+      - CODES_ALL_CHUNK
       - CODES_LIKE
+      - CODES_LIKE_CHUNK
       - CHILDREN
       - attributes
       - relationship_types

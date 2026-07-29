@@ -22,6 +22,7 @@ Useful links:
 
 Authors:
 \itemize{
+  \item Alasdair Warwick \email{alasdair.warwick06@gmail.com} (\href{https://orcid.org/0000-0002-0800-2890}{ORCID})
   \item Milan Malfait \email{m.malfait@ucl.ac.uk} (\href{https://orcid.org/0000-0001-9144-3701}{ORCID})
   \item Miguel Xochicale \email{m.xochicale@ucl.ac.uk} (\href{https://orcid.org/0000-0002-8225-7517}{ORCID})
 }

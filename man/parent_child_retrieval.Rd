@@ -90,8 +90,8 @@ N_PARENTS("E10", "E11", type = "ICD-10")
 N_CHILDREN("E10", "E11", type = "ICD-10")
 }
 \seealso{
-Other Code relationships: 
-\code{\link{attributes}()},
+Other Code relationships:
+\code{\link{attributes}},
 \code{\link{relationship_types}}
 }
 \concept{Code relationships}

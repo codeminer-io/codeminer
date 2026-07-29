@@ -105,11 +105,14 @@ subset(tree$nodes, in_input_set)
 \code{\link[=get_lookup_table]{get_lookup_table()}} for terms, \code{\link[=PARENTS]{PARENTS()}} / \code{\link[=CHILDREN]{CHILDREN()}} for
 flat codelist traversal.
 
-Other Clinical code lookups and mappings: 
-\code{\link{CODES}()},
-\code{\link{MAP}()},
-\code{\link{get_lookup_table}()},
-\code{\link{get_mapping_table}()},
-\code{\link{get_relationship_table}()}
+Other Clinical code lookups and mappings:
+\code{\link[=CODES]{CODES()}},
+\code{\link[=CODES_ALL_CHUNK]{CODES_ALL_CHUNK()}},
+\code{\link[=CODES_LIKE_CHUNK]{CODES_LIKE_CHUNK()}},
+\code{\link[=DESCRIPTION_CHUNK]{DESCRIPTION_CHUNK()}},
+\code{\link[=MAP]{MAP()}},
+\code{\link[=get_lookup_table]{get_lookup_table()}},
+\code{\link[=get_mapping_table]{get_mapping_table()}},
+\code{\link[=get_relationship_table]{get_relationship_table()}}
 }
 \concept{Clinical code lookups and mappings}

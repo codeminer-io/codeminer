@@ -54,7 +54,7 @@ Returns a lazy \code{dplyr::tbl()} containing the relationship table with
 standardised column names (\code{from}, \code{to}, \code{code_type}, plus \code{type} for
 multi-type tables) and all additional columns from the underlying database
 table. Purely hierarchical tables have no \code{type} column. Call
-\code{\link[dplyr:compute]{dplyr::collect()}} to materialise the result.
+\code{\link[dplyr:collect]{dplyr::collect()}} to materialise the result.
 }
 \details{
 This is useful for inspecting the raw relationship data used by
@@ -90,11 +90,14 @@ itself is needed. \code{\link[=get_relationship_tree]{get_relationship_tree()}} 
 tree view. \code{\link[=get_codeminer_metadata]{get_codeminer_metadata()}} for discovering available
 tables.
 
-Other Clinical code lookups and mappings: 
-\code{\link{CODES}()},
-\code{\link{MAP}()},
-\code{\link{get_lookup_table}()},
-\code{\link{get_mapping_table}()},
-\code{\link{get_relationship_tree}()}
+Other Clinical code lookups and mappings:
+\code{\link[=CODES]{CODES()}},
+\code{\link[=CODES_ALL_CHUNK]{CODES_ALL_CHUNK()}},
+\code{\link[=CODES_LIKE_CHUNK]{CODES_LIKE_CHUNK()}},
+\code{\link[=DESCRIPTION_CHUNK]{DESCRIPTION_CHUNK()}},
+\code{\link[=MAP]{MAP()}},
+\code{\link[=get_lookup_table]{get_lookup_table()}},
+\code{\link[=get_mapping_table]{get_mapping_table()}},
+\code{\link[=get_relationship_tree]{get_relationship_tree()}}
 }
 \concept{Clinical code lookups and mappings}

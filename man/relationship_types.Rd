@@ -86,8 +86,8 @@ create_dummy_database()
 # RELATIONSHIP_TYPES() lists / searches all types for a code type
 }
 \seealso{
-Other Code relationships: 
-\code{\link{attributes}()},
+Other Code relationships:
+\code{\link{attributes}},
 \code{\link{parent_child_retrieval}}
 }
 \concept{Code relationships}

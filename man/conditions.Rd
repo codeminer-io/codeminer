@@ -37,7 +37,7 @@ informational conditions.
 }
 \details{
 These wrap the corresponding \code{cli} signalling
-functions (\code{\link[cli:cli_abort]{cli::cli_abort()}}, \code{\link[cli:cli_abort]{cli::cli_warn()}}, \code{\link[cli:cli_abort]{cli::cli_inform()}}) and
+functions (\code{\link[cli:cli_abort]{cli::cli_abort()}}, \code{\link[cli:cli_warn]{cli::cli_warn()}}, \code{\link[cli:cli_inform]{cli::cli_inform()}}) and
 always append a CodeMiner-specific base class (\code{codeminer_error},
 \code{codeminer_warning}, \code{codeminer_message}).
 
