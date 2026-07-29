@@ -13,6 +13,7 @@ ATTRIBUTES_FOR(
   relationship_version = getOption("codeminer.relationship_version", default = "latest"),
   relationship_types = NULL,
   preferred_description_only = TRUE,
+  max_nodes = getOption("codeminer.max_traversal_nodes", default = 20000L),
   col_filters = "default"
 )
 
@@ -23,6 +24,7 @@ HAS_ATTRIBUTES(
   relationship_version = getOption("codeminer.relationship_version", default = "latest"),
   relationship_types = NULL,
   preferred_description_only = TRUE,
+  max_nodes = getOption("codeminer.max_traversal_nodes", default = 20000L),
   col_filters = "default"
 )
 }
@@ -42,6 +44,11 @@ all relationship types are included.}
 
 \item{preferred_description_only}{Logical. If \code{TRUE}, return only preferred
 descriptions.}
+
+\item{max_nodes}{Integer. Ceiling on the number of codes the traversal can
+accumulate before aborting. See \code{\link[=graph_closure_codes]{graph_closure_codes()}} for the
+reasoning. Defaults to
+\code{getOption("codeminer.max_traversal_nodes", default = 20000)}.}
 
 \item{col_filters}{Column filters to apply. See \code{\link[=CODES]{CODES()}} for details.}
 }

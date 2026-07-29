@@ -13,7 +13,9 @@ graph_closure(
   direction = c("out", "in"),
   rel_type = NULL,
   include_self = FALSE,
-  max_depth = Inf
+  max_depth = Inf,
+  max_nodes = getOption("codeminer.max_traversal_nodes", default = 20000L),
+  call = rlang::caller_env()
 )
 }
 \arguments{
