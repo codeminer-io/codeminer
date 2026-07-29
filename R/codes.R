@@ -739,7 +739,7 @@ abort_if_leaf_rows_exceeded <- function(
   if (n > max_rows) {
     codeminer_abort(
       c(
-        "Part of your query matched {n} rows, but only a max of {max_rows} are allowed.",
+        "Your query has matched {n} rows so far, which exceeds the allowed maximum of {max_rows} rows.",
         "i" = "Try narrowing your search (e.g. a more specific pattern, or extra filters), then run it again."
       ),
       class = "codeminer_max_leaf_rows_exceeded",
