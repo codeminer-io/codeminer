@@ -140,7 +140,10 @@ DESCRIPTION_CHUNK <- function(
   total_rows = NULL,
   accumulated_so_far = 0L,
   max_rows = getOption("codeminer.max_leaf_rows", default = 30000L),
-  max_chunk_matches = getOption("codeminer.max_chunk_matches", default = 20000L),
+  max_chunk_matches = getOption(
+    "codeminer.max_chunk_matches",
+    default = 20000L
+  ),
   lookup_version = getOption("codeminer.lookup_version", default = "latest"),
   ignore_case = TRUE,
   preferred_description_only = TRUE,
