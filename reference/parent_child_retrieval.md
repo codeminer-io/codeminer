@@ -101,7 +101,7 @@ ancestors/descendants).
 ## See also
 
 Other Code relationships:
-[`attributes()`](https://codeminer-io.github.io/codeminer/reference/attributes.md),
+[`attributes`](https://codeminer-io.github.io/codeminer/reference/attributes.md),
 [`relationship_types`](https://codeminer-io.github.io/codeminer/reference/relationship_types.md)
 
 ## Examples
@@ -110,7 +110,7 @@ Other Code relationships:
 create_dummy_database()
 #> ✔ Dummy database ready to use!
 #> ℹ To reconnect to your previous database:
-#>   `Sys.setenv(CODEMINER_DB_PATH = "/tmp/RtmpzrC8Cz/file1b3d3acce3b7.duckdb")`
+#>   `Sys.setenv(CODEMINER_DB_PATH = "/tmp/RtmpfyR2XV/file1b521c023a95.duckdb")`
 #>   `codeminer_connect()`
 PARENTS("E10", "E11", type = "ICD-10")
 #> ℹ Using "UKB v4" as the latest relationship version for "ICD-10".

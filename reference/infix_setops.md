@@ -3,10 +3,9 @@
 Infix versions of
 [dplyr::setops](https://dplyr.tidyverse.org/reference/setops.html).
 `%AND%`, `%OR%` and `%NOT%` are the equivalents of
-[`dplyr::intersect()`](https://dplyr.tidyverse.org/reference/setops.html),
-[`dplyr::union()`](https://dplyr.tidyverse.org/reference/setops.html)
-and
-[`dplyr::setdiff()`](https://dplyr.tidyverse.org/reference/setops.html)
+[`dplyr::intersect()`](https://generics.r-lib.org/reference/setops.html),
+[`dplyr::union()`](https://generics.r-lib.org/reference/setops.html) and
+[`dplyr::setdiff()`](https://generics.r-lib.org/reference/setops.html)
 respectively.
 
 ## Usage

@@ -18,6 +18,7 @@ get_lookup_table(
   col_filters = "default",
   con = NULL,
   meta = NULL,
+  rowid_range = NULL,
   call = rlang::caller_env()
 )
 ```
@@ -59,6 +60,17 @@ get_lookup_table(
   repeating the resolution. Defaults to `NULL`, which resolves the
   metadata from `type`/`lookup_version`.
 
+- rowid_range:
+
+  Optional length-2 integer vector `c(from, to)` bounding the scan to
+  `rowid >= from & rowid < to` on the underlying table, applied before
+  any other filter so DuckDB can row-group-prune rather than scanning
+  the whole table. Used by the `*_CHUNK()` functions to bound work per
+  call; `NULL` (default) scans the whole table as before. Only supported
+  when the "main" database is `duckdb_file`-backed (see
+  `backend_kind()`) - `rowid` is not addressable through the views the
+  other two backend shapes use.
+
 - call:
 
   The calling environment. Passed to
@@ -89,6 +101,9 @@ for discovering available tables.
 
 Other Clinical code lookups and mappings:
 [`CODES()`](https://codeminer-io.github.io/codeminer/reference/CODES.md),
+[`CODES_ALL_CHUNK()`](https://codeminer-io.github.io/codeminer/reference/CODES_ALL_CHUNK.md),
+[`CODES_LIKE_CHUNK()`](https://codeminer-io.github.io/codeminer/reference/CODES_LIKE_CHUNK.md),
+[`DESCRIPTION_CHUNK()`](https://codeminer-io.github.io/codeminer/reference/DESCRIPTION_CHUNK.md),
 [`MAP()`](https://codeminer-io.github.io/codeminer/reference/MAP.md),
 [`get_mapping_table()`](https://codeminer-io.github.io/codeminer/reference/get_mapping_table.md),
 [`get_relationship_table()`](https://codeminer-io.github.io/codeminer/reference/get_relationship_table.md),
@@ -100,7 +115,7 @@ Other Clinical code lookups and mappings:
 create_dummy_database()
 #> ✔ Dummy database ready to use!
 #> ℹ To reconnect to your previous database:
-#>   `Sys.setenv(CODEMINER_DB_PATH = "/tmp/RtmpzrC8Cz/file1b3dd429691.duckdb")`
+#>   `Sys.setenv(CODEMINER_DB_PATH = "/tmp/RtmpfyR2XV/file1b52674b9874.duckdb")`
 #>   `codeminer_connect()`
 
 # Get the full ICD-10 lookup table

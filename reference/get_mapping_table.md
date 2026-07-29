@@ -82,6 +82,9 @@ for discovering available tables.
 
 Other Clinical code lookups and mappings:
 [`CODES()`](https://codeminer-io.github.io/codeminer/reference/CODES.md),
+[`CODES_ALL_CHUNK()`](https://codeminer-io.github.io/codeminer/reference/CODES_ALL_CHUNK.md),
+[`CODES_LIKE_CHUNK()`](https://codeminer-io.github.io/codeminer/reference/CODES_LIKE_CHUNK.md),
+[`DESCRIPTION_CHUNK()`](https://codeminer-io.github.io/codeminer/reference/DESCRIPTION_CHUNK.md),
 [`MAP()`](https://codeminer-io.github.io/codeminer/reference/MAP.md),
 [`get_lookup_table()`](https://codeminer-io.github.io/codeminer/reference/get_lookup_table.md),
 [`get_relationship_table()`](https://codeminer-io.github.io/codeminer/reference/get_relationship_table.md),
@@ -93,7 +96,7 @@ Other Clinical code lookups and mappings:
 create_dummy_database()
 #> ✔ Dummy database ready to use!
 #> ℹ To reconnect to your previous database:
-#>   `Sys.setenv(CODEMINER_DB_PATH = "/tmp/RtmpzrC8Cz/file1b3d1fe114b3.duckdb")`
+#>   `Sys.setenv(CODEMINER_DB_PATH = "/tmp/RtmpfyR2XV/file1b523b024b33.duckdb")`
 #>   `codeminer_connect()`
 
 # Get the full Read 3 to ICD-10 mapping table

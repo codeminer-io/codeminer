@@ -178,9 +178,15 @@ coding systems.
 
 - [`DESCRIPTION()`](https://codeminer-io.github.io/codeminer/reference/DESCRIPTION.md)
   : Search for codes that match a description
+- [`DESCRIPTION_CHUNK()`](https://codeminer-io.github.io/codeminer/reference/DESCRIPTION_CHUNK.md)
+  : Chunked, bounded DESCRIPTION search
 - [`CODES()`](https://codeminer-io.github.io/codeminer/reference/CODES.md)
   [`CODES_LIKE()`](https://codeminer-io.github.io/codeminer/reference/CODES.md)
   : Look up descriptions for clinical codes
+- [`CODES_ALL_CHUNK()`](https://codeminer-io.github.io/codeminer/reference/CODES_ALL_CHUNK.md)
+  : Chunked, bounded "all codes of a type" fetch
+- [`CODES_LIKE_CHUNK()`](https://codeminer-io.github.io/codeminer/reference/CODES_LIKE_CHUNK.md)
+  : Chunked, bounded CODES_LIKE search
 - [`CHILDREN()`](https://codeminer-io.github.io/codeminer/reference/parent_child_retrieval.md)
   [`PARENTS()`](https://codeminer-io.github.io/codeminer/reference/parent_child_retrieval.md)
   [`N_CHILDREN()`](https://codeminer-io.github.io/codeminer/reference/parent_child_retrieval.md)

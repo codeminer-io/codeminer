@@ -19,6 +19,9 @@ Useful links:
 
 Authors:
 
+- Alasdair Warwick <alasdair.warwick06@gmail.com>
+  ([ORCID](https://orcid.org/0000-0002-0800-2890))
+
 - Milan Malfait <m.malfait@ucl.ac.uk>
   ([ORCID](https://orcid.org/0000-0001-9144-3701))
 

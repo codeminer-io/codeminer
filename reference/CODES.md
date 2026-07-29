@@ -111,6 +111,9 @@ The matching is case-insensitive.
 for adding new lookup tables to the database.
 
 Other Clinical code lookups and mappings:
+[`CODES_ALL_CHUNK()`](https://codeminer-io.github.io/codeminer/reference/CODES_ALL_CHUNK.md),
+[`CODES_LIKE_CHUNK()`](https://codeminer-io.github.io/codeminer/reference/CODES_LIKE_CHUNK.md),
+[`DESCRIPTION_CHUNK()`](https://codeminer-io.github.io/codeminer/reference/DESCRIPTION_CHUNK.md),
 [`MAP()`](https://codeminer-io.github.io/codeminer/reference/MAP.md),
 [`get_lookup_table()`](https://codeminer-io.github.io/codeminer/reference/get_lookup_table.md),
 [`get_mapping_table()`](https://codeminer-io.github.io/codeminer/reference/get_mapping_table.md),
