@@ -247,8 +247,8 @@ CODES_ALL_CHUNK <- function(
 
   this_meta <- get_metadata_for_lookup(con, type, lookup_version)
 
-  # Raw physical row count - see DESCRIPTION_CHUNK() for why this bypasses
-  # get_lookup_table()/col_filters.
+  # Raw physical row count - deliberately bypasses get_lookup_table()'s
+  # col_filters (see DESCRIPTION_CHUNK() for why).
   if (is.null(total_rows)) {
     total_rows <- dplyr::tbl(con, this_meta$lookup_table_name) |>
       dplyr::tally() |>
@@ -722,7 +722,10 @@ assert_chunking_supported <- function(call = rlang::caller_env()) {
     codeminer_abort(
       c(
         "Chunked queries require a {.val duckdb_file}-backed database, not {.val {kind}}.",
-        "i" = "The {.arg rowid}-based chunking mechanism only works against a real base table, not the views {.val codeminer_folder}/{.val parquet_folder} expose."
+        "i" = paste0(
+          "The {.arg rowid}-based chunking mechanism only works against a real base table, ",
+          "not the views {.val codeminer_folder}/{.val parquet_folder} expose."
+        )
       ),
       call = call
     )
