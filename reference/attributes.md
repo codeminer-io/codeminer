@@ -13,6 +13,7 @@ ATTRIBUTES_FOR(
   relationship_version = getOption("codeminer.relationship_version", default = "latest"),
   relationship_types = NULL,
   preferred_description_only = TRUE,
+  max_nodes = getOption("codeminer.max_traversal_nodes", default = 20000L),
   col_filters = "default"
 )
 
@@ -23,6 +24,7 @@ HAS_ATTRIBUTES(
   relationship_version = getOption("codeminer.relationship_version", default = "latest"),
   relationship_types = NULL,
   preferred_description_only = TRUE,
+  max_nodes = getOption("codeminer.max_traversal_nodes", default = 20000L),
   col_filters = "default"
 )
 ```
@@ -58,6 +60,13 @@ HAS_ATTRIBUTES(
 
   Logical. If `TRUE`, return only preferred descriptions.
 
+- max_nodes:
+
+  Integer. Ceiling on the number of codes the traversal can accumulate
+  before aborting (checked after each generation of the traversal,
+  before the next one runs). Defaults to
+  `getOption("codeminer.max_traversal_nodes", default = 20000)`.
+
 - col_filters:
 
   Column filters to apply. See
@@ -87,7 +96,7 @@ Other Code relationships:
 create_dummy_database()
 #> ✔ Dummy database ready to use!
 #> ℹ To reconnect to your previous database:
-#>   `Sys.setenv(CODEMINER_DB_PATH = "/tmp/RtmpfyR2XV/file1b5239acf383")`
+#>   `Sys.setenv(CODEMINER_DB_PATH = "/tmp/RtmpOTuqjN/file1a0b385ca742")`
 #>   `codeminer_connect()`
 # ATTRIBUTES_FOR returns attributes for codes
 # HAS_ATTRIBUTES returns codes that have the specified attributes

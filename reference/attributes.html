@@ -55,6 +55,7 @@ or codes that have specific attributes.</p>
 <span>  relationship_version <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"codeminer.relationship_version"</span>, default <span class="op">=</span> <span class="st">"latest"</span><span class="op">)</span>,</span>
 <span>  relationship_types <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  preferred_description_only <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  max_nodes <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"codeminer.max_traversal_nodes"</span>, default <span class="op">=</span> <span class="fl">20000L</span><span class="op">)</span>,</span>
 <span>  col_filters <span class="op">=</span> <span class="st">"default"</span></span>
 <span><span class="op">)</span></span>
 <span></span>
@@ -65,6 +66,7 @@ or codes that have specific attributes.</p>
 <span>  relationship_version <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"codeminer.relationship_version"</span>, default <span class="op">=</span> <span class="st">"latest"</span><span class="op">)</span>,</span>
 <span>  relationship_types <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  preferred_description_only <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  max_nodes <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"codeminer.max_traversal_nodes"</span>, default <span class="op">=</span> <span class="fl">20000L</span><span class="op">)</span>,</span>
 <span>  col_filters <span class="op">=</span> <span class="st">"default"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -101,6 +103,13 @@ all relationship types are included.</p></dd>
 descriptions.</p></dd>
 
 
+<dt id="arg-max-nodes">max_nodes<a class="anchor" aria-label="anchor" href="#arg-max-nodes"></a></dt>
+<dd><p>Integer. Ceiling on the number of codes the traversal can
+accumulate before aborting (checked after each generation of the
+traversal, before the next one runs). Defaults to
+<code>getOption("codeminer.max_traversal_nodes", default = 20000)</code>.</p></dd>
+
+
 <dt id="arg-col-filters">col_filters<a class="anchor" aria-label="anchor" href="#arg-col-filters"></a></dt>
 <dd><p>Column filters to apply. See <code><a href="CODES.html">CODES()</a></code> for details.</p></dd>
 
@@ -127,7 +136,7 @@ descriptions.</p></dd>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="create_dummy_database.html">create_dummy_database</a></span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Dummy database ready to use!</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> To reconnect to your previous database:</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>   `Sys.setenv(CODEMINER_DB_PATH = "/tmp/RtmpfyR2XV/file1b5239acf383")`</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>   `Sys.setenv(CODEMINER_DB_PATH = "/tmp/RtmpOTuqjN/file1a0b385ca742")`</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>   `codeminer_connect()`</span>
 <span class="r-in"><span><span class="co"># ATTRIBUTES_FOR returns attributes for codes</span></span></span>
 <span class="r-in"><span><span class="co"># HAS_ATTRIBUTES returns codes that have the specified attributes</span></span></span>

@@ -57,7 +57,9 @@ edges until no new nodes are discovered.</p>
 <span>  direction <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"out"</span>, <span class="st">"in"</span><span class="op">)</span>,</span>
 <span>  rel_type <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  include_self <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  max_depth <span class="op">=</span> <span class="cn">Inf</span></span>
+<span>  max_depth <span class="op">=</span> <span class="cn">Inf</span>,</span>
+<span>  max_nodes <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"codeminer.max_traversal_nodes"</span>, default <span class="op">=</span> <span class="fl">20000L</span><span class="op">)</span>,</span>
+<span>  call <span class="op">=</span> <span class="fu">rlang</span><span class="fu">::</span><span class="fu"><a href="https://rlang.r-lib.org/reference/stack.html" class="external-link">caller_env</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
