@@ -17,8 +17,8 @@
 #' @param preferred_description_only Logical. If `TRUE`, return only preferred
 #'   descriptions.
 #' @param max_nodes Integer. Ceiling on the number of codes the traversal can
-#'   accumulate before aborting. See [graph_closure_codes()] for the
-#'   reasoning. Defaults to
+#'   accumulate before aborting (checked after each generation of the
+#'   traversal, before the next one runs). Defaults to
 #'   `getOption("codeminer.max_traversal_nodes", default = 20000)`.
 #' @param col_filters Column filters to apply. See [CODES()] for details.
 #' @param call **For internal use only.** The execution environment of a

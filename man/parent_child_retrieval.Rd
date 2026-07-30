@@ -65,8 +65,8 @@ N_PARENTS(
 descriptions.}
 
 \item{max_nodes}{Integer. Ceiling on the number of codes the traversal can
-accumulate before aborting. See \code{\link[=graph_closure_codes]{graph_closure_codes()}} for the
-reasoning. Defaults to
+accumulate before aborting (checked after each generation of the
+traversal, before the next one runs). Defaults to
 \code{getOption("codeminer.max_traversal_nodes", default = 20000)}.}
 
 \item{col_filters}{Column filters to apply. See \code{\link[=CODES]{CODES()}} for details.}
