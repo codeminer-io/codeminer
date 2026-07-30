@@ -14,6 +14,7 @@ CHILDREN(
   lookup_version = getOption("codeminer.lookup_version", default = "latest"),
   relationship_version = getOption("codeminer.relationship_version", default = "latest"),
   preferred_description_only = TRUE,
+  max_nodes = getOption("codeminer.max_traversal_nodes", default = 20000L),
   col_filters = "default"
 )
 
@@ -23,6 +24,7 @@ PARENTS(
   lookup_version = getOption("codeminer.lookup_version", default = "latest"),
   relationship_version = getOption("codeminer.relationship_version", default = "latest"),
   preferred_description_only = TRUE,
+  max_nodes = getOption("codeminer.max_traversal_nodes", default = 20000L),
   col_filters = "default"
 )
 
@@ -33,6 +35,7 @@ N_CHILDREN(
   lookup_version = getOption("codeminer.lookup_version", default = "latest"),
   relationship_version = getOption("codeminer.relationship_version", default = "latest"),
   preferred_description_only = TRUE,
+  max_nodes = getOption("codeminer.max_traversal_nodes", default = 20000L),
   col_filters = "default",
   call = rlang::current_env()
 )
@@ -44,6 +47,7 @@ N_PARENTS(
   lookup_version = getOption("codeminer.lookup_version", default = "latest"),
   relationship_version = getOption("codeminer.relationship_version", default = "latest"),
   preferred_description_only = TRUE,
+  max_nodes = getOption("codeminer.max_traversal_nodes", default = 20000L),
   col_filters = "default",
   call = rlang::current_env()
 )
@@ -59,6 +63,11 @@ N_PARENTS(
 
 \item{preferred_description_only}{Logical. If \code{TRUE}, return only preferred
 descriptions.}
+
+\item{max_nodes}{Integer. Ceiling on the number of codes the traversal can
+accumulate before aborting (checked after each generation of the
+traversal, before the next one runs). Defaults to
+\code{getOption("codeminer.max_traversal_nodes", default = 20000)}.}
 
 \item{col_filters}{Column filters to apply. See \code{\link[=CODES]{CODES()}} for details.}
 

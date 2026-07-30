@@ -16,6 +16,10 @@
 #' @param relationship_version Relationship table version (character).
 #' @param preferred_description_only Logical. If `TRUE`, return only preferred
 #'   descriptions.
+#' @param max_nodes Integer. Ceiling on the number of codes the traversal can
+#'   accumulate before aborting (checked after each generation of the
+#'   traversal, before the next one runs). Defaults to
+#'   `getOption("codeminer.max_traversal_nodes", default = 20000)`.
 #' @param col_filters Column filters to apply. See [CODES()] for details.
 #' @param call **For internal use only.** The execution environment of a
 #'   currently running function. Used for error reporting. Users should not
@@ -43,6 +47,7 @@ CHILDREN <- function(
     default = "latest"
   ),
   preferred_description_only = TRUE,
+  max_nodes = getOption("codeminer.max_traversal_nodes", default = 20000L),
   col_filters = "default"
 ) {
   N_CHILDREN(
@@ -52,6 +57,7 @@ CHILDREN <- function(
     lookup_version = lookup_version,
     relationship_version = relationship_version,
     preferred_description_only = preferred_description_only,
+    max_nodes = max_nodes,
     col_filters = col_filters,
     call = rlang::current_env()
   )
@@ -68,6 +74,7 @@ PARENTS <- function(
     default = "latest"
   ),
   preferred_description_only = TRUE,
+  max_nodes = getOption("codeminer.max_traversal_nodes", default = 20000L),
   col_filters = "default"
 ) {
   N_PARENTS(
@@ -77,6 +84,7 @@ PARENTS <- function(
     lookup_version = lookup_version,
     relationship_version = relationship_version,
     preferred_description_only = preferred_description_only,
+    max_nodes = max_nodes,
     col_filters = col_filters,
     call = rlang::current_env()
   )
@@ -94,6 +102,7 @@ N_CHILDREN <- function(
     default = "latest"
   ),
   preferred_description_only = TRUE,
+  max_nodes = getOption("codeminer.max_traversal_nodes", default = 20000L),
   col_filters = "default",
   call = rlang::current_env()
 ) {
@@ -126,6 +135,7 @@ N_CHILDREN <- function(
     rel_type = from_meta("child_parent_relationship_code"),
     include_self = TRUE,
     max_depth = depth,
+    max_nodes = max_nodes,
     empty_warning = "No valid child codes found.",
     call = call
   )
@@ -143,6 +153,7 @@ N_PARENTS <- function(
     default = "latest"
   ),
   preferred_description_only = TRUE,
+  max_nodes = getOption("codeminer.max_traversal_nodes", default = 20000L),
   col_filters = "default",
   call = rlang::current_env()
 ) {
@@ -175,6 +186,7 @@ N_PARENTS <- function(
     rel_type = from_meta("child_parent_relationship_code"),
     include_self = TRUE,
     max_depth = depth,
+    max_nodes = max_nodes,
     empty_warning = "No valid parent codes found.",
     call = call
   )

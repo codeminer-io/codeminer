@@ -33,6 +33,7 @@ ATTRIBUTES_FOR <- function(
   ),
   relationship_types = NULL,
   preferred_description_only = TRUE,
+  max_nodes = getOption("codeminer.max_traversal_nodes", default = 20000L),
   col_filters = "default"
 ) {
   old_cf <- push_col_filters(col_filters, call = rlang::current_env())
@@ -70,6 +71,7 @@ ATTRIBUTES_FOR <- function(
     rel_type = relationship_types,
     include_self = FALSE,
     max_depth = 1,
+    max_nodes = max_nodes,
     empty_warning = "No codes found with the specified attributes.",
     require_relationship_types = "ATTRIBUTES_FOR"
   )
@@ -87,6 +89,7 @@ HAS_ATTRIBUTES <- function(
   ),
   relationship_types = NULL,
   preferred_description_only = TRUE,
+  max_nodes = getOption("codeminer.max_traversal_nodes", default = 20000L),
   col_filters = "default"
 ) {
   old_cf <- push_col_filters(col_filters, call = rlang::current_env())
@@ -124,6 +127,7 @@ HAS_ATTRIBUTES <- function(
     rel_type = relationship_types,
     include_self = FALSE,
     max_depth = 1,
+    max_nodes = max_nodes,
     empty_warning = "No codes found with the specified attributes.",
     require_relationship_types = "HAS_ATTRIBUTES"
   )

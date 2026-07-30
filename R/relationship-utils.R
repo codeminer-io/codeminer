@@ -231,7 +231,9 @@ graph_closure <- function(
   direction = c("out", "in"),
   rel_type = NULL,
   include_self = FALSE,
-  max_depth = Inf
+  max_depth = Inf,
+  max_nodes = getOption("codeminer.max_traversal_nodes", default = 20000L),
+  call = rlang::caller_env()
 ) {
   direction <- rlang::arg_match(direction)
 
@@ -282,6 +284,12 @@ graph_closure <- function(
     result <- dplyr::bind_rows(accumulated_edges, related_edges) |>
       dplyr::distinct()
 
+    abort_if_traversal_too_large(
+      length(unique(result[[return_col]])),
+      max_nodes,
+      call = call
+    )
+
     # Check if we found new edges
     if (is.null(accumulated_edges) || nrow(result) > nrow(accumulated_edges)) {
       # Extract new frontier nodes for next iteration
@@ -317,6 +325,30 @@ graph_closure <- function(
   result_nodes
 }
 
+# Guards the cost of an unbounded graph traversal (CHILDREN/PARENTS/
+# N_CHILDREN/N_PARENTS/ATTRIBUTES_FOR/HAS_ATTRIBUTES all route through
+# graph_closure()). Checked after each generation's edges are already
+# collected (that cost is unavoidable - a generation's fan-out isn't known
+# until it's queried), but before recursing into the next generation, so a
+# broad starting code (e.g. a near-root SNOMED concept) fails fast instead of
+# traversing indefinitely with no result-size guardrail at all.
+abort_if_traversal_too_large <- function(
+  n,
+  max_nodes,
+  call = rlang::caller_env()
+) {
+  if (n > max_nodes) {
+    codeminer_abort(
+      c(
+        "This search has found {n} codes so far, more than the {max_nodes} allowed.",
+        "i" = "Try a narrower starting code, or a smaller depth limit, then run it again."
+      ),
+      class = "codeminer_max_traversal_nodes_exceeded",
+      call = call
+    )
+  }
+  invisible(TRUE)
+}
 
 #' Graph closure with code lookup
 #'
@@ -336,6 +368,13 @@ graph_closure <- function(
 #'   - `NULL` for no filtering.
 #' @param include_self Logical. If `TRUE`, include starting codes in result.
 #' @param max_depth Maximum traversal depth (integer).
+#' @param max_nodes Integer. Ceiling on the number of codes the traversal can
+#'   accumulate before aborting. Checked after each generation, before the
+#'   next one is queried - the final code set (however large, up to this
+#'   ceiling) is expanded via a single, unchunked [CODES()] call, so this
+#'   also bounds that call's cost. Aborts with class
+#'   `codeminer_max_traversal_nodes_exceeded` if exceeded. Defaults to
+#'   `getOption("codeminer.max_traversal_nodes", default = 20000)`.
 #' @param empty_warning Warning message when no codes are found (character).
 #' @param require_relationship_types Either `NULL` (default) for hierarchy
 #'   callers (`CHILDREN`/`PARENTS`), or the name of the calling type-dimension
@@ -357,6 +396,7 @@ graph_closure_codes <- function(
   rel_type = from_meta("child_parent_relationship_code"),
   include_self = TRUE,
   max_depth = Inf,
+  max_nodes = getOption("codeminer.max_traversal_nodes", default = 20000L),
   empty_warning = "No valid codes found.",
   require_relationship_types = NULL,
   call = rlang::caller_env()
@@ -510,7 +550,9 @@ graph_closure_codes <- function(
     direction = direction,
     rel_type = rel_type,
     include_self = include_self,
-    max_depth = max_depth
+    max_depth = max_depth,
+    max_nodes = max_nodes,
+    call = call
   )
 
   # Include self (graph_closure handles this, but we also add original codes)
