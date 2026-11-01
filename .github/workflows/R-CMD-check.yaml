@@ -49,6 +49,11 @@ jobs:
         with:
           extra-packages: any::rcmdcheck
           needs: check
+          cache-version: 2
+        env:
+          # R-devel has no binary packages, so a cache miss compiles from
+          # source, and duckdb alone takes ~45 min on a single core.
+          MAKEFLAGS: -j4
 
       - uses: r-lib/actions/check-r-package@v2
         with:
