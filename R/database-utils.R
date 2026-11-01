@@ -244,7 +244,10 @@ serialise_col_filters <- function(col_filters, call = rlang::caller_env()) {
     entry
   })
 
-  jsonlite::toJSON(col_filters, auto_unbox = FALSE)
+  # Return a plain string: the `json` class jsonlite attaches cannot be
+  # combined with the character `col_filters` column of an existing metadata
+  # table when a new row is appended.
+  as.character(jsonlite::toJSON(col_filters, auto_unbox = FALSE))
 }
 
 #' Deserialise col_filters from JSON
@@ -686,31 +689,23 @@ table_exists <- function(con, tbl_name) {
 # Used by add_*_trud() wrappers to skip expensive read operations.
 tables_all_exist <- function(table_names, types) {
   db <- db_path()
+  # `file.exists()` is TRUE for a folder-backend directory as well as a
+  # single-file DB.
   if (!file.exists(db)) {
     return(FALSE)
   }
 
-  con <- DBI::dbConnect(duckdb::duckdb(), db, read_only = TRUE)
-  on.exit(DBI::dbDisconnect(con, shutdown = TRUE))
-
+  # Read each metadata table through the backend so the check works for every
+  # storage format. A DB that predates a metadata table (or is not a codeminer
+  # DB at all) simply has no matching entry.
   for (i in seq_along(table_names)) {
-    meta_tbl <- codeminer_metadata_table_names[[types[[i]]]]
-    if (!table_exists(con, meta_tbl)) {
-      return(FALSE)
-    }
-
-    id_col <- switch(
-      types[[i]],
-      lookup = "lookup_table_name",
-      mapping = "mapping_table_name",
-      relationship = "relationship_table_name"
+    meta <- tryCatch(
+      backend_read_metadata(db, types[[i]]),
+      error = function(e) NULL
     )
-
-    query <- glue::glue_sql(
-      "SELECT 1 FROM {`meta_tbl`} WHERE {`id_col`} = {table_names[[i]]} LIMIT 1",
-      .con = con
-    )
-    if (nrow(DBI::dbGetQuery(con, query)) == 0) {
+    if (
+      is.null(meta) || !table_names[[i]] %in% meta[[backend_id_col(types[[i]])]]
+    ) {
       return(FALSE)
     }
   }

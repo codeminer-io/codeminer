@@ -360,6 +360,40 @@ test_that("remove_lookup_table() deletes both metadata row and data file", {
   expect_false("ICD-10_v1" %in% meta_df$lookup_table_name)
 })
 
+test_that("parquet_folder: add_lookup_table() accepts metadata with col_filters", {
+  local_build_temp_folder_database()
+  add_lookup_table(
+    sample_lookup(),
+    lookup_metadata(
+      "ICD-10",
+      lookup_version = "v1",
+      col_filters = list(
+        code = list(values = c("E10", "E11", "E12"), defaults = "E10")
+      )
+    )
+  )
+
+  meta_df <- backend_read_metadata(db_path(), "lookup")
+  cf <- deserialise_col_filters(
+    meta_df$col_filters[meta_df$lookup_table_name == "ICD-10_v1"]
+  )
+  expect_equal(cf$code$defaults, "E10")
+
+  # A second table appends to the existing (character) col_filters column
+  add_lookup_table(
+    sample_lookup(),
+    lookup_metadata(
+      "ICD-10",
+      lookup_version = "v2",
+      col_filters = list(
+        code = list(values = c("E10", "E11", "E12"), defaults = "E11")
+      )
+    )
+  )
+  meta_df <- backend_read_metadata(db_path(), "lookup")
+  expect_setequal(meta_df$lookup_table_name, c("ICD-10_v1", "ICD-10_v2"))
+})
+
 # update_lookup_metadata() -------------------------------------------------
 
 test_that("update_lookup_metadata() rewrites the metadata parquet", {
