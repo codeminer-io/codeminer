@@ -1,0 +1,39 @@
+# NCHS publishes a new ICD-10-CM release each June (effective 1 October) and
+# sometimes a mid-year update around January (effective 1 April). Download URLs
+# are listed in `icd10cm_releases()` in R/get_icd10cm.R, so each new release
+# needs a row added by hand. This workflow opens a reminder issue on 1 February
+# and 1 July, unless one is already open.
+on:
+  schedule:
+    - cron: "0 9 1 2,7 *"
+  workflow_dispatch:
+
+name: icd10cm-release-reminder
+
+permissions:
+  issues: write
+
+jobs:
+  remind:
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+      TITLE: "Check for new ICD-10-CM releases"
+    steps:
+      - name: Open a reminder issue unless one is already open
+        run: |
+          existing=$(gh issue list --state open --search "\"$TITLE\" in:title" --json number --jq 'length')
+          if [ "$existing" -gt 0 ]; then
+            echo "An open reminder issue already exists; nothing to do."
+            exit 0
+          fi
+          gh issue create --title "$TITLE" --label housekeeping --body-file - <<'EOF'
+          Scheduled reminder to check whether NCHS has published an ICD-10-CM release that `icd10cm_releases()` (in `R/get_icd10cm.R`) does not yet list.
+
+          - [ ] Compare the folders at https://ftp.cdc.gov/pub/Health_Statistics/NCHS/Publications/ICD10CM/ (and https://www.cdc.gov/nchs/icd/icd-10-cm/files.html) against the last row of `icd10cm_releases()`.
+          - [ ] For each new release, locate the "code descriptions" zip (or loose `icd10cm_order_*.txt`) and confirm its code set differs from the previous release; mid-year updates that only re-issue the same codes are not listed.
+          - [ ] Add a row (effective date `YYYYMMDD`, path under the FTP folder) and update the release list in the `get_icd10cm()` documentation.
+          - [ ] Run `read_icd10cm(get_icd10cm())` against the new release and check row count, no `NA` category, and that every non-category code has a parent.
+          - [ ] Close this issue.
+          EOF
