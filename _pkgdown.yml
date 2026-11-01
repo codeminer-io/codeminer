@@ -63,6 +63,9 @@ reference:
       - get_icd10_trud
       - read_icd10_trud
       - add_icd10_trud
+      - get_icd10cm
+      - read_icd10cm
+      - add_icd10cm
       - get_opcs4_trud
       - read_opcs4_trud
       - add_opcs4_trud
