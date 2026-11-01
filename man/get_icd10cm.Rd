@@ -55,10 +55,14 @@ Releases known to the package (effective date, fiscal year):
 \code{20261001} (FY2027)
 }
 
-Mid-year updates that re-issued an unchanged code set (April 2024, April
-2025 and April 2026) are not listed. A release newer than this table can be
-downloaded by hand from the NCHS listing and passed to \code{\link[=read_icd10cm]{read_icd10cm()}} or
-\code{\link[=add_icd10cm]{add_icd10cm()}} with an explicit \code{version}.
+Releases are keyed by their full effective date, so a fiscal year with a
+mid-year update has two entries (e.g. \code{20221001} and \code{20230401}). The April
+2024, April 2025 and April 2026 updates are deliberately absent: NCHS
+re-issued the previous October's code descriptions unchanged (only the
+guidelines, index and addenda documents differed), so they would download
+an identical code set under a second version label. A release newer than
+this table can be downloaded by hand from the NCHS listing and passed to
+\code{\link[=read_icd10cm]{read_icd10cm()}} or \code{\link[=add_icd10cm]{add_icd10cm()}} with an explicit \code{version}.
 }
 \section{Attribution}{
 

@@ -35,10 +35,14 @@
 #' * `20231001` (FY2024), `20241001` (FY2025), `20251001` (FY2026),
 #'   `20261001` (FY2027)
 #'
-#' Mid-year updates that re-issued an unchanged code set (April 2024, April
-#' 2025 and April 2026) are not listed. A release newer than this table can be
-#' downloaded by hand from the NCHS listing and passed to [read_icd10cm()] or
-#' [add_icd10cm()] with an explicit `version`.
+#' Releases are keyed by their full effective date, so a fiscal year with a
+#' mid-year update has two entries (e.g. `20221001` and `20230401`). The April
+#' 2024, April 2025 and April 2026 updates are deliberately absent: NCHS
+#' re-issued the previous October's code descriptions unchanged (only the
+#' guidelines, index and addenda documents differed), so they would download
+#' an identical code set under a second version label. A release newer than
+#' this table can be downloaded by hand from the NCHS listing and passed to
+#' [read_icd10cm()] or [add_icd10cm()] with an explicit `version`.
 #'
 #' @section Attribution:
 #' ICD-10-CM is published by NCHS/CDC and is available free of charge at
