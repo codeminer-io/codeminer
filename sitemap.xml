@@ -18,6 +18,7 @@
 <url><loc>https://codeminer-io.github.io/codeminer/reference/DESCRIPTION_CHUNK.html</loc></url>
 <url><loc>https://codeminer-io.github.io/codeminer/reference/MAP.html</loc></url>
 <url><loc>https://codeminer-io.github.io/codeminer/reference/add_icd10_trud.html</loc></url>
+<url><loc>https://codeminer-io.github.io/codeminer/reference/add_icd10cm.html</loc></url>
 <url><loc>https://codeminer-io.github.io/codeminer/reference/add_lookup_table.html</loc></url>
 <url><loc>https://codeminer-io.github.io/codeminer/reference/add_mapping_table.html</loc></url>
 <url><loc>https://codeminer-io.github.io/codeminer/reference/add_nhs_data_migration.html</loc></url>
@@ -56,6 +57,7 @@
 <url><loc>https://codeminer-io.github.io/codeminer/reference/get_codeminer_metadata.html</loc></url>
 <url><loc>https://codeminer-io.github.io/codeminer/reference/get_col_filters.html</loc></url>
 <url><loc>https://codeminer-io.github.io/codeminer/reference/get_icd10_trud.html</loc></url>
+<url><loc>https://codeminer-io.github.io/codeminer/reference/get_icd10cm.html</loc></url>
 <url><loc>https://codeminer-io.github.io/codeminer/reference/get_lookup_table.html</loc></url>
 <url><loc>https://codeminer-io.github.io/codeminer/reference/get_mapping_table.html</loc></url>
 <url><loc>https://codeminer-io.github.io/codeminer/reference/get_nhs_data_migration.html</loc></url>
@@ -81,6 +83,7 @@
 <url><loc>https://codeminer-io.github.io/codeminer/reference/print.codeminer_col_filters.html</loc></url>
 <url><loc>https://codeminer-io.github.io/codeminer/reference/read_icd10_phecode_map_dummy.html</loc></url>
 <url><loc>https://codeminer-io.github.io/codeminer/reference/read_icd10_trud.html</loc></url>
+<url><loc>https://codeminer-io.github.io/codeminer/reference/read_icd10cm.html</loc></url>
 <url><loc>https://codeminer-io.github.io/codeminer/reference/read_nhs_data_migration.html</loc></url>
 <url><loc>https://codeminer-io.github.io/codeminer/reference/read_nhsbsa_bnf_snomed.html</loc></url>
 <url><loc>https://codeminer-io.github.io/codeminer/reference/read_opcs4_trud.html</loc></url>

@@ -121,6 +121,12 @@ clinical coding systems.
   : Read ICD-10 coding files into R
 - [`add_icd10_trud()`](https://codeminer-io.github.io/codeminer/reference/add_icd10_trud.md)
   : Add ICD-10 lookup table to CodeMiner database
+- [`get_icd10cm()`](https://codeminer-io.github.io/codeminer/reference/get_icd10cm.md)
+  : Get ICD-10-CM release files
+- [`read_icd10cm()`](https://codeminer-io.github.io/codeminer/reference/read_icd10cm.md)
+  : Read an ICD-10-CM release into lookup and relationship tables
+- [`add_icd10cm()`](https://codeminer-io.github.io/codeminer/reference/add_icd10cm.md)
+  : Add ICD-10-CM to CodeMiner database
 - [`get_opcs4_trud()`](https://codeminer-io.github.io/codeminer/reference/get_opcs4_trud.md)
   : Get OPCS-4 coding system files from NHS TRUD
 - [`read_opcs4_trud()`](https://codeminer-io.github.io/codeminer/reference/read_opcs4_trud.md)
