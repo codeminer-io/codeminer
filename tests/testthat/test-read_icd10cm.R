@@ -81,6 +81,23 @@ test_that("read_icd10cm() attaches the ICD-10-CM chapter as the category", {
   expect_false(anyNA(tbl$category))
 })
 
+test_that("read_icd10cm() warns about categories outside the chapter ranges", {
+  # F00 is not an ICD-10-CM category (the Mental chapter starts at F01)
+  rows <- rbind(
+    dummy_icd10cm_rows(),
+    data.frame(code = "F00", billable = "0", short = "Dummy", long = "Dummy")
+  )
+  path <- create_dummy_icd10cm_file(lines = dummy_icd10cm_lines(rows))
+
+  expect_warning(
+    result <- suppressMessages(read_icd10cm(path)),
+    "did not match any chapter range.*F00"
+  )
+  tbl <- result$icd10cm_lkp$lookup$table
+  expect_true(is.na(tbl$category[tbl$icd10cm_code == "F00"]))
+  expect_equal(sum(is.na(tbl$category)), 1L)
+})
+
 test_that("read_icd10cm() exposes billable as a column filter with both values by default", {
   path <- create_dummy_icd10cm_file()
   meta <- suppressMessages(read_icd10cm(path))$icd10cm_lkp$lookup$metadata

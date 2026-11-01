@@ -91,6 +91,20 @@ read_icd10cm <- function(
   ) |>
     dplyr::rename(category = "chapter")
 
+  # Chapter ranges are carried in the package, so a category outside every
+  # range most likely means a new release has outgrown them. Surface it rather
+  # than silently storing NA.
+  unmatched <- chapter_lookup$prefix[is.na(chapter_lookup$category)]
+  if (length(unmatched) > 0) {
+    codeminer_warn(c(
+      "!" = "{length(unmatched)} ICD-10-CM categor{?y/ies} did not match any
+             chapter range and will have an NA {.field category}:
+             {.val {unmatched}}.",
+      "i" = "The chapter ranges in {.fun icd10cm_chapters} may need updating
+             for this release."
+    ))
+  }
+
   icd10cm_table <- icd10cm_table |>
     dplyr::mutate(
       icd10cm_code_dotted = stringr::str_replace(
