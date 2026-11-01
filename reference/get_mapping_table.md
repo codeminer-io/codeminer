@@ -96,7 +96,7 @@ Other Clinical code lookups and mappings:
 create_dummy_database()
 #> ✔ Dummy database ready to use!
 #> ℹ To reconnect to your previous database:
-#>   `Sys.setenv(CODEMINER_DB_PATH = "/tmp/RtmpvEMxfx/file1a9b105185ed.duckdb")`
+#>   `Sys.setenv(CODEMINER_DB_PATH = "/tmp/RtmpcpD6UK/file19bb5b2c3c23.duckdb")`
 #>   `codeminer_connect()`
 
 # Get the full Read 3 to ICD-10 mapping table
