@@ -14,6 +14,29 @@ test_that("codeminer_connect() creates a valid persistent connection", {
   expect_true(DBI::dbIsValid(.codeminer_env$con))
 })
 
+test_that("codeminer_connect() expands a home-relative (~) main path", {
+  # A temp directory inside the home directory so the DB can be addressed
+  # with a `~/...` path.
+  home_tmp <- withr::local_tempdir(tmpdir = path.expand("~"))
+  tilde_db <- file.path("~", basename(home_tmp), "tilde.duckdb")
+  withr::local_envvar(CODEMINER_DB_PATH = path.expand(tilde_db))
+  if (
+    exists("con", envir = .codeminer_env) && DBI::dbIsValid(.codeminer_env$con)
+  ) {
+    codeminer_disconnect()
+  }
+  withr::defer(codeminer_disconnect())
+  build_database(overwrite = TRUE)
+
+  codeminer_connect(main = tilde_db)
+
+  expect_equal(.codeminer_env$db_path, path.expand(tilde_db))
+  # The attached database is the real one (its metadata tables are present),
+  # not an empty one created at a literal "~" path.
+  expect_s3_class(get_codeminer_metadata("lookup"), "data.frame")
+  expect_false(dir.exists("~"))
+})
+
 test_that("get_db_con() returns the same connection on repeated calls", {
   local_build_temp_database()
 

@@ -24,6 +24,9 @@ codeminer_connect <- function(main = NULL) {
   if (is.null(main)) {
     main <- db_path()
   }
+  # DuckDB's ATTACH does not expand `~`, so an unexpanded home-relative path
+  # would silently attach a new, empty database at a literal "~/..." location.
+  main <- path.expand(main)
 
   if (!main_was_explicit) {
     codeminer_inform(c(
