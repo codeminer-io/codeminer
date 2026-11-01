@@ -150,6 +150,52 @@ test_that("read_icd10_trud() attaches chapter as the category", {
   expect_equal(tbl[tbl$ALT_CODE == "J46", ]$category, "Respiratory")
 })
 
+test_that("read_icd10_trud() warns about categories outside the chapter ranges", {
+  dir <- withr::local_tempdir()
+  content_dir <- file.path(dir, "Content")
+  dir.create(content_dir)
+
+  # U99 is outside the U00-U85 "Special purposes" range
+  writeLines(
+    c(
+      paste(
+        c(
+          "CODE",
+          "ALT_CODE",
+          "USAGE",
+          "USAGE_UK",
+          "DESCRIPTION",
+          "MODIFIER_4",
+          "MODIFIER_5",
+          "QUALIFIERS",
+          "GENDER_MASK",
+          "MIN_AGE",
+          "MAX_AGE",
+          "TREE_DESCRIPTION"
+        ),
+        collapse = "\t"
+      ),
+      paste(
+        c("E10.-", "E10", "M", "N", "Dummy", "", "", "", "0", "0", "999", "E"),
+        collapse = "\t"
+      ),
+      paste(
+        c("U99.-", "U99", "M", "N", "Dummy", "", "", "", "0", "0", "999", "U"),
+        collapse = "\t"
+      )
+    ),
+    file.path(content_dir, "ICD10_Edition5_CodesAndTitlesAndMetadata_GB.txt")
+  )
+
+  expect_warning(
+    result <- suppressMessages(read_icd10_trud(dir)),
+    "did not match any chapter range.*U99"
+  )
+  tbl <- result$icd10_lkp$lookup$table
+  expect_true(is.na(tbl$category[tbl$ALT_CODE == "U99"]))
+  expect_equal(tbl$category[tbl$ALT_CODE == "E10"], "Endocrine")
+})
+
 test_that("read_icd10_trud() returns relationship table", {
   dir <- create_dummy_icd10_dir()
   result <- suppressMessages(read_icd10_trud(dir))
