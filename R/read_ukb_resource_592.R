@@ -1122,43 +1122,36 @@ extend_read_v2_icd10_from_ukb592 <- function(ukb592_result) {
 #'
 #' @noRd
 build_prefix_hierarchy_len <- function(codes) {
-  codes <- tibble::tibble(code = unique(codes)) |>
-    dplyr::mutate("len" = nchar(.data$code))
+  codes <- unique(codes)
+  lens <- sort(unique(nchar(codes)))
 
-  lens <- sort(unique(codes$len))
-
-  all_pairs <- purrr::map_dfr(seq_along(lens)[-1], \(i) {
-    child_len <- lens[i]
-    parent_len <- lens[(i - 1)]
-
-    children <- codes[codes$len == child_len, ]
-    parents <- codes[codes$len == parent_len, ]
-
-    if (nrow(children) == 0 || nrow(parents) == 0) {
-      stop()
-    }
-
-    children |>
-      dplyr::mutate(parent_code = substr(.data$code, 1, parent_len)) |>
-      dplyr::inner_join(
-        parents |>
-          dplyr::select("parent_code" = dplyr::all_of("code")),
-        by = "parent_code"
-      ) |>
-      dplyr::select(
-        "from" = dplyr::all_of("code"),
-        "to" = dplyr::all_of("parent_code")
-      )
-  })
-
-  # When no parent-child pairs exist (e.g. all codes are the same length),
-  # `map_dfr()` returns a zero-column frame; guarantee the `from`/`to` columns so
-  # the (empty) relationship table is still well-formed.
-  if (ncol(all_pairs) == 0) {
+  # Fewer than two distinct lengths means no code can be a prefix of another
+  # (e.g. a single code, or all codes the same length): return a well-formed
+  # empty relationship table.
+  if (length(lens) < 2) {
     return(tibble::tibble(from = character(), to = character()))
   }
 
-  all_pairs
+  # Try every shorter length present in the data as a candidate parent length
+  # for each code, keep the candidates that are real codes, and take the
+  # longest. Walking all shorter lengths (rather than only the next one down)
+  # matters where a code's immediate prefix is not itself a code — e.g. ICD-10-CM
+  # `T07XXXA`, whose parent is `T07` because `T07XXX`, `T07XX` and `T07X` do not
+  # exist.
+  tidyr::expand_grid(
+    from = codes,
+    parent_len = lens
+  ) |>
+    dplyr::filter(.data$parent_len < nchar(.data$from)) |>
+    dplyr::mutate(to = stringr::str_sub(.data$from, 1, .data$parent_len)) |>
+    dplyr::filter(.data$to %in% .env$codes) |>
+    dplyr::arrange(
+      nchar(.data$from),
+      .data$from,
+      dplyr::desc(.data$parent_len)
+    ) |>
+    dplyr::distinct(.data$from, .keep_all = TRUE) |>
+    dplyr::select("from", "to")
 }
 
 #' Get a vector of ICD10 codes in ALT_CODE format for a specified start/end
