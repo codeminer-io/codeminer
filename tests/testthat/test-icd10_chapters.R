@@ -27,6 +27,7 @@ test_that("icd10_chapter_lookup() maps each chapter boundary correctly", {
   expect_equal(chap_for("D50"), "Blood")
   expect_equal(chap_for("D89"), "Blood")
   expect_equal(chap_for("E10"), "Endocrine")
+  expect_equal(chap_for("E90"), "Endocrine")
   expect_equal(chap_for("H59"), "Eye")
   expect_equal(chap_for("H60"), "Ear")
   expect_equal(chap_for("S00"), "Injury")

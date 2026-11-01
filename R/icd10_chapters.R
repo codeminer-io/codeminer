@@ -10,7 +10,7 @@ icd10_chapters <- function() {
     "A00"  , "B99" , "Infectious"       ,
     "C00"  , "D48" , "Neoplasms"        ,
     "D50"  , "D89" , "Blood"            ,
-    "E00"  , "E89" , "Endocrine"        ,
+    "E00"  , "E90" , "Endocrine"        ,
     "F00"  , "F99" , "Mental"           ,
     "G00"  , "G99" , "Nervous"          ,
     "H00"  , "H59" , "Eye"              ,
