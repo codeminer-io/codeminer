@@ -14,6 +14,57 @@ test_that("codeminer_connect() creates a valid persistent connection", {
   expect_true(DBI::dbIsValid(.codeminer_env$con))
 })
 
+test_that("codeminer_connect() expands a home-relative (~) main path", {
+  # A temp directory inside the home directory so the DB can be addressed
+  # with a `~/...` path.
+  home_tmp <- withr::local_tempdir(tmpdir = path.expand("~"))
+  tilde_db <- file.path("~", basename(home_tmp), "tilde.duckdb")
+  withr::local_envvar(CODEMINER_DB_PATH = path.expand(tilde_db))
+  if (
+    exists("con", envir = .codeminer_env) && DBI::dbIsValid(.codeminer_env$con)
+  ) {
+    codeminer_disconnect()
+  }
+  withr::defer(codeminer_disconnect())
+  build_database(overwrite = TRUE)
+
+  codeminer_connect(main = tilde_db)
+
+  expect_equal(.codeminer_env$db_path, path.expand(tilde_db))
+  expect_s3_class(get_codeminer_metadata("lookup"), "data.frame")
+})
+
+test_that("get_db_con() keeps an explicitly connected database despite CODEMINER_DB_PATH", {
+  # Default DB from the environment variable...
+  env_db <- local_build_temp_database()
+  # ...and a second, separately built DB connected to explicitly.
+  other_db <- withr::local_tempfile(fileext = ".duckdb")
+  withr::with_envvar(c(CODEMINER_DB_PATH = other_db), build_database())
+  codeminer_disconnect()
+  codeminer_connect(main = other_db)
+
+  expect_equal(.codeminer_env$db_path, other_db)
+  con <- get_db_con()
+  expect_true(DBI::dbIsValid(con))
+  expect_equal(.codeminer_env$db_path, other_db)
+  expect_false(identical(db_path(), other_db))
+})
+
+test_that("get_db_con() follows a changed CODEMINER_DB_PATH after an implicit connect", {
+  first_db <- local_build_temp_database()
+  second_db <- withr::local_tempfile(fileext = ".duckdb")
+  withr::with_envvar(c(CODEMINER_DB_PATH = second_db), build_database())
+
+  # Implicit connect (no `main`) follows the env var
+  codeminer_disconnect()
+  codeminer_connect()
+  expect_equal(.codeminer_env$db_path, first_db)
+
+  withr::local_envvar(CODEMINER_DB_PATH = second_db)
+  get_db_con()
+  expect_equal(.codeminer_env$db_path, second_db)
+})
+
 test_that("get_db_con() returns the same connection on repeated calls", {
   local_build_temp_database()
 

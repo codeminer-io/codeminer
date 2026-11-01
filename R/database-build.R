@@ -328,7 +328,9 @@ connect_to_db <- function(..., read_only = TRUE, .envir = parent.frame()) {
 db_path <- function() {
   env_value <- Sys.getenv("CODEMINER_DB_PATH")
   if (env_value != "") {
-    return(env_value)
+    # Expanded here so every consumer (including DuckDB's ATTACH, which does
+    # not understand `~`) sees an absolute path.
+    return(path.expand(env_value))
   }
 
   base <- rappdirs::user_data_dir("codeminer")

@@ -10,7 +10,7 @@ icd10_chapters <- function() {
     "A00"  , "B99" , "Infectious"       ,
     "C00"  , "D48" , "Neoplasms"        ,
     "D50"  , "D89" , "Blood"            ,
-    "E00"  , "E89" , "Endocrine"        ,
+    "E00"  , "E90" , "Endocrine"        ,
     "F00"  , "F99" , "Mental"           ,
     "G00"  , "G99" , "Nervous"          ,
     "H00"  , "H59" , "Eye"              ,
@@ -62,4 +62,55 @@ icd10_chapter_lookup <- function() {
     ) |>
     tidyr::unnest("prefix") |>
     dplyr::select("prefix", "chapter")
+}
+
+# Chapter ranges for ICD-10-CM, the US clinical modification. These differ
+# from the WHO ranges above (e.g. D49, K95, V00-Y99, S00-T88) and the third
+# character of a category can be a letter (C4A, O9A, QA1), so prefixes cannot
+# be enumerated digit by digit. Where a chapter is the last to use its leading
+# letter the range is left open-ended (`BZZ`, `QZZ`, ...) so categories added
+# in later releases still resolve. Short labels match `icd10_chapters()`.
+icd10cm_chapters <- function() {
+  # fmt: skip
+  tibble::tribble(
+    ~start , ~end  , ~chapter           ,
+    "A00"  , "BZZ" , "Infectious"       ,
+    "C00"  , "D49" , "Neoplasms"        ,
+    "D50"  , "DZZ" , "Blood"            ,
+    "E00"  , "EZZ" , "Endocrine"        ,
+    "F01"  , "FZZ" , "Mental"           ,
+    "G00"  , "GZZ" , "Nervous"          ,
+    "H00"  , "H59" , "Eye"              ,
+    "H60"  , "HZZ" , "Ear"              ,
+    "I00"  , "IZZ" , "Circulatory"      ,
+    "J00"  , "JZZ" , "Respiratory"      ,
+    "K00"  , "KZZ" , "Digestive"        ,
+    "L00"  , "LZZ" , "Skin"             ,
+    "M00"  , "MZZ" , "Musculoskeletal"  ,
+    "N00"  , "NZZ" , "Genitourinary"    ,
+    "O00"  , "OZZ" , "Pregnancy"        ,
+    "P00"  , "PZZ" , "Perinatal"        ,
+    "Q00"  , "QZZ" , "Congenital"       ,
+    "R00"  , "RZZ" , "Symptoms"         ,
+    "S00"  , "TZZ" , "Injury"           ,
+    "V00"  , "YZZ" , "External causes"  ,
+    "Z00"  , "ZZZ" , "Health status"    ,
+    "U00"  , "UZZ" , "Special purposes"
+  )
+}
+
+# Resolve 3-character ICD-10-CM prefixes to chapters by inclusive range
+# comparison (string comparison works because every prefix is exactly three
+# characters and digits sort before letters). Returns one row per unique
+# prefix, with `NA` for anything outside every range.
+icd10cm_chapter_lookup <- function(prefixes) {
+  chapters <- icd10cm_chapters()
+  prefixes <- unique(prefixes)
+
+  chapter <- purrr::map_chr(prefixes, function(prefix) {
+    hit <- chapters$chapter[chapters$start <= prefix & prefix <= chapters$end]
+    if (length(hit) == 1) hit else NA_character_
+  })
+
+  tibble::tibble(prefix = prefixes, chapter = chapter)
 }

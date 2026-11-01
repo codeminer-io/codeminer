@@ -9,6 +9,12 @@ test_that("db_path() returns correct path based on environment variable", {
     expect_equal(db_path(), custom_path)
   )
 
+  # A home-relative path is expanded
+  withr::with_envvar(
+    new = c(CODEMINER_DB_PATH = "~/test_db.duckdb"),
+    expect_equal(db_path(), path.expand("~/test_db.duckdb"))
+  )
+
   # Test with empty env var (default behavior)
   withr::with_envvar(
     new = c(CODEMINER_DB_PATH = ""),

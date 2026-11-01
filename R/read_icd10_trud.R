@@ -147,6 +147,24 @@ read_icd10_trud <- function(
     ) |>
     dplyr::select(-".prefix")
 
+  # The chapter ranges are carried in the package, so a category outside every
+  # range most likely means the ranges need updating. Surface it rather than
+  # silently storing NA.
+  unmatched <- unique(stringr::str_sub(
+    icd10_table$ALT_CODE[is.na(icd10_table$category)],
+    1,
+    3
+  ))
+  if (length(unmatched) > 0) {
+    codeminer_warn(c(
+      "!" = "{length(unmatched)} ICD-10 categor{?y/ies} did not match any
+             chapter range and will have an NA {.field category}:
+             {.val {unmatched}}.",
+      "i" = "The chapter ranges in {.fun icd10_chapters} may need updating
+             for this release."
+    ))
+  }
+
   icd10_metadata <- lookup_metadata(
     code_type = "ICD-10",
     lookup_version = version,

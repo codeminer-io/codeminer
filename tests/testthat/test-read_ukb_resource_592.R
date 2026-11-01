@@ -247,10 +247,41 @@ test_that("`build_prefix_hierarchy_len()` handles edge cases", {
   # Single code - no relationships
   result <- build_prefix_hierarchy_len("A")
   expect_equal(nrow(result), 0)
+  expect_named(result, c("from", "to"))
 
   # Codes with same length - no relationships
   result <- build_prefix_hierarchy_len(c("AA", "BB", "CC"))
   expect_equal(nrow(result), 0)
+  expect_named(result, c("from", "to"))
+
+  # Duplicated input codes produce a single edge
+  result <- build_prefix_hierarchy_len(c("A", "AB", "AB"))
+  expect_equal(result, tibble::tibble(from = "AB", to = "A"))
+})
+
+test_that("`build_prefix_hierarchy_len()` uses the longest valid prefix", {
+  # `T07XXXA` has no 6-, 5- or 4-character prefix in the set, so it must walk
+  # down to `T07` rather than be orphaned; `S72001A` has an immediate parent.
+  # Lengths 4-6 are present in the data (via the `S72` branch), so the shorter
+  # parent lengths are all candidates for `T07XXXA`.
+  codes <- c("T07", "T07XXXA", "S72", "S720", "S7200", "S72001", "S72001A")
+
+  result <- build_prefix_hierarchy_len(codes)
+
+  expect_equal(
+    result,
+    # fmt: skip
+    # nolint start
+    tibble::tribble(
+      ~from,     ~to,
+      "S720",    "S72",
+      "S7200",   "S720",
+      "S72001",  "S7200",
+      "S72001A", "S72001",
+      "T07XXXA", "T07"
+    )
+    # nolint end
+  )
 })
 
 # `process_icd10_lkp()` ---------------------------------------------------
