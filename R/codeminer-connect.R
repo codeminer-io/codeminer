@@ -98,6 +98,9 @@ codeminer_connect <- function(main = NULL) {
     enforce_schema_gate(main)
     backend_attach(.codeminer_env$con, CODEMINER_SCHEMA, main)
     .codeminer_env$db_path <- main
+    # Recorded so that `get_db_con()` does not replace an explicitly chosen
+    # database with `CODEMINER_DB_PATH` on the next query.
+    .codeminer_env$main_explicit <- main_was_explicit
     codeminer_set_search_path()
   }
 
@@ -128,6 +131,7 @@ codeminer_disconnect <- function() {
   for (field in c(
     "con",
     "db_path",
+    "main_explicit",
     "metadata",
     "active_versions",
     "active_col_filters"

@@ -20,9 +20,15 @@ get_db_con <- function(con = NULL) {
     !exists("con", envir = .codeminer_env) ||
     !DBI::dbIsValid(.codeminer_env$con)
 
-  # Also reconnect if CODEMINER_DB_PATH changed since last connect
-  # (but not while core is temporarily DETACHed during a write)
-  if (!needs_connect && !is.null(.codeminer_env$db_path)) {
+  # Also reconnect if CODEMINER_DB_PATH changed since last connect (but not
+  # while core is temporarily DETACHed during a write). A connection made with
+  # an explicit `codeminer_connect(main = ...)` is kept regardless of the
+  # environment variable.
+  if (
+    !needs_connect &&
+      !is.null(.codeminer_env$db_path) &&
+      !isTRUE(.codeminer_env$main_explicit)
+  ) {
     needs_connect <- !identical(
       .codeminer_env$db_path,
       db_path()
