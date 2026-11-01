@@ -73,6 +73,11 @@ read_phecode <- function(
       progress = FALSE,
       col_types = readr::cols(.default = "c")
     )
+    # The source file is dotted (A00.0); the ICD-10 lookup code is undotted.
+    icd10_phecode$ICD10 <- stringr::str_remove(
+      icd10_phecode$ICD10,
+      pattern = "\\."
+    )
 
     meta <- mapping_metadata(
       from_code_type = "ICD-10",

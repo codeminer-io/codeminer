@@ -3,6 +3,14 @@ test_that("read_phecode() lookup metadata uses canonical code_type", {
   expect_equal(result$phecode_lkp$lookup$metadata$code_type, "Phecode")
 })
 
+test_that("read_phecode() removes dots from ICD-10 codes to match the lookup", {
+  result <- read_phecode(icd10_map_path = dummy_icd10_phecode_map_path())
+  codes <- result$icd10_phecode$mapping$table$ICD10
+
+  expect_false(any(grepl(".", codes, fixed = TRUE)))
+  expect_true(all(c("E10", "E100", "E101") %in% codes))
+})
+
 test_that("read_phecode() icd10_phecode mapping metadata has from_col / to_col matching real columns", {
   result <- read_phecode(icd10_map_path = dummy_icd10_phecode_map_path())
   meta <- result$icd10_phecode$mapping$metadata
