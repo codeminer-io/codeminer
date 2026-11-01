@@ -44,15 +44,24 @@ occasional mid-year updates.
 \details{
 NCHS does not name release files consistently from year to year, so the
 package carries a table of verified download URLs keyed by effective date.
-Releases known to the package (effective date, fiscal year):
+Releases known to the package (effective date, fiscal year), generated from
+that table when the documentation is built:
 \itemize{
-\item \code{20151001} (FY2016), \code{20161001} (FY2017), \code{20171001} (FY2018),
-\code{20181001} (FY2019), \code{20191001} (FY2020), \code{20201001} (FY2021)
+\item \code{20151001} (FY2016)
+\item \code{20161001} (FY2017)
+\item \code{20171001} (FY2018)
+\item \code{20181001} (FY2019)
+\item \code{20191001} (FY2020)
+\item \code{20201001} (FY2021)
 \item \code{20210101} (FY2021 January update)
-\item \code{20211001} (FY2022), \code{20220401} (FY2022 April update)
-\item \code{20221001} (FY2023), \code{20230401} (FY2023 April update)
-\item \code{20231001} (FY2024), \code{20241001} (FY2025), \code{20251001} (FY2026),
-\code{20261001} (FY2027)
+\item \code{20211001} (FY2022)
+\item \code{20220401} (FY2022 April update)
+\item \code{20221001} (FY2023)
+\item \code{20230401} (FY2023 April update)
+\item \code{20231001} (FY2024)
+\item \code{20241001} (FY2025)
+\item \code{20251001} (FY2026)
+\item \code{20261001} (FY2027)
 }
 
 Releases are keyed by their full effective date, so a fiscal year with a

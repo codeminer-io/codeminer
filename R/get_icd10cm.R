@@ -25,15 +25,10 @@
 #' @details
 #' NCHS does not name release files consistently from year to year, so the
 #' package carries a table of verified download URLs keyed by effective date.
-#' Releases known to the package (effective date, fiscal year):
+#' Releases known to the package (effective date, fiscal year), generated from
+#' that table when the documentation is built:
 #'
-#' * `20151001` (FY2016), `20161001` (FY2017), `20171001` (FY2018),
-#'   `20181001` (FY2019), `20191001` (FY2020), `20201001` (FY2021)
-#' * `20210101` (FY2021 January update)
-#' * `20211001` (FY2022), `20220401` (FY2022 April update)
-#' * `20221001` (FY2023), `20230401` (FY2023 April update)
-#' * `20231001` (FY2024), `20241001` (FY2025), `20251001` (FY2026),
-#'   `20261001` (FY2027)
+#' `r icd10cm_releases_doc()`
 #'
 #' Releases are keyed by their full effective date, so a fiscal year with a
 #' mid-year update has two entries (e.g. `20221001` and `20230401`). The April
@@ -169,4 +164,21 @@ icd10cm_releases <- function() {
     dplyr::mutate(
       url = paste0(base_url, purrr::map_chr(.data$file, utils::URLencode))
     )
+}
+
+# Markdown bullet list of the known releases, evaluated inline in the roxygen
+# for `get_icd10cm()` so the documentation cannot drift from the table. The
+# US fiscal year starts on 1 October; any other effective month is a mid-year
+# update to the fiscal year already in force.
+icd10cm_releases_doc <- function() {
+  versions <- icd10cm_releases()$version
+  year <- as.integer(stringr::str_sub(versions, 1, 4))
+  month <- as.integer(stringr::str_sub(versions, 5, 6))
+  fiscal_year <- ifelse(month >= 10, year + 1, year)
+  update <- ifelse(
+    month == 10,
+    "",
+    paste0(" ", month.name[month], " update")
+  )
+  paste0("* `", versions, "` (FY", fiscal_year, update, ")", collapse = "\n")
 }

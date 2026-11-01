@@ -11,6 +11,18 @@ test_that("icd10cm_releases() is a well-formed, ascending release table", {
   expect_false(any(grepl(" ", releases$url)))
 })
 
+test_that("icd10cm_releases_doc() lists every release with its fiscal year", {
+  doc <- icd10cm_releases_doc()
+  lines <- strsplit(doc, "\n")[[1]]
+
+  expect_length(lines, nrow(icd10cm_releases()))
+  expect_true(all(stringr::str_detect(lines, "^\\* `[0-9]{8}` \\(FY[0-9]{4}")))
+  # October releases open a fiscal year; other months are mid-year updates
+  expect_true("* `20261001` (FY2027)" %in% lines)
+  expect_true("* `20210101` (FY2021 January update)" %in% lines)
+  expect_true("* `20230401` (FY2023 April update)" %in% lines)
+})
+
 test_that("get_icd10cm() validates release argument", {
   expect_error(
     get_icd10cm(release = c("latest", "other")),
