@@ -99,8 +99,6 @@ export(update_relationship_metadata)
 export(validate_database)
 export(with_col_filters)
 export(with_type)
-importFrom(rlang,
-  .data,
-  .env,
-  `:=`
-)
+importFrom(rlang,.data)
+importFrom(rlang,.env)
+importFrom(rlang,`:=`)
