@@ -137,7 +137,7 @@ Other Clinical code lookups and mappings:
 create_dummy_database()
 #> ✔ Dummy database ready to use!
 #> ℹ To reconnect to your previous database:
-#>   `Sys.setenv(CODEMINER_DB_PATH = "/tmp/RtmpitoaKT/file191846d8db1e.duckdb")`
+#>   `Sys.setenv(CODEMINER_DB_PATH = "/tmp/RtmphhiyFJ/file19ec39cd36c1.duckdb")`
 #>   `codeminer_connect()`
 chunk <- DESCRIPTION_CHUNK("cyst", type = "ICD-10", batch_size = 100)
 #> ℹ Using "UKB v4" as the latest lookup version for "ICD-10".
