@@ -54,7 +54,7 @@ get_phecode <- function(
       extracted_name = "Phecode_map_v1_2_icd10_WHO_beta.csv"
     ),
     icd9_map = list(
-      url = "https://github.com/PheWAS/PheWAS/raw/refs/heads/master/data/phemap.rda",
+      url = "https://github.com/PheWAS/PheWAS/raw/refs/heads/main/data/phemap.rda",
       zip_name = NULL,
       extracted_name = "phemap.rda"
     )
