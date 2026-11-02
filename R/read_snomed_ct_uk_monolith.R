@@ -331,6 +331,17 @@ read_snomed_ct_uk_monolith <- function(
     # There may be more than one matching file
     raw_maps <- purrr::map(path_map_all, fread_sct) |>
       dplyr::bind_rows()
+
+    # Like relationships, map rows carry an `active` flag: retired (`"0"`) rows
+    # are kept in the release for history but no longer hold.
+    sct_map_col_filters <- list(
+      active = list(
+        values = c("0", "1"),
+        defaults = c("1"),
+        description = "Whether the map row is active. Defaults to active rows only.",
+        value_labels = c("1" = "Active", "0" = "Inactive")
+      )
+    )
   }
 
   if ("sct_icd10" %in% tables) {
@@ -369,7 +380,8 @@ read_snomed_ct_uk_monolith <- function(
       map_version = version,
       from_col = "referencedComponentId",
       to_col = "mapTarget",
-      map_source = source
+      map_source = source,
+      col_filters = sct_map_col_filters
     )
 
     result$sct_icd10 <- list(
@@ -409,7 +421,8 @@ read_snomed_ct_uk_monolith <- function(
       map_version = version,
       from_col = "referencedComponentId",
       to_col = "mapTarget",
-      map_source = source
+      map_source = source,
+      col_filters = sct_map_col_filters
     )
 
     result$sct_opcs4 <- list(
