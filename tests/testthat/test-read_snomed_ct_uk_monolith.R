@@ -472,6 +472,25 @@ test_that("read_snomed_ct_uk_monolith() defaults relationships to active edges o
   expect_equal(cf$active$defaults, "1")
 })
 
+test_that("read_snomed_ct_uk_monolith() defaults maps to active rows only", {
+  result <- suppressMessages(
+    read_snomed_ct_uk_monolith(
+      dummy_snomed_ct_uk_monolith_path(),
+      tables = c("sct_icd10", "sct_opcs4")
+    )
+  )
+
+  purrr::walk(
+    list(result$sct_icd10, result$sct_opcs4),
+    function(map) {
+      cf <- deserialise_col_filters(map$mapping$metadata$col_filters)
+      expect_equal(cf$active$values, c("0", "1"))
+      expect_equal(cf$active$defaults, "1")
+      expect_true("active" %in% names(map$mapping$table))
+    }
+  )
+})
+
 test_that("read_snomed_ct_uk_monolith() errors on an unmatched ICD-10 refset", {
   # A non-matching .icd10_refset_id should fail loudly rather than silently
   # storing an empty mapping table (the guard that was missing for OPCS-4).
