@@ -125,7 +125,7 @@ Other Clinical code lookups and mappings:
 create_dummy_database()
 #> ✔ Dummy database ready to use!
 #> ℹ To reconnect to your previous database:
-#>   `Sys.setenv(CODEMINER_DB_PATH = "/tmp/RtmpcpD6UK/file19bb61e93326.duckdb")`
+#>   `Sys.setenv(CODEMINER_DB_PATH = "/tmp/RtmpitoaKT/file19187c8a86e6.duckdb")`
 #>   `codeminer_connect()`
 chunk <- CODES_LIKE_CHUNK("^E1", type = "ICD-10", batch_size = 100)
 #> ℹ Using "UKB v4" as the latest lookup version for "ICD-10".

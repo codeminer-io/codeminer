@@ -84,14 +84,14 @@ result$icd10_phecode$mapping$table
 #>    ICD10 PHECODE `Exl. Phecodes`          `Excl. Phenotypes`                    
 #>    <chr> <chr>   <chr>                    <chr>                                 
 #>  1 E10   250.1   249-250.99               DIABETES                              
-#>  2 E10.0 250.1   249-250.99               DIABETES                              
-#>  3 E10.1 250.11  249-250.99               DIABETES                              
-#>  4 E10.2 250.12  249-250.99               DIABETES                              
-#>  5 E10.3 250.23  249-250.99               DIABETES                              
-#>  6 E10.3 250.7   250.70-250.79,360-365.99 diabetic retinopathy and degenerative…
-#>  7 E10.3 250.13  249-250.99               DIABETES                              
-#>  8 E10.4 250.14  249-250.99               DIABETES                              
-#>  9 E10.4 250.24  249-250.99               DIABETES                              
-#> 10 E10.5 443.7   440-449.99               DISEASES OF ARTERIES, ARTERIOLES, AND…
+#>  2 E100  250.1   249-250.99               DIABETES                              
+#>  3 E101  250.11  249-250.99               DIABETES                              
+#>  4 E102  250.12  249-250.99               DIABETES                              
+#>  5 E103  250.23  249-250.99               DIABETES                              
+#>  6 E103  250.7   250.70-250.79,360-365.99 diabetic retinopathy and degenerative…
+#>  7 E103  250.13  249-250.99               DIABETES                              
+#>  8 E104  250.14  249-250.99               DIABETES                              
+#>  9 E104  250.24  249-250.99               DIABETES                              
+#> 10 E105  443.7   440-449.99               DISEASES OF ARTERIES, ARTERIOLES, AND…
 #> # ℹ 63 more rows
 ```
