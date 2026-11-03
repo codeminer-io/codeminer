@@ -26,8 +26,14 @@
 #' @param col_filters Column filters for the tables this query touches. One
 #'   of:
 #'   - `"default"` (default): apply session-pinned filters
-#'     ([codeminer_set_col_filters()]) where set, else the metadata-defined
-#'     default filters.
+#'     ([codeminer_set_col_filters()]) where set, else the
+#'     `codeminer.col_filters` option where set, else the metadata-defined
+#'     default filters. The option takes the same shapes as this argument:
+#'     set it once in a script's setup (e.g.
+#'     `options(codeminer.col_filters = list(relationship = list("SNOMED CT" = NA)))`)
+#'     and every query applies it; `options(codeminer.col_filters = NA)`
+#'     turns filtering off (`NULL` would unset the option). See
+#'     `vignette("configure-queries")`.
 #'   - `NULL` (or `NA`): no filtering for any table this query touches.
 #'   - A table-keyed list — the shape returned by [get_col_filters()] — with
 #'     top-level names `lookup` / `relationship` / `mapping`, keyed by code

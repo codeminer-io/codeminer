@@ -106,6 +106,8 @@ codeminer_connect <- function(main = NULL) {
 
   # Clear cached version selections — they may refer to a different database
   .codeminer_env$active_versions <- list()
+  # Re-validate the `codeminer.col_filters` option against the new metadata
+  clear_option_col_filters_cache()
 
   # Cache metadata from the attached database
   codeminer_refresh_cache()
@@ -134,7 +136,8 @@ codeminer_disconnect <- function() {
     "main_explicit",
     "metadata",
     "active_versions",
-    "active_col_filters"
+    "active_col_filters",
+    "option_col_filters"
   )) {
     if (exists(field, envir = .codeminer_env)) {
       rm(list = field, envir = .codeminer_env)
@@ -145,8 +148,9 @@ codeminer_disconnect <- function() {
 
 #' Show workbench status
 #'
-#' Prints the current state of the workbench connection, including
-#' which databases are attached.
+#' Prints the current state of the workbench connection: the attached
+#' database, pinned versions, pinned column filters and the
+#' `codeminer.col_filters` option when set.
 #'
 #' @return The attached database path, invisibly (`NULL` if none attached).
 #' @export
@@ -200,6 +204,39 @@ codeminer_status <- function() {
         )
         # Pre-render: cli interpolates `msgs` only when emitted below, by
         # which point the loop variables would all hold their final values.
+        msgs <- c(
+          msgs,
+          " " = escape_cli(cli::format_inline(
+            "  {type}: {.val {key}} -> {filter_desc}"
+          ))
+        )
+      }
+    }
+  }
+
+  # Show the codeminer.col_filters option if set (below pins, above defaults)
+  cf_option <- tryCatch(
+    option_col_filters(),
+    codeminer_col_filters_invalid = function(e) "invalid"
+  )
+  if (identical(cf_option, "invalid")) {
+    msgs <- c(
+      msgs,
+      "x" = "Option {.code codeminer.col_filters}: invalid (queries will error)."
+    )
+  } else if (is_col_filters_off(cf_option)) {
+    msgs <- c(
+      msgs,
+      "i" = "Option {.code codeminer.col_filters}: NA (no filtering where not pinned)."
+    )
+  } else if (length(cf_option) > 0) {
+    msgs <- c(msgs, "i" = "Option {.code codeminer.col_filters}:")
+    for (type in names(cf_option)) {
+      for (key in names(cf_option[[type]])) {
+        filter_desc <- paste(
+          format_filter_entry(cf_option[[type]][[key]]),
+          collapse = "; "
+        )
         msgs <- c(
           msgs,
           " " = escape_cli(cli::format_inline(
@@ -450,7 +487,9 @@ codeminer_clear_versions <- function(
 #'
 #' Pinned filters apply when queries run with `col_filters = "default"`; an
 #' explicit `col_filters` argument on a query function overrides the pin for
-#' that call (again whole-key, per table).
+#' that call (again whole-key, per table). Pins in turn take priority over the
+#' `codeminer.col_filters` option, the script-level setting described in
+#' `vignette("configure-queries")`.
 #'
 #' New pins are merged with existing ones by table key. To replace all pins,
 #' call [codeminer_clear_col_filters()] first. Pins that match no registered
@@ -581,6 +620,9 @@ codeminer_clear_col_filters <- function() {
 #' Note the argument order (filters first, code last, as in
 #' `withr::with_*()`): wrap the expression rather than piping into this
 #' function.
+#'
+#' Inside the scope, the temporary filters take priority over session pins
+#' and over the `codeminer.col_filters` option for the tables they name.
 #'
 #' @return The result of evaluating `code`.
 #' @export

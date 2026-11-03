@@ -1344,3 +1344,247 @@ test_that("table getters accept the table-keyed col_filters argument", {
   ))
   expect_equal(nrow(dplyr::collect(lazy)), 2)
 })
+
+# === The codeminer.col_filters option =======================================
+
+# A lookup with a status column filtered to "1" by default
+add_option_test_lookup <- function(type = "opt_test") {
+  table <- data.frame(
+    code = c("A", "B"),
+    description = c("a", "b"),
+    status = c("1", "0")
+  )
+  meta <- lookup_metadata(
+    type,
+    col_filters = list(status = list(values = c("0", "1"), defaults = "1"))
+  )
+  suppressMessages(add_lookup_table(table, meta))
+}
+
+codes_for <- function(type = "opt_test", ...) {
+  suppressMessages(CODES("all", type = type, ...))$code
+}
+
+test_that("codeminer.col_filters option applies when nothing is pinned", {
+  local_build_temp_database()
+  add_option_test_lookup()
+  withr::local_options(codeminer.col_filters = NULL)
+
+  # Unset: metadata defaults
+  expect_identical(codes_for(), "A")
+
+  # A table-keyed list replaces that table's defaults
+  withr::with_options(
+    list(
+      codeminer.col_filters = list(lookup = list(opt_test = list(status = "0")))
+    ),
+    expect_identical(codes_for(), "B")
+  )
+
+  # NA as a table entry un-filters that table
+  withr::with_options(
+    list(codeminer.col_filters = list(lookup = list(opt_test = NA))),
+    expect_setequal(codes_for(), c("A", "B"))
+  )
+
+  # NA as the whole option turns filtering off
+  withr::with_options(
+    list(codeminer.col_filters = NA),
+    expect_setequal(codes_for(), c("A", "B"))
+  )
+
+  # "default" is the same as unset
+  withr::with_options(
+    list(codeminer.col_filters = "default"),
+    expect_identical(codes_for(), "A")
+  )
+
+  # Back to unset: nothing lingers
+  expect_identical(codes_for(), "A")
+})
+
+test_that("explicit argument, with_col_filters() and pins beat the option", {
+  local_build_temp_database()
+  add_option_test_lookup()
+  add_option_test_lookup("opt_other")
+  withr::local_options(
+    codeminer.col_filters = list(lookup = list(opt_test = list(status = "0")))
+  )
+  expect_identical(codes_for(), "B")
+
+  # Explicit argument
+  expect_identical(
+    codes_for(col_filters = list(lookup = list(opt_test = list(status = "1")))),
+    "A"
+  )
+  expect_setequal(codes_for(col_filters = NA), c("A", "B"))
+
+  # Scoped override
+  scoped <- suppressMessages(with_col_filters(
+    list(lookup = list(opt_test = list(status = "1"))),
+    CODES("all", type = "opt_test")
+  ))
+  expect_identical(scoped$code, "A")
+
+  # A pin for the same key wins over the option ...
+  suppressMessages(codeminer_set_col_filters(
+    lookup = list(opt_test = list(status = c("0", "1")))
+  ))
+  expect_setequal(codes_for(), c("A", "B"))
+  codeminer_clear_col_filters()
+
+  # ... while a pin for another key leaves the option in force
+  suppressMessages(codeminer_set_col_filters(
+    lookup = list(opt_other = list(status = "0"))
+  ))
+  expect_identical(codes_for(), "B")
+  codeminer_clear_col_filters()
+
+  # Option still applies once the pins are gone
+  expect_identical(codes_for(), "B")
+})
+
+test_that("the option never overrides an explicit argument in nested calls", {
+  local_build_temp_database()
+
+  # MAP() looks the mapped codes up in the target lookup through an internal
+  # CODES() call that passes no col_filters. The option must not reach in there
+  # over the outer call's explicit argument.
+  target <- data.frame(
+    code = c("T1", "T2", "T3"),
+    description = c("Target 1", "Target 2", "Target 3"),
+    status = c("1", "0", "1")
+  )
+  suppressMessages(add_lookup_table(
+    target,
+    lookup_metadata(
+      "map_target",
+      col_filters = list(
+        status = list(values = c("0", "1"), defaults = c("0", "1"))
+      )
+    )
+  ))
+  suppressMessages(add_lookup_table(
+    data.frame(code = c("S1", "S2", "S3"), description = c("s1", "s2", "s3")),
+    lookup_metadata("map_source")
+  ))
+  suppressMessages(add_mapping_table(
+    data.frame(from = c("S1", "S2", "S3"), to = c("T1", "T2", "T3")),
+    mapping_metadata("map_source", "map_target")
+  ))
+
+  withr::local_options(
+    codeminer.col_filters = list(lookup = list(map_target = list(status = "0")))
+  )
+
+  # Option alone: only the inactive target survives
+  suppressWarnings(
+    via_option <- suppressMessages(
+      MAP("S1", "S2", "S3", from = "map_source", to = "map_target")
+    )
+  )
+  expect_identical(via_option$code, "T2")
+
+  # Explicit argument on the outer call wins for the nested lookup too
+  suppressWarnings(
+    explicit <- suppressMessages(MAP(
+      "S1",
+      "S2",
+      "S3",
+      from = "map_source",
+      to = "map_target",
+      col_filters = list(lookup = list(map_target = list(status = "1")))
+    ))
+  )
+  expect_setequal(explicit$code, c("T1", "T3"))
+})
+
+test_that("an unset option leaves resolution exactly as before", {
+  local_build_temp_database()
+  add_option_test_lookup()
+  withr::local_options(codeminer.col_filters = NULL)
+
+  meta <- get_metadata_for_lookup(get_db_con(), "opt_test", "latest")
+  expect_identical(
+    resolve_col_filters(meta$col_filters, "lookup", "opt_test"),
+    list(status = "1")
+  )
+  expect_null(option_col_filters())
+
+  before <- codes_for()
+  withr::with_options(
+    list(codeminer.col_filters = list(lookup = list(opt_test = NA))),
+    expect_setequal(codes_for(), c("A", "B"))
+  )
+  expect_identical(codes_for(), before)
+})
+
+test_that("the option is validated once per value, and bad shapes error", {
+  local_build_temp_database()
+  add_option_test_lookup()
+
+  # Unknown key: warns on the first query that resolves filters, then is quiet
+  withr::local_options(
+    codeminer.col_filters = list(lookup = list(opt_tset = list(status = "0")))
+  )
+  expect_warning(codes_for(), class = "codeminer_col_filters_unmatched")
+  expect_no_warning(codes_for())
+
+  # A new value is validated afresh
+  withr::local_options(
+    codeminer.col_filters = list(lookup = list(opt_tes = list(status = "0")))
+  )
+  expect_warning(codes_for(), class = "codeminer_col_filters_unmatched")
+
+  # Reconnecting drops the cache, so the same value warns again
+  codeminer_disconnect()
+  local_build_temp_database()
+  add_option_test_lookup()
+  expect_warning(codes_for(), class = "codeminer_col_filters_unmatched")
+
+  # Wrong top-level names, or a string other than "default", are errors
+  withr::with_options(
+    list(codeminer.col_filters = list(relationshp = list())),
+    expect_error(codes_for(), class = "codeminer_col_filters_invalid")
+  )
+  withr::with_options(
+    list(codeminer.col_filters = "defualt"),
+    expect_error(codes_for(), class = "codeminer_col_filters_invalid")
+  )
+})
+
+test_that("codeminer_status() shows the option", {
+  local_build_temp_database()
+  add_option_test_lookup()
+
+  withr::with_options(
+    list(codeminer.col_filters = NULL),
+    expect_no_match(
+      paste(capture_messages(codeminer_status()), collapse = "\n"),
+      "codeminer.col_filters"
+    )
+  )
+  withr::with_options(
+    list(
+      codeminer.col_filters = list(lookup = list(opt_test = list(status = "0")))
+    ),
+    expect_match(
+      paste(capture_messages(codeminer_status()), collapse = "\n"),
+      "codeminer.col_filters.*\n.*opt_test.*status"
+    )
+  )
+  withr::with_options(
+    list(codeminer.col_filters = NA),
+    expect_match(
+      paste(capture_messages(codeminer_status()), collapse = "\n"),
+      "codeminer.col_filters.*NA"
+    )
+  )
+  withr::with_options(
+    list(codeminer.col_filters = list(relationshp = list())),
+    expect_match(
+      paste(capture_messages(codeminer_status()), collapse = "\n"),
+      "codeminer.col_filters.*invalid"
+    )
+  )
+})

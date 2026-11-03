@@ -302,7 +302,7 @@ codeminer_set_version(
 
 Some tables contain rows that should be excluded by default — for example, inactive SNOMED CT concepts or approximate code mappings. Column filters (`col_filters`) let table authors declare which columns are filterable, what values are available, and which values should be selected by default. You can override them per call, per session, or per scope; the model in one sentence:
 
-> For each table a query touches: the call's `col_filters` entry, else the session pin, else the metadata defaults — first match wins, replacing the whole set; `NA` means unfiltered at whatever level you apply it.
+> For each table a query touches: the call's `col_filters` entry, else the session pin, else the `codeminer.col_filters` option, else the metadata defaults — first match wins, replacing the whole set; `NA` means unfiltered at whatever level you apply it.
 
 ```r
 # Defaults (from metadata / session pins)

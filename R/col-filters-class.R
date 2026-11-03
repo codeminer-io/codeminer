@@ -645,6 +645,51 @@ pop_col_filters <- function(old) {
   invisible()
 }
 
+#' Read and validate the `codeminer.col_filters` option
+#'
+#' The option is the recipe-level filter setting: `resolve_col_filters()`
+#' consults it after call-scoped overlays and session pins, before the metadata
+#' defaults. Validation (including the registered-tables warning) runs once per
+#' distinct option value; the result is cached in
+#' `.codeminer_env$option_col_filters` and the cache is dropped on connect and
+#' disconnect so a new database re-validates.
+#'
+#' @return `NULL` when the option is unset or `"default"`, `NA` when it is the
+#'   "no filtering" sentinel, else the validated type-layered list.
+#' @keywords internal
+#' @noRd
+option_col_filters <- function() {
+  raw <- getOption("codeminer.col_filters")
+  if (is.null(raw) || identical(raw, "default")) {
+    return(NULL)
+  }
+  if (is_col_filters_off(raw)) {
+    return(NA)
+  }
+
+  cache <- .codeminer_env$option_col_filters
+  if (!is.null(cache) && identical(cache$raw, raw)) {
+    return(cache$validated)
+  }
+
+  validated <- validate_col_filters_value(
+    raw,
+    call = rlang::call2("getOption", "codeminer.col_filters")
+  )
+  .codeminer_env$option_col_filters <- list(raw = raw, validated = validated)
+  validated
+}
+
+#' Drop the cached validation of the `codeminer.col_filters` option
+#' @keywords internal
+#' @noRd
+clear_option_col_filters_cache <- function() {
+  if (exists("option_col_filters", envir = .codeminer_env)) {
+    rm("option_col_filters", envir = .codeminer_env)
+  }
+  invisible()
+}
+
 #' Hint bullet when active column filters may explain missing codes
 #'
 #' Returns an `"i"` bullet for [missing_codes_warning()]'s `extra` argument

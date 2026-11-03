@@ -473,8 +473,15 @@ validate_col_filters_columns <- function(
 #' Determines the effective filters for one table from the session filter
 #' state: a call-scoped overlay (the `col_filters` argument, applied via
 #' `push_col_filters()`) or session pin for the table's key wins over the
-#' metadata defaults, whole-key. The `NA` sentinel — as the whole state or as
+#' `codeminer.col_filters` option, which wins over the metadata defaults,
+#' whole-key. The `NA` sentinel — as the whole state, the whole option, or as
 #' a key's entry — means no filtering.
+#'
+#' The option is read here, once per table read, rather than as the formal
+#' default of the `col_filters` argument: several query functions call other
+#' query functions without passing `col_filters`, and an argument default would
+#' be re-evaluated inside those nested calls and pushed over the outer call's
+#' explicit overlay.
 #'
 #' @param metadata_col_filters The serialised JSON col_filters string from
 #'   the metadata table.
@@ -511,6 +518,24 @@ resolve_col_filters <- function(
         return(NULL)
       }
       return(pinned)
+    }
+  }
+
+  # Then the `codeminer.col_filters` option: a recipe-level setting that sits
+  # below anything done in the session and above the metadata defaults.
+  option <- option_col_filters()
+  if (!is.null(option)) {
+    if (is_col_filters_off(option)) {
+      return(NULL)
+    }
+    for (key in c(pin_key, alt_keys)) {
+      entry <- option[[pin_type]][[key]]
+      if (!is.null(entry)) {
+        if (is_col_filters_off(entry)) {
+          return(NULL)
+        }
+        return(entry)
+      }
     }
   }
 

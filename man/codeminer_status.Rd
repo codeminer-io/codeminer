@@ -10,8 +10,9 @@ codeminer_status()
 The attached database path, invisibly (\code{NULL} if none attached).
 }
 \description{
-Prints the current state of the workbench connection, including
-which databases are attached.
+Prints the current state of the workbench connection: the attached
+database, pinned versions, pinned column filters and the
+\code{codeminer.col_filters} option when set.
 }
 \seealso{
 Other Workbench management:

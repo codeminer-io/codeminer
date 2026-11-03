@@ -29,8 +29,13 @@ those defaults per call, per session, or per scope.
 The whole model fits in one sentence:
 
 > **For each table a query touches: the call's `col_filters` entry, else the
-> session pin, else the metadata defaults — first match wins, replacing the
-> whole set; `NA` means unfiltered at whatever level you apply it.**
+> session pin, else the `codeminer.col_filters` option, else the metadata
+> defaults — first match wins, replacing the whole set; `NA` means unfiltered
+> at whatever level you apply it.**
+
+This vignette is the reference for that model. For a task-led guide to the
+common settings (table versions, inactive SNOMED CT concepts and
+relationships, one module only) see `vignette("configure-queries")`.
 
 # Motivation: filtering every table a query touches
 
@@ -317,6 +322,11 @@ table can be filtered (like `moduleId_concept` in the motivating example).
 - **Defaults that should always apply** belong in the database metadata
   (`update_*_metadata()`): they travel with the database file, so every R
   process — including fresh parallel workers — gets them on connect.
+- **Settings for a whole script** go in the `codeminer.col_filters` option,
+  set once in the setup block:
+  `options(codeminer.col_filters = list(relationship = list("SNOMED CT" = NA)))`.
+  It takes the same shapes as the argument, sits below pins and above the
+  metadata defaults, and `NA` turns filtering off (`NULL` unsets the option).
 - **Session-wide tweaks** are pins, set where you connect. Fresh R processes
   start with no pins; the place you connect is the place you pin.
 - **Per-call or per-scope deviations** use the `col_filters` argument or

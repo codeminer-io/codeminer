@@ -30,6 +30,9 @@ scoped to that call.
 Note the argument order (filters first, code last, as in
 \verb{withr::with_*()}): wrap the expression rather than piping into this
 function.
+
+Inside the scope, the temporary filters take priority over session pins
+and over the \code{codeminer.col_filters} option for the tables they name.
 }
 \examples{
 \dontrun{
