@@ -52,8 +52,14 @@ preferred description for each code. Default: \code{FALSE}.}
 of:
 \itemize{
 \item \code{"default"} (default): apply session-pinned filters
-(\code{\link[=codeminer_set_col_filters]{codeminer_set_col_filters()}}) where set, else the metadata-defined
-default filters.
+(\code{\link[=codeminer_set_col_filters]{codeminer_set_col_filters()}}) where set, else the
+\code{codeminer.col_filters} option where set, else the metadata-defined
+default filters. The option takes the same shapes as this argument:
+set it once in a script's setup (e.g.
+\code{options(codeminer.col_filters = list(relationship = list("SNOMED CT" = NA)))})
+and every query applies it; \code{options(codeminer.col_filters = NA)}
+turns filtering off (\code{NULL} would unset the option). See
+\code{vignette("configure-queries")}.
 \item \code{NULL} (or \code{NA}): no filtering for any table this query touches.
 \item A table-keyed list — the shape returned by \code{\link[=get_col_filters]{get_col_filters()}} — with
 top-level names \code{lookup} / \code{relationship} / \code{mapping}, keyed by code

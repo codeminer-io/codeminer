@@ -1,0 +1,353 @@
+---
+title: "Configuring versions and filters"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Configuring versions and filters}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(codeminer)
+
+create_dummy_database()
+```
+
+Every query function has sensible defaults: the latest version of each table,
+and the column filters the table author registered (active SNOMED CT
+relationships, assured mappings, and so on). This guide is about changing those
+defaults when a piece of work needs something else, and about doing it once
+rather than on every call. `vignette("col_filters")` is the reference for how
+filters are modelled; this vignette works through the common tasks.
+
+# Three places to set things
+
+Each setting can be made at three levels. The narrowest one that names a
+table wins:
+
+| Level | Versions | Column filters |
+|---|---|---|
+| One call | `lookup_version = `, `relationship_version = `, `map_version = ` | `col_filters = ` |
+| The session | `codeminer_set_version()` | `codeminer_set_col_filters()`, `with_col_filters()` |
+| A script | `options(codeminer.lookup_version = ...)` etc. | `options(codeminer.col_filters = ...)` |
+
+So the order of precedence for filters is: the `col_filters` argument (or an
+enclosing `with_col_filters()`), then session pins, then the
+`codeminer.col_filters` option, then the defaults registered in the database.
+For versions it is the argument, then `codeminer_set_version()` pins, then the
+`codeminer.*_version` options, then `"latest"`.
+
+The options a script can set, all read when a query runs:
+
+| Option | Default | Used for |
+|---|---|---|
+| `codeminer.code_type` | unset | `type` on lookup and relationship queries (not `MAP()`) |
+| `codeminer.map_from`, `codeminer.map_to` | unset | `from` and `to` in `MAP()` |
+| `codeminer.lookup_version` | `"latest"` | `lookup_version` |
+| `codeminer.relationship_version` | `"latest"` | `relationship_version` |
+| `codeminer.map_version` | `"latest"` | `map_version` in `MAP()` |
+| `codeminer.col_filters` | unset | `col_filters`, when a call leaves it at `"default"` |
+| `codeminer.max_traversal_nodes` | `20000` | `max_nodes` on hierarchy queries |
+| `codeminer.max_tree_codes` | `10000` | `max_codes` in `get_relationship_tree()` |
+| `codeminer.chunk_batch_size`, `codeminer.max_leaf_rows`, `codeminer.max_chunk_matches` | `200000`, `30000`, `20000` | the `*_CHUNK` paging functions |
+
+Put the options at the top of a script, in the same block that attaches the
+package, so anyone reading the script sees what every result depends on.
+`codeminer_status()` prints the pins and the filter option in force.
+
+# Use a specific table version
+
+A database can hold several versions of a lookup, relationship or mapping
+table. `"latest"` is resolved once per session and cached, so a script is
+consistent, but a result you want to reproduce later should name its version.
+
+```{r versions}
+# What is in the database, and which version "latest" currently means
+get_codeminer_metadata("lookup")[, c("code_type", "lookup_version")]
+
+# Pin one code type for the session
+codeminer_set_version(lookup = c("ICD-10" = "UKB v4"))
+codeminer_status()
+
+codeminer_clear_versions()
+```
+
+The `codeminer.lookup_version`, `codeminer.relationship_version` and
+`codeminer.map_version` options set one version string for every code type,
+which suits a database built from a single release:
+
+```r
+options(codeminer.lookup_version = "UKB v4", codeminer.map_version = "UKB v4")
+```
+
+Pins are per code type, so when different code types need different versions,
+use `codeminer_set_version()` in the setup block instead. An explicit
+`lookup_version = ` argument always wins over both.
+
+# The SNOMED CT filters
+
+The remaining scenarios are about SNOMED CT, whose tables carry `active` flags
+that are filtered by default. The dummy database used in this vignette has no
+SNOMED CT, so the evaluated examples register a tiny table shaped like it, and
+each one is followed by the command to run against a real database. Discover a
+real database's filters with:
+
+```r
+get_col_filters(defaults_only = FALSE)
+```
+
+On a database built from the UK SNOMED CT release that returns, among others:
+
+| Table | Column | Values | Default |
+|---|---|---|---|
+| `lookup` / `"SNOMED CT"` | `active_concept` | `0`, `1` | both |
+| `lookup` / `"SNOMED CT"` | `active_description` | `0`, `1` | `1` |
+| `lookup` / `"SNOMED CT"` | `moduleId_concept` | the release's module ids | all of them |
+| `relationship` / `"SNOMED CT"` | `active` | `0`, `1` | `1` |
+| `mapping` / `"SNOMED CT > ICD-10"` and others | `active` | `0`, `1` | `1` |
+
+```{r demo-lookup}
+# A lookup shaped like the SNOMED CT one: concepts and descriptions carry
+# active flags, and each concept belongs to a module.
+demo <- data.frame(
+  code = c("100", "100", "200", "300", "D1", "D2", "DF1"),
+  description = c(
+    "Warfarin", "Warfarin (old term)", "Heparin", "Aspirin",
+    "Anticoagulant", "Antiplatelet", "Oral tablet"
+  ),
+  active_concept = c("1", "1", "0", "1", "1", "1", "1"),
+  active_description = c("1", "0", "1", "1", "1", "1", "1"),
+  module = c("core", "core", "core", "drug", "core", "core", "core")
+)
+add_lookup_table(
+  demo,
+  lookup_metadata(
+    "Demo SCT",
+    col_filters = list(
+      active_concept = list(
+        values = c("0", "1"),
+        defaults = c("0", "1"),
+        description = "Whether the concept is active in the release."
+      ),
+      active_description = list(
+        values = c("0", "1"),
+        defaults = "1",
+        description = "Whether the description (term) is active."
+      ),
+      module = list(
+        values = c("core", "drug"),
+        defaults = c("core", "drug"),
+        description = "Module the concept belongs to."
+      )
+    )
+  )
+)
+```
+
+## Include inactive descriptions, or restrict to one module
+
+By default each concept returns with its active descriptions only. To see
+retired terms as well, un-filter `active_description`; to work with the UK
+drug extension only, narrow the module column. Both are table-keyed entries
+under `lookup`:
+
+```{r lookup-filters}
+# Default: active descriptions
+CODES("all", type = "Demo SCT", preferred_description_only = FALSE)
+
+# Retired terms too, for this call
+CODES(
+  "all",
+  type = "Demo SCT",
+  preferred_description_only = FALSE,
+  col_filters = list(lookup = list("Demo SCT" = list(active_description = NA)))
+)
+
+# One module only, for the whole script
+options(
+  codeminer.col_filters = list(lookup = list("Demo SCT" = list(module = "drug")))
+)
+CODES("all", type = "Demo SCT")
+
+options(codeminer.col_filters = NULL)
+```
+
+Note what the second call did: an entry for a table *replaces* that table's
+default filters wholesale, so naming only `active_description = NA` also
+dropped the default `module` filter. That is harmless here, because the module
+default includes every value, but when a table has several restrictive defaults
+start from `get_col_filters()` and amend it (see `vignette("col_filters")`,
+"Amending filters").
+
+On a real database:
+
+```r
+# Retired descriptions too
+options(codeminer.col_filters = list(
+  lookup = list("SNOMED CT" = list(active_description = NA))
+))
+
+# UK drug extension only
+options(codeminer.col_filters = list(
+  lookup = list("SNOMED CT" = list(moduleId_concept = "999000011000001104"))
+))
+```
+
+## Include inactive relationships
+
+Relationships carry an `active` flag and queries use active ones by default.
+That is right for a current hierarchy, but it hides retired links: a product
+withdrawn years ago still appears in old records, and its "has active
+ingredient" relationship is inactive, so a prescription list built from
+ingredients misses it. Un-filter the relationship table, and only that table,
+for the whole script:
+
+```{r demo-relationship}
+rel <- data.frame(
+  from = c("100", "200", "300", "100"),
+  to = c("D1", "D1", "D2", "DF1"),
+  type = c("is a", "is a", "is a", "has dose form"),
+  active = c("1", "0", "1", "1")
+)
+add_relationship_table(
+  rel,
+  relationship_metadata(
+    "Demo SCT",
+    type_col = "type",
+    child_parent_relationship_code = "is a",
+    col_filters = list(
+      active = list(
+        values = c("0", "1"),
+        defaults = "1",
+        description = "Whether the relationship edge is active.",
+        value_labels = c("1" = "Active", "0" = "Inactive")
+      )
+    )
+  )
+)
+
+# Default: only the active "is a" link reaches Warfarin
+CHILDREN("D1", type = "Demo SCT")
+
+# The script-wide setting: all relationships, lookup filters untouched
+options(
+  codeminer.col_filters = list(relationship = list("Demo SCT" = NA))
+)
+CHILDREN("D1", type = "Demo SCT")
+```
+
+Keep `codeminer.col_filters` set for the rest of the recipe, so every
+`CHILDREN()`, `PARENTS()`, `ATTRIBUTES_FOR()` and `HAS_ATTRIBUTES()` call sees
+the same relationships. Don't reach for `col_filters = NA` instead: that turns
+off the *lookup* filters too, which returns retired descriptions as extra rows
+and changes the row count of every result.
+
+On a real database:
+
+```r
+options(codeminer.col_filters = list(relationship = list("SNOMED CT" = NA)))
+```
+
+## Restrict relationship types
+
+Relationship *types* are not a filter. They are the `relationship_types`
+argument of `ATTRIBUTES_FOR()` and `HAS_ATTRIBUTES()`, because which types
+matter differs from one question to the next within the same recipe
+(ingredients for one part, dose forms for another). `RELATIONSHIP_TYPES_TO()`
+lists the types that point at a code:
+
+```{r relationship-types}
+RELATIONSHIP_TYPES_TO("DF1", type = "Demo SCT")
+
+ATTRIBUTES_FOR("100", type = "Demo SCT", relationship_types = "has dose form")
+```
+
+The `codeminer.col_filters` option set above is still in force, so these
+calls also use inactive relationships. Clear it when a recipe moves on:
+
+```{r clear-option}
+options(codeminer.col_filters = NULL)
+```
+
+## Include inactive map rows
+
+Mapping tables have filters of their own. The dummy database's Read v3 to
+ICD-10 map registers `mapping_status`, selecting exact, general and default
+mappings; SNOMED CT maps register `active`, selecting active rows. The key is
+the `"from > to"` pair:
+
+```{r mapping-filters}
+nrow(MAP("all", from = "Read v3", to = "ICD-10"))
+
+# Every row, whatever its status, for the rest of the script
+options(
+  codeminer.col_filters = list(mapping = list("Read v3 > ICD-10" = NA))
+)
+nrow(MAP("all", from = "Read v3", to = "ICD-10"))
+
+options(codeminer.col_filters = NULL)
+```
+
+On a real database:
+
+```r
+options(codeminer.col_filters = list(mapping = list("SNOMED CT > ICD-10" = NA)))
+```
+
+# Settings and the rest of the session
+
+The option is the lowest-priority setting, so anything you do in the session
+still works as before while it is set:
+
+- A `col_filters` argument on one call, or a `with_col_filters()` block,
+  overrides it for the tables it names.
+- A `codeminer_set_col_filters()` pin overrides it for the tables it names.
+  `codeminer_set_col_filters(NA)` turns all filtering off and leaves the
+  option unread until `codeminer_clear_col_filters()`.
+- Tables the option does not name keep their registered defaults.
+
+Two things to know:
+
+- `options(codeminer.col_filters = NULL)` *removes* the option, which returns
+  to the defaults. To turn all filtering off through the option, use
+  `options(codeminer.col_filters = NA)`.
+- The value is checked at the first query that uses it. A misspelt code type
+  is a warning, and the query runs with the defaults for that table; a
+  misspelt top-level name (anything other than `lookup`, `relationship` and
+  `mapping`) is an error. A misspelt option *name* is silent, as with any R
+  option, so copy the name from here.
+
+# Storing settings in a recipe
+
+A recipe's setup block is the place for every setting that changes results:
+
+```r
+library(codeminer)
+options(
+  codeminer.code_type = "SNOMED CT",
+  codeminer.col_filters = list(relationship = list("SNOMED CT" = NA))
+)
+codeminer_set_version(
+  lookup = c("SNOMED CT" = "uk_sct2mo_43.1.0_20261021000001Z.zip"),
+  relationship = c("SNOMED CT" = "uk_sct2mo_43.1.0_20261021000001Z.zip")
+)
+```
+
+For a project that shares settings between scripts, keep them in a JSON file
+and read it in the setup block. Filter objects round-trip through
+`jsonlite::toJSON()` and `jsonlite::fromJSON()` (see `vignette("col_filters")`,
+"The round-trip guarantee"), and `vignette("codeminer")` shows the same
+pattern for version pins.
+
+```{r cleanup, include = FALSE}
+options(codeminer.col_filters = NULL)
+codeminer_clear_col_filters()
+codeminer_clear_versions()
+```

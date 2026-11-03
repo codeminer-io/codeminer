@@ -45,7 +45,9 @@ rest, amend \code{\link[=get_col_filters]{get_col_filters()}} output and pin tha
 
 Pinned filters apply when queries run with \code{col_filters = "default"}; an
 explicit \code{col_filters} argument on a query function overrides the pin for
-that call (again whole-key, per table).
+that call (again whole-key, per table). Pins in turn take priority over the
+\code{codeminer.col_filters} option, the script-level setting described in
+\code{vignette("configure-queries")}.
 
 New pins are merged with existing ones by table key. To replace all pins,
 call \code{\link[=codeminer_clear_col_filters]{codeminer_clear_col_filters()}} first. Pins that match no registered
