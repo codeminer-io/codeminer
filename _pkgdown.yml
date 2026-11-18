@@ -75,6 +75,8 @@ reference:
       - get_read2_trud
       - read_read2_trud
       - add_read2_trud
+      - read_cprd_aurum
+      - add_cprd_aurum
       - build_database
       - validate_database
       - dummy_ukb_resource_592_path
