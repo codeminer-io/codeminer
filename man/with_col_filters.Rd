@@ -9,7 +9,7 @@ with_col_filters(col_filters, code)
 \arguments{
 \item{col_filters}{The filters to apply: a type-layered list or
 \code{\link[=get_col_filters]{get_col_filters()}} object (each table entry replaces that table's
-pins/defaults wholesale), or \code{NULL} / \code{NA} for no filtering at all.}
+current filters wholesale), or \code{NULL} / \code{NA} for no filtering at all.}
 
 \item{code}{Code to execute with the temporary filters. The scope covers
 query \emph{construction}: every codeminer read made while \code{code} evaluates
@@ -20,19 +20,24 @@ The result of evaluating \code{code}.
 }
 \description{
 Applies column filters for the duration of the supplied expression, then
-restores the previous state (even on error). This is useful when you need
-different filters for a group of calls without permanently changing
-session state. For a single call, prefer the \code{col_filters} argument on
-the query function itself (see \code{\link[=CODES]{CODES()}}) — it has the same semantics,
-scoped to that call.
+restores the previous setting (even on error). This is useful when you
+need different filters for a group of calls without changing the setting
+for the whole session. For a single call, prefer the \code{col_filters}
+argument on the query function itself (see \code{\link[=CODES]{CODES()}}) — it has the same
+semantics, scoped to that call.
 }
 \details{
 Note the argument order (filters first, code last, as in
 \verb{withr::with_*()}): wrap the expression rather than piping into this
 function.
 
-Inside the scope, the temporary filters take priority over session pins
-and over the \code{codeminer.col_filters} option for the tables they name.
+The function works through the \code{codeminer.col_filters} option: it merges
+\code{col_filters} into the option's current value by table key, sets the
+option for the duration of \code{code}, and restores the previous value
+afterwards. Tables \code{col_filters} does not name keep whatever the option
+or the metadata defaults give them. Because the option is the mechanism,
+the scope applies to any code that reads the option, not just to the
+query functions in this package. See \code{vignette("configure-queries")}.
 }
 \examples{
 \dontrun{
@@ -47,15 +52,13 @@ with_col_filters(NA, CODES("all", type = "SNOMED CT"))
 }
 }
 \seealso{
-\code{\link[=codeminer_set_col_filters]{codeminer_set_col_filters()}}
+\code{\link[=get_col_filters]{get_col_filters()}}, \code{\link[=codeminer_status]{codeminer_status()}}
 
 Other Workbench management:
-\code{\link[=codeminer_clear_col_filters]{codeminer_clear_col_filters()}},
 \code{\link[=codeminer_clear_versions]{codeminer_clear_versions()}},
 \code{\link[=codeminer_connect]{codeminer_connect()}},
 \code{\link[=codeminer_disconnect]{codeminer_disconnect()}},
 \code{\link[=codeminer_refresh_cache]{codeminer_refresh_cache()}},
-\code{\link[=codeminer_set_col_filters]{codeminer_set_col_filters()}},
 \code{\link[=codeminer_set_version]{codeminer_set_version()}},
 \code{\link[=codeminer_status]{codeminer_status()}},
 \code{\link[=default_col_filters]{default_col_filters()}},

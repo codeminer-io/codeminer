@@ -35,13 +35,13 @@ table wins:
 | Level | Versions | Column filters |
 |---|---|---|
 | One call | `lookup_version = `, `relationship_version = `, `map_version = ` | `col_filters = ` |
-| The session | `codeminer_set_version()` | `codeminer_set_col_filters()`, `with_col_filters()` |
-| A script | `options(codeminer.lookup_version = ...)` etc. | `options(codeminer.col_filters = ...)` |
+| An expression | — | `with_col_filters()` |
+| The session or a script | `codeminer_set_version()`, `options(codeminer.lookup_version = ...)` etc. | `options(codeminer.col_filters = ...)` |
 
-So the order of precedence for filters is: the `col_filters` argument (or an
-enclosing `with_col_filters()`), then session pins, then the
-`codeminer.col_filters` option, then the defaults registered in the database.
-For versions it is the argument, then `codeminer_set_version()` pins, then the
+So the order of precedence for filters is: the `col_filters` argument, then the
+`codeminer.col_filters` option (which an enclosing `with_col_filters()` sets
+temporarily), then the defaults registered in the database. For versions it is
+the argument, then `codeminer_set_version()` pins, then the
 `codeminer.*_version` options, then `"latest"`.
 
 The options a script can set, all read when a query runs:
@@ -303,14 +303,12 @@ options(codeminer.col_filters = list(mapping = list("SNOMED CT > ICD-10" = NA)))
 
 # Settings and the rest of the session
 
-The option is the lowest-priority setting, so anything you do in the session
+The option sits just above the registered defaults, so a narrower setting
 still works as before while it is set:
 
-- A `col_filters` argument on one call, or a `with_col_filters()` block,
-  overrides it for the tables it names.
-- A `codeminer_set_col_filters()` pin overrides it for the tables it names.
-  `codeminer_set_col_filters(NA)` turns all filtering off and leaves the
-  option unread until `codeminer_clear_col_filters()`.
+- A `col_filters` argument on one call overrides it for the tables it names.
+- A `with_col_filters()` block merges its filters into the option for the
+  duration of the expression, then puts the previous value back.
 - Tables the option does not name keep their registered defaults.
 
 Two things to know:
@@ -348,6 +346,5 @@ pattern for version pins.
 
 ```{r cleanup, include = FALSE}
 options(codeminer.col_filters = NULL)
-codeminer_clear_col_filters()
 codeminer_clear_versions()
 ```

@@ -32,8 +32,6 @@ reference:
       - codeminer_refresh_cache
       - codeminer_set_version
       - codeminer_clear_versions
-      - codeminer_set_col_filters
-      - codeminer_clear_col_filters
       - with_col_filters
 
   - title: Database management

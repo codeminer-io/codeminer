@@ -22,11 +22,9 @@ code type.
 }
 \seealso{
 Other Workbench management:
-\code{\link[=codeminer_clear_col_filters]{codeminer_clear_col_filters()}},
 \code{\link[=codeminer_clear_versions]{codeminer_clear_versions()}},
 \code{\link[=codeminer_connect]{codeminer_connect()}},
 \code{\link[=codeminer_disconnect]{codeminer_disconnect()}},
-\code{\link[=codeminer_set_col_filters]{codeminer_set_col_filters()}},
 \code{\link[=codeminer_set_version]{codeminer_set_version()}},
 \code{\link[=codeminer_status]{codeminer_status()}},
 \code{\link[=default_col_filters]{default_col_filters()}},

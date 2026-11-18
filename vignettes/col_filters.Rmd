@@ -29,9 +29,9 @@ those defaults per call, per session, or per scope.
 The whole model fits in one sentence:
 
 > **For each table a query touches: the call's `col_filters` entry, else the
-> session pin, else the `codeminer.col_filters` option, else the metadata
-> defaults — first match wins, replacing the whole set; `NA` means unfiltered
-> at whatever level you apply it.**
+> `codeminer.col_filters` option, else the metadata defaults — first match
+> wins, replacing the whole set; `NA` means unfiltered at whatever level you
+> apply it.**
 
 This vignette is the reference for that model. For a task-led guide to the
 common settings (table versions, inactive SNOMED CT concepts and
@@ -120,12 +120,12 @@ Filters on an existing table can be changed without re-adding the data via
 
 Every query function accepts `col_filters`:
 
-- **`"default"`** (the default): session pins where set, else metadata
-  defaults.
+- **`"default"`** (the default): the `codeminer.col_filters` option where
+  set, else metadata defaults.
 - **`NULL`** (or `NA`): no filtering for any table this query touches.
 - **A table-keyed list** (as above): each entry **replaces** that table's
-  pinned/default filters wholesale; unnamed tables keep their pins/defaults.
-  `NA` as a table entry un-filters that one table.
+  current filters wholesale; unnamed tables keep their option/default
+  filters. `NA` as a table entry un-filters that one table.
 
 ```{r arg-examples}
 # The dummy Read v3 > ICD-10 mapping declares a mapping_status filter with
@@ -174,13 +174,13 @@ inside out:
 |---|---|
 | a named list of column filters | **replaces** that table's defaults wholesale |
 | `NA` | un-filter the whole table |
-| *table omitted* | keeps its pins / metadata defaults |
+| *table omitted* | keeps its option / metadata defaults |
 
 **Whole argument** (`col_filters =`):
 
 | Value | Meaning |
 |---|---|
-| `"default"` | session pins where set, else metadata defaults |
+| `"default"` | the `codeminer.col_filters` option where set, else metadata defaults |
 | `NULL` / `NA` | no filtering for any table this query touches |
 | a table-keyed list | as in the tables above |
 
@@ -232,32 +232,35 @@ Opt-in columns are still fully visible under
 `get_col_filters(defaults_only = FALSE)` for discovery — they are only absent
 from the applied-defaults shape.
 
-# Session pins and scoped overrides
+# The option and scoped overrides
 
-`codeminer_set_col_filters()` pins filters for the session — the same shape,
-the same replacement rule, applied whenever a query runs with
+The `codeminer.col_filters` option sets filters for the session — the same
+shape, the same replacement rule, applied whenever a query runs with
 `col_filters = "default"`:
 
-```{r pins}
-codeminer_set_col_filters(
-  mapping = list("Read v3 > ICD-10" = list(mapping_status = "E"))
+```{r option}
+options(
+  codeminer.col_filters = list(
+    mapping = list("Read v3 > ICD-10" = list(mapping_status = "E"))
+  )
 )
 
-# The pin now applies to every query that touches this mapping table
+# The option now applies to every query that touches this mapping table
 nrow(MAP("all", from = "Read v3", to = "ICD-10"))
 
-codeminer_clear_col_filters()
+options(codeminer.col_filters = NULL)
 nrow(MAP("all", from = "Read v3", to = "ICD-10"))
 ```
 
-Because a pin replaces a table's defaults wholesale, the setter tells you
-when a pin drops registered default columns. `codeminer_set_col_filters(NA)`
-disables all filtering for the session; `codeminer_clear_col_filters()`
-returns to the metadata defaults. `codeminer_status()` shows the active
-state.
+`options(codeminer.col_filters = NA)` disables all filtering for the
+session; `options(codeminer.col_filters = NULL)` removes the option and
+returns to the metadata defaults. `codeminer_status()` shows the current
+value. The option is validated at the first query that uses it: a misspelt
+code type warns once, a misspelt top-level name is an error.
 
-`with_col_filters(col_filters, code)` applies filters for the duration of an
-expression, then restores the previous state (even on error):
+`with_col_filters(col_filters, code)` merges filters into the option for the
+duration of an expression, then restores the previous value (even on
+error):
 
 ```{r with}
 with_col_filters(
@@ -310,7 +313,7 @@ cf$mapping[["Read v3 > ICD-10"]]$mapping_status <- c("E", "G")
 nrow(MAP("all", from = "Read v3", to = "ICD-10", col_filters = cf))
 ```
 
-The same object works with `codeminer_set_col_filters(col_filters = cf)` and
+The same object works with `options(codeminer.col_filters = cf)` and
 `with_col_filters(cf, ...)`. Deleting a column from the object
 (`cf$mapping[["Read v3 > ICD-10"]]$refine_flag <- NULL`) removes that
 override, and setting a table's entry to `NA` un-filters the table. Columns
@@ -322,13 +325,12 @@ table can be filtered (like `moduleId_concept` in the motivating example).
 - **Defaults that should always apply** belong in the database metadata
   (`update_*_metadata()`): they travel with the database file, so every R
   process — including fresh parallel workers — gets them on connect.
-- **Settings for a whole script** go in the `codeminer.col_filters` option,
-  set once in the setup block:
+- **Settings for a session or a whole script** go in the
+  `codeminer.col_filters` option, set once in the setup block:
   `options(codeminer.col_filters = list(relationship = list("SNOMED CT" = NA)))`.
-  It takes the same shapes as the argument, sits below pins and above the
-  metadata defaults, and `NA` turns filtering off (`NULL` unsets the option).
-- **Session-wide tweaks** are pins, set where you connect. Fresh R processes
-  start with no pins; the place you connect is the place you pin.
+  It takes the same shapes as the argument and sits above the metadata
+  defaults; `NA` turns filtering off (`NULL` unsets the option). Fresh R
+  processes start without it, so set it where you connect.
 - **Per-call or per-scope deviations** use the `col_filters` argument or
   `with_col_filters()`.
 
