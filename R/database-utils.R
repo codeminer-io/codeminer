@@ -470,18 +470,23 @@ validate_col_filters_columns <- function(
 
 #' Resolve column filters for a single table read
 #'
-#' Determines the effective filters for one table from the session filter
-#' state: a call-scoped overlay (the `col_filters` argument, applied via
-#' `push_col_filters()`) or session pin for the table's key wins over the
-#' metadata defaults, whole-key. The `NA` sentinel — as the whole state or as
-#' a key's entry — means no filtering.
+#' Determines the effective filters for one table: a call-scoped overlay
+#' (the `col_filters` argument, applied via `push_col_filters()`) for the
+#' table's key wins over the `codeminer.col_filters` option (which
+#' [with_col_filters()] sets temporarily), which wins over the metadata
+#' defaults, whole-key. The `NA` sentinel — as the whole overlay, the whole
+#' option, or as a key's entry — means no filtering.
+#'
+#' The option is read here, once per table read, rather than as the formal
+#' default of the `col_filters` argument: several query functions call other
+#' query functions without passing `col_filters`, and an argument default would
+#' be re-evaluated inside those nested calls and pushed over the outer call's
+#' explicit overlay.
 #'
 #' @param metadata_col_filters The serialised JSON col_filters string from
 #'   the metadata table.
-#' @param pin_type Key into `.codeminer_env$active_col_filters` (one of
-#'   "lookup", "mapping", or "relationship").
-#' @param pin_key Key to look up in the filter state (e.g. code_type or
-#'   "from > to" mapping key).
+#' @param pin_type Table type (one of "lookup", "mapping", or "relationship").
+#' @param pin_key Key to look up (e.g. code_type or "from > to" mapping key).
 #' @param alt_keys Optional fallback keys tried after `pin_key` — used for
 #'   reverse-swapped mappings, where a filter may be keyed by the registered
 #'   direction rather than the requested one.
@@ -496,21 +501,38 @@ resolve_col_filters <- function(
 ) {
   state <- .codeminer_env$active_col_filters
 
-  # The whole-state NA sentinel disables all filtering (pins and defaults)
+  # A whole-overlay NA (col_filters = NULL / NA on the call) disables all
+  # filtering
   if (is_col_filters_off(state)) {
     return(NULL)
   }
 
-  # Check the filter state (call-scoped overlays and session pins share it);
-  # the requested key wins over any fallback keys.
+  # The call-scoped overlay; the requested key wins over any fallback keys.
   for (key in c(pin_key, alt_keys)) {
-    pinned <- state[[pin_type]][[key]]
-    if (!is.null(pinned)) {
+    overlaid <- state[[pin_type]][[key]]
+    if (!is.null(overlaid)) {
       # A key-level NA sentinel un-filters this one table
-      if (is_col_filters_off(pinned)) {
+      if (is_col_filters_off(overlaid)) {
         return(NULL)
       }
-      return(pinned)
+      return(overlaid)
+    }
+  }
+
+  # Then the `codeminer.col_filters` option, the session and recipe setting.
+  option <- option_col_filters()
+  if (!is.null(option)) {
+    if (is_col_filters_off(option)) {
+      return(NULL)
+    }
+    for (key in c(pin_key, alt_keys)) {
+      entry <- option[[pin_type]][[key]]
+      if (!is.null(entry)) {
+        if (is_col_filters_off(entry)) {
+          return(NULL)
+        }
+        return(entry)
+      }
     }
   }
 
@@ -538,7 +560,7 @@ resolve_col_filters <- function(
 #' rows where the column value is in the specified values.
 #'
 #' Columns absent from the table are silently skipped: user-supplied filters
-#' (the `col_filters` argument and session pins) are checked against the
+#' (the `col_filters` argument and the option) are checked against the
 #' table's real columns when they are set, and metadata defaults are checked
 #' when they are written.
 #'
@@ -582,8 +604,8 @@ apply_col_filters <- function(
 #'
 #' Reads the registered `col_filters` from the metadata tables of the connected
 #' database. Returns a nested list keyed by table type and table key (code type
-#' or mapping pair). This reflects the **registered defaults**, not the active
-#' session pins — use [codeminer_status()] to inspect the currently pinned state.
+#' or mapping pair). This reflects the **registered defaults**, not the
+#' `codeminer.col_filters` option — use [codeminer_status()] to see that.
 #'
 #' @param defaults_only Logical. If `TRUE` (default), return the applied default
 #'   filters — the shape you amend and pass back to filter a query. If `FALSE`,
@@ -598,8 +620,8 @@ apply_col_filters <- function(
 #'     defaults = ..., description = ..., value_labels = ...))`
 #'
 #'   The `defaults_only = TRUE` form is the shape accepted by the
-#'   `col_filters` argument on query functions (see [CODES()]),
-#'   [codeminer_set_col_filters()], and [with_col_filters()] — amend it with
+#'   `col_filters` argument on query functions (see [CODES()]), the
+#'   `codeminer.col_filters` option, and [with_col_filters()] — amend it with
 #'   plain assignment and pass it back. Each column's default is its applied
 #'   value set (a column included in full by default lists all of its values),
 #'   so passing the output back unchanged reproduces the default query exactly.

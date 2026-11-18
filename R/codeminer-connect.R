@@ -106,6 +106,8 @@ codeminer_connect <- function(main = NULL) {
 
   # Clear cached version selections — they may refer to a different database
   .codeminer_env$active_versions <- list()
+  # Re-validate the `codeminer.col_filters` option against the new metadata
+  clear_option_col_filters_cache()
 
   # Cache metadata from the attached database
   codeminer_refresh_cache()
@@ -134,7 +136,8 @@ codeminer_disconnect <- function() {
     "main_explicit",
     "metadata",
     "active_versions",
-    "active_col_filters"
+    "active_col_filters",
+    "option_col_filters"
   )) {
     if (exists(field, envir = .codeminer_env)) {
       rm(list = field, envir = .codeminer_env)
@@ -145,8 +148,8 @@ codeminer_disconnect <- function() {
 
 #' Show workbench status
 #'
-#' Prints the current state of the workbench connection, including
-#' which databases are attached.
+#' Prints the current state of the workbench connection: the attached
+#' database, pinned versions and the `codeminer.col_filters` option when set.
 #'
 #' @return The attached database path, invisibly (`NULL` if none attached).
 #' @export
@@ -186,16 +189,27 @@ codeminer_status <- function() {
     }
   }
 
-  # Show pinned col_filters if any
-  cf_pins <- .codeminer_env$active_col_filters
-  if (is_col_filters_off(cf_pins)) {
-    msgs <- c(msgs, "i" = "Column filters: disabled (no filtering).")
-  } else if (length(cf_pins) > 0) {
-    msgs <- c(msgs, "i" = "Pinned column filters:")
-    for (type in names(cf_pins)) {
-      for (key in names(cf_pins[[type]])) {
+  # Show the codeminer.col_filters option if set
+  cf_option <- tryCatch(
+    option_col_filters(),
+    codeminer_col_filters_invalid = function(e) "invalid"
+  )
+  if (identical(cf_option, "invalid")) {
+    msgs <- c(
+      msgs,
+      "x" = "Option {.code codeminer.col_filters}: invalid (queries will error)."
+    )
+  } else if (is_col_filters_off(cf_option)) {
+    msgs <- c(
+      msgs,
+      "i" = "Option {.code codeminer.col_filters}: NA (no filtering)."
+    )
+  } else if (length(cf_option) > 0) {
+    msgs <- c(msgs, "i" = "Option {.code codeminer.col_filters}:")
+    for (type in names(cf_option)) {
+      for (key in names(cf_option[[type]])) {
         filter_desc <- paste(
-          format_filter_entry(cf_pins[[type]][[key]]),
+          format_filter_entry(cf_option[[type]][[key]]),
           collapse = "; "
         )
         # Pre-render: cli interpolates `msgs` only when emitted below, by
@@ -422,157 +436,18 @@ codeminer_clear_versions <- function(
 }
 
 
-#' Pin column filters for the session
-#'
-#' Overrides the default column filters defined in table metadata. Pinned
-#' filters persist until cleared with [codeminer_clear_col_filters()] or
-#' [codeminer_disconnect()].
-#'
-#' @param col_filters A whole type-layered filter object — the shape returned
-#'   by [get_col_filters()], i.e. `list(lookup =, relationship =, mapping =)`
-#'   — or `NA` to disable all filtering (pins *and* metadata defaults) for
-#'   the session. Cannot be combined with the per-type arguments.
-#' @param lookup Named list of column filters for lookup tables, keyed by
-#'   code type. Each value is a named list of `column_name = c(values)` pairs,
-#'   or `NA` to un-filter that table.
-#'   E.g. `list("SNOMED CT" = list(active_concept = c("1")))`.
-#' @param relationship Named list of column filters for relationship tables,
-#'   keyed by code type.
-#' @param mapping Named list of column filters for mapping tables, keyed by
-#'   `"from > to"` pairs.
-#'   E.g. `list("Read 3 > ICD-10" = list(mapping_status = c("E", "G")))`.
-#'
-#' @details
-#' A pin **replaces** the metadata-defined default filters for its table
-#' wholesale (it does not merge column-by-column) — a message lists any
-#' default columns the pin drops. To tweak one column while keeping the
-#' rest, amend [get_col_filters()] output and pin that.
-#'
-#' Pinned filters apply when queries run with `col_filters = "default"`; an
-#' explicit `col_filters` argument on a query function overrides the pin for
-#' that call (again whole-key, per table).
-#'
-#' New pins are merged with existing ones by table key. To replace all pins,
-#' call [codeminer_clear_col_filters()] first. Pins that match no registered
-#' table, column, or value trigger a warning.
-#'
-#' @return The current pinned col_filters (a list), invisibly.
-#' @export
-#' @family Workbench management
-#' @seealso [with_col_filters()], [codeminer_clear_col_filters()],
-#'   [get_col_filters()]
-#' @examples
-#' \dontrun{
-#' # Pin lookup filters — only return active SNOMED concepts
-#' codeminer_set_col_filters(
-#'   lookup = list("SNOMED CT" = list(active_concept = c("1")))
-#' )
-#'
-#' # Pin mapping filters
-#' codeminer_set_col_filters(
-#'   mapping = list("Read 3 > ICD-10" = list(mapping_status = c("E", "G")))
-#' )
-#'
-#' # Amend the registered defaults and pin the result
-#' cf <- get_col_filters()
-#' cf$lookup[["SNOMED CT"]]$moduleId_concept <- "999000011000001104"
-#' codeminer_set_col_filters(col_filters = cf)
-#'
-#' # Disable all filtering for the session
-#' codeminer_set_col_filters(NA)
-#'
-#' # Clear all filter pins (back to metadata defaults)
-#' codeminer_clear_col_filters()
-#' }
-codeminer_set_col_filters <- function(
-  col_filters = NULL,
-  lookup = NULL,
-  relationship = NULL,
-  mapping = NULL
-) {
-  call <- rlang::current_env()
-  has_type_args <- !is.null(lookup) ||
-    !is.null(relationship) ||
-    !is.null(mapping)
-
-  if (!is.null(col_filters) && has_type_args) {
-    codeminer_abort(
-      paste0(
-        "Supply either {.arg col_filters} or the per-type arguments ",
-        "({.arg lookup} / {.arg relationship} / {.arg mapping}), not both."
-      ),
-      call = call
-    )
-  }
-  if (is.null(col_filters) && !has_type_args) {
-    codeminer_abort(
-      "At least one of {.arg col_filters}, {.arg lookup}, {.arg relationship}, or {.arg mapping} must be provided.",
-      call = call
-    )
-  }
-
-  # NA disables all filtering (pins and metadata defaults) for the session
-  if (!is.null(col_filters) && is_col_filters_off(col_filters)) {
-    .codeminer_env$active_col_filters <- NA
-    return(invisible(NA))
-  }
-
-  new_pins <- if (!is.null(col_filters)) {
-    validate_col_filters_value(col_filters, call = call)
-  } else {
-    supplied <- list(
-      lookup = lookup,
-      relationship = relationship,
-      mapping = mapping
-    )
-    supplied <- supplied[!vapply(supplied, is.null, logical(1))]
-    for (type in names(supplied)) {
-      check_not_whole_col_filters(supplied[[type]], type, call = call)
-    }
-    validate_col_filters_value(supplied, call = call)
-  }
-
-  inform_replaced_col_filter_defaults(new_pins)
-
-  # Merge into the session state; setting pins clears a session-wide NA
-  state <- .codeminer_env$active_col_filters
-  if (is.null(state) || is_col_filters_off(state)) {
-    state <- list()
-  }
-  for (type in names(new_pins)) {
-    state[[type]] <- merge_col_filter_pins(state[[type]], new_pins[[type]])
-  }
-  .codeminer_env$active_col_filters <- state
-
-  invisible(.codeminer_env$active_col_filters)
-}
-
-#' Clear all pinned column filters
-#'
-#' Removes all column filter pins set by [codeminer_set_col_filters()]
-#' (including a session-wide `NA` "no filtering" state), returning to the
-#' metadata-defined defaults.
-#'
-#' @return `NULL`, invisibly.
-#' @export
-#' @family Workbench management
-codeminer_clear_col_filters <- function() {
-  .codeminer_env$active_col_filters <- list()
-  invisible()
-}
-
 #' Temporarily override column filters
 #'
 #' Applies column filters for the duration of the supplied expression, then
-#' restores the previous state (even on error). This is useful when you need
-#' different filters for a group of calls without permanently changing
-#' session state. For a single call, prefer the `col_filters` argument on
-#' the query function itself (see [CODES()]) — it has the same semantics,
-#' scoped to that call.
+#' restores the previous setting (even on error). This is useful when you
+#' need different filters for a group of calls without changing the setting
+#' for the whole session. For a single call, prefer the `col_filters`
+#' argument on the query function itself (see [CODES()]) — it has the same
+#' semantics, scoped to that call.
 #'
 #' @param col_filters The filters to apply: a type-layered list or
 #'   [get_col_filters()] object (each table entry replaces that table's
-#'   pins/defaults wholesale), or `NULL` / `NA` for no filtering at all.
+#'   current filters wholesale), or `NULL` / `NA` for no filtering at all.
 #' @param code Code to execute with the temporary filters. The scope covers
 #'   query *construction*: every codeminer read made while `code` evaluates
 #'   resolves against the temporary filters.
@@ -582,10 +457,18 @@ codeminer_clear_col_filters <- function() {
 #' `withr::with_*()`): wrap the expression rather than piping into this
 #' function.
 #'
+#' The function works through the `codeminer.col_filters` option: it merges
+#' `col_filters` into the option's current value by table key, sets the
+#' option for the duration of `code`, and restores the previous value
+#' afterwards. Tables `col_filters` does not name keep whatever the option
+#' or the metadata defaults give them. Because the option is the mechanism,
+#' the scope applies to any code that reads the option, not just to the
+#' query functions in this package. See `vignette("configure-queries")`.
+#'
 #' @return The result of evaluating `code`.
 #' @export
 #' @family Workbench management
-#' @seealso [codeminer_set_col_filters()]
+#' @seealso [get_col_filters()], [codeminer_status()]
 #' @examples
 #' \dontrun{
 #' # Temporarily include inactive SNOMED concepts
@@ -598,9 +481,43 @@ codeminer_clear_col_filters <- function() {
 #' with_col_filters(NA, CODES("all", type = "SNOMED CT"))
 #' }
 with_col_filters <- function(col_filters, code) {
-  old_cf <- push_col_filters(col_filters)
-  on.exit(pop_col_filters(old_cf), add = TRUE)
-  force(code)
+  if (identical(col_filters, "default")) {
+    return(force(code))
+  }
+
+  if (is.null(col_filters) || is_col_filters_off(col_filters)) {
+    new_option <- NA
+  } else {
+    overlay <- validate_col_filters_value(
+      col_filters,
+      call = rlang::current_env()
+    )
+    current <- option_col_filters()
+    if (is.null(current) || is_col_filters_off(current)) {
+      current <- list()
+    }
+    for (type in names(overlay)) {
+      current[[type]] <- merge_col_filter_tables(
+        current[[type]],
+        overlay[[type]]
+      )
+    }
+    new_option <- current
+  }
+
+  # The merged value is already validated: prime the cache so the first
+  # query inside the scope does not warn a second time, and restore it with
+  # the option afterwards.
+  old_cache <- .codeminer_env$option_col_filters
+  on.exit(.codeminer_env$option_col_filters <- old_cache, add = TRUE)
+  if (!is_col_filters_off(new_option)) {
+    .codeminer_env$option_col_filters <- list(
+      raw = new_option,
+      validated = new_option
+    )
+  }
+
+  withr::with_options(list(codeminer.col_filters = new_option), code)
 }
 
 
@@ -732,12 +649,12 @@ merge_pins <- function(existing, new_pins) {
   existing
 }
 
-#' Merge col_filter pins (new pins overwrite existing by key)
+#' Merge one type's layer of column filters (new entries overwrite by key)
 #' @noRd
-merge_col_filter_pins <- function(existing, new_pins) {
+merge_col_filter_tables <- function(existing, new_entries) {
   if (is.null(existing)) {
-    return(new_pins)
+    return(new_entries)
   }
-  existing[names(new_pins)] <- new_pins
+  existing[names(new_entries)] <- new_entries
   existing
 }

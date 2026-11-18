@@ -257,7 +257,7 @@ escape_cli <- function(x) {
 #' Validate and normalise a user-supplied column-filter value
 #'
 #' Shared by the `col_filters` argument on query functions,
-#' [with_col_filters()], and [codeminer_set_col_filters()]. Aborts on
+#' [with_col_filters()], and the `codeminer.col_filters` option. Aborts on
 #' malformed shapes (including the pre-#170 flat `list(column = values)`
 #' form) and emits one consolidated warning for entries that do not match
 #' the registered tables.
@@ -337,7 +337,8 @@ validate_col_filters_value <- function(x, call = rlang::caller_env()) {
 
 #' Validate one type's layer of column filters
 #'
-#' Structural validation shared by the query-argument path and session pins:
+#' Structural validation shared by the query-argument path, [with_col_filters()]
+#' and the `codeminer.col_filters` option:
 #' a named list keyed by table, each entry either the `NA` sentinel
 #' ("unfiltered") or a named list of `column = c(values)` pairs.
 #'
@@ -507,98 +508,12 @@ check_col_filters_registered <- function(x) {
   invisible()
 }
 
-#' Abort when a per-type pin argument is given a whole filter object
-#'
-#' Catches `codeminer_set_col_filters(lookup = get_col_filters())` style
-#' mistakes, which would otherwise fail with a confusing low-level error.
-#'
-#' @param x The per-type argument value.
-#' @param arg The argument name (for the message).
-#' @param call The calling environment for error messages.
-#' @keywords internal
-#' @noRd
-check_not_whole_col_filters <- function(x, arg, call = rlang::caller_env()) {
-  looks_whole <- inherits(x, "codeminer_col_filters")
-  if (!looks_whole && is.list(x) && length(x) > 0 && rlang::is_named(x)) {
-    looks_whole <- all(names(x) %in% c("lookup", "relationship", "mapping"))
-  }
-  if (looks_whole) {
-    codeminer_abort(
-      c(
-        "{.arg {arg}} looks like a whole column-filter object (type-layered list).",
-        "i" = "Did you mean {.code codeminer_set_col_filters(col_filters = x)}?"
-      ),
-      call = call
-    )
-  }
-  invisible()
-}
-
-#' Inform when session pins replace registered default filters
-#'
-#' A pin replaces its table's default filters wholesale, so a pin that does
-#' not restate a default column silently drops that default. Emitted by
-#' [codeminer_set_col_filters()] only — scoped filters (the `col_filters`
-#' argument and [with_col_filters()]) are visible at the call site and stay
-#' quiet.
-#'
-#' @param pins_by_type A normalised type-layered filter list.
-#' @keywords internal
-#' @noRd
-inform_replaced_col_filter_defaults <- function(pins_by_type) {
-  meta_cache <- .codeminer_env$metadata
-  if (is.null(meta_cache) || length(meta_cache) == 0) {
-    return(invisible())
-  }
-
-  bullets <- character()
-  for (type in names(pins_by_type)) {
-    layer <- pins_by_type[[type]]
-    for (key in names(layer)) {
-      entry <- layer[[key]]
-      # Un-filtering via NA is explicit intent; nothing to flag
-      if (is_col_filters_off(entry)) {
-        next
-      }
-      row <- registered_meta_row_for_key(type, key)
-      if (is.null(row)) {
-        next
-      }
-      spec <- deserialise_col_filters(row$col_filters)
-      if (is.null(spec)) {
-        next
-      }
-      default_cols <- names(Filter(
-        function(entry_spec) length(entry_spec$defaults) > 0,
-        spec
-      ))
-      dropped <- setdiff(default_cols, names(entry))
-      if (length(dropped) > 0) {
-        bullets <- c(
-          bullets,
-          "i" = escape_cli(cli::format_inline(
-            "Pin for {type} {.val {key}} replaces its default {cli::qty(dropped)}filter{?s} on {.field {dropped}}."
-          ))
-        )
-      }
-    }
-  }
-
-  if (length(bullets) > 0) {
-    codeminer_inform(c(
-      bullets,
-      "i" = "To keep defaults, amend {.fun get_col_filters} output and pin that."
-    ))
-  }
-  invisible()
-}
-
 # --- Call-scoped filter state ---------------------------------------------------
 
 #' Apply a query's col_filters argument as a call-scoped overlay
 #'
-#' The `col_filters` argument on query functions is a per-call pin: each
-#' table entry replaces that table's session pin / metadata defaults for the
+#' The `col_filters` argument on query functions is a per-call override: each
+#' table entry replaces that table's option entry / metadata defaults for the
 #' duration of the calling function, and every internal read the query makes
 #' resolves against the overlaid state. Callers pair this with
 #' `on.exit(pop_col_filters(old), add = TRUE)`.
@@ -629,7 +544,7 @@ push_col_filters <- function(col_filters, call = rlang::caller_env()) {
     state <- list()
   }
   for (type in names(overlay)) {
-    state[[type]] <- merge_col_filter_pins(state[[type]], overlay[[type]])
+    state[[type]] <- merge_col_filter_tables(state[[type]], overlay[[type]])
   }
   .codeminer_env$active_col_filters <- state
   old
@@ -645,11 +560,57 @@ pop_col_filters <- function(old) {
   invisible()
 }
 
+#' Read and validate the `codeminer.col_filters` option
+#'
+#' The option is the session- and recipe-level filter setting:
+#' `resolve_col_filters()` consults it after the call-scoped overlay, before
+#' the metadata defaults. [with_col_filters()] sets it temporarily.
+#' Validation (including the registered-tables warning) runs once per
+#' distinct option value; the result is cached in
+#' `.codeminer_env$option_col_filters` and the cache is dropped on connect and
+#' disconnect so a new database re-validates.
+#'
+#' @return `NULL` when the option is unset or `"default"`, `NA` when it is the
+#'   "no filtering" sentinel, else the validated type-layered list.
+#' @keywords internal
+#' @noRd
+option_col_filters <- function() {
+  raw <- getOption("codeminer.col_filters")
+  if (is.null(raw) || identical(raw, "default")) {
+    return(NULL)
+  }
+  if (is_col_filters_off(raw)) {
+    return(NA)
+  }
+
+  cache <- .codeminer_env$option_col_filters
+  if (!is.null(cache) && identical(cache$raw, raw)) {
+    return(cache$validated)
+  }
+
+  validated <- validate_col_filters_value(
+    raw,
+    call = rlang::call2("getOption", "codeminer.col_filters")
+  )
+  .codeminer_env$option_col_filters <- list(raw = raw, validated = validated)
+  validated
+}
+
+#' Drop the cached validation of the `codeminer.col_filters` option
+#' @keywords internal
+#' @noRd
+clear_option_col_filters_cache <- function() {
+  if (exists("option_col_filters", envir = .codeminer_env)) {
+    rm("option_col_filters", envir = .codeminer_env)
+  }
+  invisible()
+}
+
 #' Hint bullet when active column filters may explain missing codes
 #'
 #' Returns an `"i"` bullet for [missing_codes_warning()]'s `extra` argument
 #' when the table's resolved filters are non-`NULL`, so users discover that
-#' filtering (defaults, pins, or the `col_filters` argument) may have
+#' filtering (defaults, the option, or the `col_filters` argument) may have
 #' excluded their codes.
 #'
 #' @inheritParams resolve_col_filters

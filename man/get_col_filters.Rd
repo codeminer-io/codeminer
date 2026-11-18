@@ -22,8 +22,8 @@ keyed by code type (or \code{"from > to"} for mappings), containing either:
 }
 
 The \code{defaults_only = TRUE} form is the shape accepted by the
-\code{col_filters} argument on query functions (see \code{\link[=CODES]{CODES()}}),
-\code{\link[=codeminer_set_col_filters]{codeminer_set_col_filters()}}, and \code{\link[=with_col_filters]{with_col_filters()}} — amend it with
+\code{col_filters} argument on query functions (see \code{\link[=CODES]{CODES()}}), the
+\code{codeminer.col_filters} option, and \code{\link[=with_col_filters]{with_col_filters()}} — amend it with
 plain assignment and pass it back. Each column's default is its applied
 value set (a column included in full by default lists all of its values),
 so passing the output back unchanged reproduces the default query exactly.
@@ -35,17 +35,15 @@ empty object if no database is connected.
 \description{
 Reads the registered \code{col_filters} from the metadata tables of the connected
 database. Returns a nested list keyed by table type and table key (code type
-or mapping pair). This reflects the \strong{registered defaults}, not the active
-session pins — use \code{\link[=codeminer_status]{codeminer_status()}} to inspect the currently pinned state.
+or mapping pair). This reflects the \strong{registered defaults}, not the
+\code{codeminer.col_filters} option — use \code{\link[=codeminer_status]{codeminer_status()}} to see that.
 }
 \seealso{
 Other Workbench management:
-\code{\link[=codeminer_clear_col_filters]{codeminer_clear_col_filters()}},
 \code{\link[=codeminer_clear_versions]{codeminer_clear_versions()}},
 \code{\link[=codeminer_connect]{codeminer_connect()}},
 \code{\link[=codeminer_disconnect]{codeminer_disconnect()}},
 \code{\link[=codeminer_refresh_cache]{codeminer_refresh_cache()}},
-\code{\link[=codeminer_set_col_filters]{codeminer_set_col_filters()}},
 \code{\link[=codeminer_set_version]{codeminer_set_version()}},
 \code{\link[=codeminer_status]{codeminer_status()}},
 \code{\link[=default_col_filters]{default_col_filters()}},
