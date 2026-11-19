@@ -36,7 +36,7 @@ requested, a named list of data frames.
 create_dummy_database()
 #> ✔ Dummy database ready to use!
 #> ℹ To reconnect to your previous database:
-#>   `Sys.setenv(CODEMINER_DB_PATH = "/tmp/Rtmpghebf3/file1a2628380171.duckdb")`
+#>   `Sys.setenv(CODEMINER_DB_PATH = "/tmp/Rtmp2UzWkJ/file1c056cbd97a.duckdb")`
 #>   `codeminer_connect()`
 get_codeminer_metadata()
 #> $lookup

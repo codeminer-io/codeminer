@@ -145,6 +145,10 @@ clinical coding systems.
   : Read Read 2 coding files into R
 - [`add_read2_trud()`](https://codeminer-io.github.io/codeminer/reference/add_read2_trud.md)
   : Add Read 2 tables to CodeMiner database
+- [`read_cprd_aurum()`](https://codeminer-io.github.io/codeminer/reference/read_cprd_aurum.md)
+  : Read CPRD Aurum code browser files into R
+- [`add_cprd_aurum()`](https://codeminer-io.github.io/codeminer/reference/add_cprd_aurum.md)
+  : Add CPRD Aurum code browser tables to CodeMiner database
 - [`build_database()`](https://codeminer-io.github.io/codeminer/reference/build_database.md)
   : Build the Codeminer database
 - [`validate_database()`](https://codeminer-io.github.io/codeminer/reference/validate_database.md)
